@@ -3,8 +3,7 @@ from pathlib import Path
 
 import typer
 
-from nbqa import (put_magics_back_in, replace_magics, replace_source,
-                  save_source)
+from nbqa import put_magics_back_in, replace_magics, replace_source, save_source
 
 
 def main(command, dir="."):

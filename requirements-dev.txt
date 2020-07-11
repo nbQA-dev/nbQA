@@ -1,3 +1,5 @@
-pytest
-black
-flake8
+black==19.10b0
+flake8==3.8.3
+pre-commit==2.6.0
+pytest==5.4.3
+pytest-azurepipelines==0.8.0

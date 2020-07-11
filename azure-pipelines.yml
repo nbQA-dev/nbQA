@@ -30,6 +30,11 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    pip install pytest pytest-azurepipelines
+    black . --check
+    isort . --check-only
+    flake8
+  displayName: 'static analysis'
+
+- script: |
     pytest
   displayName: 'pytest'
