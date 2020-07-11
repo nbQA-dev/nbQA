@@ -1,0 +1,2 @@
+ipynb-py-convert==0.4.5
+typer==0.3.0
