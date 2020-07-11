@@ -1,8 +1,9 @@
-from nbqa.__main__ import main
-from pathlib import Path
 import difflib
+import json
 import shutil
-import textwrap
+from pathlib import Path
+
+from nbqa.__main__ import main
 
 
 def test_black_works(tmpdir):
@@ -11,139 +12,33 @@ def test_black_works(tmpdir):
         str(Path(tmpdir) / "test_notebook.ipynb"),
     )
     with open(Path("tests/data") / "test_notebook.ipynb", "r") as handle:
-        before = handle.readlines()
+        before = json.loads(handle.read())
     main("black")
     with open(Path("tests/data") / "test_notebook.ipynb", "r") as handle:
-        after = handle.readlines()
-    result = list(difflib.unified_diff(before, after))
-    expected = [
-        "--- \n",
-        "+++ \n",
-        "@@ -1,61 +1,61 @@\n",
-        " {\n",
-        '- "cells": [\n',
-        "-  {\n",
-        '-   "cell_type": "code",\n',
-        '-   "execution_count": null,\n',
-        '-   "metadata": {},\n',
-        '-   "outputs": [],\n',
-        '-   "source": [\n',
-        '-    "import pandas as pd\\n",\n',
-        '-    "\\n",\n',
-        '-    "import numpy as np\\n",\n',
-        '-    "\\n",\n',
-        '-    "import os"\n',
-        "-   ]\n",
-        '+  "cells": [\n',
-        "+    {\n",
-        '+      "cell_type": "code",\n',
-        '+      "metadata": {},\n',
-        '+      "source": [\n',
-        '+        "import pandas as pd\\n",\n',
-        '+        "\\n",\n',
-        '+        "import numpy as np\\n",\n',
-        '+        "\\n",\n',
-        '+        "import os"\n',
-        "+      ],\n",
-        '+      "outputs": [],\n',
-        '+      "execution_count": null\n',
-        "+    },\n",
-        "+    {\n",
-        '+      "cell_type": "code",\n',
-        '+      "metadata": {},\n',
-        '+      "source": [\n',
-        '+        "%%time\\n",\n',
-        '+        "def hello(name: str = \\"world\\"):\\n",\n',
-        '+        "\\n",\n',
-        '+        "    return f\\"hello {name}\\"\\n",\n',
-        '+        "\\n",\n',
-        '+        "\\n",\n',
-        '+        "hello(3)"\n',
-        "+      ],\n",
-        '+      "outputs": [],\n',
-        '+      "execution_count": null\n',
-        "+    },\n",
-        "+    {\n",
-        '+      "cell_type": "code",\n',
-        '+      "metadata": {},\n',
-        '+      "source": [],\n',
-        '+      "outputs": [],\n',
-        '+      "execution_count": null\n',
-        "+    }\n",
-        "+  ],\n",
-        '+  "metadata": {\n',
-        '+    "anaconda-cloud": {},\n',
-        '+    "kernelspec": {\n',
-        '+      "display_name": "Python 3",\n',
-        '+      "language": "python",\n',
-        '+      "name": "python3"\n',
-        "+    },\n",
-        '+    "language_info": {\n',
-        '+      "codemirror_mode": {\n',
-        '+        "name": "ipython",\n',
-        '+        "version": 3\n',
-        "+      },\n",
-        '+      "file_extension": ".py",\n',
-        '+      "mimetype": "text/x-python",\n',
-        '+      "name": "python",\n',
-        '+      "nbconvert_exporter": "python",\n',
-        '+      "pygments_lexer": "ipython3",\n',
-        '+      "version": "3.6.1"\n',
-        "+    }\n",
-        "   },\n",
-        "-  {\n",
-        '-   "cell_type": "code",\n',
-        '-   "execution_count": null,\n',
-        '-   "metadata": {},\n',
-        '-   "outputs": [],\n',
-        '-   "source": [\n',
-        '-    "%%time\\n",\n',
-        '-    "def hello(name: str = \\"world\\"):\\n",\n',
-        '-    "\\n",\n',
-        "-    \"    return f'hello {name}'\\n\",\n",
-        '-    "\\n",\n',
-        '-    "\\n",\n',
-        '-    "hello(3)"\n',
-        "-   ]\n",
-        "-  },\n",
-        "-  {\n",
-        '-   "cell_type": "code",\n',
-        '-   "execution_count": null,\n',
-        '-   "metadata": {},\n',
-        '-   "outputs": [],\n',
-        '-   "source": []\n',
-        "-  }\n",
-        "- ],\n",
-        '- "metadata": {\n',
-        '-  "anaconda-cloud": {},\n',
-        '-  "kernelspec": {\n',
-        '-   "display_name": "Python 3",\n',
-        '-   "language": "python",\n',
-        '-   "name": "python3"\n',
-        "-  },\n",
-        '-  "language_info": {\n',
-        '-   "codemirror_mode": {\n',
-        '-    "name": "ipython",\n',
-        '-    "version": 3\n',
-        "-   },\n",
-        '-   "file_extension": ".py",\n',
-        '-   "mimetype": "text/x-python",\n',
-        '-   "name": "python",\n',
-        '-   "nbconvert_exporter": "python",\n',
-        '-   "pygments_lexer": "ipython3",\n',
-        '-   "version": "3.7.7"\n',
-        "-  }\n",
-        "- },\n",
-        '- "nbformat": 4,\n',
-        '- "nbformat_minor": 4\n',
-        "-}\n",
-        '+  "nbformat": 4,\n',
-        '+  "nbformat_minor": 1\n',
-        "+}",
+        after = json.loads(handle.read())
+
+    # check non-cells haven't changed:
+    for i in ["metadata", "nbformat", "nbformat_minor"]:
+        assert before[i] == after[i]
+
+    before_sources = ["".join(i["source"]) for i in before["cells"]]
+    after_sources = ["".join(i["source"]) for i in after["cells"]]
+
+    result = [
+        "".join(difflib.unified_diff(bef, aft))
+        for bef, aft in zip(before_sources, after_sources)
     ]
+    expected = [
+        "",
+        "--- \n+++ \n@@ -50,7 +50,7 @@\n n   f-'+\" h e l@@ -63,7 +63,7 @@\n m e }-'+\" \n \n \n",
+        "",
+    ]
+
     (Path("tests/data") / "test_notebook.ipynb").unlink()
+
     shutil.copy(
         str(Path(tmpdir) / "test_notebook.ipynb"),
         str(Path("tests/data") / "test_notebook.ipynb"),
     )
+
     assert result == expected
