@@ -12,5 +12,3 @@ def main(path, dest):
                 ["".join(i["source"]) for i in json.loads(notebook)["cells"]]
             )
         )
-
-    return [i["outputs"] for i in json.loads(notebook)["cells"]]

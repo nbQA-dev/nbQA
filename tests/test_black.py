@@ -30,6 +30,7 @@ def test_black_works(tmpdir):
     ]
     expected = [
         "",
+        "",
         "--- \n+++ \n@@ -50,7 +50,7 @@\n n   f-'+\" h e l@@ -63,7 +63,7 @@\n m e }-'+\" \n \n \n",
         "",
     ]
@@ -40,5 +41,4 @@ def test_black_works(tmpdir):
         str(Path(tmpdir) / "test_notebook.ipynb"),
         str(Path("tests/data") / "test_notebook.ipynb"),
     )
-
     assert result == expected
