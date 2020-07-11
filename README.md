@@ -1,3 +1,5 @@
+[![Build Status](https://dev.azure.com/megorelli/megorelli/_apis/build/status/MarcoGorelli.nbQA?branchName=master)](https://dev.azure.com/megorelli/megorelli/_build/latest?definitionId=1&branchName=master)
+
 Current limitations:
 
 - line numbers are from converted Python file, not from notebook
