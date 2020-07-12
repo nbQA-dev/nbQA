@@ -28,3 +28,9 @@ def test_black_works(tmp_notebook_for_testing, capsys):
 
     # check out and err
     out, err = capsys.readouterr()
+    expected_out = ""
+    expected_err = (
+        "reformatted notebook_for_testing.ipynb\nAll done! ✨ 🍰 ✨\n1 file reformatted.\n"
+    )
+    assert out == expected_out
+    assert err == expected_err
