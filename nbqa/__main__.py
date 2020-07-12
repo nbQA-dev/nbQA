@@ -1,5 +1,6 @@
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 import typer
@@ -20,15 +21,18 @@ def main(command, dir="."):
         replace_magics.main(python_file)
 
         try:
-            output = subprocess.check_output(
-                f"{command} {python_file}", shell=True, stderr=subprocess.STDOUT
+            output = subprocess.run(
+                [f"{command}", f"{python_file}"],
+                stderr=subprocess.PIPE,
+                stdout=subprocess.PIPE,
             )
         except subprocess.CalledProcessError as e:
             output_code = e.returncode
             output = e.output
 
         # replace ending, convert to str
-        output = output.decode().replace(".py", ".ipynb")
+        out = output.stdout.decode().replace(".py", ".ipynb")
+        err = output.stderr.decode().replace(".py", ".ipynb")
 
         with open(python_file, "r") as handle:
             cells = handle.readlines()
@@ -42,14 +46,12 @@ def main(command, dir="."):
             else:
                 cell_count += 1
                 mapping[n + 1] = f"cell_{cell_no}:{cell_count}"
-        output = re.sub(
-            rf"(?<={notebook.name}:)\d+",
-            lambda x: str(mapping[int(x.group())]),
-            output,
+        out = re.sub(
+            rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), out,
         )
 
-        # replace line numbers
-        print(output)
+        sys.stdout.write(out)
+        sys.stderr.write(err)
 
         put_magics_back_in.main(python_file)
 
