@@ -11,7 +11,6 @@ def main(python_file, notebook):
 
     with open(notebook, "r") as handle:
         new_sources = json.loads(handle.read())["cells"]
-    breakpoint()
     notebook_json = json.loads(nb)
     new_cells = [
         {
@@ -22,5 +21,5 @@ def main(python_file, notebook):
     ]
     notebook_json.update({"cells": new_cells})
     with open(notebook, "w") as handle:
-        json.dump(notebook_json, handle, indent=1)
+        json.dump(notebook_json, handle, indent=1, ensure_ascii=False)
         handle.write("\n")

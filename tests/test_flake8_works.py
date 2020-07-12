@@ -17,12 +17,11 @@ def test_black_works(tmpdir):
         after = handle.readlines()
 
     result = "".join(difflib.unified_diff(before, after))
-    expected = None
+    expected = ""
     (Path("tests/data") / "test_notebook.ipynb").unlink()
 
     shutil.copy(
         str(Path(tmpdir) / "test_notebook.ipynb"),
         str(Path("tests/data") / "test_notebook.ipynb"),
     )
-    breakpoint()
     assert result == expected

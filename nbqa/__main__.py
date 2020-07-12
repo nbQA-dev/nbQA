@@ -8,7 +8,6 @@ from nbqa import put_magics_back_in, replace_magics, replace_source, save_source
 
 def main(command, dir="."):
     notebooks = Path(".").rglob("*.ipynb")
-    breakpoint()
     for notebook in notebooks:
         if "ipynb_checkpoints" in str(notebook):
             continue
