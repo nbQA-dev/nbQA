@@ -12,7 +12,7 @@ def test_black_works(tmpdir):
     )
     with open(Path("tests/data") / "test_notebook.ipynb", "r") as handle:
         before = handle.readlines()
-    main("black")
+    main("flake8")
     with open(Path("tests/data") / "test_notebook.ipynb", "r") as handle:
         after = handle.readlines()
 
@@ -24,4 +24,5 @@ def test_black_works(tmpdir):
         str(Path(tmpdir) / "test_notebook.ipynb"),
         str(Path("tests/data") / "test_notebook.ipynb"),
     )
+    breakpoint()
     assert result == expected
