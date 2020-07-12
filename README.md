@@ -1,8 +1,16 @@
 [![Build Status](https://dev.azure.com/megorelli/megorelli/_apis/build/status/MarcoGorelli.nbQA?branchName=master)](https://dev.azure.com/megorelli/megorelli/_build/latest?definitionId=1&branchName=master)
 
-Current limitations:
+# nbQA
 
-- line numbers are from converted Python file, not from notebook
-- black adds extra blank lines at the end of some cells
-- output is gone (don't yet know if there's a way to preserve it)
-- flags aren't passed on
+Adapter to run any code-quality tool on a Jupyter notebook.
+
+E.g. just as you would run
+```bash
+flake8 my_file.py
+```
+you can run
+```bash
+nbqa flake8 my_file.py
+```
+
+Installation instructions: coming soon
