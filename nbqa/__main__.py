@@ -31,13 +31,12 @@ def main(command, dir="."):
         output = output.decode().replace(".py", ".ipynb")
 
         with open("test_notebook.py", "r") as handle:
-            data = handle.read()
-        cells = data.split("\n")
+            cells = handle.readlines()
         mapping = {}
         cell_no = 0
-        cell_count = 0
+        cell_count = None
         for n, i in enumerate(cells):
-            if i == "# %%":
+            if i == "# %%\n":
                 cell_no += 1
                 cell_count = 0
             else:
