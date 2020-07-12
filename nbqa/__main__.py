@@ -14,15 +14,13 @@ def main(command, dir="."):
     for notebook in notebooks:
         if "ipynb_checkpoints" in str(notebook):
             continue
-        python_file = Path(f"{Path(notebook).stem}.py")
-        assert not python_file.exists()
-        save_source.main(notebook, python_file)
 
-        replace_magics.main(python_file)
+        tempfile = save_source.main(notebook)
+        replace_magics.main(tempfile)
 
         try:
             output = subprocess.run(
-                [f"{command}", f"{python_file}"],
+                [f"{command}", f"{tempfile}"],
                 stderr=subprocess.PIPE,
                 stdout=subprocess.PIPE,
             )
@@ -31,10 +29,10 @@ def main(command, dir="."):
             output = e.output
 
         # replace ending, convert to str
-        out = output.stdout.decode().replace(".py", ".ipynb")
-        err = output.stderr.decode().replace(".py", ".ipynb")
+        out = output.stdout.decode().replace(tempfile, notebook.name)
+        err = output.stderr.decode().replace(tempfile, notebook.name)
 
-        with open(python_file, "r") as handle:
+        with open(tempfile, "r") as handle:
             cells = handle.readlines()
         mapping = {}
         cell_no = 0
@@ -53,11 +51,9 @@ def main(command, dir="."):
         sys.stdout.write(out)
         sys.stderr.write(err)
 
-        put_magics_back_in.main(python_file)
+        put_magics_back_in.main(tempfile)
 
-        replace_source.main(python_file, notebook)
-
-        python_file.unlink()
+        replace_source.main(tempfile, notebook)
 
     return output_code
 
