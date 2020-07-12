@@ -26,7 +26,6 @@ def main(command, dir="."):
         except subprocess.CalledProcessError as e:
             output_code = e.returncode
             output = e.output
-        breakpoint()
 
         # replace ending, convert to str
         output = output.decode().replace(".py", ".ipynb")
@@ -44,7 +43,6 @@ def main(command, dir="."):
             else:
                 cell_count += 1
                 mapping[n + 1] = f"{cell_no}:{cell_count}"
-        breakpoint()
         output = re.sub(
             r"(?<=test_notebook\.ipynb:)\d+",
             lambda x: "cell_" + str(mapping[int(x.group())]),

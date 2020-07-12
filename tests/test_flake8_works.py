@@ -28,7 +28,6 @@ def test_flake8_works(tmpdir, capsys):
     assert result == expected
 
     out, err = capsys.readouterr()
-    breakpoint()
 
     expected_out = (
         "test_notebook.ipynb:cell_1:1:1: F401 'pandas as pd' imported but unused\n"
