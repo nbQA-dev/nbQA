@@ -23,7 +23,7 @@ def test_black_works(tmpdir):
         "+++ \n"
         "@@ -48,7 +48,7 @@\n"
         '     "%%time\\n",\n'
-        '     "def hello(name: str = \\"world\\"):\\n",\n'
+        '     "def hello(name: str = \\"world\\\\n\\"):\\n",\n'
         '     "\\n",\n-    "    return f\'hello {name}\'\\n",\n'
         '+    "    return f\\"hello {name}\\"\\n",\n     "\\n",\n'
         '     "\\n",\n     "hello(3)"\n'
