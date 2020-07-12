@@ -30,7 +30,7 @@ def main(command, dir="."):
         # replace ending, convert to str
         output = output.decode().replace(".py", ".ipynb")
 
-        with open("test_notebook.py", "r") as handle:
+        with open(python_file, "r") as handle:
             cells = handle.readlines()
         mapping = {}
         cell_no = 0
@@ -41,10 +41,10 @@ def main(command, dir="."):
                 cell_count = 0
             else:
                 cell_count += 1
-                mapping[n + 1] = f"{cell_no}:{cell_count}"
+                mapping[n + 1] = f"cell_{cell_no}:{cell_count}"
         output = re.sub(
-            r"(?<=test_notebook\.ipynb:)\d+",
-            lambda x: "cell_" + str(mapping[int(x.group())]),
+            rf"(?<={notebook.name}:)\d+",
+            lambda x: str(mapping[int(x.group())]),
             output,
         )
 
