@@ -20,9 +20,7 @@ def main(command, dir="."):
 
         try:
             output = subprocess.run(
-                [f"{command}", f"{tempfile}"],
-                stderr=subprocess.PIPE,
-                stdout=subprocess.PIPE,
+                [command, tempfile], stderr=subprocess.PIPE, stdout=subprocess.PIPE,
             )
         except subprocess.CalledProcessError as e:
             output_code = e.returncode

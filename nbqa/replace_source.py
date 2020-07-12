@@ -1,13 +1,12 @@
 import json
+import subprocess
 
 
 def main(python_file, notebook):
     with open(notebook, "r") as handle:
         nb = handle.read()
 
-    import os
-
-    os.system(f"ipynb-py-convert {python_file} {notebook}")
+    subprocess.run(["ipynb-py-convert", python_file, notebook])
 
     with open(notebook, "r") as handle:
         new_sources = json.loads(handle.read())["cells"]
