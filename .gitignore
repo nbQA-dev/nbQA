@@ -3,3 +3,6 @@
 venv
 test-output.xml
 .coverage
+coverage.xml
+htmlcov/
+junit
