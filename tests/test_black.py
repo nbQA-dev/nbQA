@@ -1,23 +1,19 @@
 import difflib
-import shutil
-from pathlib import Path
 
 from nbqa.__main__ import main
 
 
-def test_black_works(tmpdir):
-    shutil.copy(
-        str(Path("tests/data") / "test_notebook.ipynb"),
-        str(Path(tmpdir) / "test_notebook.ipynb"),
-    )
-    with open(Path("tests/data") / "test_notebook.ipynb", "r") as handle:
+def test_black_works(tmp_notebook_for_testing, capsys):
+    """
+    Check black works. Should only reformat code cells.
+    """
+    # check diff
+    with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
     main("black")
-    with open(Path("tests/data") / "test_notebook.ipynb", "r") as handle:
+    with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()
-
     result = "".join(difflib.unified_diff(before, after))
-
     expected = (
         "--- \n"
         "+++ \n"
@@ -28,10 +24,7 @@ def test_black_works(tmpdir):
         '+    "    return f\\"hello {name}\\"\\n",\n     "\\n",\n'
         '     "\\n",\n     "hello(3)"\n'
     )
-    (Path("tests/data") / "test_notebook.ipynb").unlink()
-
-    shutil.copy(
-        str(Path(tmpdir) / "test_notebook.ipynb"),
-        str(Path("tests/data") / "test_notebook.ipynb"),
-    )
     assert result == expected
+
+    # check out and err
+    out, err = capsys.readouterr()
