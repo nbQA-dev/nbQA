@@ -1,5 +1,4 @@
 [![Build Status](https://dev.azure.com/megorelli/megorelli/_apis/build/status/MarcoGorelli.nbQA?branchName=master)](https://dev.azure.com/megorelli/megorelli/_build/latest?definitionId=1&branchName=master)
-[![Azure DevOps coverage](https://img.shields.io/azure-devops/coverage/MarcoGorelli/nbQA/1/master.svg)](https://dev.azure.com/megorelli/megorelli/_build/latest?definitionId=1&branchName=master)
 
 # nbQA
 
