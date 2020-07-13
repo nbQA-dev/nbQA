@@ -3,13 +3,24 @@ import subprocess
 import sys
 from pathlib import Path
 
-import typer
-
 from nbqa import put_magics_back_in, replace_magics, replace_source, save_source
 
 
-def main(command, dir="."):
-    notebooks = Path(".").rglob("*.ipynb")
+def main(args=None):
+
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Process some integers.")
+    parser.add_argument("command")
+    parser.add_argument("root_dir", default=".", nargs="?")
+    args, kwargs = parser.parse_known_args(args)
+    command = args.command
+    root_dir = args.root_dir
+
+    if not Path(root_dir).is_dir():
+        notebooks = [Path(root_dir)]
+    else:
+        notebooks = Path(root_dir).rglob("*.ipynb")
     output_code = 0
     for notebook in notebooks:
         if "ipynb_checkpoints" in str(notebook):
@@ -20,8 +31,12 @@ def main(command, dir="."):
 
         try:
             output = subprocess.run(
-                [command, tempfile], stderr=subprocess.PIPE, stdout=subprocess.PIPE,
+                [command, tempfile, *kwargs],
+                stderr=subprocess.PIPE,
+                stdout=subprocess.PIPE,
             )
+            if output_code == 0:
+                output_code = output.returncode
         except subprocess.CalledProcessError as e:
             output_code = e.returncode
             output = e.output
@@ -53,8 +68,8 @@ def main(command, dir="."):
 
         replace_source.main(tempfile, notebook)
 
-    return output_code
+    sys.exit(output_code)
 
 
 if __name__ == "__main__":
-    typer.run(main)
+    main()
