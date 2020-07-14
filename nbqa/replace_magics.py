@@ -1,7 +1,5 @@
 import re
 
-import typer
-
 
 def main(path):
 
@@ -12,7 +10,3 @@ def main(path):
 
     with open(path, "w") as handle:
         handle.write(file)
-
-
-if __name__ == "__main__":
-    typer.run(main)
