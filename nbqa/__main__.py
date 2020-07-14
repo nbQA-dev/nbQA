@@ -29,17 +29,13 @@ def main(args=None):
         tempfile = save_source.main(notebook)
         replace_magics.main(tempfile)
 
-        try:
-            output = subprocess.run(
-                [command, tempfile, *kwargs],
-                stderr=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-            )
-            if output_code == 0:
-                output_code = output.returncode
-        except subprocess.CalledProcessError as e:
-            output_code = e.returncode
-            output = e.output
+        output = subprocess.run(
+            [command, tempfile, *kwargs],
+            stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+        )
+        if output_code == 0:
+            output_code = output.returncode
 
         # replace ending, convert to str
         out = output.stdout.decode().replace(tempfile, notebook.name)
