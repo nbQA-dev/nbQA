@@ -1,4 +1,5 @@
 import argparse
+import os
 import re
 import subprocess
 import sys
@@ -35,7 +36,15 @@ def _temp_python_file_for_notebook(notebook, tmpdir):
     """
     Get temporary file to save converted notebook into.
     """
-    return Path(tmpdir).joinpath(notebook.stem).with_suffix(".py")
+    # Add 3 extra whitespaces because `ipynb` is 3 chars longer than `py`.
+    temp_python_file = (
+        Path(tmpdir)
+        .joinpath(notebook.parent)
+        .joinpath(f"{notebook.stem}   ")
+        .with_suffix(".py")
+    )
+    temp_python_file.parent.mkdir(parents=True, exist_ok=True)
+    return temp_python_file
 
 
 def _replace_temp_python_file_references_in_out_err(
@@ -46,8 +55,19 @@ def _replace_temp_python_file_references_in_out_err(
 
     Needs docstring with example, gotta doctest it.
     """
+    # Take care of case when out/err display full path
     out = out.replace(str(temp_python_file), notebook.name)
     err = err.replace(str(temp_python_file), notebook.name)
+
+    # Take care of case when out/err display relative path
+    out = out.replace(
+        str(notebook.parent.joinpath(f"{notebook.stem}   ").with_suffix(".py")),
+        str(notebook),
+    )
+    err = err.replace(
+        str(notebook.parent.joinpath(f"{notebook.stem}   ").with_suffix(".py")),
+        str(notebook),
+    )
 
     with open(str(temp_python_file), "r") as handle:
         cells = handle.readlines()
@@ -64,6 +84,12 @@ def _replace_temp_python_file_references_in_out_err(
     out = re.sub(
         rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), out,
     )
+    return out, err
+
+
+def _replace_tmpdir_references(out, err, tmpdirname):
+    out = re.sub(rf"{tmpdirname}(?=\s)", str(Path.cwd()), out)
+    err = re.sub(rf"{tmpdirname}(?=\s)", str(Path.cwd()), err)
     return out, err
 
 
@@ -84,15 +110,22 @@ def main(raw_args=None):
             save_source.main(notebook, temp_python_file)
             replace_magics.main(temp_python_file)
 
+        env = os.environ.copy()
+        env["PYTHONPATH"] = os.getcwd()
+
         output = subprocess.run(
             [command, tmpdirname, *kwargs],
             stderr=subprocess.PIPE,
             stdout=subprocess.PIPE,
+            cwd=tmpdirname,
+            env=env,
         )
         output_code = output.returncode
 
         out = output.stdout.decode()
         err = output.stderr.decode()
+
+        out, err = _replace_tmpdir_references(out, err, tmpdirname)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(

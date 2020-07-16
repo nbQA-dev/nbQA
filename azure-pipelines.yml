@@ -6,6 +6,9 @@
 trigger:
 - master
 
+variables:
+  disable.coverage.autogenerate: 'true'
+
 pool:
   vmImage: 'ubuntu-latest'
 strategy:
@@ -35,7 +38,7 @@ steps:
   displayName: 'static analysis'
 
 - script: |
-    pytest --junitxml=junit/test-results.xml --cov=nbqa --cov-report=xml --cov-report=html
+    pytest --junitxml=junit/test-results.xml --cov=nbqa --cov-report=xml --cov-report=html -vv
   displayName: 'pytest'
 
 - task: PublishCodeCoverageResults@1
