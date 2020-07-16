@@ -56,8 +56,8 @@ def _replace_temp_python_file_references_in_out_err(
     Needs docstring with example, gotta doctest it.
     """
     # Take care of case when out/err display full path
-    out = out.replace(str(temp_python_file), notebook.name)
-    err = err.replace(str(temp_python_file), notebook.name)
+    out = out.replace(str(temp_python_file), str(notebook))
+    err = err.replace(str(temp_python_file), str(notebook))
 
     # Take care of case when out/err display relative path
     out = out.replace(
@@ -100,6 +100,17 @@ def _create_blank_init_files(notebook, tmpdirname):
     init_files = Path(parts[0]).rglob("__init__.py")
     for i in init_files:
         Path(tmpdirname).joinpath(i).touch()
+
+
+def _ensure_cell_separators_remain(temp_python_file):
+    """
+    Isort removes a blank line which separates the cells.
+    """
+    with open(str(temp_python_file), "r") as handle:
+        py_file = handle.read()
+    py_file = re.sub(r"(?<=\n\n)(?<!\n\n\n)# %%", "\n# %%", py_file)
+    with open(str(temp_python_file), "w") as handle:
+        handle.write(py_file)
 
 
 def main(raw_args=None):
@@ -148,7 +159,7 @@ def main(raw_args=None):
             )
 
             put_magics_back_in.main(temp_python_file)
-
+            _ensure_cell_separators_remain(temp_python_file)
             replace_source.main(temp_python_file, notebook)
 
         sys.stdout.write(out)
