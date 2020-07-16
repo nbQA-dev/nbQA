@@ -32,7 +32,39 @@ def _get_notebooks(root_dir) -> List[Path]:
 
 
 def _temp_python_file_for_notebook(notebook, tmpdir):
+    """
+    Get temporary file to save converted notebook into.
+    """
     return Path(tmpdir).joinpath(notebook.stem).with_suffix(".py")
+
+
+def _replace_temp_python_file_references_in_out_err(
+    temp_python_file, notebook, out, err
+):
+    """
+    Out and err refer to temporary Python files - make them refer to Jupyter notebooks.
+
+    Needs docstring with example, gotta doctest it.
+    """
+    out = out.replace(str(temp_python_file), notebook.name)
+    err = err.replace(str(temp_python_file), notebook.name)
+
+    with open(str(temp_python_file), "r") as handle:
+        cells = handle.readlines()
+    mapping = {}
+    cell_no = 0
+    cell_count = None
+    for n, i in enumerate(cells):
+        if i == "# %%\n":
+            cell_no += 1
+            cell_count = 0
+        else:
+            cell_count += 1
+            mapping[n + 1] = f"cell_{cell_no}:{cell_count}"
+    out = re.sub(
+        rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), out,
+    )
+    return out, err
 
 
 def main(raw_args=None):
@@ -63,25 +95,8 @@ def main(raw_args=None):
         err = output.stderr.decode()
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
-            out = out.replace(str(temp_python_file), notebook.name)
-            err = err.replace(str(temp_python_file), notebook.name)
-
-            with open(str(temp_python_file), "r") as handle:
-                cells = handle.readlines()
-            mapping = {}
-            cell_no = 0
-            cell_count = None
-            for n, i in enumerate(cells):
-                if i == "# %%\n":
-                    cell_no += 1
-                    cell_count = 0
-                else:
-                    cell_count += 1
-                    mapping[n + 1] = f"cell_{cell_no}:{cell_count}"
-            out = re.sub(
-                rf"(?<={notebook.name}:)\d+",
-                lambda x: str(mapping[int(x.group())]),
-                out,
+            out, err = _replace_temp_python_file_references_in_out_err(
+                temp_python_file, notebook, out, err
             )
 
             put_magics_back_in.main(temp_python_file)

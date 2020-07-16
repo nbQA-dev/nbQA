@@ -1,7 +1,17 @@
 import json
 
 
+def _parse_python_cell(cell):
+    source = cell.splitlines(True)
+    if source[0] == "\n":
+        return {"source": source[1:], "cell_type": "code"}
+    return {"source": source[1:], "cell_type": "markdown"}
+
+
 def main(python_file, notebook):
+    """
+    Replace `source` of original notebook.
+    """
     with open(notebook, "r") as handle:
         notebook_json = json.load(handle)
 
@@ -10,22 +20,13 @@ def main(python_file, notebook):
 
     pycells = pyfile[len("# %%") :].split("\n\n\n# %%")
 
-    new_sources = []
-    for i in pycells:
-        cells = i.splitlines(True)
-        if cells[0] == "\n":
-            new_sources.append({"source": cells[1:], "cell_type": "code"})
-        else:
-            new_sources.append({"source": cells[1:], "cell_type": "markdown"})
+    new_sources = (_parse_python_cell(i) for i in pycells)
 
-    new_sources = [
-        {
-            **{key: val for key, val in i.items() if i != "source"},
-            **{"source": new_sources[n]["source"]},
-        }
-        for n, i in enumerate(notebook_json["cells"])
+    new_cells = [
+        {**i, **{"source": j["source"]}}
+        for i, j in zip(notebook_json["cells"], new_sources)
     ]
-    notebook_json.update({"cells": new_sources})
+    notebook_json.update({"cells": new_cells})
     with open(notebook, "w") as handle:
         json.dump(notebook_json, handle, indent=1, ensure_ascii=False)
         handle.write("\n")
