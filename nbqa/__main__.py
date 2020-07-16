@@ -126,8 +126,13 @@ def main(raw_args=None):
         env = os.environ.copy()
         env["PYTHONPATH"] = os.getcwd()
 
+        if Path(root_dir).is_dir():
+            arg = str(Path(tmpdirname).joinpath(root_dir))
+        else:
+            assert len(nb_to_py_mapping) == 1
+            arg = str(next(iter(nb_to_py_mapping.values())))
         output = subprocess.run(
-            [command, tmpdirname, *kwargs],
+            [command, arg, *kwargs],
             stderr=subprocess.PIPE,
             stdout=subprocess.PIPE,
             cwd=tmpdirname,
