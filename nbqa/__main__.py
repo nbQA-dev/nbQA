@@ -97,11 +97,17 @@ def main(raw_args=None):
             save_source.main(notebook, temp_python_file)
             replace_magics.main(temp_python_file)
 
+        import os
+
+        env = os.environ.copy()
+        env["PATH"] += "."
+
         output = subprocess.run(
             [command, tmpdirname, *kwargs],
             stderr=subprocess.PIPE,
             stdout=subprocess.PIPE,
             cwd=tmpdirname,
+            env=env,
         )
         output_code = output.returncode
 
