@@ -33,5 +33,5 @@ def test_mypy_works(tmp_notebook_for_testing, capsys):
         """  # noqa
     )
     expected_err = ""
-    assert out == expected_out
-    assert err == expected_err
+    assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
+    assert sorted(err.splitlines()) == sorted(expected_err.splitlines())

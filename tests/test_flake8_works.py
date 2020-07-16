@@ -35,5 +35,5 @@ def test_flake8_works(tmp_notebook_for_testing, capsys):
         "tests/data/notebook_starting_with_md.ipynb:cell_1:5:1: F401 'nbqa' imported but unused\n"
     )
     expected_err = ""
-    assert out == expected_out
-    assert err == expected_err
+    assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
+    assert sorted(err.splitlines()) == sorted(expected_err.splitlines())
