@@ -27,6 +27,9 @@ def test_flake8_works(tmp_notebook_for_testing, capsys):
         "notebook_for_testing.ipynb:cell_1:1:1: F401 'pandas as pd' imported but unused\n"
         "notebook_for_testing.ipynb:cell_1:3:1: F401 'numpy as np' imported but unused\n"
         "notebook_for_testing.ipynb:cell_1:5:1: F401 'os' imported but unused\n"
+        "notebook_for_testing_copy.ipynb:cell_1:1:1: F401 'pandas as pd' imported but unused\n"
+        "notebook_for_testing_copy.ipynb:cell_1:3:1: F401 'numpy as np' imported but unused\n"
+        "notebook_for_testing_copy.ipynb:cell_1:5:1: F401 'os' imported but unused\n"
     )
     expected_err = ""
     assert out == expected_out

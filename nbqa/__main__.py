@@ -27,8 +27,8 @@ def _get_notebooks(root_dir) -> List[Path]:
     Get generator with all notebooks in directory.
     """
     if not Path(root_dir).is_dir():
-        return [i for i in (Path(root_dir),)]
-    return [i for i in Path(".").rglob("*.ipynb") if ".ipynb_checkpoints" not in str(i)]
+        return (i for i in (Path(root_dir),))
+    return (i for i in Path(".").rglob("*.ipynb") if ".ipynb_checkpoints" not in str(i))
 
 
 def _temp_python_file_for_notebook(notebook, tmpdir):
@@ -43,10 +43,14 @@ def main(raw_args=None):
 
     with tempfile.TemporaryDirectory() as tmpdirname:
 
-        for notebook in notebooks:
-            temp_file = _temp_python_file_for_notebook(notebook, tmpdirname)
-            save_source.main(notebook, temp_file)
-            replace_magics.main(temp_file)
+        nb_to_py_mapping = {
+            notebook: _temp_python_file_for_notebook(notebook, tmpdirname)
+            for notebook in notebooks
+        }
+
+        for notebook, temp_python_file in nb_to_py_mapping.items():
+            save_source.main(notebook, temp_python_file)
+            replace_magics.main(temp_python_file)
 
         output = subprocess.run(
             [command, tmpdirname, *kwargs],
@@ -58,13 +62,11 @@ def main(raw_args=None):
         out = output.stdout.decode()
         err = output.stderr.decode()
 
-        # replace ending, convert to str
-        for notebook in notebooks:
-            temp_file = _temp_python_file_for_notebook(notebook, tmpdirname)
-            out = out.replace(str(temp_file), notebook.name)
-            err = err.replace(str(temp_file), notebook.name)
+        for notebook, temp_python_file in nb_to_py_mapping.items():
+            out = out.replace(str(temp_python_file), notebook.name)
+            err = err.replace(str(temp_python_file), notebook.name)
 
-            with open(str(temp_file), "r") as handle:
+            with open(str(temp_python_file), "r") as handle:
                 cells = handle.readlines()
             mapping = {}
             cell_no = 0
@@ -82,9 +84,9 @@ def main(raw_args=None):
                 out,
             )
 
-            put_magics_back_in.main(temp_file)
+            put_magics_back_in.main(temp_python_file)
 
-            replace_source.main(temp_file, notebook)
+            replace_source.main(temp_python_file, notebook)
 
         sys.stdout.write(out)
         sys.stderr.write(err)
