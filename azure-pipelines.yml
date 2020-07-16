@@ -6,6 +6,9 @@
 trigger:
 - master
 
+variables:
+  disable.coverage.autogenerate: 'true'
+
 pool:
   vmImage: 'ubuntu-latest'
 strategy:
