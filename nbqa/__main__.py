@@ -100,7 +100,7 @@ def main(raw_args=None):
         import os
 
         env = os.environ.copy()
-        env["PATH"] += "."
+        env["PATH"] += f":{os.getcwd()}"
 
         output = subprocess.run(
             [command, tmpdirname, *kwargs],
