@@ -94,9 +94,6 @@ def _replace_tmpdir_references(out, err, tmpdirname):
 
 
 def _create_blank_init_files(notebook, tmpdirname):
-    """
-    I think we just need the subdirs for each notebook...
-    """
     parts = notebook.parts
     if not parts:
         return
