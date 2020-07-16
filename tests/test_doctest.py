@@ -27,7 +27,7 @@ def test_black_works(tmp_notebook_for_testing, capsys):
     # check out and err
     out, err = capsys.readouterr()
     expected_out = dedent(
-        f"""\  # noqa
+        f"""\
         ============================= test session starts ==============================
         platform {platform.system().lower()} -- Python {platform.python_version()}, pytest-5.4.3, py-1.9.0, pluggy-0.13.1
         rootdir: {str(Path.cwd())}
@@ -38,7 +38,7 @@ def test_black_works(tmp_notebook_for_testing, capsys):
         tests/data/notebook_for_testing_copy.ipynb .                                [100%]
 
         ============================== 2 passed in 0.03s ===============================
-        """
+        """  # noqa
     )
     expected_err = ""
     assert out == expected_out
