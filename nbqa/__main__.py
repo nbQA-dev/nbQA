@@ -93,6 +93,15 @@ def _replace_tmpdir_references(out, err, tmpdirname):
     return out, err
 
 
+def _create_blank_init_files(notebook, tmpdirname):
+    parts = notebook.parts
+    if not parts:
+        return
+    init_files = Path(parts[0]).rglob("__init__.py")
+    for i in init_files:
+        Path(tmpdirname).joinpath(i).touch()
+
+
 def main(raw_args=None):
 
     command, root_dir, kwargs = _parse_args(raw_args)
@@ -109,12 +118,18 @@ def main(raw_args=None):
         for notebook, temp_python_file in nb_to_py_mapping.items():
             save_source.main(notebook, temp_python_file)
             replace_magics.main(temp_python_file)
+            _create_blank_init_files(notebook, tmpdirname)
 
         env = os.environ.copy()
         env["PYTHONPATH"] = os.getcwd()
 
+        if Path(root_dir).is_dir():
+            arg = str(Path(tmpdirname).joinpath(root_dir))
+        else:
+            assert len(nb_to_py_mapping) == 1
+            arg = str(next(iter(nb_to_py_mapping.values())))
         output = subprocess.run(
-            [command, tmpdirname, *kwargs],
+            [command, arg, *kwargs],
             stderr=subprocess.PIPE,
             stdout=subprocess.PIPE,
             cwd=tmpdirname,

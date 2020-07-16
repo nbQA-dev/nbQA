@@ -10,17 +10,20 @@ nbQA
 
 Adapter to run any code-quality tool on a Jupyter notebook.
 
-E.g. just as you would run `flake8` against a Python file
+The general command is
 
 .. code-block:: bash
 
-    flake8 my_python_file.py
+    nbqa <command> <root directory> <flags for command>
 
-you can now just as easily run it against a Jupyter notebook by prepending `nbqa`:
+For example, you could run:
 
 .. code-block:: bash
 
     nbqa flake8 my_notebook.ipynb
+    nbqa black . --check
+    nbqa mypy --missing-imports
+    nbqa pytest . --doctest-modules
 
 Installation: nbQA has no dependencies, so as long as you have Python3.6+, you can do
 
@@ -29,3 +32,15 @@ Installation: nbQA has no dependencies, so as long as you have Python3.6+, you c
     pip install -U nbqa
 
 and it'll work without conflicting with any of your existing installs!
+
+------------------------------
+Supported third party packages
+------------------------------
+In theory, `nbqa` can adapt any Python code-quality tool to a Jupyter Notebook.
+
+In practice, here are the tools I've actually tested:
+- flake8
+- black
+- pytest
+- mypy (make sure you will need to have `__init__` files in each subdirectory)
+- doctest (as long as you run it via `pytest` with the `--doctest-modules` flag)
