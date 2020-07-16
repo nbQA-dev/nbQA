@@ -1,12 +1,11 @@
 import json
-from pathlib import Path
 
 CODE_SEPARATOR = "\n\n# %%\n"
 
 MARKDOWN_SEPARATOR = "\n\n# %% [markdown]\n"
 
 
-def main(path, tmpdir):
+def main(path, temp_file):
 
     with open(path, "r") as handle:
         notebook = json.load(handle)
@@ -21,8 +20,5 @@ def main(path, tmpdir):
     ]
 
     # make filename from path and tmpdir
-    temp_file = Path(tmpdir).joinpath(path.stem).with_suffix(".py")
     with open(str(temp_file), "w") as handle:
         handle.write("".join(result)[len("\n\n") : -len("\n")])
-
-    return temp_file

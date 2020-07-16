@@ -4,7 +4,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Iterator
+from typing import List
 
 from nbqa import put_magics_back_in, replace_magics, replace_source, save_source
 
@@ -22,13 +22,17 @@ def _parse_args(raw_args):
     return command, root_dir, kwargs
 
 
-def _get_notebooks(root_dir) -> Iterator[Path]:
+def _get_notebooks(root_dir) -> List[Path]:
     """
     Get generator with all notebooks in directory.
     """
     if not Path(root_dir).is_dir():
-        return (i for i in (Path(root_dir),))
-    return Path(root_dir).rglob("*.ipynb")
+        return [i for i in (Path(root_dir),)]
+    return [i for i in Path(".").rglob("*.ipynb") if ".ipynb_checkpoints" not in str(i)]
+
+
+def _temp_python_file_for_notebook(notebook, tmpdir):
+    return Path(tmpdir).joinpath(notebook.stem).with_suffix(".py")
 
 
 def main(raw_args=None):
@@ -37,30 +41,28 @@ def main(raw_args=None):
 
     notebooks = _get_notebooks(root_dir)
 
-    output_code = 0
-
     with tempfile.TemporaryDirectory() as tmpdirname:
 
         for notebook in notebooks:
-            if "ipynb_checkpoints" in str(notebook):
-                continue
-
-            temp_file = save_source.main(
-                notebook, tmpdirname
-            )  # let's pass the temp dir to here
+            temp_file = _temp_python_file_for_notebook(notebook, tmpdirname)
+            save_source.main(notebook, temp_file)
             replace_magics.main(temp_file)
 
-            output = subprocess.run(
-                [command, str(temp_file), *kwargs],
-                stderr=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-            )
-            if output_code == 0:
-                output_code = output.returncode
+        output = subprocess.run(
+            [command, tmpdirname, *kwargs],
+            stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+        )
+        output_code = output.returncode
 
-            # replace ending, convert to str
-            out = output.stdout.decode().replace(str(temp_file), notebook.name)
-            err = output.stderr.decode().replace(str(temp_file), notebook.name)
+        out = output.stdout.decode()
+        err = output.stderr.decode()
+
+        # replace ending, convert to str
+        for notebook in notebooks:
+            temp_file = _temp_python_file_for_notebook(notebook, tmpdirname)
+            out = out.replace(str(temp_file), notebook.name)
+            err = err.replace(str(temp_file), notebook.name)
 
             with open(str(temp_file), "r") as handle:
                 cells = handle.readlines()
@@ -80,12 +82,12 @@ def main(raw_args=None):
                 out,
             )
 
-            sys.stdout.write(out)
-            sys.stderr.write(err)
-
             put_magics_back_in.main(temp_file)
 
             replace_source.main(temp_file, notebook)
+
+        sys.stdout.write(out)
+        sys.stderr.write(err)
 
     sys.exit(output_code)
 
