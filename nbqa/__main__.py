@@ -1,4 +1,5 @@
 import argparse
+import os
 import re
 import subprocess
 import sys
@@ -97,10 +98,8 @@ def main(raw_args=None):
             save_source.main(notebook, temp_python_file)
             replace_magics.main(temp_python_file)
 
-        import os
-
         env = os.environ.copy()
-        env["PATH"] += f":{os.getcwd()}"
+        env["PYTHONPATH"] = os.getcwd()
 
         output = subprocess.run(
             [command, tmpdirname, *kwargs],
