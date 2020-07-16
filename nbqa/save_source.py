@@ -1,17 +1,16 @@
 import json
 import tempfile
+from pathlib import Path
 
 CODE_SEPARATOR = "\n\n# %%\n"
 
 MARKDOWN_SEPARATOR = "\n\n# %% [markdown]\n"
 
 
-def main(path):
+def main(path, tmpdir):
 
-    _, filename = tempfile.mkstemp(suffix=".py")
-
-    with open(path, "r") as handel:
-        notebook = json.load(handel)
+    with open(path, "r") as handle:
+        notebook = json.load(handle)
 
     cells = notebook["cells"]
 
@@ -22,7 +21,9 @@ def main(path):
         for i in cells
     ]
 
-    with open(filename, "w") as handle:
+    # make filename from path and tmpdir
+    temp_file = Path(tmpdir).joinpath(path.stem).with_suffix('.py')
+    with open(str(temp_file), "w") as handle:
         handle.write("".join(result)[len("\n\n") : -len("\n")])
 
-    return filename
+    return temp_file
