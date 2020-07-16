@@ -9,6 +9,9 @@ def _parse_python_cell(cell):
 
 
 def main(python_file, notebook):
+    """
+    Replace `source` of original notebook.
+    """
     with open(notebook, "r") as handle:
         notebook_json = json.load(handle)
 
@@ -20,11 +23,8 @@ def main(python_file, notebook):
     new_sources = (_parse_python_cell(i) for i in pycells)
 
     new_cells = [
-        {
-            **{key: val for key, val in i.items() if i != "source"},
-            **{"source": j["source"]},
-        }
-        for n, (i, j) in enumerate(zip(notebook_json["cells"], new_sources))
+        {**i, **{"source": j["source"]}}
+        for i, j in zip(notebook_json["cells"], new_sources)
     ]
     notebook_json.update({"cells": new_cells})
     with open(notebook, "w") as handle:
