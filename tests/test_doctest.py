@@ -26,7 +26,7 @@ def test_black_works(tmp_notebook_for_testing, capsys):
 
     # check out and err
     out, err = capsys.readouterr()
-    expected_out = dedent(  # noqa
+    expected_out = dedent(
         f"""\  # noqa
         ============================= test session starts ==============================
         platform {platform.system().lower()} -- Python {platform.python_version()}, pytest-5.4.3, py-1.9.0, pluggy-0.13.1
