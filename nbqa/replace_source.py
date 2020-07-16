@@ -22,12 +22,6 @@ def main(python_file, notebook):
 
     new_sources = (_parse_python_cell(i) for i in pycells)
 
-    # new_cells = [
-    #     {**i, **{"source": j["source"]}}
-    #     for i, j in zip(notebook_json["cells"], new_sources)
-    # ]
-
-    # original_code_cells = (i for i in notebook_json["cells"] if i['cell_type'] == 'code')
     new_cells = []
     for i in notebook_json["cells"]:
         if i["cell_type"] == "markdown":
