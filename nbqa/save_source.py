@@ -17,8 +17,8 @@ def main(path, temp_file):
         if i["cell_type"] == "code"
         else f"{MARKDOWN_SEPARATOR}{''.join(i['source'])}\n"
         for i in cells
+        if i["cell_type"] == "code"
     ]
 
-    # make filename from path and tmpdir
     with open(str(temp_file), "w") as handle:
         handle.write("".join(result)[len("\n\n") : -len("\n")])

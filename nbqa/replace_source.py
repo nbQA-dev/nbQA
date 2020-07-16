@@ -22,10 +22,14 @@ def main(python_file, notebook):
 
     new_sources = (_parse_python_cell(i) for i in pycells)
 
-    new_cells = [
-        {**i, **{"source": j["source"]}}
-        for i, j in zip(notebook_json["cells"], new_sources)
-    ]
+    new_cells = []
+    for i in notebook_json["cells"]:
+        if i["cell_type"] == "markdown":
+            new_cells.append(i)
+            continue
+        i["source"] = next(new_sources)["source"]
+        new_cells.append(i)
+
     notebook_json.update({"cells": new_cells})
     with open(notebook, "w") as handle:
         json.dump(notebook_json, handle, indent=1, ensure_ascii=False)
