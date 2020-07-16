@@ -95,8 +95,6 @@ def _replace_tmpdir_references(out, err, tmpdirname):
 
 def _create_blank_init_files(notebook, tmpdirname):
     parts = notebook.parts
-    if not parts:
-        return
     init_files = Path(parts[0]).rglob("__init__.py")
     for i in init_files:
         Path(tmpdirname).joinpath(i).touch()
