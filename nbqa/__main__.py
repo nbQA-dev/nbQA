@@ -75,7 +75,7 @@ def _replace_temp_python_file_references_in_out_err(
     cell_no = 0
     cell_count = None
     for n, i in enumerate(cells):
-        if i == "# %%\n":
+        if i in ["# %%\n"]:
             cell_no += 1
             cell_count = 0
         else:

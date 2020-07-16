@@ -33,12 +33,13 @@ def test_pytest_doctest_works(tmp_notebook_for_testing, capsys):
         platform {platform.system().lower()} -- Python {platform.python_version()}, pytest-5.4.3, py-1.9.0, pluggy-0.13.1
         rootdir: {str(Path.cwd())}
         plugins: cov-2.10.0
-        collected 2 items
+        collected 3 items
 
-        tests/data/notebook_for_testing.ipynb .                                  [ 50%]
-        tests/data/notebook_for_testing_copy.ipynb .                             [100%]
+        tests/data/notebook_for_testing.ipynb .                                  [ 33%]
+        tests/data/notebook_for_testing_copy.ipynb .                             [ 66%]
+        tests/data/notebook_starting_with_md.ipynb .                             [100%]
 
-        ============================== 2 passed in ===============================
+        ============================== 3 passed in ===============================
         """  # noqa
     )
     expected_err = ""
