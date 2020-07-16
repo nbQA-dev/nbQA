@@ -24,12 +24,12 @@ def test_flake8_works(tmp_notebook_for_testing, capsys):
     # check out and err
     out, err = capsys.readouterr()
     expected_out = (
-        "notebook_for_testing.ipynb:cell_1:1:1: F401 'os' imported but unused\n"
-        "notebook_for_testing.ipynb:cell_1:3:1: F401 'glob' imported but unused\n"
-        "notebook_for_testing.ipynb:cell_1:5:1: F401 'nbqa' imported but unused\n"
-        "notebook_for_testing_copy.ipynb:cell_1:1:1: F401 'os' imported but unused\n"
-        "notebook_for_testing_copy.ipynb:cell_1:3:1: F401 'glob' imported but unused\n"
-        "notebook_for_testing_copy.ipynb:cell_1:5:1: F401 'nbqa' imported but unused\n"
+        "tests/data/notebook_for_testing.ipynb:cell_1:1:1: F401 'os' imported but unused\n"
+        "tests/data/notebook_for_testing.ipynb:cell_1:3:1: F401 'glob' imported but unused\n"
+        "tests/data/notebook_for_testing.ipynb:cell_1:5:1: F401 'nbqa' imported but unused\n"
+        "tests/data/notebook_for_testing_copy.ipynb:cell_1:1:1: F401 'os' imported but unused\n"
+        "tests/data/notebook_for_testing_copy.ipynb:cell_1:3:1: F401 'glob' imported but unused\n"
+        "tests/data/notebook_for_testing_copy.ipynb:cell_1:5:1: F401 'nbqa' imported but unused\n"
     )
     expected_err = ""
     assert out == expected_out
