@@ -1,5 +1,4 @@
 import json
-import tempfile
 from pathlib import Path
 
 CODE_SEPARATOR = "\n\n# %%\n"
@@ -22,7 +21,7 @@ def main(path, tmpdir):
     ]
 
     # make filename from path and tmpdir
-    temp_file = Path(tmpdir).joinpath(path.stem).with_suffix('.py')
+    temp_file = Path(tmpdir).joinpath(path.stem).with_suffix(".py")
     with open(str(temp_file), "w") as handle:
         handle.write("".join(result)[len("\n\n") : -len("\n")])
 

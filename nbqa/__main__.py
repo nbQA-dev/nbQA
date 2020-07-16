@@ -1,13 +1,12 @@
+import argparse
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Iterator
-import tempfile
 
 from nbqa import put_magics_back_in, replace_magics, replace_source, save_source
-
-import argparse
 
 
 def _parse_args(raw_args):
@@ -31,8 +30,9 @@ def _get_notebooks(root_dir) -> Iterator[Path]:
         return (i for i in (Path(root_dir),))
     return Path(root_dir).rglob("*.ipynb")
 
+
 def main(raw_args=None):
-    
+
     command, root_dir, kwargs = _parse_args(raw_args)
 
     notebooks = _get_notebooks(root_dir)
@@ -45,7 +45,9 @@ def main(raw_args=None):
             if "ipynb_checkpoints" in str(notebook):
                 continue
 
-            temp_file = save_source.main(notebook, tmpdirname)  # let's pass the temp dir to here
+            temp_file = save_source.main(
+                notebook, tmpdirname
+            )  # let's pass the temp dir to here
             replace_magics.main(temp_file)
 
             output = subprocess.run(
@@ -73,7 +75,9 @@ def main(raw_args=None):
                     cell_count += 1
                     mapping[n + 1] = f"cell_{cell_no}:{cell_count}"
             out = re.sub(
-                rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), out,
+                rf"(?<={notebook.name}:)\d+",
+                lambda x: str(mapping[int(x.group())]),
+                out,
             )
 
             sys.stdout.write(out)
