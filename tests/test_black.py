@@ -20,12 +20,15 @@ def test_black_works(tmp_notebook_for_testing, capsys):
     expected = (
         "--- \n"
         "+++ \n"
-        "@@ -48,7 +48,7 @@\n"
-        '     "%%time\\n",\n'
-        '     "def hello(name: str = \\"world\\\\n\\"):\\n",\n'
-        '     "\\n",\n-    "    return f\'hello {name}\'\\n",\n'
-        '+    "    return f\\"hello {name}\\"\\n",\n     "\\n",\n'
-        '     "\\n",\n     "hello(3)"\n'
+        "@@ -59,7 +59,7 @@\n"
+        "    \"    'hello goodbye'\n\"\n"
+        '    "    """\n"\n'
+        '    "\n"\n'
+        "-    \"    return f'hello {name}'\n\"\n"
+        '+    "    return f"hello {name}"\n"\n'
+        '    "\n"\n'
+        '    "\n"\n'
+        '    "hello(3)"\n'
     )
     assert result == expected
 

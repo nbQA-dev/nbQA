@@ -88,6 +88,7 @@ def main(raw_args=None):
             [command, tmpdirname, *kwargs],
             stderr=subprocess.PIPE,
             stdout=subprocess.PIPE,
+            cwd=tmpdirname,
         )
         output_code = output.returncode
 
