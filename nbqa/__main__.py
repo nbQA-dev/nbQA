@@ -1,68 +1,91 @@
+import argparse
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
+from typing import Iterator
 
 from nbqa import put_magics_back_in, replace_magics, replace_source, save_source
 
 
-def main(args=None):
-
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Process some integers.")
+def _parse_args(raw_args):
+    """
+    Parse command-line arguments.
+    """
+    parser = argparse.ArgumentParser(description="")
     parser.add_argument("command")
     parser.add_argument("root_dir", default=".", nargs="?")
-    args, kwargs = parser.parse_known_args(args)
+    args, kwargs = parser.parse_known_args(raw_args)
     command = args.command
     root_dir = args.root_dir
+    return command, root_dir, kwargs
 
+
+def _get_notebooks(root_dir) -> Iterator[Path]:
+    """
+    Get generator with all notebooks in directory.
+    """
     if not Path(root_dir).is_dir():
-        notebooks = [Path(root_dir)]
-    else:
-        notebooks = Path(root_dir).rglob("*.ipynb")
+        return (i for i in (Path(root_dir),))
+    return Path(root_dir).rglob("*.ipynb")
+
+
+def main(raw_args=None):
+
+    command, root_dir, kwargs = _parse_args(raw_args)
+
+    notebooks = _get_notebooks(root_dir)
+
     output_code = 0
-    for notebook in notebooks:
-        if "ipynb_checkpoints" in str(notebook):
-            continue
 
-        tempfile = save_source.main(notebook)
-        replace_magics.main(tempfile)
+    with tempfile.TemporaryDirectory() as tmpdirname:
 
-        output = subprocess.run(
-            [command, tempfile, *kwargs],
-            stderr=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-        )
-        if output_code == 0:
-            output_code = output.returncode
+        for notebook in notebooks:
+            if "ipynb_checkpoints" in str(notebook):
+                continue
 
-        # replace ending, convert to str
-        out = output.stdout.decode().replace(tempfile, notebook.name)
-        err = output.stderr.decode().replace(tempfile, notebook.name)
+            temp_file = save_source.main(
+                notebook, tmpdirname
+            )  # let's pass the temp dir to here
+            replace_magics.main(temp_file)
 
-        with open(tempfile, "r") as handle:
-            cells = handle.readlines()
-        mapping = {}
-        cell_no = 0
-        cell_count = None
-        for n, i in enumerate(cells):
-            if i == "# %%\n":
-                cell_no += 1
-                cell_count = 0
-            else:
-                cell_count += 1
-                mapping[n + 1] = f"cell_{cell_no}:{cell_count}"
-        out = re.sub(
-            rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), out,
-        )
+            output = subprocess.run(
+                [command, str(temp_file), *kwargs],
+                stderr=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+            )
+            if output_code == 0:
+                output_code = output.returncode
 
-        sys.stdout.write(out)
-        sys.stderr.write(err)
+            # replace ending, convert to str
+            out = output.stdout.decode().replace(str(temp_file), notebook.name)
+            err = output.stderr.decode().replace(str(temp_file), notebook.name)
 
-        put_magics_back_in.main(tempfile)
+            with open(str(temp_file), "r") as handle:
+                cells = handle.readlines()
+            mapping = {}
+            cell_no = 0
+            cell_count = None
+            for n, i in enumerate(cells):
+                if i == "# %%\n":
+                    cell_no += 1
+                    cell_count = 0
+                else:
+                    cell_count += 1
+                    mapping[n + 1] = f"cell_{cell_no}:{cell_count}"
+            out = re.sub(
+                rf"(?<={notebook.name}:)\d+",
+                lambda x: str(mapping[int(x.group())]),
+                out,
+            )
 
-        replace_source.main(tempfile, notebook)
+            sys.stdout.write(out)
+            sys.stderr.write(err)
+
+            put_magics_back_in.main(temp_file)
+
+            replace_source.main(temp_file, notebook)
 
     sys.exit(output_code)
 

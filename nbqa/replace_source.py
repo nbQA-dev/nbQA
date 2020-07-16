@@ -5,7 +5,7 @@ def main(python_file, notebook):
     with open(notebook, "r") as handle:
         notebook_json = json.load(handle)
 
-    with open(python_file, "r") as handle:
+    with open(str(python_file), "r") as handle:
         pyfile = handle.read()
 
     pycells = pyfile[len("# %%") :].split("\n\n\n# %%")
