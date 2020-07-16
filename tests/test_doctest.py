@@ -8,9 +8,9 @@ import pytest
 from nbqa.__main__ import main
 
 
-def test_black_works(tmp_notebook_for_testing, capsys):
+def test_pytest_doctest_works(tmp_notebook_for_testing, capsys):
     """
-    Check black works. Should only reformat code cells.
+    Check pytest --doctest-modules works.
     """
     # check diff
     with open(tmp_notebook_for_testing, "r") as handle:
