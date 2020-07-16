@@ -35,8 +35,8 @@ def test_pytest_doctest_works(tmp_notebook_for_testing, capsys):
         plugins: cov-2.10.0
         collected 2 items
 
-        tests/data/notebook_for_testing.ipynb .                                     [ 50%]
-        tests/data/notebook_for_testing_copy.ipynb .                                [100%]
+        tests/data/notebook_for_testing.ipynb .                                  [ 50%]
+        tests/data/notebook_for_testing_copy.ipynb .                             [100%]
 
         ============================== 2 passed in ===============================
         """  # noqa
@@ -46,6 +46,5 @@ def test_pytest_doctest_works(tmp_notebook_for_testing, capsys):
     # remove references to how many seconds the test took
     out = re.sub(r"(?<=passed in) \d+\.\d+s", "", out)
     err = re.sub(r"(?<=passed in) \d+\.\d+s", "", err)
-
     assert out == expected_out
     assert err == expected_err

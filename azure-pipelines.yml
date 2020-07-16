@@ -35,10 +35,11 @@ steps:
   displayName: 'static analysis'
 
 - script: |
-    pytest --junitxml=junit/test-results.xml --cov=nbqa --cov-report=xml -vv
+    pytest --junitxml=junit/test-results.xml --cov=nbqa --cov-report=xml --cov-report=html -vv
   displayName: 'pytest'
 
 - task: PublishCodeCoverageResults@1
   inputs:
     codeCoverageTool: Cobertura
     summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+    reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'

@@ -36,7 +36,13 @@ def _temp_python_file_for_notebook(notebook, tmpdir):
     """
     Get temporary file to save converted notebook into.
     """
-    temp_python_file = Path(tmpdir).joinpath(notebook).with_suffix(".py")
+    # Add 3 extra whitespaces because `ipynb` is 3 chars longer than `py`.
+    temp_python_file = (
+        Path(tmpdir)
+        .joinpath(notebook.parent)
+        .joinpath(f"{notebook.stem}   ")
+        .with_suffix(".py")
+    )
     temp_python_file.parent.mkdir(parents=True, exist_ok=True)
     return temp_python_file
 
@@ -54,8 +60,14 @@ def _replace_temp_python_file_references_in_out_err(
     err = err.replace(str(temp_python_file), notebook.name)
 
     # Take care of case when out/err display relative path
-    out = out.replace(str(notebook.with_suffix(".py")), str(notebook))
-    err = err.replace(str(notebook.with_suffix(".py")), str(notebook))
+    out = out.replace(
+        str(notebook.parent.joinpath(f"{notebook.stem}   ").with_suffix(".py")),
+        str(notebook),
+    )
+    err = err.replace(
+        str(notebook.parent.joinpath(f"{notebook.stem}   ").with_suffix(".py")),
+        str(notebook),
+    )
 
     with open(str(temp_python_file), "r") as handle:
         cells = handle.readlines()
