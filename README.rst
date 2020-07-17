@@ -32,7 +32,7 @@ The general syntax is
 
 .. code-block:: bash
 
-    nbqa <command> <root directory> <flags for command>
+    nbqa <command> <directory or file> <flags>
 
 Example of commands you can do:
 
