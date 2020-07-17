@@ -1,4 +1,4 @@
-.. image:: ../assets/output-onlinepngtools.png
+.. image:: https://github.com/MarcoGorelli/nbQA/raw/master/assets/output-onlinepngtools.png
   :width: 400
 
 nbQA
