@@ -70,7 +70,7 @@ See Also
 
 Here are some other code quality tools for Jupyter Notebooks:
 
-- `flake-nb`_;
+- `flake8-nb`_;
 - `black-nb`_.
 
 Project template from cookiecutter_.
