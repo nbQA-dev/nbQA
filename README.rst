@@ -70,8 +70,8 @@ See Also
 
 Here are some other code quality tools for Jupyter Notebooks:
 
-- flake-nb_;
-- black-nb_.
+- `flake-nb`_;
+- `black-nb`_.
 
 Project template from cookiecutter_.
 
@@ -82,6 +82,6 @@ Project template from cookiecutter_.
 .. _isort: https://timothycrosley.github.io/isort/
 .. _mypy: http://mypy-lang.org/
 .. _doctest: https://docs.python.org/3/library/doctest.html
-.. _black: https://github.com/tomcatling/black-nb
+.. _black-nb: https://github.com/tomcatling/black-nb
 .. _flake8-nb: https://flake8-nb.readthedocs.io/en/latest/readme.html
 .. _here: https://nbqa.readthedocs.io/en/latest/
