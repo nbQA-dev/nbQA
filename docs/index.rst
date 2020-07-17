@@ -1,5 +1,8 @@
-Welcome to nbQA's documentation!
-======================================
+.. image:: ../assets/output-onlinepngtools.png
+  :width: 400
+
+nbQA
+====
 
 .. toctree::
    :maxdepth: 2

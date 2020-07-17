@@ -68,7 +68,8 @@ Ready to contribute? Here's how to set up `nbqa` for local development.
 
     $ mkvirtualenv nbqa
     $ cd nbqa-dev/
-    $ python setup.py develop
+    $ pip install -r requirements-dev.txt
+    $ pip install -r requirements-docs.txt  # for contributing to the documentation
 
 4. Create a branch for local development::
 
@@ -76,13 +77,9 @@ Ready to contribute? Here's how to set up `nbqa` for local development.
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass tests,
-   including testing other Python versions with tox::
+5. When you're done making changes, check that your changes pass tests:
 
-    $ python setup.py test or pytest
-    $ tox
-
-   To get flake8 and tox, just pip install them into your virtualenv.
+    $ pytest
 
 6. Commit your changes and push your branch to GitHub::
 
@@ -108,20 +105,8 @@ Before you submit a pull request, check that it meets these guidelines:
 Tips
 ----
 
-To run a subset of tests::
+Enable pre-commit to catch errors early-on:
 
+.. code-block:
 
-    $ python -m unittest tests.test_nbqa
-
-Deploying
----------
-
-A reminder for the maintainers on how to deploy.
-Make sure all your changes are committed (including an entry in HISTORY.rst).
-Then run::
-
-$ bump2version patch # possible: major / minor / patch
-$ git push
-$ git push --tags
-
-Travis will then deploy to PyPI if tests pass.
+    pre-commit install
