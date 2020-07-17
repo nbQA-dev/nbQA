@@ -17,8 +17,10 @@ nbQA
 .. image:: https://readthedocs.org/projects/nbqa/badge/?version=latest&style=plastic
     :target: https://nbqa.readthedocs.io/en/latest/
 
-Adapter to run any code-quality tool on a Jupyter notebook. Zero dependencies, runs on Python3.6+.
-Documentation is hosted here_.
+.. image:: https://img.shields.io/pypi/pyversions/nbqa.svg
+    :target: https://pypi.org/project/nbqa/
+
+Adapter to run any code-quality tool on a Jupyter notebook. Documentation is hosted here_.
 
 Installation
 ------------
@@ -68,8 +70,8 @@ See Also
 
 Here are some other code quality tools for Jupyter Notebooks:
 
-- flake-nb_;
-- black-nb_.
+- `flake8-nb`_;
+- `black-nb`_.
 
 Project template from cookiecutter_.
 
@@ -80,6 +82,6 @@ Project template from cookiecutter_.
 .. _isort: https://timothycrosley.github.io/isort/
 .. _mypy: http://mypy-lang.org/
 .. _doctest: https://docs.python.org/3/library/doctest.html
-.. _black: https://github.com/tomcatling/black-nb
+.. _black-nb: https://github.com/tomcatling/black-nb
 .. _flake8-nb: https://flake8-nb.readthedocs.io/en/latest/readme.html
 .. _here: https://nbqa.readthedocs.io/en/latest/
