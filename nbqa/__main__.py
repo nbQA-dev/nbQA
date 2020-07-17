@@ -47,19 +47,19 @@ def _temp_python_file_for_notebook(notebook, tmpdir):
     return temp_python_file
 
 
-def _replace_temp_python_file_references_in_out_err(
-    temp_python_file, notebook, out, err
-):
+def _replace_full_path_out_err(out, err, temp_python_file, notebook):
     """
-    Out and err refer to temporary Python files - make them refer to Jupyter notebooks.
-
-    Needs docstring with example, gotta doctest it.
+    Take care of case when out/err display full path.
     """
-    # Take care of case when out/err display full path
     out = out.replace(str(temp_python_file), str(notebook))
     err = err.replace(str(temp_python_file), str(notebook))
+    return out, err
 
-    # Take care of case when out/err display relative path
+
+def _replace_relative_path_out_err(out, err, notebook):
+    """
+    Take care of case when out/err display relative path.
+    """
     out = out.replace(
         str(notebook.parent.joinpath(f"{notebook.stem}   ").with_suffix(".py")),
         str(notebook),
@@ -68,7 +68,13 @@ def _replace_temp_python_file_references_in_out_err(
         str(notebook.parent.joinpath(f"{notebook.stem}   ").with_suffix(".py")),
         str(notebook),
     )
+    return out, err
 
+
+def _map_python_line_to_nb_lines(out, err, temp_python_file, notebook):
+    """
+    Make sure stdout and stderr make reference to Jupyter Notebook lines.
+    """
     with open(str(temp_python_file), "r") as handle:
         cells = handle.readlines()
     mapping = {}
@@ -84,16 +90,37 @@ def _replace_temp_python_file_references_in_out_err(
     out = re.sub(
         rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), out,
     )
+    err = re.sub(
+        rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), err,
+    )
+    return out, err
+
+
+def _replace_temp_python_file_references_in_out_err(
+    temp_python_file, notebook, out, err
+):
+    """
+    Replace references to temporary directory name with current working directory.
+    """
+    out, err = _replace_full_path_out_err(out, err, temp_python_file, notebook)
+    out, err = _replace_relative_path_out_err(out, err, notebook)
+    out, err = _map_python_line_to_nb_lines(out, err, temp_python_file, notebook)
     return out, err
 
 
 def _replace_tmpdir_references(out, err, tmpdirname):
+    """
+    Replace references to temporary directory name with current working directory.
+    """
     out = re.sub(rf"{tmpdirname}(?=\s)", str(Path.cwd()), out)
     err = re.sub(rf"{tmpdirname}(?=\s)", str(Path.cwd()), err)
     return out, err
 
 
 def _create_blank_init_files(notebook, tmpdirname):
+    """
+    Replicate local (possibly blank) __init__ files to temporary directory.
+    """
     parts = notebook.parts
     init_files = Path(parts[0]).rglob("__init__.py")
     for i in init_files:
@@ -109,6 +136,32 @@ def _ensure_cell_separators_remain(temp_python_file):
     py_file = re.sub(r"(?<=\n\n)(?<!\n\n\n)# %%", "\n# %%", py_file)
     with open(str(temp_python_file), "w") as handle:
         handle.write(py_file)
+
+
+def _run_command(command, root_dir, tmpdirname, nb_to_py_mapping, kwargs):
+    """
+    Run third-party tool against given file or directory.
+    """
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.getcwd()
+
+    if Path(root_dir).is_dir():
+        arg = str(Path(tmpdirname).joinpath(root_dir))
+    else:
+        assert len(nb_to_py_mapping) == 1
+        arg = str(next(iter(nb_to_py_mapping.values())))
+    output = subprocess.run(
+        [command, arg, *kwargs],
+        stderr=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        cwd=tmpdirname,
+        env=env,
+    )
+    output_code = output.returncode
+
+    out = output.stdout.decode()
+    err = output.stderr.decode()
+    return out, err, output_code
 
 
 def main(raw_args=None):
@@ -129,25 +182,9 @@ def main(raw_args=None):
             replace_magics.main(temp_python_file)
             _create_blank_init_files(notebook, tmpdirname)
 
-        env = os.environ.copy()
-        env["PYTHONPATH"] = os.getcwd()
-
-        if Path(root_dir).is_dir():
-            arg = str(Path(tmpdirname).joinpath(root_dir))
-        else:
-            assert len(nb_to_py_mapping) == 1
-            arg = str(next(iter(nb_to_py_mapping.values())))
-        output = subprocess.run(
-            [command, arg, *kwargs],
-            stderr=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            cwd=tmpdirname,
-            env=env,
+        out, err, output_code = _run_command(
+            command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
         )
-        output_code = output.returncode
-
-        out = output.stdout.decode()
-        err = output.stderr.decode()
 
         out, err = _replace_tmpdir_references(out, err, tmpdirname)
 
