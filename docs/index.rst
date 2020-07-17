@@ -1,5 +1,5 @@
 .. image:: https://github.com/MarcoGorelli/nbQA/raw/master/assets/output-onlinepngtools.png
-  :width: 300
+  :width: 400
 
 nbQA
 ====
