@@ -50,6 +50,16 @@ def _temp_python_file_for_notebook(notebook, tmpdir):
 def _replace_full_path_out_err(out, err, temp_python_file, notebook):
     """
     Take care of case when out/err display full path.
+
+    Examples
+    --------
+    >>> out = ""
+    >>> err = "reformatted tmpdir/notebook   .py\\nAll done!"
+    >>> temp_python_file = Path('tmpdir').joinpath('notebook   .py')
+    >>> notebook = Path('notebook.ipynb')
+    >>> out, err = _replace_full_path_out_err(out, err, temp_python_file, notebook)
+    >>> err
+    'reformatted notebook.ipynb\\nAll done!'
     """
     out = out.replace(str(temp_python_file), str(notebook))
     err = err.replace(str(temp_python_file), str(notebook))
@@ -59,6 +69,15 @@ def _replace_full_path_out_err(out, err, temp_python_file, notebook):
 def _replace_relative_path_out_err(out, err, notebook):
     """
     Take care of case when out/err display relative path.
+
+    Examples
+    --------
+    >>> out = "notebook   .py ."
+    >>> err = ""
+    >>> notebook = Path('notebook.ipynb')
+    >>> out, err = _replace_relative_path_out_err(out, err, notebook)
+    >>> out
+    'notebook.ipynb .'
     """
     out = out.replace(
         str(notebook.parent.joinpath(f"{notebook.stem}   ").with_suffix(".py")),
@@ -108,12 +127,24 @@ def _replace_temp_python_file_references_in_out_err(
     return out, err
 
 
-def _replace_tmpdir_references(out, err, tmpdirname):
+def _replace_tmpdir_references(out, err, tmpdirname, cwd=None):
     """
     Replace references to temporary directory name with current working directory.
+
+    Examples
+    --------
+    >>> out = "rootdir: /tmp/tmpdir\\n"
+    >>> err = ""
+    >>> tmpdirname = "/tmp/tmpdir"
+    >>> cwd = Path("nbQA-dev")
+    >>> out, err = _replace_tmpdir_references(out, err, tmpdirname, cwd)
+    >>> out
+    'rootdir: nbQA-dev\\n'
     """
-    out = re.sub(rf"{tmpdirname}(?=\s)", str(Path.cwd()), out)
-    err = re.sub(rf"{tmpdirname}(?=\s)", str(Path.cwd()), err)
+    if cwd is None:
+        cwd = Path.cwd()
+    out = re.sub(rf"{tmpdirname}(?=\s)", str(cwd), out)
+    err = re.sub(rf"{tmpdirname}(?=\s)", str(cwd), err)
     return out, err
 
 
