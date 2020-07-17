@@ -2,8 +2,6 @@ import json
 
 CODE_SEPARATOR = "\n\n# %%\n"
 
-MARKDOWN_SEPARATOR = "\n\n# %% [markdown]\n"
-
 
 def main(path, temp_file):
 
@@ -14,8 +12,6 @@ def main(path, temp_file):
 
     result = [
         f"{CODE_SEPARATOR}{''.join(i['source'])}\n"
-        if i["cell_type"] == "code"
-        else f"{MARKDOWN_SEPARATOR}{''.join(i['source'])}\n"
         for i in cells
         if i["cell_type"] == "code"
     ]
