@@ -33,9 +33,9 @@ Installation: nbQA has no dependencies, so as long as you have Python3.6+, you c
 
 and it'll work without conflicting with any of your existing installs!
 
-------------------------------
 Supported third party packages
 ------------------------------
+
 In theory, `nbqa` can adapt any Python code-quality tool to a Jupyter Notebook.
 
 In practice, here are the tools I've actually tested:

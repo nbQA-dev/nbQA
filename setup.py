@@ -35,6 +35,7 @@ setup(
     install_requires=requirements,
     license="MIT license",
     long_description=readme + "\n\n" + history,
+    long_description_content_type="text/x-rst",
     include_package_data=True,
     keywords="nbqa",
     name="nbqa",
@@ -43,6 +44,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/MarcoGorelli/nbQA",
-    version="0.1.1",
+    version="0.1.2",
     zip_safe=False,
 )
