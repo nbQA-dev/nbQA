@@ -17,6 +17,9 @@ nbQA
 .. image:: https://readthedocs.org/projects/nbqa/badge/?version=latest&style=plastic
     :target: https://nbqa.readthedocs.io/en/latest/
 
+.. image:: https://img.shields.io/pypi/pyversions/nbqa.svg
+    :target: https://pypi.org/project/nbqa/
+
 Adapter to run any code-quality tool on a Jupyter notebook. Zero dependencies, runs on Python3.6+.
 Documentation is hosted here_.
 
