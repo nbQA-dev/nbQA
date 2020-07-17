@@ -80,7 +80,7 @@ def _replace_temp_python_file_references_in_out_err(
             cell_count = 0
         else:
             cell_count += 1
-            mapping[n + 1] = f"cell_{cell_no}:{cell_count}"
+        mapping[n + 1] = f"cell_{cell_no}:{cell_count}"
     out = re.sub(
         rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), out,
     )

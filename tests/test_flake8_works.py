@@ -33,6 +33,8 @@ def test_flake8_works(tmp_notebook_for_testing, capsys):
         "tests/data/notebook_starting_with_md.ipynb:cell_1:1:1: F401 'os' imported but unused\n"
         "tests/data/notebook_starting_with_md.ipynb:cell_1:3:1: F401 'glob' imported but unused\n"
         "tests/data/notebook_starting_with_md.ipynb:cell_1:5:1: F401 'nbqa' imported but unused\n"
+        "tests/data/notebook_starting_with_md.ipynb:cell_3:0:1: E303 too many blank lines (3)\n"
+        "tests/data/notebook_starting_with_md.ipynb:cell_3:2:1: E302 expected 2 blank lines, found 3\n"
     )
     expected_err = ""
     assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
