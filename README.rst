@@ -51,6 +51,40 @@ Example of commands you can do:
 
 Note that you will need to have your desired third-party tool installed - e.g., to run the first example above, you will need to have flake8_ installed.
 
+Examples
+--------
+
+Format your notebooks using :code:`black`:
+
+.. code-block:: bash
+
+    $ nbqa black .
+    reformatted tweet-sentiment-roberta-pytorch.ipynb
+    All done! ✨ 🍰 ✨
+    1 files reformatted.
+
+Check static type annotations:
+
+.. code-block:: bash
+
+    $ nbqa mypy tweet-sentiment-roberta-pytorch.ipynb --ignore-missing-imports
+    tweet-sentiment-roberta-pytorch.ipynb:cell_10:5: error: Argument "batch_size" to "get_test_loader" has incompatible type "str"; expected "int"
+
+Check any examples in your docstrings are correct:
+
+.. code-block:: bash
+
+    $ python -m nbqa pytest tweet-sentiment-roberta-pytorch.ipynb --doctest-modules
+    ============================= test session starts ==============================
+    platform linux -- Python 3.8.2, pytest-5.4.3, py-1.9.0, pluggy-0.13.1
+    rootdir: /home/marco/tweet-sentiment-extraction
+    plugins: cov-2.10.0
+    collected 3 items
+
+    tweet-sentiment-roberta-pytorch.ipynb .                                  [100%]
+
+    ============================== 1 passed in 0.03s ===============================
+
 Supported third party packages
 ------------------------------
 
