@@ -10,3 +10,4 @@ junit
 docs/_build
 dist
 .tox
+build/
