@@ -26,7 +26,7 @@ def test_mypy_works(tmp_notebook_for_testing, capsys):
     out, err = capsys.readouterr()
     expected_out = dedent(
         """\
-        tests/data/notebook_starting_with_md.ipynb:cell_2:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
+        tests/data/notebook_starting_with_md.ipynb:cell_3:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
         tests/data/notebook_for_testing_copy.ipynb:cell_2:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
         tests/data/notebook_for_testing.ipynb:cell_2:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
         Found 3 errors in 3 files (checked 6 source files)
