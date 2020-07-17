@@ -20,8 +20,7 @@ nbQA
 .. image:: https://img.shields.io/pypi/pyversions/nbqa.svg
     :target: https://pypi.org/project/nbqa/
 
-Adapter to run any code-quality tool on a Jupyter notebook. Zero dependencies, runs on Python3.6+.
-Documentation is hosted here_.
+Adapter to run any code-quality tool on a Jupyter notebook. Documentation is hosted here_.
 
 Installation
 ------------
