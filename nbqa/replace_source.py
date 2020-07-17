@@ -1,13 +1,6 @@
 import json
 
 
-def _parse_python_cell(cell):
-    source = cell.splitlines(True)
-    if source[0] == "\n":
-        return {"source": source[1:], "cell_type": "code"}
-    return {"source": source[1:], "cell_type": "markdown"}
-
-
 def main(python_file, notebook):
     """
     Replace `source` of original notebook.
@@ -20,7 +13,9 @@ def main(python_file, notebook):
 
     pycells = pyfile[len("# %%") :].split("\n\n\n# %%")
 
-    new_sources = (_parse_python_cell(i) for i in pycells)
+    new_sources = (
+        {"source": i.splitlines(True)[1:], "cell_type": "code"} for i in pycells
+    )
 
     new_cells = []
     for i in notebook_json["cells"]:
