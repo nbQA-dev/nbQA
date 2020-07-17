@@ -81,7 +81,6 @@ def _replace_temp_python_file_references_in_out_err(
         else:
             cell_count += 1
         mapping[n + 1] = f"cell_{cell_no}:{cell_count}"
-    # this is easy - all you need to do is map the cell line as well.
     out = re.sub(
         rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), out,
     )
