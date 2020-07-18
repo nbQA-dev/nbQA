@@ -24,7 +24,7 @@ def _parse_args(raw_args):
         description="Adapter to run any code-quality tool on a Jupyter notebook.",
         usage="nbqa <command> <notebook or directory> <flags>",
     )
-    parser.add_argument("command", help="Command to run, e.g. `flake8`.")
+    parser.add_argument("-c", "--command", help="Command to run, e.g. `flake8`.")
     parser.add_argument(
         "root_dir", default=".", nargs="?", help="File or directory to run command on."
     )
