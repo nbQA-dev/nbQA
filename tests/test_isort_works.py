@@ -13,7 +13,7 @@ def test_isort_works(tmp_notebook_for_testing, capsys):
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
-        main(["isort", "tests/data/notebook_for_testing.ipynb"])
+        main(["--command=isort", "tests/data/notebook_for_testing.ipynb"])
 
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()
@@ -38,7 +38,7 @@ def test_isort_initial_md(tmp_notebook_starting_with_md, capsys):
     with open(tmp_notebook_starting_with_md, "r") as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
-        main(["isort", "tests/data/notebook_starting_with_md.ipynb"])
+        main(["--command=isort", "tests/data/notebook_starting_with_md.ipynb"])
 
     with open(tmp_notebook_starting_with_md, "r") as handle:
         after = handle.readlines()

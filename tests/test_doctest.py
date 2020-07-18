@@ -17,7 +17,7 @@ def test_pytest_doctest_works(tmp_notebook_for_testing, capsys):
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
-        main(["pytest", "--doctest-modules"])
+        main(["--command=pytest", "--doctest-modules"])
 
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()
