@@ -1,0 +1,8 @@
+- id: nbqa
+  name: nbqa
+  description: "Quality Assurance for Jupyter Notebooks"
+  entry: nbqa
+  language: python
+  language_version: python3
+  require_serial: true
+  types: [python]
