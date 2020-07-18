@@ -22,6 +22,14 @@ nbQA
 
 Adapter to run any code-quality tool on a Jupyter notebook. Documentation is hosted here_.
 
+Prerequisites
+-------------
+If you don't have `pip`_ installed, this `Python installation guide`_ can guide
+you through the process.
+
+.. _pip: https://pip.pypa.io
+.. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
+
 Installation
 ------------
 
@@ -38,18 +46,18 @@ The general syntax is
 
 .. code-block:: bash
 
-    nbqa <command> <directory or file> <flags>
+    nbqa <command> <notebook or directory> <flags>
 
-Example of commands you can do:
+For example, you could run:
 
 .. code-block:: bash
 
     nbqa flake8 my_notebook.ipynb
-    nbqa black . --check
-    nbqa mypy --missing-imports
-    nbqa pytest . --doctest-modules
+    nbqa black my_notebook.ipynb --check
+    nbqa mypy my_notebook.ipynb --ignore-missing-imports
+    nbqa pytest my_notebook.ipynb --doctest-modules
 
-Note that you will need to have your desired third-party tool installed - e.g., to run the first example above, you will need to have flake8_ installed.
+You can also pass an entire directory instead of a single file, e.g. :code:`nbqa flake8 .`.
 
 Examples
 --------
@@ -74,7 +82,7 @@ Check any examples in your docstrings are correct:
 
 .. code-block:: bash
 
-    $ python -m nbqa pytest tweet-sentiment-roberta-pytorch.ipynb --doctest-modules
+    $ nbqa pytest tweet-sentiment-roberta-pytorch.ipynb --doctest-modules
     ============================= test session starts ==============================
     platform linux -- Python 3.8.2, pytest-5.4.3, py-1.9.0, pluggy-0.13.1
     rootdir: /home/marco/tweet-sentiment-extraction
