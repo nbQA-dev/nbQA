@@ -53,9 +53,9 @@ The general syntax is
 
 .. code-block:: bash
 
-    nbqa -c <command>
+    nbqa -c <command> <args>
 
-For example, you could run:
+, where :code:`command` is any Python code quality tool For example, you could run:
 
 .. code-block:: bash
 
