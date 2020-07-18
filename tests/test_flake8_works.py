@@ -13,7 +13,7 @@ def test_flake8_works(tmp_notebook_for_testing, capsys):
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
-        main(["--command=flake8"])
+        main(["flake8", "."])
 
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()

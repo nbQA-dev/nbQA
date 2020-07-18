@@ -53,18 +53,18 @@ The general syntax is
 
 .. code-block:: bash
 
-    nbqa -c <command> <args>
+    nbqa <command> <notebook or directory> <args>
 
 , where :code:`command` is any Python code quality tool. For example, you could run:
 
 .. code-block:: bash
 
-    $ nbqa -c flake8 my_notebook.ipynb
-    $ nbqa -c black my_notebook.ipynb --check
-    $ nbqa -c mypy my_notebook.ipynb --ignore-missing-imports
-    $ nbqa -c pytest my_notebook.ipynb --doctest-modules
+    $ nbqa flake8 my_notebook.ipynb
+    $ nbqa black my_notebook.ipynb --check
+    $ nbqa mypy my_notebook.ipynb --ignore-missing-imports
+    $ nbqa pytest my_notebook.ipynb --doctest-modules
 
-You can also pass an entire directory instead of a single file, e.g. :code:`nbqa -c flake8 my_notebooks`.
+You can also pass an entire directory instead of a single file, e.g. :code:`nbqa flake8 my_notebooks`.
 
 Examples
 --------
@@ -73,7 +73,7 @@ Format your notebooks using :code:`black`:
 
 .. code-block:: bash
 
-    $ nbqa -c black .
+    $ nbqa black .
     reformatted tweet-sentiment-roberta-pytorch.ipynb
     All done! ✨ 🍰 ✨
     1 files reformatted.
@@ -82,14 +82,14 @@ Check static type annotations:
 
 .. code-block:: bash
 
-    $ nbqa -c mypy tweet-sentiment-roberta-pytorch.ipynb --ignore-missing-imports
+    $ nbqa mypy tweet-sentiment-roberta-pytorch.ipynb --ignore-missing-imports
     tweet-sentiment-roberta-pytorch.ipynb:cell_10:5: error: Argument "batch_size" to "get_test_loader" has incompatible type "str"; expected "int"
 
 Check any examples in your docstrings are correct:
 
 .. code-block:: bash
 
-    $ nbqa -c pytest tweet-sentiment-roberta-pytorch.ipynb --doctest-modules
+    $ nbqa pytest tweet-sentiment-roberta-pytorch.ipynb --doctest-modules
     ============================= test session starts ==============================
     platform linux -- Python 3.8.2, pytest-5.4.3, py-1.9.0, pluggy-0.13.1
     rootdir: /home/marco/tweet-sentiment-extraction

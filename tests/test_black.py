@@ -13,7 +13,7 @@ def test_black_works(tmp_notebook_for_testing, capsys):
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
-        main(["--command=black", "tests/data/notebook_for_testing.ipynb"])
+        main(["black", "tests/data/notebook_for_testing.ipynb"])
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()
 
