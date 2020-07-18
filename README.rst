@@ -44,7 +44,7 @@ Check your installation with
 .. code-block:: bash
 
     $ nbqa --version
-    nbqa 0.1.2
+    nbqa 0.1.3
 
 Quickstart
 ----------
@@ -64,7 +64,7 @@ For example, you could run:
     $ nbqa mypy my_notebook.ipynb --ignore-missing-imports
     $ nbqa pytest my_notebook.ipynb --doctest-modules
 
-You can also pass an entire directory instead of a single file, e.g. :code:`nbqa flake8 .`.
+You can also pass an entire directory instead of a single file, e.g. :code:`nbqa flake8 my_notebooks`.
 
 Examples
 --------
