@@ -169,6 +169,33 @@ def _ensure_cell_separators_remain(temp_python_file):
         handle.write(py_file)
 
 
+def _get_arg(root_dir, tmpdirname, nb_to_py_mapping):
+    """
+    Get argument to run command against.
+
+    If running against a single notebook, it'll be the filepath of the converted
+    notebook in the temporary directory.
+    If running against a directory, it'll be the directory mirrored in the temporary
+    directory.
+
+    Examples
+    --------
+    >>> root_dir = "root_dir"
+    >>> tmpdirname = "tmpdir"
+    >>> nb_to_py_mapping = {
+    ...     Path('my_notebook.ipynb'): Path('tmpdir').joinpath('my_notebook   .py')
+    ... }
+    >>> _get_arg(root_dir, tmpdirname, nb_to_py_mapping).as_posix()
+    'tmpdir/my_notebook   .py'
+    """
+    if Path(root_dir).is_dir():
+        arg = Path(tmpdirname).joinpath(root_dir)
+    else:
+        assert len(nb_to_py_mapping) == 1
+        arg = next(iter(nb_to_py_mapping.values()))
+    return arg
+
+
 def _run_command(command, root_dir, tmpdirname, nb_to_py_mapping, kwargs):
     """
     Run third-party tool against given file or directory.
@@ -176,18 +203,21 @@ def _run_command(command, root_dir, tmpdirname, nb_to_py_mapping, kwargs):
     env = os.environ.copy()
     env["PYTHONPATH"] = os.getcwd()
 
-    if Path(root_dir).is_dir():
-        arg = str(Path(tmpdirname).joinpath(root_dir))
-    else:
-        assert len(nb_to_py_mapping) == 1
-        arg = str(next(iter(nb_to_py_mapping.values())))
-    output = subprocess.run(
-        [command, arg, *kwargs],
-        stderr=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        cwd=tmpdirname,
-        env=env,
-    )
+    arg = _get_arg(root_dir, tmpdirname, nb_to_py_mapping)
+
+    try:
+        output = subprocess.run(
+            [command, str(arg), *kwargs],
+            stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            cwd=tmpdirname,
+            env=env,
+        )
+    except FileNotFoundError as fnfe:
+        raise ValueError(
+            f"Command `{command}` not found. "
+            "Please make sure you have it installed before running nbQA on it."
+        ) from fnfe
     output_code = output.returncode
 
     out = output.stdout.decode()
