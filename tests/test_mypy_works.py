@@ -14,7 +14,7 @@ def test_mypy_works(tmp_notebook_for_testing, capsys):
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
-        main(["--command=mypy", "--ignore-missing-imports"])
+        main(["mypy", "--ignore-missing-imports", "."])
 
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()
