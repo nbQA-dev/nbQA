@@ -7,16 +7,28 @@ import tempfile
 from pathlib import Path
 from typing import List
 
-from nbqa import put_magics_back_in, replace_magics, replace_source, save_source
+from nbqa import (
+    __version__,
+    put_magics_back_in,
+    replace_magics,
+    replace_source,
+    save_source,
+)
 
 
 def _parse_args(raw_args):
     """
     Parse command-line arguments.
     """
-    parser = argparse.ArgumentParser(description="")
-    parser.add_argument("command")
-    parser.add_argument("root_dir", default=".", nargs="?")
+    parser = argparse.ArgumentParser(
+        description="Adapter to run any code-quality tool on a Jupyter notebook.",
+        usage="nbqa <command> <notebook or directory> <flags>",
+    )
+    parser.add_argument("command", help="Command to run, e.g. `flake8`.")
+    parser.add_argument(
+        "root_dir", default=".", nargs="?", help="File or directory to run command on."
+    )
+    parser.add_argument("--version", action="version", version=f"nbQA {__version__}")
     args, kwargs = parser.parse_known_args(raw_args)
     command = args.command
     root_dir = args.root_dir

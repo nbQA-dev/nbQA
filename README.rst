@@ -37,7 +37,14 @@ Install :code:`nbqa` with
 
 .. code-block:: bash
 
-    pip install nbqa
+    $ pip install nbqa
+
+Check your installation with
+
+.. code-block:: bash
+
+    $ nbqa --version
+    nbqa 0.1.2
 
 Quickstart
 ----------
@@ -52,10 +59,10 @@ For example, you could run:
 
 .. code-block:: bash
 
-    nbqa flake8 my_notebook.ipynb
-    nbqa black my_notebook.ipynb --check
-    nbqa mypy my_notebook.ipynb --ignore-missing-imports
-    nbqa pytest my_notebook.ipynb --doctest-modules
+    $ nbqa flake8 my_notebook.ipynb
+    $ nbqa black my_notebook.ipynb --check
+    $ nbqa mypy my_notebook.ipynb --ignore-missing-imports
+    $ nbqa pytest my_notebook.ipynb --doctest-modules
 
 You can also pass an entire directory instead of a single file, e.g. :code:`nbqa flake8 .`.
 
