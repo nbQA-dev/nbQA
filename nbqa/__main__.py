@@ -253,8 +253,6 @@ def main(raw_args=None):
     notebooks = _get_notebooks(root_dir)
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        tmpdirname = tmpdirname.replace("\\", "\\\\")
-
         nb_to_py_mapping = {
             notebook: _temp_python_file_for_notebook(notebook, tmpdirname)
             for notebook in notebooks
@@ -277,7 +275,7 @@ def main(raw_args=None):
             command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
         )
 
-        out, err = _replace_tmpdir_references(out, err, tmpdirname)
+        # out, err = _replace_tmpdir_references(out, err, tmpdirname)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(
