@@ -12,7 +12,7 @@ def test_nbqa_ini_works(tmp_notebook_for_testing, capsys):
     """
 
     with open(".nbqa.ini", "w") as f:
-        f.write("[flake8]\nignore=F401\nselect=E303\n")
+        f.write("[flake8]\nignore=F401\nselect=E303\nquiet\n")
 
     # check diff
     with open(tmp_notebook_for_testing, "r") as handle:
@@ -30,7 +30,7 @@ def test_nbqa_ini_works(tmp_notebook_for_testing, capsys):
 
     # check out and err
     out, err = capsys.readouterr()
-    expected_out = "tests/data/notebook_starting_with_md.ipynb:cell_3:0:1: E303 too many blank lines (3)\n"
+    expected_out = "tests/data/notebook_starting_with_md.ipynb\n"
     expected_err = ""
     assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
     assert sorted(err.splitlines()) == sorted(expected_err.splitlines())
