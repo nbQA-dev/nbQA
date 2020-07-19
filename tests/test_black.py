@@ -1,4 +1,5 @@
 import difflib
+import os
 
 import pytest
 
@@ -12,8 +13,9 @@ def test_black_works(tmp_notebook_for_testing, capsys):
     # check diff
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
+    path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
     with pytest.raises(SystemExit):
-        main(["black", "tests/data/notebook_for_testing.ipynb"])
+        main(["black", path])
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()
 
@@ -28,6 +30,6 @@ def test_black_works(tmp_notebook_for_testing, capsys):
     # check out and err
     out, err = capsys.readouterr()
     expected_out = ""
-    expected_err = "reformatted tests/data/notebook_for_testing.ipynb\nAll done! ✨ 🍰 ✨\n1 file reformatted.\n"  # noqa
+    expected_err = f"reformatted {path}\nAll done! ✨ 🍰 ✨\n1 file reformatted.\n"  # noqa
     assert out == expected_out
     assert err == expected_err

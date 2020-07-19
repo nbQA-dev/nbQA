@@ -1,4 +1,5 @@
 import difflib
+import os
 from textwrap import dedent
 
 import pytest
@@ -24,11 +25,14 @@ def test_mypy_works(tmp_notebook_for_testing, capsys):
 
     # check out and err
     out, err = capsys.readouterr()
+    path_0 = os.path.join("tests", "data", "notebook_for_testing.ipynb")
+    path_1 = os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
+    path_2 = os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
     expected_out = dedent(
-        """\
-        tests/data/notebook_starting_with_md.ipynb:cell_3:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
-        tests/data/notebook_for_testing_copy.ipynb:cell_2:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
-        tests/data/notebook_for_testing.ipynb:cell_2:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
+        f"""\
+        {path_2}:cell_3:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
+        {path_1}:cell_2:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
+        {path_0}:cell_2:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
         Found 3 errors in 3 files (checked 6 source files)
         """  # noqa
     )
