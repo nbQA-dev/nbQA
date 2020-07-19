@@ -29,7 +29,11 @@ def test_black_works(tmp_notebook_for_testing, capsys):
 
     # check out and err
     out, err = capsys.readouterr()
-    expected_out = ""
-    expected_err = f"reformatted {path}{os.linesep}All done! \u2728 \U0001f370 \u2728{os.linesep}1 file reformatted.{os.linesep}"  # noqa
-    assert out == expected_out
-    assert err == expected_err
+    expected_out = []
+    expected_err = [
+        f"reformatted {path}",
+        "All done! \u2728 \U0001f370 \u2728",
+        "1 file reformatted.",
+    ]  # noqa
+    assert out.splitlines() == expected_out
+    assert err.splitlines() == expected_err
