@@ -44,7 +44,7 @@ Check your installation with
 .. code-block:: bash
 
     $ nbqa --version
-    nbqa 0.1.3
+    nbqa 0.1.7
 
 Quickstart
 ----------
