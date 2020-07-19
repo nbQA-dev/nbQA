@@ -159,8 +159,9 @@ could add to your :code:`.pre-commit-config.yaml` file:
         name: nbqa-mypy
 
 It's entirely optional which tool to use with which mirror, the purpose of having
-these mirror is to avoid duplicate keys in the :code:`.pre-commit.yaml` file, but
-they're all the same.
+these mirrors is to avoid duplicate keys in the :code:`.pre-commit.yaml` file, but
+they're all the same. I'm keeping 10 mirrors up-to-date with this repository, so currently
+that's the maximum number of pre-commit hooks you can have for :code:`nbqa` tools.
 
 See Also
 --------
