@@ -3,7 +3,7 @@ import pytest
 from nbqa.__main__ import main
 
 
-def test_missing_root_dir(capsys):
+def test_missing_root_dir():
     msg = (
         "Please specify both a command and a notebook/directory, e.g.\n"
         "nbqa flake8 my_notebook.ipynb"
