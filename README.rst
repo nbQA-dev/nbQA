@@ -114,6 +114,45 @@ In practice, here are the tools it's been tested with:
 - mypy_ (you will need to have `__init__` files in each subdirectory)
 - doctest_ (as long as you run it via pytest_ with the `--doctest-modules` flag)
 
+Configuration
+-------------
+
+You can pass extra configurations to your tools either via the command line (as in the
+examples above), or in a :code:`.nbqa.ini` file, which could look something like this:
+
+.. code-block:: ini
+
+    [black]
+    line-length=96
+
+    [flake8]
+    max-line-length=88
+    ignore=E203,W503,W504
+
+Flags from this :code:`.ini` will be passed to :code:`nbqa` as they're written.
+
+Usage as pre-commit hook
+------------------------
+
+If you want to use :code:`nbqa` with `pre-commit`_, here's an example of what you
+could add to your :code:`.pre-commit-config.yaml` file:
+
+.. code-block::yaml
+
+  - repo: https://github.com/MarcoGorelli/nbQA-mirror-0
+    rev: master
+    hooks:
+      - id: nbqa
+        args: ['flake8']
+  - repo: https://github.com/MarcoGorelli/nbQA-mirror-1
+    rev: master
+    hooks:
+      - id: nbqa
+        args: ['isort']
+
+Note that, because the repository keys need to be unique, you will need to use a
+different mirror repository for each pre-commit hook you wish to use.
+
 See Also
 --------
 
@@ -134,3 +173,4 @@ Project template from cookiecutter_.
 .. _black-nb: https://github.com/tomcatling/black-nb
 .. _flake8-nb: https://flake8-nb.readthedocs.io/en/latest/readme.html
 .. _here: https://nbqa.readthedocs.io/en/latest/
+.. _`pre-commit`: https://pre-commit.com/
