@@ -140,19 +140,19 @@ could add to your :code:`.pre-commit-config.yaml` file:
 .. code-block:: yaml
 
   - repo: https://github.com/MarcoGorelli/nbQA-mirror-0
-    rev: master
+    rev: 0.1.7
     hooks:
       - id: nbqa
         args: ['flake8']
         name: nbqa-flake8
   - repo: https://github.com/MarcoGorelli/nbQA-mirror-1
-    rev: master
+    rev: 0.1.7
     hooks:
       - id: nbqa
         args: ['isort']
         name: nbqa-isort
   - repo: https://github.com/MarcoGorelli/nbQA-mirror-2
-    rev: master
+    rev: 0.1.7
     hooks:
       - id: nbqa
         args: ['mypy']
