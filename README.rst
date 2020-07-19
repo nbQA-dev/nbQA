@@ -39,6 +39,7 @@ Install :code:`nbqa` with
 
     $ pip install nbqa
 
+There are **no dependencies** for :code:`nbqa` so installation should be lightning-fast.
 Check your installation with
 
 .. code-block:: bash
