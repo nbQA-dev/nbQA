@@ -73,7 +73,7 @@ Format your notebooks using :code:`black`:
 
 .. code-block:: bash
 
-    $ nbqa black .
+    $ nbqa black . --line-length=96
     reformatted tweet-sentiment-roberta-pytorch.ipynb
     All done! ✨ 🍰 ✨
     1 files reformatted.
@@ -149,6 +149,11 @@ could add to your :code:`.pre-commit-config.yaml` file:
     hooks:
       - id: nbqa
         args: ['isort']
+  - repo: https://github.com/MarcoGorelli/nbQA-mirror-2
+    rev: master
+    hooks:
+      - id: nbqa
+        args: ['mypy']
 
 Note that, because the repository keys need to be unique, you will need to use a
 different mirror repository for each pre-commit hook you wish to use.

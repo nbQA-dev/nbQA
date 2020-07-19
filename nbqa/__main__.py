@@ -23,12 +23,22 @@ def _parse_args(raw_args):
     """
     parser = argparse.ArgumentParser(
         description="Adapter to run any code-quality tool on a Jupyter notebook.",
-        usage="nbqa <command> <notebook or directory> <flags>",
+        usage=(
+            "nbqa <command> <notebook or directory> <flags>\n"
+            "e.g. `nbqa flake8 my_notebook.ipynb --ignore=E203`"
+        ),
     )
     parser.add_argument("command", help="Command to run, e.g. `flake8`.")
     parser.add_argument("root_dir", help="Notebook or directory to run command on.")
     parser.add_argument("--version", action="version", version=f"nbQA {__version__}")
-    args, kwargs = parser.parse_known_args(raw_args)
+    try:
+        args, kwargs = parser.parse_known_args(raw_args)
+    except SystemExit as e:
+        msg = (
+            "Please specify both a command and a notebook/directory, e.g.\n"
+            "nbqa flake8 my_notebook.ipynb"
+        )
+        raise ValueError(msg) from e
     command = args.command
     root_dir = args.root_dir
     return command, root_dir, kwargs
