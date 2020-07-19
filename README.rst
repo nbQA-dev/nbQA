@@ -137,7 +137,7 @@ Usage as pre-commit hook
 If you want to use :code:`nbqa` with `pre-commit`_, here's an example of what you
 could add to your :code:`.pre-commit-config.yaml` file:
 
-.. code-block::yaml
+.. code-block:: yaml
 
   - repo: https://github.com/MarcoGorelli/nbQA-mirror-0
     rev: master
