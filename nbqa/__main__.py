@@ -164,8 +164,8 @@ def _replace_tmpdir_references(out, err, tmpdirname, cwd=None):
     """
     if cwd is None:
         cwd = Path.cwd()
-    out = re.sub(rf"{str(Path(tmpdirname))}(?=\s)", str(cwd), out)
-    err = re.sub(rf"{str(Path(tmpdirname))}(?=\s)", str(cwd), err)
+    out = re.sub(rf"{tmpdirname}(?=\s)", str(cwd), out)
+    err = re.sub(rf"{tmpdirname}(?=\s)", str(cwd), err)
     return out, err
 
 
@@ -253,6 +253,7 @@ def main(raw_args=None):
     notebooks = _get_notebooks(root_dir)
 
     with tempfile.TemporaryDirectory() as tmpdirname:
+        tmpdirname = tmpdirname.replace("\\", "\\\\")
 
         nb_to_py_mapping = {
             notebook: _temp_python_file_for_notebook(notebook, tmpdirname)
