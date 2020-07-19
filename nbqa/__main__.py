@@ -264,10 +264,13 @@ def main(raw_args=None):
             replace_magics.main(temp_python_file)
             _create_blank_init_files(notebook, tmpdirname)
 
-        config = configparser.ConfigParser()
+        config = configparser.ConfigParser(allow_no_value=True)
         config.read(".nbqa.ini")
         if command in config.sections():
-            configs = [[f"--{key}", val] for key, val in config[command].items()]
+            configs = [
+                [f"--{key}", val] if val is not None else [f"--{key}"]
+                for key, val in config[command].items()
+            ]
             kwargs.extend([j for i in configs for j in i])
         out, err, output_code = _run_command(
             command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
