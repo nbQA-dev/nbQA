@@ -30,6 +30,6 @@ def test_black_works(tmp_notebook_for_testing, capsys):
     # check out and err
     out, err = capsys.readouterr()
     expected_out = ""
-    expected_err = f"reformatted {path}\nAll done! ✨ 🍰 ✨\n1 file reformatted.\n"  # noqa
+    expected_err = f"reformatted {path}{os.linesep}All done! ✨ 🍰 ✨{os.linesep}1 file reformatted.{os.linesep}"  # noqa
     assert out == expected_out
     assert err == expected_err
