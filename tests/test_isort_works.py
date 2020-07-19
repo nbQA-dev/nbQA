@@ -1,4 +1,5 @@
 import difflib
+from pathlib import Path
 
 import pytest
 
@@ -13,7 +14,7 @@ def test_isort_works(tmp_notebook_for_testing, capsys):
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
-        main(["isort", "tests/data/notebook_for_testing.ipynb"])
+        main(["isort", str(Path("tests/data/notebook_for_testing.ipynb"))])
 
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()
