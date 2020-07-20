@@ -25,9 +25,15 @@ def test_flake8_works(tmp_notebook_for_testing, capsys):
 
     # check out and err
     out, err = capsys.readouterr()
-    path_0 = os.path.join("tests", "data", "notebook_for_testing.ipynb")
-    path_1 = os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
-    path_2 = os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
+    path_0 = os.path.abspath(
+        os.path.join("tests", "data", "notebook_for_testing.ipynb")
+    )
+    path_1 = os.path.abspath(
+        os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
+    )
+    path_2 = os.path.abspath(
+        os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
+    )
     expected_out = dedent(
         f"""\
         {path_0}:cell_1:1:1: F401 'os' imported but unused

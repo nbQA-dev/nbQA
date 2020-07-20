@@ -31,9 +31,7 @@ def test_nbqa_ini_works(tmp_notebook_for_testing, capsys):
 
     # check out and err
     out, err = capsys.readouterr()
-    expected_out = (
-        f"{os.path.join('tests', 'data', 'notebook_starting_with_md.ipynb')}\n"
-    )
+    expected_out = f"{os.path.abspath(os.path.join('tests', 'data', 'notebook_starting_with_md.ipynb'))}\n"
     expected_err = ""
     assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
     assert sorted(err.splitlines()) == sorted(expected_err.splitlines())

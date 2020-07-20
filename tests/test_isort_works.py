@@ -13,7 +13,7 @@ def test_isort_works(tmp_notebook_for_testing, capsys):
     # check diff
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
-    path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
+    path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     with pytest.raises(SystemExit):
         main(["isort", path])
 
@@ -39,7 +39,9 @@ def test_isort_initial_md(tmp_notebook_starting_with_md, capsys):
     # check diff
     with open(tmp_notebook_starting_with_md, "r") as handle:
         before = handle.readlines()
-    path = os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
+    path = os.path.abspath(
+        os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
+    )
     with pytest.raises(SystemExit):
         main(["isort", path])
 

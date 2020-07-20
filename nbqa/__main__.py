@@ -60,7 +60,7 @@ def _temp_python_file_for_notebook(notebook, tmpdir):
     # Add 3 extra whitespaces because `ipynb` is 3 chars longer than `py`.
     temp_python_file = (
         Path(tmpdir)
-        .joinpath(notebook.parent)
+        .joinpath(notebook.resolve().relative_to(Path.cwd()).parent)
         .joinpath(f"{notebook.stem}   ")
         .with_suffix(".py")
     )
@@ -79,11 +79,11 @@ def _replace_full_path_out_err(out, err, temp_python_file, notebook):
     >>> temp_python_file = Path('tmpdir').joinpath('notebook   .py')
     >>> notebook = Path('notebook.ipynb')
     >>> out, err = _replace_full_path_out_err(out, err, temp_python_file, notebook)
-    >>> err
-    'reformatted notebook.ipynb\\nAll done!'
+    >>> err.splitlines()[0][-6:]
+    '.ipynb'
     """
-    out = out.replace(str(temp_python_file), str(notebook))
-    err = err.replace(str(temp_python_file), str(notebook))
+    out = out.replace(str(temp_python_file), str(notebook.resolve()))
+    err = err.replace(str(temp_python_file), str(notebook.resolve()))
     return out, err
 
 
@@ -173,9 +173,10 @@ def _create_blank_init_files(notebook, tmpdirname):
     """
     Replicate local (possibly blank) __init__ files to temporary directory.
     """
-    parts = notebook.parts
+    parts = notebook.resolve().relative_to(Path.cwd()).parts
     init_files = Path(parts[0]).rglob("__init__.py")
     for i in init_files:
+        Path(tmpdirname).joinpath(i).parent.mkdir(parents=True, exist_ok=True)
         Path(tmpdirname).joinpath(i).touch()
 
 

@@ -30,7 +30,7 @@ def test_black_works(tmp_notebook_for_testing, capsys):
     # check diff
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
-    path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
+    path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     with pytest.raises(SystemExit):
         main(["black", path])
     with open(tmp_notebook_for_testing, "r") as handle:
