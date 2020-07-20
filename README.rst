@@ -22,6 +22,8 @@ nbQA
 
 Adapter to run any code-quality tool on a Jupyter notebook. Documentation is hosted here_.
 
+NOTE: this will currently not work on Windows, but I'm working on making it cross-platform.
+
 Prerequisites
 -------------
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
