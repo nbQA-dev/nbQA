@@ -26,7 +26,7 @@ def test_isort_works(tmp_notebook_for_testing, capsys):
 
     # check out and err
     out, err = capsys.readouterr()
-    expected_out = f"Fixing {path}\n"
+    expected_out = f"Fixing {path}{os.linesep}"
     expected_err = ""
     assert out == expected_out
     assert err == expected_err
