@@ -72,6 +72,11 @@ def _replace_full_path_out_err(out, err, temp_python_file, notebook):
     """
     Take care of case when out/err display full path.
     """
+    print("***")
+    print(out)
+    print(notebook)
+    print(temp_python_file)
+    print("***")
     out = out.replace(str(temp_python_file), str(notebook.resolve()))
     err = err.replace(str(temp_python_file), str(notebook.resolve()))
     return out, err
