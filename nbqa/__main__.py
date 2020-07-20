@@ -71,16 +71,6 @@ def _temp_python_file_for_notebook(notebook, tmpdir):
 def _replace_full_path_out_err(out, err, temp_python_file, notebook):
     """
     Take care of case when out/err display full path.
-
-    Examples
-    --------
-    >>> out = ""
-    >>> err = "reformatted tmpdir/notebook   .py\\nAll done!"
-    >>> temp_python_file = Path('tmpdir').joinpath('notebook   .py')
-    >>> notebook = Path('notebook.ipynb')
-    >>> out, err = _replace_full_path_out_err(out, err, temp_python_file, notebook)
-    >>> err.splitlines()[0][-6:]
-    '.ipynb'
     """
     out = out.replace(str(temp_python_file), str(notebook.resolve()))
     err = err.replace(str(temp_python_file), str(notebook.resolve()))
