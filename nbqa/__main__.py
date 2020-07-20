@@ -75,7 +75,7 @@ def _replace_full_path_out_err(out, err, temp_python_file, notebook):
     print("***")
     print(out)
     print(notebook)
-    print(temp_python_file)
+    print(str(Path(temp_python_file).resolve()))
     print("***")
     out = out.replace(str(temp_python_file), str(notebook.resolve()))
     err = err.replace(str(temp_python_file), str(notebook.resolve()))
