@@ -54,7 +54,7 @@ def test_isort_initial_md(tmp_notebook_starting_with_md, capsys):
 
     # check out and err
     out, err = capsys.readouterr()
-    expected_out = f"Fixing {path}\n"
+    expected_out = f"Fixing {path}{os.linesep}"
     expected_err = ""
     assert out == expected_out
     assert err == expected_err

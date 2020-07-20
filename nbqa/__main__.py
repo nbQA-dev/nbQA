@@ -82,12 +82,8 @@ def _replace_full_path_out_err(out, err, temp_python_file, notebook):
     >>> err.splitlines()[0][-6:]
     '.ipynb'
     """
-    out = out.replace(
-        str(temp_python_file).replace("\\", "\\\\"), str(notebook.resolve())
-    )
-    err = err.replace(
-        str(temp_python_file).replace("\\", "\\\\"), str(notebook.resolve())
-    )
+    out = out.replace(str(temp_python_file), str(notebook.resolve()))
+    err = err.replace(str(temp_python_file), str(notebook.resolve()))
     return out, err
 
 
