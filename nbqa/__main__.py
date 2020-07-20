@@ -92,6 +92,7 @@ def _replace_relative_path_out_err(out, err, notebook):
     """
     print("***")
     print(out)
+    print(notebook)
     print("***")
     out = out.replace(
         str(notebook.parent.joinpath(f"{notebook.stem}   ").with_suffix(".py")),
