@@ -72,13 +72,8 @@ def _replace_full_path_out_err(out, err, temp_python_file, notebook):
     """
     Take care of case when out/err display full path.
     """
-    print("***")
-    print(out)
-    print(notebook)
-    print(str(Path(temp_python_file).resolve()))
-    print("***")
-    out = out.replace(str(temp_python_file), str(notebook.resolve()))
-    err = err.replace(str(temp_python_file), str(notebook.resolve()))
+    out = out.replace(str(Path(temp_python_file).resolve()), str(notebook.resolve()))
+    err = err.replace(str(Path(temp_python_file).resolve()), str(notebook.resolve()))
     return out, err
 
 
@@ -95,10 +90,6 @@ def _replace_relative_path_out_err(out, err, notebook):
     >>> out
     'notebook.ipynb .'
     """
-    print("***")
-    print(out)
-    print(notebook)
-    print("***")
     out = out.replace(
         str(notebook.parent.joinpath(f"{notebook.stem}   ").with_suffix(".py")),
         str(notebook),
