@@ -78,5 +78,5 @@ stages:
         displayName: 'static analysis'
 
       - script: |
-          pytest -vv
+          pytest -vv -k isort
         displayName: 'pytest'

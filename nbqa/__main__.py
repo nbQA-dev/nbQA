@@ -90,6 +90,9 @@ def _replace_relative_path_out_err(out, err, notebook):
     >>> out
     'notebook.ipynb .'
     """
+    print("***")
+    print(out)
+    print("***")
     out = out.replace(
         str(notebook.parent.joinpath(f"{notebook.stem}   ").with_suffix(".py")),
         str(notebook),
