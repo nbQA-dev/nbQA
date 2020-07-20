@@ -164,8 +164,8 @@ def _replace_tmpdir_references(out, err, tmpdirname, cwd=None):
     """
     if cwd is None:
         cwd = Path.cwd()
-    out = re.sub(rf"{tmpdirname}(?=\s)", str(cwd), out)
-    err = re.sub(rf"{tmpdirname}(?=\s)", str(cwd), err)
+    out = out.replace(f"rootdir: {tmpdirname}", f"rootdir: {str(cwd)}")
+    err = err.replace(f"rootdir: {tmpdirname}", f"rootdir: {str(cwd)}")
     return out, err
 
 
@@ -275,7 +275,7 @@ def main(raw_args=None):
             command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
         )
 
-        # out, err = _replace_tmpdir_references(out, err, tmpdirname)
+        out, err = _replace_tmpdir_references(out, err, tmpdirname)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(

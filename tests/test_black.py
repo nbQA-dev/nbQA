@@ -1,9 +1,26 @@
 import difflib
 import os
+import re
 
 import pytest
 
 from nbqa.__main__ import main
+
+
+def _de_emojify(text):
+    # https://stackoverflow.com/a/49986645
+    regrex_pattern = re.compile(
+        pattern="["
+        "\U0001F600-\U0001F64F"  # emoticons
+        "\U0001F300-\U0001F5FF"  # symbols & pictographs
+        "\U0001F680-\U0001F6FF"  # transport & map symbols
+        "\U0001F1E0-\U0001F1FF"  # flags (iOS)
+        "\U00002702-\U000027B0"
+        "\U000024C2-\U0001F251"
+        "]+",
+        flags=re.UNICODE,
+    )
+    return regrex_pattern.sub(r"", text)
 
 
 def test_black_works(tmp_notebook_for_testing, capsys):
@@ -29,11 +46,7 @@ def test_black_works(tmp_notebook_for_testing, capsys):
 
     # check out and err
     out, err = capsys.readouterr()
-    expected_out = []
-    expected_err = [
-        f"reformatted {path}",
-        "All done! \u2728 \U0001f370 \u2728",
-        "1 file reformatted.",
-    ]  # noqa
-    assert out.splitlines() == expected_out
-    assert err.splitlines() == expected_err
+    expected_out = ""
+    expected_err = f"reformatted {path}{os.linesep}All done!   {os.linesep}1 file reformatted.{os.linesep}"  # noqa
+    assert _de_emojify(out) == _de_emojify(expected_out)
+    assert _de_emojify(err) == _de_emojify(expected_err)
