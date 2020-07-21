@@ -78,5 +78,5 @@ stages:
         displayName: 'static analysis'
 
       - script: |
-          pytest -vv -k pytest_doctest
+          pytest -vv -k pytest_doctest -s
         displayName: 'pytest'
