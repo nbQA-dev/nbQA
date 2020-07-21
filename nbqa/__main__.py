@@ -155,8 +155,8 @@ def _replace_tmpdir_references(out, err, tmpdirname, cwd=None):
     >>> tmpdirname = os.path.join('tmp', 'tmpdir')
     >>> cwd = Path("nbQA-dev")
     >>> out, err = _replace_tmpdir_references(out, err, tmpdirname, cwd)
-    >>> out
-    'rootdir: nbQA-dev\\n'
+    >>> out.strip(os.linesep)
+    'rootdir: nbQA-dev'
     """
     if cwd is None:
         cwd = Path.cwd().resolve()
