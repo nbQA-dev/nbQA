@@ -20,6 +20,9 @@ nbQA
 .. image:: https://img.shields.io/pypi/pyversions/nbqa.svg
     :target: https://pypi.org/project/nbqa/
 
+.. image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
+    :target: https://github.com/pre-commit/pre-commit
+
 Adapter to run any code-quality tool on a Jupyter notebook. Documentation is hosted here_.
 
 Prerequisites
