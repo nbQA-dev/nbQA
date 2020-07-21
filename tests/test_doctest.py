@@ -28,19 +28,19 @@ def test_pytest_doctest_works(tmp_notebook_for_testing, capsys):
     # check out and err
     out, err = capsys.readouterr()
     expected_err = ""
-    # assert f"rootdir: {str(Path.cwd())}" in out.splitlines()[2]
-    # assert (
-    #     os.path.join("tests", "data", "notebook_for_testing.ipynb")
-    #     in out.splitlines()[6]
-    # )
-    # assert (
-    #     os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
-    #     in out.splitlines()[7]
-    # )
-    # assert (
-    #     os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
-    #     in out.splitlines()[8]
-    # )
+    assert f"rootdir: {str(Path.cwd())}" in out.splitlines()[2]
+    assert any(
+        os.path.join("tests", "data", "notebook_for_testing.ipynb") in i
+        for i in out.splitlines()
+    )
+    assert any(
+        os.path.join("tests", "data", "notebook_for_testing_copy.ipynb") in i
+        for i in out.splitlines()
+    )
+    assert any(
+        os.path.join("tests", "data", "notebook_starting_with_md.ipynb") in i
+        for i in out.splitlines()
+    )
 
     print(out.splitlines())
 
