@@ -160,18 +160,23 @@ def _replace_tmpdir_references(out, err, tmpdirname, cwd=None):
     """
     if cwd is None:
         cwd = Path.cwd().resolve()
-
-    out = re.sub(r"(?<=rootdir: ).+[^\r\n]", str(cwd), out)
-    err = re.sub(r"(?<=rootdir: ).+[^\r\n]", str(cwd), err)
-    # out = out.replace(f"rootdir: {tmpdirname}", f"rootdir: {str(cwd)}")
-    # err = err.replace(f"rootdir: {tmpdirname}", f"rootdir: {str(cwd)}")
-    # out = out.replace(
-    #     f"rootdir: {str(Path(tmpdirname).resolve())}", f"rootdir: {str(cwd)}"
-    # )
-    # err = err.replace(
-    #     f"rootdir: {str(Path(tmpdirname).resolve())}", f"rootdir: {str(cwd)}"
-    # )
-    return out, err
+    new_out = os.linesep.join(
+        [
+            i if not i.startswith("rootdir: ") else f"rootdir: {str(cwd)}"
+            for i in out.splitlines()
+        ]
+    )
+    new_err = os.linesep.join(
+        [
+            i if not i.startswith("rootdir: ") else f"rootdir: {str(cwd)}"
+            for i in err.splitlines()
+        ]
+    )
+    if new_out:
+        new_out += os.linesep
+    if new_err:
+        new_err += os.linesep
+    return new_out, new_err
 
 
 def _create_blank_init_files(notebook, tmpdirname):
