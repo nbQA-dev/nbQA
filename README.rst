@@ -45,7 +45,7 @@ Check your installation with
 .. code-block:: bash
 
     $ nbqa --version
-    nbqa 0.1.8
+    nbqa 0.1.9
 
 Quickstart
 ----------
@@ -141,19 +141,19 @@ could add to your :code:`.pre-commit-config.yaml` file:
 .. code-block:: yaml
 
   - repo: https://github.com/MarcoGorelli/nbQA-mirror-0
-    rev: 0.1.8
+    rev: 0.1.9
     hooks:
       - id: nbqa
         args: ['flake8']
         name: nbqa-flake8
   - repo: https://github.com/MarcoGorelli/nbQA-mirror-1
-    rev: 0.1.8
+    rev: 0.1.9
     hooks:
       - id: nbqa
         args: ['isort']
         name: nbqa-isort
   - repo: https://github.com/MarcoGorelli/nbQA-mirror-2
-    rev: 0.1.8
+    rev: 0.1.9
     hooks:
       - id: nbqa
         args: ['mypy']

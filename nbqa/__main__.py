@@ -34,11 +34,13 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
     try:
         args, kwargs = parser.parse_known_args(raw_args)
     except SystemExit as e:
-        msg = (
-            "Please specify both a command and a notebook/directory, e.g.\n"
-            "nbqa flake8 my_notebook.ipynb"
-        )
-        raise ValueError(msg) from e
+        if e.code != 0:
+            msg = (
+                "Please specify both a command and a notebook/directory, e.g.\n"
+                "nbqa flake8 my_notebook.ipynb"
+            )
+            raise ValueError(msg) from e
+        sys.exit(0)
     command = args.command
     root_dir = args.root_dir
     return command, root_dir, kwargs
