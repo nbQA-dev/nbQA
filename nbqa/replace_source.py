@@ -1,9 +1,13 @@
 import json
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma: nocover
+    from pathlib import Path
 
 
-def main(python_file, notebook):
+def main(python_file: "Path", notebook: "Path") -> None:
     """
-    Replace `source` of original notebook.
+    Replace `source` code cells of original notebook.
     """
     with open(notebook, "r") as handle:
         notebook_json = json.load(handle)

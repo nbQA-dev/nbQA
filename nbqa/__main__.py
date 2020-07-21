@@ -6,7 +6,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import List
+from typing import Iterator, List, Optional, Tuple
 
 from nbqa import (
     __version__,
@@ -17,7 +17,7 @@ from nbqa import (
 )
 
 
-def _parse_args(raw_args):
+def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
     """
     Parse command-line arguments.
     """
@@ -44,7 +44,7 @@ def _parse_args(raw_args):
     return command, root_dir, kwargs
 
 
-def _get_notebooks(root_dir) -> List[Path]:
+def _get_notebooks(root_dir: str) -> Iterator[Path]:
     """
     Get generator with all notebooks in directory.
     """
@@ -53,7 +53,7 @@ def _get_notebooks(root_dir) -> List[Path]:
     return (i for i in Path(".").rglob("*.ipynb") if ".ipynb_checkpoints" not in str(i))
 
 
-def _temp_python_file_for_notebook(notebook, tmpdir):
+def _temp_python_file_for_notebook(notebook: Path, tmpdir: str) -> Path:
     """
     Get temporary file to save converted notebook into.
     """
@@ -68,7 +68,9 @@ def _temp_python_file_for_notebook(notebook, tmpdir):
     return temp_python_file
 
 
-def _replace_full_path_out_err(out, err, temp_python_file, notebook):
+def _replace_full_path_out_err(
+    out: str, err: str, temp_python_file: Path, notebook: Path
+) -> Tuple[str, str]:
     """
     Take care of case when out/err display full path.
     """
@@ -83,7 +85,9 @@ def _replace_full_path_out_err(out, err, temp_python_file, notebook):
     return out, err
 
 
-def _replace_relative_path_out_err(out, err, notebook):
+def _replace_relative_path_out_err(
+    out: str, err: str, notebook: Path
+) -> Tuple[str, str]:
     """
     Take care of case when out/err display relative path.
 
@@ -107,7 +111,9 @@ def _replace_relative_path_out_err(out, err, notebook):
     return out, err
 
 
-def _map_python_line_to_nb_lines(out, err, temp_python_file, notebook):
+def _map_python_line_to_nb_lines(
+    out: str, err: str, temp_python_file: Path, notebook: Path
+) -> Tuple[str, str]:
     """
     Make sure stdout and stderr make reference to Jupyter Notebook lines.
     """
@@ -121,6 +127,7 @@ def _map_python_line_to_nb_lines(out, err, temp_python_file, notebook):
             cell_no += 1
             cell_count = 0
         else:
+            assert cell_count is not None
             cell_count += 1
         mapping[n + 1] = f"cell_{cell_no}:{cell_count}"
     out = re.sub(
