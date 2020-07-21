@@ -1,8 +1,6 @@
-# noqa
-
 import difflib
-import os  # noqa
-from pathlib import Path  # noqa
+import os
+from pathlib import Path
 
 import pytest
 

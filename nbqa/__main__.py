@@ -264,6 +264,7 @@ def main(raw_args=None):
     notebooks = _get_notebooks(root_dir)
 
     with tempfile.TemporaryDirectory() as tmpdirname:
+
         nb_to_py_mapping = {
             notebook: _temp_python_file_for_notebook(notebook, tmpdirname)
             for notebook in notebooks
