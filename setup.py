@@ -7,8 +7,6 @@ from setuptools import find_packages, setup
 with open("README.rst") as readme_file:
     readme = readme_file.read()
 
-with open("HISTORY.rst") as history_file:
-    history = history_file.read()
 
 requirements = []
 
@@ -34,7 +32,7 @@ setup(
     entry_points={"console_scripts": ["nbqa=nbqa.__main__:main"]},
     install_requires=requirements,
     license="MIT license",
-    long_description=readme + "\n\n" + history,
+    long_description=readme,
     long_description_content_type="text/x-rst",
     include_package_data=True,
     keywords="nbqa",
@@ -44,6 +42,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/MarcoGorelli/nbQA",
-    version="0.1.7",
+    version="0.1.8",
     zip_safe=False,
 )
