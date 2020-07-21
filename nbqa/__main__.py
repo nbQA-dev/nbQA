@@ -162,6 +162,12 @@ def _replace_tmpdir_references(out, err, tmpdirname, cwd=None):
         cwd = Path.cwd()
     out = out.replace(f"rootdir: {tmpdirname}", f"rootdir: {str(cwd)}")
     err = err.replace(f"rootdir: {tmpdirname}", f"rootdir: {str(cwd)}")
+    out = out.replace(
+        f"rootdir: {str(Path(tmpdirname).resolve())}", f"rootdir: {str(cwd)}"
+    )
+    err = err.replace(
+        f"rootdir: {str(Path(tmpdirname).resolve())}", f"rootdir: {str(cwd)}"
+    )
     return out, err
 
 
