@@ -6,7 +6,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Iterator, List, Optional, Tuple
+from typing import Dict, Iterator, List, Optional, Tuple
 
 from nbqa import (
     __version__,
@@ -142,8 +142,8 @@ def _map_python_line_to_nb_lines(
 
 
 def _replace_temp_python_file_references_in_out_err(
-    temp_python_file, notebook, out, err
-):
+    temp_python_file: Path, notebook: Path, out: str, err: str
+) -> Tuple[str, str]:
     """
     Replace references to temporary directory name with current working directory.
     """
@@ -153,7 +153,9 @@ def _replace_temp_python_file_references_in_out_err(
     return out, err
 
 
-def _replace_tmpdir_references(out, err, tmpdirname, cwd=None):
+def _replace_tmpdir_references(
+    out: str, err: str, cwd: Optional[Path] = None
+) -> Tuple[str, str]:
     """
     Replace references to temporary directory name with current working directory.
 
@@ -161,9 +163,8 @@ def _replace_tmpdir_references(out, err, tmpdirname, cwd=None):
     --------
     >>> out = f"rootdir: {os.path.join('tmp', 'tmpdir')}\\n"
     >>> err = ""
-    >>> tmpdirname = os.path.join('tmp', 'tmpdir')
     >>> cwd = Path("nbQA-dev")
-    >>> out, err = _replace_tmpdir_references(out, err, tmpdirname, cwd)
+    >>> out, err = _replace_tmpdir_references(out, err, cwd)
     >>> out.strip(os.linesep)
     'rootdir: nbQA-dev'
     """
@@ -188,7 +189,7 @@ def _replace_tmpdir_references(out, err, tmpdirname, cwd=None):
     return new_out, new_err
 
 
-def _create_blank_init_files(notebook, tmpdirname):
+def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
     """
     Replicate local (possibly blank) __init__ files to temporary directory.
     """
@@ -199,7 +200,7 @@ def _create_blank_init_files(notebook, tmpdirname):
         Path(tmpdirname).joinpath(i).touch()
 
 
-def _ensure_cell_separators_remain(temp_python_file):
+def _ensure_cell_separators_remain(temp_python_file: Path) -> None:
     """
     Isort removes a blank line which separates the cells.
     """
@@ -210,7 +211,9 @@ def _ensure_cell_separators_remain(temp_python_file):
         handle.write(py_file)
 
 
-def _get_arg(root_dir, tmpdirname, nb_to_py_mapping):
+def _get_arg(
+    root_dir: str, tmpdirname: str, nb_to_py_mapping: Dict[Path, Path]
+) -> Path:
     """
     Get argument to run command against.
 
@@ -237,7 +240,13 @@ def _get_arg(root_dir, tmpdirname, nb_to_py_mapping):
     return arg
 
 
-def _run_command(command, root_dir, tmpdirname, nb_to_py_mapping, kwargs):
+def _run_command(
+    command: str,
+    root_dir: str,
+    tmpdirname: str,
+    nb_to_py_mapping: Dict[Path, Path],
+    kwargs: List[str],
+) -> Tuple[str, str, int]:
     """
     Run third-party tool against given file or directory.
     """
@@ -266,7 +275,7 @@ def _run_command(command, root_dir, tmpdirname, nb_to_py_mapping, kwargs):
     return out, err, output_code
 
 
-def main(raw_args=None):
+def main(raw_args: Optional[List[str]] = None) -> None:
 
     command, root_dir, kwargs = _parse_args(raw_args)
 
@@ -296,7 +305,7 @@ def main(raw_args=None):
             command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
         )
 
-        out, err = _replace_tmpdir_references(out, err, tmpdirname)
+        out, err = _replace_tmpdir_references(out, err)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(
