@@ -11,3 +11,4 @@ docs/_build
 dist
 .tox
 build/
+.coverage*
