@@ -160,6 +160,13 @@ def _replace_tmpdir_references(out, err, tmpdirname, cwd=None):
     """
     if cwd is None:
         cwd = Path.cwd()
+
+    print("***")
+    print(out)
+    print(tmpdirname)
+    print(cwd)
+    print("***")
+
     out = out.replace(f"rootdir: {tmpdirname}", f"rootdir: {str(cwd)}")
     err = err.replace(f"rootdir: {tmpdirname}", f"rootdir: {str(cwd)}")
     out = out.replace(
