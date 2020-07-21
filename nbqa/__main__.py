@@ -159,7 +159,7 @@ def _replace_tmpdir_references(out, err, tmpdirname, cwd=None):
     'rootdir: nbQA-dev\\n'
     """
     if cwd is None:
-        cwd = Path.cwd()
+        cwd = Path.cwd().resolve()
 
     out = re.sub(r"(?<=rootdir: ).+[^\r\n]", str(cwd), out)
     err = re.sub(r"(?<=rootdir: ).+[^\r\n]", str(cwd), err)
