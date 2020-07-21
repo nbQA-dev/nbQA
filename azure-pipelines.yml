@@ -1,48 +1,83 @@
-# Python package
-# Create and test a Python package on multiple Python versions.
-# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
-
 trigger:
 - master
+name: $(Year:yy)$(DayOfYear)$(Rev:r)
 
-variables:
-  disable.coverage.autogenerate: 'true'
 
-pool:
-  vmImage: 'ubuntu-latest'
-strategy:
-  matrix:
-    Python36:
-      python.version: '3.6'
-    Python37:
-      python.version: '3.7'
-    Python38:
-      python.version: '3.8'
+stages:
+  - stage: Unit_Test
+    jobs:
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
+    - job: 'Test_Linux'
+      pool:
+        vmImage: 'Ubuntu-16.04'
+      strategy:
+        matrix:
+          Python36:
+            python.version: '3.6'
+          Python37:
+            python.version: '3.7'
+          Python38:
+            python.version: '3.8'
 
-- script: |
-    python -m pip install --upgrade pip
-    pip install -r requirements-dev.txt
-  displayName: 'Install dependencies'
+      steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '$(python.version)'
+          architecture: 'x64'
 
-- script: |
-    black . --check
-    isort . --check-only
-    flake8
-  displayName: 'static analysis'
+      - script: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+        displayName: 'Install dependencies'
 
-- script: |
-    pytest --junitxml=junit/test-results.xml --cov-report=xml --cov-report=html -vv
-  displayName: 'pytest'
+      - script: |
+          black . --check
+          isort . --check-only
+          flake8
+        displayName: 'static analysis'
 
-- task: PublishCodeCoverageResults@1
-  inputs:
-    codeCoverageTool: Cobertura
-    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
-    reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
+      - script: |
+          pytest --junitxml=junit/test-results.xml --cov-report=xml --cov-report=html -vv
+        displayName: 'pytest'
+
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: Cobertura
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
+
+
+
+    - job: 'Test_Windows'
+      pool:
+        vmImage: 'vs2017-win2016'
+      strategy:
+        matrix:
+          Python36:
+            python.version: '3.6'
+          Python37:
+            python.version: '3.7'
+          Python38:
+            python.version: '3.8'
+
+
+      steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '$(python.version)'
+          architecture: 'x64'
+
+      - script: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+        displayName: 'Install dependencies'
+
+      - script: |
+          black . --check
+          isort . --check-only
+          flake8
+        displayName: 'static analysis'
+
+      - script: |
+          pytest -vv
+        displayName: 'pytest'

@@ -60,7 +60,7 @@ def _temp_python_file_for_notebook(notebook, tmpdir):
     # Add 3 extra whitespaces because `ipynb` is 3 chars longer than `py`.
     temp_python_file = (
         Path(tmpdir)
-        .joinpath(notebook.parent)
+        .joinpath(notebook.resolve().relative_to(Path.cwd()).parent)
         .joinpath(f"{notebook.stem}   ")
         .with_suffix(".py")
     )
@@ -71,19 +71,15 @@ def _temp_python_file_for_notebook(notebook, tmpdir):
 def _replace_full_path_out_err(out, err, temp_python_file, notebook):
     """
     Take care of case when out/err display full path.
-
-    Examples
-    --------
-    >>> out = ""
-    >>> err = "reformatted tmpdir/notebook   .py\\nAll done!"
-    >>> temp_python_file = Path('tmpdir').joinpath('notebook   .py')
-    >>> notebook = Path('notebook.ipynb')
-    >>> out, err = _replace_full_path_out_err(out, err, temp_python_file, notebook)
-    >>> err
-    'reformatted notebook.ipynb\\nAll done!'
     """
-    out = out.replace(str(temp_python_file), str(notebook))
-    err = err.replace(str(temp_python_file), str(notebook))
+    out = out.replace(str(temp_python_file), str(notebook.resolve()))
+    err = err.replace(str(temp_python_file), str(notebook.resolve()))
+
+    # This next part is necessary to handle cases when `resolve` changes the path.
+    # I couldn't reproduce this locally, but during CI, on the Windows job, I found
+    # that VSSADM~1 was changing into VssAdministrator.
+    out = out.replace(str(temp_python_file.resolve()), str(notebook.resolve()))
+    err = err.replace(str(temp_python_file.resolve()), str(notebook.resolve()))
     return out, err
 
 
@@ -154,28 +150,43 @@ def _replace_tmpdir_references(out, err, tmpdirname, cwd=None):
 
     Examples
     --------
-    >>> out = "rootdir: /tmp/tmpdir\\n"
+    >>> out = f"rootdir: {os.path.join('tmp', 'tmpdir')}\\n"
     >>> err = ""
-    >>> tmpdirname = "/tmp/tmpdir"
+    >>> tmpdirname = os.path.join('tmp', 'tmpdir')
     >>> cwd = Path("nbQA-dev")
     >>> out, err = _replace_tmpdir_references(out, err, tmpdirname, cwd)
-    >>> out
-    'rootdir: nbQA-dev\\n'
+    >>> out.strip(os.linesep)
+    'rootdir: nbQA-dev'
     """
     if cwd is None:
-        cwd = Path.cwd()
-    out = re.sub(rf"{tmpdirname}(?=\s)", str(cwd), out)
-    err = re.sub(rf"{tmpdirname}(?=\s)", str(cwd), err)
-    return out, err
+        cwd = Path.cwd().resolve()
+    new_out = os.linesep.join(
+        [
+            i if not i.startswith("rootdir: ") else f"rootdir: {str(cwd)}"
+            for i in out.splitlines()
+        ]
+    )
+    new_err = os.linesep.join(
+        [
+            i if not i.startswith("rootdir: ") else f"rootdir: {str(cwd)}"
+            for i in err.splitlines()
+        ]
+    )
+    if new_out:
+        new_out += os.linesep
+    if new_err:
+        new_err += os.linesep
+    return new_out, new_err
 
 
 def _create_blank_init_files(notebook, tmpdirname):
     """
     Replicate local (possibly blank) __init__ files to temporary directory.
     """
-    parts = notebook.parts
+    parts = notebook.resolve().relative_to(Path.cwd()).parts
     init_files = Path(parts[0]).rglob("__init__.py")
     for i in init_files:
+        Path(tmpdirname).joinpath(i).parent.mkdir(parents=True, exist_ok=True)
         Path(tmpdirname).joinpath(i).touch()
 
 

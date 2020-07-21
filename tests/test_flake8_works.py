@@ -1,4 +1,6 @@
 import difflib
+import os
+from textwrap import dedent
 
 import pytest
 
@@ -23,18 +25,29 @@ def test_flake8_works(tmp_notebook_for_testing, capsys):
 
     # check out and err
     out, err = capsys.readouterr()
-    expected_out = (
-        "tests/data/notebook_for_testing.ipynb:cell_1:1:1: F401 'os' imported but unused\n"
-        "tests/data/notebook_for_testing.ipynb:cell_1:3:1: F401 'glob' imported but unused\n"
-        "tests/data/notebook_for_testing.ipynb:cell_1:5:1: F401 'nbqa' imported but unused\n"
-        "tests/data/notebook_for_testing_copy.ipynb:cell_1:1:1: F401 'os' imported but unused\n"
-        "tests/data/notebook_for_testing_copy.ipynb:cell_1:3:1: F401 'glob' imported but unused\n"
-        "tests/data/notebook_for_testing_copy.ipynb:cell_1:5:1: F401 'nbqa' imported but unused\n"
-        "tests/data/notebook_starting_with_md.ipynb:cell_1:1:1: F401 'os' imported but unused\n"
-        "tests/data/notebook_starting_with_md.ipynb:cell_1:3:1: F401 'glob' imported but unused\n"
-        "tests/data/notebook_starting_with_md.ipynb:cell_1:5:1: F401 'nbqa' imported but unused\n"
-        "tests/data/notebook_starting_with_md.ipynb:cell_3:0:1: E303 too many blank lines (3)\n"
-        "tests/data/notebook_starting_with_md.ipynb:cell_3:2:1: E302 expected 2 blank lines, found 3\n"
+    path_0 = os.path.abspath(
+        os.path.join("tests", "data", "notebook_for_testing.ipynb")
+    )
+    path_1 = os.path.abspath(
+        os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
+    )
+    path_2 = os.path.abspath(
+        os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
+    )
+    expected_out = dedent(
+        f"""\
+        {path_0}:cell_1:1:1: F401 'os' imported but unused
+        {path_0}:cell_1:3:1: F401 'glob' imported but unused
+        {path_0}:cell_1:5:1: F401 'nbqa' imported but unused
+        {path_1}:cell_1:1:1: F401 'os' imported but unused
+        {path_1}:cell_1:3:1: F401 'glob' imported but unused
+        {path_1}:cell_1:5:1: F401 'nbqa' imported but unused
+        {path_2}:cell_1:1:1: F401 'os' imported but unused
+        {path_2}:cell_1:3:1: F401 'glob' imported but unused
+        {path_2}:cell_1:5:1: F401 'nbqa' imported but unused
+        {path_2}:cell_3:0:1: E303 too many blank lines (3)
+        {path_2}:cell_3:2:1: E302 expected 2 blank lines, found 3
+        """
     )
     expected_err = ""
     assert sorted(out.splitlines()) == sorted(expected_out.splitlines())

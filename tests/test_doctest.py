@@ -1,8 +1,6 @@
 import difflib
-import platform
-import re
+import os
 from pathlib import Path
-from textwrap import dedent
 
 import pytest
 
@@ -27,25 +25,21 @@ def test_pytest_doctest_works(tmp_notebook_for_testing, capsys):
 
     # check out and err
     out, err = capsys.readouterr()
-    expected_out = dedent(
-        f"""\
-        ============================= test session starts ==============================
-        platform {platform.system().lower()} -- Python {platform.python_version()}, pytest-5.4.3, py-1.9.0, pluggy-0.13.1
-        rootdir: {str(Path.cwd())}
-        plugins: cov-2.10.0
-        collected 3 items
-
-        tests/data/notebook_for_testing.ipynb .                                  [ 33%]
-        tests/data/notebook_for_testing_copy.ipynb .                             [ 66%]
-        tests/data/notebook_starting_with_md.ipynb .                             [100%]
-
-        ============================== 3 passed in ===============================
-        """  # noqa
-    )
     expected_err = ""
+    assert f"rootdir: {str(Path.cwd())}" in out.splitlines()[2]
+    assert any(
+        os.path.join("tests", "data", "notebook_for_testing.ipynb") in i
+        for i in out.splitlines()
+    )
+    assert any(
+        os.path.join("tests", "data", "notebook_for_testing_copy.ipynb") in i
+        for i in out.splitlines()
+    )
+    assert any(
+        os.path.join("tests", "data", "notebook_starting_with_md.ipynb") in i
+        for i in out.splitlines()
+    )
 
-    # remove references to how many seconds the test took
-    out = re.sub(r"(?<=passed in) \d+\.\d+s", "", out)
-    err = re.sub(r"(?<=passed in) \d+\.\d+s", "", err)
-    assert out == expected_out
+    print(out.splitlines())
+
     assert err == expected_err
