@@ -23,6 +23,9 @@ nbQA
 .. image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
     :target: https://github.com/pre-commit/pre-commit
 
+.. image:: http://www.mypy-lang.org/static/mypy_badge.svg
+    :target: http://mypy-lang.org/
+
 Adapter to run any code-quality tool on a Jupyter notebook. Documentation is hosted here_.
 
 Prerequisites
