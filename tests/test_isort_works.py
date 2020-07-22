@@ -17,6 +17,13 @@ def test_isort_works(
 ) -> None:
     """
     Check isort works.
+
+    Parameters
+    ----------
+    tmp_notebook_for_testing
+        Temporary copy of :code:`notebook_for_testing.ipynb`.
+    capsys
+        Pytest fixture to capture stdout and stderr.
     """
     # check diff
     with open(tmp_notebook_for_testing, "r") as handle:
@@ -45,6 +52,13 @@ def test_isort_initial_md(
 ) -> None:
     """
     Check isort works when a notebook starts with a markdown cell.
+
+    Parameters
+    ----------
+    tmp_notebook_starting_with_md
+        Temporary copy of :code:`notebook_for_testing.ipynb`.
+    capsys
+        Pytest fixture to capture stdout and stderr.
     """
     # check diff
     with open(tmp_notebook_starting_with_md, "r") as handle:
