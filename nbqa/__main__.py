@@ -20,6 +20,26 @@ from nbqa import (
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
     """
     Parse command-line arguments.
+
+    Parameters
+    ----------
+    raw_args
+        Passed via command-line.
+
+    Returns
+    -------
+    command
+        The third-party tool to run (e.g. :code:`mypy`).
+    root_dir
+        The notebook or directory to run third-party tool on.
+    kwargs
+        Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
+
+    Raises
+    ------
+    ValueError
+        If user doesn't specify both a command and a notebook/directory to run it
+        on (e.g. if the user runs :code:`nbqa flake8` instead of :code:`nbqa flake8 .`).
     """
     parser = argparse.ArgumentParser(
         description="Adapter to run any code-quality tool on a Jupyter notebook.",
