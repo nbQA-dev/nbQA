@@ -5,12 +5,20 @@ if TYPE_CHECKING:  # pragma: nocover
     from pathlib import Path
 
 
-def main(path: "Path") -> None:
+def main(temp_python_file: "Path") -> None:
+    """
+    Temporarily comment-out "magic" IPython lines (e.g. :code:`%%timeit`).
 
-    with open(str(path), "r") as handle:
+    Parameters
+    ----------
+    temp_python_file
+        Temporary Python file notebook was converted to.
+    """
+
+    with open(str(temp_python_file), "r") as handle:
         file = handle.read()
 
     file = re.sub(r"(%%\w+)", r"# \1", file)
 
-    with open(str(path), "w") as handle:
+    with open(str(temp_python_file), "w") as handle:
         handle.write(file)

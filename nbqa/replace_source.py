@@ -8,6 +8,13 @@ if TYPE_CHECKING:  # pragma: nocover
 def main(python_file: "Path", notebook: "Path") -> None:
     """
     Replace `source` code cells of original notebook.
+
+    Parameters
+    ----------
+    python_file
+        Temporary Python file notebook was converted to.
+    notebook
+        Jupyter Notebook third-party tool is run against.
     """
     with open(notebook, "r") as handle:
         notebook_json = json.load(handle)

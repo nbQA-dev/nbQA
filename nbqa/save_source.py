@@ -7,12 +7,22 @@ if TYPE_CHECKING:  # pragma: nocover
 CODE_SEPARATOR = "\n\n# %%\n"
 
 
-def main(path: "Path", temp_file: "Path") -> None:
+def main(notebook: "Path", temp_python_file: "Path") -> None:
+    """
+    Extract code cells from notebook and save them in temporary Python file.
 
-    with open(path, "r") as handle:
-        notebook = json.load(handle)
+    Parameters
+    ----------
+    notebook
+        Jupyter Notebook third-party tool is being run against.
+    temp_python_file
+        Temporary Python file to save converted notebook in.
+    """
 
-    cells = notebook["cells"]
+    with open(notebook, "r") as handle:
+        parsed_notebook = json.load(handle)
+
+    cells = parsed_notebook["cells"]
 
     result = [
         f"{CODE_SEPARATOR}{''.join(i['source'])}\n"
@@ -20,5 +30,5 @@ def main(path: "Path", temp_file: "Path") -> None:
         if i["cell_type"] == "code"
     ]
 
-    with open(str(temp_file), "w") as handle:
+    with open(str(temp_python_file), "w") as handle:
         handle.write("".join(result)[len("\n\n") : -len("\n")])
