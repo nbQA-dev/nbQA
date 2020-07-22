@@ -133,7 +133,7 @@ examples above), or in a :code:`.nbqa.ini` file, which could look something like
     line-length=96
 
     [flake8]
-    max-line-length=88
+    max-line-length=96
     ignore=E203,W503,W504
 
 Flags from this :code:`.ini` will be passed to :code:`nbqa` as they're written.
