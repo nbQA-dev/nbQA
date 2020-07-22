@@ -1,13 +1,21 @@
 import difflib
 import os
 from textwrap import dedent
+from typing import TYPE_CHECKING
 
 import pytest
 
 from nbqa.__main__ import main
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-def test_flake8_works(tmp_notebook_for_testing, capsys):
+    from _pytest.capture import CaptureFixture
+
+
+def test_flake8_works(
+    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture"
+) -> None:
     """
     Check flake8 works. Shouldn't alter the notebook content.
     """

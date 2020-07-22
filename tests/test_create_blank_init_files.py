@@ -1,10 +1,14 @@
 import os
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from nbqa.__main__ import _create_blank_init_files
 
+if TYPE_CHECKING:
+    from py._path.local import LocalPath
 
-def test_create_blank_init_files(tmpdir):
+
+def test_create_blank_init_files(tmpdir: "LocalPath") -> None:
     """
     Check that if a notebook is in current working directory then no init file is made.
     """

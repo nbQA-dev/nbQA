@@ -1,12 +1,20 @@
 import difflib
 import os
+from typing import TYPE_CHECKING
 
 import pytest
 
 from nbqa.__main__ import main
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-def test_isort_works(tmp_notebook_for_testing, capsys):
+    from _pytest.capture import CaptureFixture
+
+
+def test_isort_works(
+    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture"
+) -> None:
     """
     Check isort works.
     """
@@ -32,7 +40,9 @@ def test_isort_works(tmp_notebook_for_testing, capsys):
     assert err == expected_err
 
 
-def test_isort_initial_md(tmp_notebook_starting_with_md, capsys):
+def test_isort_initial_md(
+    tmp_notebook_starting_with_md: "Path", capsys: "CaptureFixture"
+) -> None:
     """
     Check isort works when a notebook starts with a markdown cell.
     """

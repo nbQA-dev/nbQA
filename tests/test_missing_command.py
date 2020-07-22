@@ -3,7 +3,7 @@ import pytest
 from nbqa.__main__ import main
 
 
-def test_missing_command():
+def test_missing_command() -> None:
     command = "some-fictional-command"
     msg = (
         f"Command `{command}` not found. "

@@ -1,17 +1,22 @@
 import difflib
 import os
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
 from nbqa.__main__ import main
 
+if TYPE_CHECKING:
+    from _pytest.capture import CaptureFixture
 
-def test_nbqa_ini_works(tmp_notebook_for_testing, capsys):
+
+def test_nbqa_ini_works(
+    tmp_notebook_for_testing: Path, capsys: "CaptureFixture"
+) -> None:
     """
     Check .nbqa.ini config is picked up works.
     """
-
     with open(".nbqa.ini", "w") as f:
         f.write("[flake8]\nignore=F401\nselect=E303\nquiet\n")
 

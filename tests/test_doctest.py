@@ -1,13 +1,19 @@
 import difflib
 import os
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
 from nbqa.__main__ import main
 
+if TYPE_CHECKING:
+    from _pytest.capture import CaptureFixture
 
-def test_pytest_doctest_works(tmp_notebook_for_testing, capsys):
+
+def test_pytest_doctest_works(
+    tmp_notebook_for_testing: Path, capsys: "CaptureFixture"
+) -> None:
     """
     Check pytest --doctest-modules works.
     """
