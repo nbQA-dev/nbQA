@@ -5,7 +5,7 @@ DIRTY_NOTEBOOK = os.path.join("tests", "data", "notebook_for_testing.ipynb")
 CLEAN_NOTEBOOK = os.path.join("tests", "data", "clean_notebook.ipynb")
 
 
-def test_flake8_return_code():
+def test_flake8_return_code() -> None:
     output = subprocess.run(["python", "-m", "nbqa", "flake8", DIRTY_NOTEBOOK])
     result = output.returncode
     expected = 1
@@ -17,7 +17,7 @@ def test_flake8_return_code():
     assert result == expected
 
 
-def test_black_return_code():
+def test_black_return_code() -> None:
 
     output = subprocess.run(
         ["python", "-m", "nbqa", "black", DIRTY_NOTEBOOK, "--check"]

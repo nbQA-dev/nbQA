@@ -1,12 +1,20 @@
 import difflib
 import os
+from typing import TYPE_CHECKING
 
 import pytest
 
 from nbqa.__main__ import main
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-def test_black_works(tmp_notebook_for_testing, capsys):
+    from _pytest.capture import CaptureFixture
+
+
+def test_black_works(
+    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture"
+) -> None:
     """
     Check black works. Should only reformat code cells.
     """
