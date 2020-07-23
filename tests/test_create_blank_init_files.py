@@ -11,6 +11,11 @@ if TYPE_CHECKING:
 def test_create_blank_init_files(tmpdir: "LocalPath") -> None:
     """
     Check that if a notebook is in current working directory then no init file is made.
+
+    Parameters
+    ----------
+    tmpdir
+        Pytest fixture, gives us a temporary directory.
     """
     _create_blank_init_files(
         Path(os.path.join("tests", "data", "notebook_for_testing.ipynb")), tmpdir

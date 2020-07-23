@@ -16,6 +16,13 @@ def test_pytest_doctest_works(
 ) -> None:
     """
     Check pytest --doctest-modules works.
+
+    Parameters
+    ----------
+    tmp_notebook_for_testing
+        Temporary copy of :code:`notebook_for_testing.ipynb`.
+    capsys
+        Pytest fixture to capture stdout and stderr.
     """
     # check diff
     with open(tmp_notebook_for_testing, "r") as handle:

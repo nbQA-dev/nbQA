@@ -12,6 +12,16 @@ if TYPE_CHECKING:
 def tmp_notebook_for_testing(tmpdir: "LocalPath") -> Iterator[Path]:
     """
     Make temporary copy of test notebook before it's operated on, then revert it.
+
+    Parameters
+    ----------
+    tmpdir
+        Pytest fixture, gives us a temporary directory.
+
+    Yields
+    ------
+    Path
+        Temporary copy of test notebook.
     """
     filename = Path("tests/data") / "notebook_for_testing.ipynb"
     temp_file = Path(tmpdir) / "tmp.ipynb"
@@ -28,6 +38,16 @@ def tmp_notebook_for_testing(tmpdir: "LocalPath") -> Iterator[Path]:
 def tmp_notebook_starting_with_md(tmpdir: "LocalPath") -> Iterator[Path]:
     """
     Make temporary copy of test notebook before it's operated on, then revert it.
+
+    Parameters
+    ----------
+    tmpdir
+        Pytest fixture, gives us a temporary directory.
+
+    Yields
+    ------
+    Path
+        Temporary copy of notebook.
     """
     filename = Path("tests/data") / "notebook_starting_with_md.ipynb"
     temp_file = Path(tmpdir) / "tmp.ipynb"

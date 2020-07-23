@@ -20,6 +20,26 @@ from nbqa import (
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
     """
     Parse command-line arguments.
+
+    Parameters
+    ----------
+    raw_args
+        Passed via command-line.
+
+    Returns
+    -------
+    command
+        The third-party tool to run (e.g. :code:`mypy`).
+    root_dir
+        The notebook or directory to run third-party tool on.
+    kwargs
+        Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
+
+    Raises
+    ------
+    ValueError
+        If user doesn't specify both a command and a notebook/directory to run it
+        on (e.g. if the user runs :code:`nbqa flake8` instead of :code:`nbqa flake8 .`).
     """
     parser = argparse.ArgumentParser(
         description="Adapter to run any code-quality tool on a Jupyter notebook.",
@@ -49,15 +69,41 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
     """
     Get generator with all notebooks in directory.
+
+    Parameters
+    ----------
+    root_dir
+        Notebook or directory to run third-party tool on.
+
+    Returns
+    -------
+    notebooks
+        All Jupyter Notebooks found in directory.
     """
     if not Path(root_dir).is_dir():
         return (i for i in (Path(root_dir),))
-    return (i for i in Path(".").rglob("*.ipynb") if ".ipynb_checkpoints" not in str(i))
+    notebooks = (
+        i for i in Path(".").rglob("*.ipynb") if ".ipynb_checkpoints" not in str(i)
+    )
+    return notebooks
 
 
 def _temp_python_file_for_notebook(notebook: Path, tmpdir: str) -> Path:
     """
     Get temporary file to save converted notebook into.
+
+    Parameters
+    ----------
+    notebook
+        Notebook that third-party tool will be run on.
+    tmpdir
+        Temporary directory where converted notebooks will be saved.
+
+    Returns
+    -------
+    Path
+        Temporary Python file whose location mirrors that of the notebook, but
+        inside the temporary directory.
     """
     # Add 3 extra whitespaces because `ipynb` is 3 chars longer than `py`.
     temp_python_file = (
@@ -74,7 +120,25 @@ def _replace_full_path_out_err(
     out: str, err: str, temp_python_file: Path, notebook: Path
 ) -> Tuple[str, str]:
     """
-    Take care of case when out/err display full path.
+    Replace references to temporary Python file's full path with notebook's path.
+
+    Parameters
+    ----------
+    out
+        Captured stdout from third-party tool.
+    err
+        Captured stderr from third-party tool.
+    temp_python_file
+        Temporary Python file where notebook was converted to.
+    notebook
+        Original Jupyter notebook.
+
+    Returns
+    -------
+    out
+        Stdout with temporary Python file's full path with notebook's path.
+    err
+        Stderr with temporary Python file's full path with notebook's path.
     """
     out = out.replace(str(temp_python_file), str(notebook.resolve()))
     err = err.replace(str(temp_python_file), str(notebook.resolve()))
@@ -91,8 +155,23 @@ def _replace_relative_path_out_err(
     out: str, err: str, notebook: Path
 ) -> Tuple[str, str]:
     """
-    Take care of case when out/err display relative path.
+    Replace references to temporary Python file's relative path with notebook's path.
 
+    Parameters
+    ----------
+    out
+        Captured stdout from third-party tool.
+    err
+        Captured stderr from third-party tool.
+    notebook
+        Original Jupyter notebook.
+
+    Returns
+    -------
+    out
+        Stdout with temporary Python file's relative path with notebook's path.
+    err
+        Stderr with temporary Python file's relative path with notebook's path.
     Examples
     --------
     >>> out = "notebook   .py ."
@@ -117,7 +196,27 @@ def _map_python_line_to_nb_lines(
     out: str, err: str, temp_python_file: Path, notebook: Path
 ) -> Tuple[str, str]:
     """
-    Make sure stdout and stderr make reference to Jupyter Notebook lines.
+    Make sure stdout and stderr make reference to Jupyter Notebook cells and lines.
+
+    Parameters
+    ----------
+    out
+        Captured stdout from third-party tool.
+    err
+        Captured stderr from third-party tool.
+    temp_python_file
+        Temporary Python file where notebook was converted to.
+    notebook
+        Original Jupyter notebook.
+
+    Returns
+    -------
+    out
+        Stdout with references to temporary Python file's lines replaced with references
+        to notebook's cells and lines.
+    err
+        Stderr with references to temporary Python file's lines replaced with references
+        to notebook's cells and lines.
     """
     with open(str(temp_python_file), "r") as handle:
         cells = handle.readlines()
@@ -145,7 +244,25 @@ def _replace_temp_python_file_references_in_out_err(
     temp_python_file: Path, notebook: Path, out: str, err: str
 ) -> Tuple[str, str]:
     """
-    Replace references to temporary directory name with current working directory.
+    Replace references to temporary Python file with references to notebook.
+
+    Parameters
+    ----------
+    temp_python_file
+        Temporary Python file where notebook was converted to.
+    notebook
+        Original Jupyter notebook.
+    out
+        Captured stdout from third-party tool.
+    err
+        Captured stderr from third-party tool.
+
+    Returns
+    -------
+    out
+        Stdout with temporary directory replaced by current working directory.
+    err
+        Stderr with temporary directory replaced by current working directory.
     """
     out, err = _replace_full_path_out_err(out, err, temp_python_file, notebook)
     out, err = _replace_relative_path_out_err(out, err, notebook)
@@ -158,6 +275,22 @@ def _replace_tmpdir_references(
 ) -> Tuple[str, str]:
     """
     Replace references to temporary directory name with current working directory.
+
+    Parameters
+    ----------
+    out
+        Captured stdout from third-party tool.
+    err
+        Captured stderr from third-party tool.
+    cwd
+        Current working directory.
+
+    Returns
+    -------
+    out
+        Stdout with references to temporary Python replaced with references to notebook.
+    err
+        Stderr with references to temporary Python replaced with references to notebook.
 
     Examples
     --------
@@ -192,6 +325,13 @@ def _replace_tmpdir_references(
 def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
     """
     Replicate local (possibly blank) __init__ files to temporary directory.
+
+    Parameters
+    ----------
+    notebook
+        Notebook third-party tool is being run against.
+    tmpdirname
+        Temporary directory to store converted notebooks in.
     """
     parts = notebook.resolve().relative_to(Path.cwd()).parts
     init_files = Path(parts[0]).rglob("__init__.py")
@@ -202,7 +342,12 @@ def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
 
 def _ensure_cell_separators_remain(temp_python_file: Path) -> None:
     """
-    Isort removes a blank line which separates the cells.
+    Reinstate blank line which separates the cells (may be removed by isort).
+
+    Parameters
+    ----------
+    temp_python_file
+        Temporary Python file notebook was converted to.
     """
     with open(str(temp_python_file), "r") as handle:
         py_file = handle.read()
@@ -221,6 +366,20 @@ def _get_arg(
     notebook in the temporary directory.
     If running against a directory, it'll be the directory mirrored in the temporary
     directory.
+
+    Parameters
+    ----------
+    root_dir
+        Notebook or directory third-party tool is being run against.
+    tmpdirname
+        Temporary directory where converted notebooks are stored.
+    nb_to_py_mapping
+        Mapping between notebooks and Python files corresponding to converted notebooks.
+
+    Returns
+    -------
+    Path
+        Notebook or directory to run third-party tool against.
 
     Examples
     --------
@@ -249,6 +408,33 @@ def _run_command(
 ) -> Tuple[str, str, int]:
     """
     Run third-party tool against given file or directory.
+
+    Parameters
+    ----------
+    command
+        Third-party tool (e.g. :code:`mypy`) to run against notebook.
+    root_dir
+        Notebook or directory to run third-party tool on.
+    tmpdirname
+        Temporary directory where converted notebooks will be stored.
+    nb_to_py_mapping
+        Mapping between notebooks and Python files corresponding to converted notebooks.
+    kwargs
+        Flags to pass to third-party tool (e.g. :code:`--verbose`).
+
+    Returns
+    -------
+    out
+        Captured stdout from running third-party tool.
+    err
+        Captured stderr from running third-party tool.
+    output_code
+        Return code from third-party tool.
+
+    Raises
+    ------
+    ValueError
+        If third-party tool isn't found in system.
     """
     env = os.environ.copy()
     env["PYTHONPATH"] = os.getcwd()
