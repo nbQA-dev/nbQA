@@ -15,7 +15,14 @@ if TYPE_CHECKING:
 
 def test_mypy_works(tmp_notebook_for_testing: "Path", capsys: "CaptureFixture") -> None:
     """
-    Check flake8 works. Shouldn't alter the notebook content.
+    Check mypy works. Shouldn't alter the notebook content.
+
+    Parameters
+    ----------
+    tmp_notebook_for_testing
+        Temporary copy of :code:`notebook_for_testing.ipynb`.
+    capsys
+        Pytest fixture to capture stdout and stderr.
     """
     # check diff
     with open(tmp_notebook_for_testing, "r") as handle:

@@ -18,6 +18,13 @@ def test_flake8_works(
 ) -> None:
     """
     Check flake8 works. Shouldn't alter the notebook content.
+
+    Parameters
+    ----------
+    tmp_notebook_for_testing
+        Temporary copy of :code:`notebook_for_testing.ipynb`.
+    capsys
+        Pytest fixture to capture stdout and stderr.
     """
     # check diff
     with open(tmp_notebook_for_testing, "r") as handle:

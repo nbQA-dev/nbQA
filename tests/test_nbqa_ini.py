@@ -16,6 +16,13 @@ def test_nbqa_ini_works(
 ) -> None:
     """
     Check .nbqa.ini config is picked up works.
+
+    Parameters
+    ----------
+    tmp_notebook_for_testing
+        Temporary copy of :code:`notebook_for_testing.ipynb`.
+    capsys
+        Pytest fixture to capture stdout and stderr.
     """
     with open(".nbqa.ini", "w") as f:
         f.write("[flake8]\nignore=F401\nselect=E303\nquiet\n")

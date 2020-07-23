@@ -17,6 +17,13 @@ def test_black_works(
 ) -> None:
     """
     Check black works. Should only reformat code cells.
+
+    Parameters
+    ----------
+    tmp_notebook_for_testing
+        Temporary copy of :code:`notebook_for_testing.ipynb`.
+    capsys
+        Pytest fixture to capture stdout and stderr.
     """
     # check diff
     with open(tmp_notebook_for_testing, "r") as handle:
