@@ -11,7 +11,7 @@ def main(temp_python_file: "Path") -> None:
 
     Parameters
     ----------
-    temp_python_file
+    temp_pythoin_file
         Temporary Python file notebook was converted to.
     """
 
