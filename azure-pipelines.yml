@@ -77,7 +77,6 @@ stages:
           black . --check
           isort . --check-only
           flake8
-          darglint nbqa tests
         displayName: 'static analysis'
 
       - script: |
