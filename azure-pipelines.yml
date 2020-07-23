@@ -35,6 +35,7 @@ stages:
           isort . --check-only
           flake8
           mypy .
+          interrogate -v -c pyproject.toml
         displayName: 'static analysis'
 
       - script: |
