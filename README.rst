@@ -26,6 +26,9 @@ nbQA
 .. image:: http://www.mypy-lang.org/static/mypy_badge.svg
     :target: http://mypy-lang.org/
 
+.. image:: https://interrogate.readthedocs.io/en/latest/_static/interrogate_badge.svg
+   :target: https://github.com/econchick/interrogate
+
 Adapter to run any code-quality tool on a Jupyter notebook. Documentation is hosted here_.
 
 Prerequisites

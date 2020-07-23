@@ -1,3 +1,9 @@
+"""
+Check that blank :code:`__init__.py` files are created.
+
+This is necessary for :code:`mypy` to work.
+"""
+
 import os
 from pathlib import Path
 from typing import TYPE_CHECKING

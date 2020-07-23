@@ -1,5 +1,6 @@
 black==19.10b0
 flake8==3.8.3
+interrogate==1.2.0
 isort==5.0.9
 mypy==0.782
 pre-commit==2.6.0

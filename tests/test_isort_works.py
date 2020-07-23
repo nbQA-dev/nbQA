@@ -1,3 +1,7 @@
+"""
+Check :code:`isort` works as intended.
+"""
+
 import difflib
 import os
 from typing import TYPE_CHECKING

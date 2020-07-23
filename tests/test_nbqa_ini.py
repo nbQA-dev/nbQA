@@ -1,3 +1,7 @@
+"""
+Check configs from :code:`.nbqa.ini` are picked up.
+"""
+
 import difflib
 import os
 from pathlib import Path

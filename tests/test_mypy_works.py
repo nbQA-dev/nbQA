@@ -1,3 +1,7 @@
+"""
+Check :code:`mypy` works as intended.
+"""
+
 import difflib
 import os
 from textwrap import dedent

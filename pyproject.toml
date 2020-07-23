@@ -1,5 +1,4 @@
 [tool.interrogate]
 ignore-init-method = true
-ignore-init-module = true
 fail-under = 100
 exclude = ["setup.py", "docs", "build", "venv"]

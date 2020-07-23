@@ -23,3 +23,8 @@ repos:
     rev: v0.782
     hooks:
     -   id: mypy
+-   repo: https://github.com/econchick/interrogate
+    rev: 1.2.0
+    hooks:
+    - id: interrogate
+      args: ['-v', '-c', 'pyproject.toml']
