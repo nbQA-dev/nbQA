@@ -19,6 +19,9 @@ def main(temp_python_file: "Path") -> None:
     with open(str(temp_python_file), "r") as handle:
         file = handle.read()
 
+    # line magics
+    file = re.sub(r"(?<!%)(%\w+)", r"# \1", file)
+    # cell magics
     file = re.sub(r"(%%\w+)", r"# \1", file)
 
     with open(str(temp_python_file), "w") as handle:
