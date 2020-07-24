@@ -43,11 +43,6 @@ extensions = [
 autosummary_generate = True
 add_module_names = False
 autodoc_member_order = "bysource"
-autodoc_default_options = {
-    "members": True,
-    "private-members": True,
-    "special-members": True,
-}
 autodoc_typehints = "description"
 
 # Add any paths that contain templates here, relative to this directory.
