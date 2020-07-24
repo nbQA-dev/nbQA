@@ -1,3 +1,7 @@
+"""
+Check that running :code:`pytest` with the :code:`--doctest-modules` flag works.
+"""
+
 import difflib
 import os
 from pathlib import Path

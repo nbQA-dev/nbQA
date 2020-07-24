@@ -1,3 +1,7 @@
+"""
+Define some fixtures that can be re-used between tests.
+"""
+
 import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING, Iterator

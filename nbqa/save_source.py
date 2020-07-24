@@ -1,3 +1,9 @@
+"""
+Extract code cells from notebook and save them to temporary Python file.
+
+Markdown cells, output, and metadata are ignored.
+"""
+
 import json
 from typing import TYPE_CHECKING
 

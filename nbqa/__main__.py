@@ -1,3 +1,7 @@
+"""
+Run third-party tool (e.g. :code:`mypy`) against notebook or directory.
+"""
+
 import argparse
 import configparser
 import os
@@ -462,6 +466,15 @@ def _run_command(
 
 
 def main(raw_args: Optional[List[str]] = None) -> None:
+    """
+    Run third-party tool (e.g. :code:`mypy`) against notebook or directory.
+
+    Parameters
+    ----------
+    raw_args
+        Command-line arguments (if calling this function directly), defaults to
+        :code:`None` if calling via command-line.
+    """
 
     command, root_dir, kwargs = _parse_args(raw_args)
 

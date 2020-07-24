@@ -1,3 +1,9 @@
+"""
+Replace :code:`source` code cells of original notebook with ones from converted file.
+
+The converted file will have had the third-party tool run against it by now.
+"""
+
 import json
 from typing import TYPE_CHECKING
 
@@ -7,7 +13,7 @@ if TYPE_CHECKING:  # pragma: nocover
 
 def main(python_file: "Path", notebook: "Path") -> None:
     """
-    Replace `source` code cells of original notebook.
+    Replace :code:`source` code cells of original notebook.
 
     Parameters
     ----------
