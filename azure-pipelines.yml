@@ -2,7 +2,6 @@ trigger:
 - master
 name: $(Year:yy)$(DayOfYear)$(Rev:r)
 
-
 stages:
   - stage: Unit_Test
     jobs:
@@ -19,11 +18,23 @@ stages:
           Python38:
             python.version: '3.8'
 
+      variables:
+        PIP_CACHE_DIR: $(Pipeline.Workspace)/.pip
+
       steps:
       - task: UsePythonVersion@0
         inputs:
           versionSpec: '$(python.version)'
           architecture: 'x64'
+
+      - task: Cache@2
+        inputs:
+          key: 'python | "$(Agent.OS)" | requirements.txt'
+          restoreKeys: |
+            python | "$(Agent.OS)"
+            python
+          path: $(PIP_CACHE_DIR)
+        displayName: Cache pip packages
 
       - script: |
           python -m pip install --upgrade pip
@@ -62,12 +73,23 @@ stages:
           Python38:
             python.version: '3.8'
 
+      variables:
+        PIP_CACHE_DIR: $(Pipeline.Workspace)/.pip
 
       steps:
       - task: UsePythonVersion@0
         inputs:
           versionSpec: '$(python.version)'
           architecture: 'x64'
+
+      - task: Cache@2
+        inputs:
+          key: 'python | "$(Agent.OS)" | requirements.txt'
+          restoreKeys: |
+            python | "$(Agent.OS)"
+            python
+          path: $(PIP_CACHE_DIR)
+        displayName: Cache pip packages
 
       - script: |
           python -m pip install --upgrade pip
