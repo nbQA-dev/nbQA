@@ -1,6 +1,4 @@
-"""
-Uncomment magic IPython lines from converted notebook.
-"""
+"""Uncomment magic IPython lines from converted notebook."""
 
 import re
 from typing import TYPE_CHECKING

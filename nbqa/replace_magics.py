@@ -1,6 +1,4 @@
-"""
-Comment-out magic IPython lines from converted notebook.
-"""
+"""Comment-out magic IPython lines from converted notebook."""
 
 import re
 from typing import TYPE_CHECKING
@@ -18,7 +16,6 @@ def main(temp_python_file: "Path") -> None:
     temp_python_file
         Temporary Python file notebook was converted to.
     """
-
     with open(str(temp_python_file), "r") as handle:
         file = handle.read()
 

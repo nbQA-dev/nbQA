@@ -47,6 +47,7 @@ stages:
           flake8
           mypy .
           interrogate nbqa tests -v -c pyproject.toml
+          pydocstyle nbqa tests
         displayName: 'static analysis'
 
       - script: |
@@ -100,6 +101,7 @@ stages:
           flake8
           mypy .
           interrogate nbqa tests -v -c pyproject.toml
+          pydocstyle nbqa tests
         displayName: 'static analysis'
 
       - script: |

@@ -1,6 +1,4 @@
-"""
-Attributes used by in docs / packaging.
-"""
+"""Attributes used by in docs / packaging."""
 
 __author__ = """Marco Gorelli"""
 __email__ = "m.e.gorelli@gmail.com"

@@ -1,3 +1,1 @@
-"""
-Necessary so we can run :code:`pytest`.
-"""
+"""Necessary so we can run :code:`pytest`."""

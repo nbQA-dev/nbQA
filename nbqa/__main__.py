@@ -1,6 +1,4 @@
-"""
-Run third-party tool (e.g. :code:`mypy`) against notebook or directory.
-"""
+"""Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
 
 import argparse
 import configparser
@@ -277,7 +275,7 @@ def _replace_temp_python_file_references_in_out_err(
 def _replace_tmpdir_references(
     out: str, err: str, cwd: Optional[Path] = None
 ) -> Tuple[str, str]:
-    """
+    r"""
     Replace references to temporary directory name with current working directory.
 
     Parameters
@@ -475,7 +473,6 @@ def main(raw_args: Optional[List[str]] = None) -> None:
         Command-line arguments (if calling this function directly), defaults to
         :code:`None` if calling via command-line.
     """
-
     command, root_dir, kwargs = _parse_args(raw_args)
 
     notebooks = _get_notebooks(root_dir)
