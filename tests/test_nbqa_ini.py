@@ -28,8 +28,8 @@ def test_nbqa_ini_works(
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with open(".nbqa.ini", "w") as f:
-        f.write("[flake8]\nignore=F401\nselect=E303\nquiet\n")
+    with open(".nbqa.ini", "w") as handle:
+        handle.write("[flake8]\nignore=F401\nselect=E303\nquiet\n")
 
     # check diff
     with open(tmp_notebook_for_testing, "r") as handle:
@@ -47,7 +47,10 @@ def test_nbqa_ini_works(
 
     # check out and err
     out, err = capsys.readouterr()
-    expected_out = f"{os.path.abspath(os.path.join('tests', 'data', 'notebook_starting_with_md.ipynb'))}\n"
+    notebook = os.path.abspath(
+        os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
+    )
+    expected_out = f"{notebook}\n"
     expected_err = ""
     assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
     assert sorted(err.splitlines()) == sorted(expected_err.splitlines())

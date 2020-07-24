@@ -48,6 +48,7 @@ stages:
           mypy .
           interrogate nbqa tests -v -c pyproject.toml
           pydocstyle nbqa tests
+          pylint nbqa tests
         displayName: 'static analysis'
 
       - script: |
@@ -102,6 +103,7 @@ stages:
           mypy .
           interrogate nbqa tests -v -c pyproject.toml
           pydocstyle nbqa tests
+          pylint nbqa tests
         displayName: 'static analysis'
 
       - script: |
