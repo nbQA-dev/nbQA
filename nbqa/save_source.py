@@ -24,7 +24,6 @@ def main(notebook: "Path", temp_python_file: "Path") -> None:
     temp_python_file
         Temporary Python file to save converted notebook in.
     """
-
     with open(notebook, "r") as handle:
         parsed_notebook = json.load(handle)
 

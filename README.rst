@@ -29,6 +29,9 @@ nbQA
 .. image:: https://interrogate.readthedocs.io/en/latest/_static/interrogate_badge.svg
    :target: https://github.com/econchick/interrogate
 
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+   :target: https://github.com/psf/black
+
 Adapter to run any code-quality tool on a Jupyter notebook. Documentation is hosted here_.
 
 Prerequisites
