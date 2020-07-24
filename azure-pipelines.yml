@@ -35,7 +35,7 @@ stages:
           isort . --check-only
           flake8
           mypy .
-          interrogate -v -c pyproject.toml
+          interrogate nbqa tests -v -c pyproject.toml
         displayName: 'static analysis'
 
       - script: |
@@ -78,7 +78,8 @@ stages:
           black . --check
           isort . --check-only
           flake8
-          interrogate -v -c pyproject.toml
+          mypy .
+          interrogate nbqa tests -v -c pyproject.toml
         displayName: 'static analysis'
 
       - script: |

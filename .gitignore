@@ -1,6 +1,6 @@
 *.pyc
 .ipynb_checkpoints
-venv
+.venv
 test-output.xml
 .coverage
 coverage.xml
