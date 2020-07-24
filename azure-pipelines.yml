@@ -2,7 +2,6 @@ trigger:
 - master
 name: $(Year:yy)$(DayOfYear)$(Rev:r)
 
-
 stages:
   - stage: Unit_Test
     jobs:
@@ -19,11 +18,23 @@ stages:
           Python38:
             python.version: '3.8'
 
+      variables:
+        PIP_CACHE_DIR: $(Pipeline.Workspace)/.pip
+
       steps:
       - task: UsePythonVersion@0
         inputs:
           versionSpec: '$(python.version)'
           architecture: 'x64'
+
+      - task: Cache@2
+        inputs:
+          key: 'python | "$(Agent.OS)" | requirements-dev.txt'
+          restoreKeys: |
+            python | "$(Agent.OS)"
+            python
+          path: $(PIP_CACHE_DIR)
+        displayName: Cache pip packages
 
       - script: |
           python -m pip install --upgrade pip
@@ -48,8 +59,6 @@ stages:
           summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
           reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
 
-
-
     - job: 'Test_Windows'
       pool:
         vmImage: 'vs2017-win2016'
@@ -62,12 +71,23 @@ stages:
           Python38:
             python.version: '3.8'
 
+      variables:
+        PIP_CACHE_DIR: $(Pipeline.Workspace)/.pip
 
       steps:
       - task: UsePythonVersion@0
         inputs:
           versionSpec: '$(python.version)'
           architecture: 'x64'
+
+      - task: Cache@2
+        inputs:
+          key: 'python | "$(Agent.OS)" | requirements-dev.txt'
+          restoreKeys: |
+            python | "$(Agent.OS)"
+            python
+          path: $(PIP_CACHE_DIR)
+        displayName: Cache pip packages
 
       - script: |
           python -m pip install --upgrade pip
