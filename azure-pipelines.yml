@@ -59,8 +59,6 @@ stages:
           summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
           reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
 
-
-
     - job: 'Test_Windows'
       pool:
         vmImage: 'vs2017-win2016'
