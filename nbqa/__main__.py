@@ -55,13 +55,13 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
     parser.add_argument("--version", action="version", version=f"nbQA {__version__}")
     try:
         args, kwargs = parser.parse_known_args(raw_args)
-    except SystemExit as e:
-        if e.code != 0:
+    except SystemExit as exception:
+        if exception.code != 0:
             msg = (
                 "Please specify both a command and a notebook/directory, e.g.\n"
                 "nbqa flake8 my_notebook.ipynb"
             )
-            raise ValueError(msg) from e
+            raise ValueError(msg) from exception
         sys.exit(0)
     command = args.command
     root_dir = args.root_dir
@@ -225,14 +225,14 @@ def _map_python_line_to_nb_lines(
     mapping = {}
     cell_no = 0
     cell_count = None
-    for n, i in enumerate(cells):
-        if i == "# %%\n":
+    for idx, cell in enumerate(cells):
+        if cell == "# %%\n":
             cell_no += 1
             cell_count = 0
         else:
             assert cell_count is not None
             cell_count += 1
-        mapping[n + 1] = f"cell_{cell_no}:{cell_count}"
+        mapping[idx + 1] = f"cell_{cell_no}:{cell_count}"
     out = re.sub(
         rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), out,
     )

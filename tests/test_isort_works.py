@@ -40,7 +40,7 @@ def test_isort_works(
         after = handle.readlines()
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
-    expected = '+    "import glob\\n",\n' '-    "\\n",\n' '-    "import glob\\n",\n'
+    expected = '+    "import glob\\n",\n-    "\\n",\n-    "import glob\\n",\n'
     assert result == expected
 
     # check out and err
@@ -77,7 +77,7 @@ def test_isort_initial_md(
         after = handle.readlines()
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
-    expected = '+    "import glob\\n",\n' '-    "\\n",\n' '-    "import glob\\n",\n'
+    expected = '+    "import glob\\n",\n-    "\\n",\n-    "import glob\\n",\n'
     assert result == expected
 
     # check out and err
