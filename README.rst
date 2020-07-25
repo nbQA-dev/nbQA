@@ -71,7 +71,7 @@ The general syntax is
 
     nbqa <command> <notebook or directory> <args>
 
-, where :code:`command` is any Python code quality tool. For example, you could run:
+, where :code:`command` is any standard Python code quality tool. For example, you could run:
 
 .. code-block:: bash
 
@@ -161,18 +161,21 @@ could add to your :code:`.pre-commit-config.yaml` file:
       - id: nbqa
         args: ['flake8']
         name: nbqa-flake8
+        additional_dependencies: ['flake8']
   - repo: https://github.com/MarcoGorelli/nbQA-mirror-1
     rev: 0.1.10
     hooks:
       - id: nbqa
         args: ['isort']
         name: nbqa-isort
+        additional_dependencies: ['isort']
   - repo: https://github.com/MarcoGorelli/nbQA-mirror-2
     rev: 0.1.10
     hooks:
       - id: nbqa
         args: ['mypy']
         name: nbqa-mypy
+        additional_dependencies: ['mypy']
 
 It's entirely optional which tool to use with which mirror, the purpose of having
 these mirrors is to avoid duplicate keys in the :code:`.pre-commit.yaml` file, but
@@ -182,7 +185,7 @@ that's the maximum number of pre-commit hooks you can have for :code:`nbqa` tool
 See Also
 --------
 
-Here are some other code quality tools for Jupyter Notebooks:
+Here are some specialised code quality tools for Jupyter Notebooks:
 
 - `flake8-nb`_;
 - `black-nb`_.
