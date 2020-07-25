@@ -57,6 +57,4 @@ def test_pytest_doctest_works(
         for i in out.splitlines()
     )
 
-    print(out.splitlines())
-
     assert err == expected_err
