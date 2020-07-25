@@ -4,6 +4,7 @@ import argparse
 import configparser
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -443,19 +444,18 @@ def _run_command(
 
     arg = _get_arg(root_dir, tmpdirname, nb_to_py_mapping)
 
-    try:
-        output = subprocess.run(
-            [command, str(arg), *kwargs],
-            stderr=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            cwd=tmpdirname,
-            env=env,
-        )
-    except FileNotFoundError as fnfe:
+    if shutil.which(command) is None:
         raise ValueError(
             f"Command `{command}` not found. "
             "Please make sure you have it installed before running nbQA on it."
-        ) from fnfe
+        )
+    output = subprocess.run(
+        [command, str(arg), *kwargs],
+        stderr=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        cwd=tmpdirname,
+        env=env,
+    )
     output_code = output.returncode
 
     out = output.stdout.decode()
