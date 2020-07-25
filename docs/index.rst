@@ -6,12 +6,19 @@ nbQA
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: USER DOCS:
 
    readme
+   authors
+   history
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: DEVELOPER DOCS:
+
    modules
    contributing
-   authors
 
 Indices and tables
 ==================
