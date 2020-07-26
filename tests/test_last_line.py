@@ -1,3 +1,7 @@
+"""
+Check that files end with the correct new-line separator.
+"""
+
 import os
 import subprocess
 
@@ -6,7 +10,7 @@ DIRTY_NOTEBOOK = os.path.join("tests", "data", "notebook_for_testing.ipynb")
 
 def test_last_line() -> None:
     """
-    Check flake8 returns 0 if it passes, 1 otherwise.
+    Check that files end with the correct new-line separator.
     """
     subprocess.run(["python", "-m", "nbqa", "flake8", DIRTY_NOTEBOOK])
 
