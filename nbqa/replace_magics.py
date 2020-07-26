@@ -1,6 +1,5 @@
 """Comment-out magic IPython lines from converted notebook."""
 
-import re
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: nocover
@@ -17,12 +16,11 @@ def main(temp_python_file: "Path") -> None:
         Temporary Python file notebook was converted to.
     """
     with open(str(temp_python_file), "r") as handle:
-        file = handle.read()
+        file = handle.readlines()
 
-    # line magics
-    file = re.sub(r"(?<!%)(%\w+)", r"# \1", file)
-    # cell magics
-    file = re.sub(r"(%%\w+)", r"# \1", file)
+    file = [
+        i if not (i.startswith("!") or i.startswith("%")) else f"# {i}" for i in file
+    ]
 
     with open(str(temp_python_file), "w") as handle:
-        handle.write(file)
+        handle.writelines(file)
