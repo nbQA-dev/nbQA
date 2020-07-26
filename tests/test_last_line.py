@@ -15,6 +15,6 @@ def test_last_line() -> None:
     subprocess.run(["python", "-m", "nbqa", "flake8", DIRTY_NOTEBOOK])
 
     with open(DIRTY_NOTEBOOK, "r") as handle:
-        last_line = handle.readlines()[-1]
+        last_line = handle.read()
 
-    assert last_line == f"{str('}')}{os.linesep}"
+    assert last_line.endswith(os.linesep)
