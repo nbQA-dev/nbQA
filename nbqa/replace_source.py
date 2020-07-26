@@ -5,6 +5,7 @@ The converted file will have had the third-party tool run against it by now.
 """
 
 import json
+import os
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: nocover
@@ -45,4 +46,4 @@ def main(python_file: "Path", notebook: "Path") -> None:
     notebook_json.update({"cells": new_cells})
     with open(notebook, "w") as handle:
         json.dump(notebook_json, handle, indent=1, ensure_ascii=False)
-        handle.write("\n")
+        handle.write(os.linesep)
