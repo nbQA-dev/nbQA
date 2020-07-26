@@ -42,7 +42,7 @@ def test_black_return_code() -> None:
     expected = 0
     assert result == expected
 
-    output = subprocess.run(["python", "-m", "nbqa", "black", "--check", "."])
+    output = subprocess.run(["python", "-m", "nbqa", "black", "--check", "tests"])
     result = output.returncode
     expected = 1
     assert result == expected

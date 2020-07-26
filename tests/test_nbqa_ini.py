@@ -35,7 +35,7 @@ def test_nbqa_ini_works(
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
-        main(["flake8", ".", "--ignore", "E302"])
+        main(["flake8", "tests", "--ignore", "E302"])
 
     Path(".nbqa.ini").unlink()
 

@@ -86,7 +86,7 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
     if not Path(root_dir).is_dir():
         return (i for i in (Path(root_dir),))
     notebooks = (
-        i for i in Path(".").rglob("*.ipynb") if ".ipynb_checkpoints" not in str(i)
+        i for i in Path(root_dir).rglob("*.ipynb") if ".ipynb_checkpoints" not in str(i)
     )
     return notebooks
 

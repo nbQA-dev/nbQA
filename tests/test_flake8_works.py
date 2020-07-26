@@ -34,7 +34,7 @@ def test_flake8_works(
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
-        main(["flake8", "."])
+        main(["flake8", "tests"])
 
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()
