@@ -33,8 +33,8 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
     -------
     command
         The third-party tool to run (e.g. :code:`mypy`).
-    root_dir
-        The notebook or directory to run third-party tool on.
+    root_dirs
+        The notebooks or directories to run third-party tool on.
     kwargs
         Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
 
@@ -53,7 +53,7 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
     )
     parser.add_argument("command", help="Command to run, e.g. `flake8`.")
     parser.add_argument(
-        "root_dir", nargs="+", help="Notebook or directory to run command on."
+        "root_dirs", nargs="+", help="Notebook or directory to run command on."
     )
     parser.add_argument("--version", action="version", version=f"nbQA {__version__}")
     try:
@@ -67,8 +67,8 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
             raise ValueError(msg) from exception
         sys.exit(0)
     command = args.command
-    root_dir = args.root_dir
-    return command, root_dir, kwargs
+    root_dirs = args.root_dirs
+    return command, root_dirs, kwargs
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
