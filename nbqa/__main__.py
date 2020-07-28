@@ -53,7 +53,7 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
     )
     parser.add_argument("command", help="Command to run, e.g. `flake8`.")
     parser.add_argument(
-        "root_dirs", nargs="+", help="Notebook or directory to run command on."
+        "root_dirs", nargs="+", help="Notebooks or directories to run command on."
     )
     parser.add_argument("--version", action="version", version=f"nbQA {__version__}")
     try:
