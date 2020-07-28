@@ -52,7 +52,9 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
         ),
     )
     parser.add_argument("command", help="Command to run, e.g. `flake8`.")
-    parser.add_argument("root_dir", help="Notebook or directory to run command on.")
+    parser.add_argument(
+        "root_dir", nargs="+", help="Notebook or directory to run command on."
+    )
     parser.add_argument("--version", action="version", version=f"nbQA {__version__}")
     try:
         args, kwargs = parser.parse_known_args(raw_args)
@@ -463,18 +465,24 @@ def _run_command(
     return out, err, output_code
 
 
-def main(raw_args: Optional[List[str]] = None) -> None:
+def _run_on_one_root_dir(root_dir: str, command: str, kwargs: List[str]) -> int:
     """
-    Run third-party tool (e.g. :code:`mypy`) against notebook or directory.
+    Run third-party tool on a single notebook or directory.
 
     Parameters
     ----------
-    raw_args
-        Command-line arguments (if calling this function directly), defaults to
-        :code:`None` if calling via command-line.
-    """
-    command, root_dir, kwargs = _parse_args(raw_args)
+    root_dir
+        Notebook or directory to run 3rd-party tool on.
+    command
+        Third-party tool (e.g. :code:`mypy`)
+    kwargs
+        Additional flags to pass to 3rd party tool
 
+    Returns
+    -------
+    int
+        Output code from third-party tool.
+    """
     notebooks = _get_notebooks(root_dir)
 
     with tempfile.TemporaryDirectory() as tmpdirname:
@@ -515,7 +523,24 @@ def main(raw_args: Optional[List[str]] = None) -> None:
         sys.stdout.write(out)
         sys.stderr.write(err)
 
-    sys.exit(output_code)
+    return output_code
+
+
+def main(raw_args: Optional[List[str]] = None) -> None:
+    """
+    Run third-party tool (e.g. :code:`mypy`) against notebook or directory.
+
+    Parameters
+    ----------
+    raw_args
+        Command-line arguments (if calling this function directly), defaults to
+        :code:`None` if calling via command-line.
+    """
+    command, root_dirs, kwargs = _parse_args(raw_args)
+
+    output_codes = [_run_on_one_root_dir(i, command, kwargs) for i in root_dirs]
+
+    sys.exit(int(any(output_codes)))
 
 
 if __name__ == "__main__":
