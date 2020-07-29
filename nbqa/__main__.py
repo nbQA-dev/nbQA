@@ -345,6 +345,25 @@ def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
         Path(tmpdirname).joinpath(i).touch()
 
 
+def _preserve_config_files(notebook: Path, tmpdirname: str) -> None:
+    """
+    Replicate local (possibly blank) __init__ files to temporary directory.
+
+    Parameters
+    ----------
+    notebook
+        Notebook third-party tool is being run against.
+    tmpdirname
+        Temporary directory to store converted notebooks in.
+    """
+    config_files = (i for i in Path.cwd().glob("*") if i.is_file())
+    for i in config_files:
+        Path(tmpdirname).joinpath(i.relative_to(Path.cwd())).parent.mkdir(
+            parents=True, exist_ok=True
+        )
+        shutil.copy(str(i), str(Path(tmpdirname).joinpath(i.relative_to(Path.cwd()))))
+
+
 def _ensure_cell_separators_remain(temp_python_file: Path) -> None:
     """
     Reinstate blank line which separates the cells (may be removed by isort).
@@ -496,6 +515,7 @@ def _run_on_one_root_dir(root_dir: str, command: str, kwargs: List[str]) -> int:
             save_source.main(notebook, temp_python_file)
             replace_magics.main(temp_python_file)
             _create_blank_init_files(notebook, tmpdirname)
+            _preserve_config_files(notebook, tmpdirname)
 
         config = configparser.ConfigParser(allow_no_value=True)
         config.read(".nbqa.ini")
