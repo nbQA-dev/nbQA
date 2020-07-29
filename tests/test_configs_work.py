@@ -1,3 +1,7 @@
+"""
+Check local config files are picked up by nbqa.
+"""
+
 import difflib
 import os
 from pathlib import Path
