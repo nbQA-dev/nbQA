@@ -345,9 +345,9 @@ def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
         Path(tmpdirname).joinpath(i).touch()
 
 
-def _preserve_config_files(notebook: Path, tmpdirname: str) -> None:
+def _preserve_config_files(tmpdirname: str) -> None:
     """
-    Replicate local (possibly blank) __init__ files to temporary directory.
+    Copy local files to temporary directory so config files will be there.
 
     Parameters
     ----------
@@ -515,7 +515,7 @@ def _run_on_one_root_dir(root_dir: str, command: str, kwargs: List[str]) -> int:
             save_source.main(notebook, temp_python_file)
             replace_magics.main(temp_python_file)
             _create_blank_init_files(notebook, tmpdirname)
-            _preserve_config_files(notebook, tmpdirname)
+        _preserve_config_files(tmpdirname)
 
         config = configparser.ConfigParser(allow_no_value=True)
         config.read(".nbqa.ini")
