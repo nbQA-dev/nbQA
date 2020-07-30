@@ -32,7 +32,7 @@ def test_pytest_doctest_works(
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
-        main(["pytest", "--doctest-modules", "tests"])
+        main(["pytest", "tests", "--cov", "None"])
 
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()
