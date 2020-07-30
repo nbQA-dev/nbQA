@@ -19,6 +19,8 @@ from nbqa import (
     save_source,
 )
 
+CONFIG_FILES = {"flake8": [".flake8"]}
+
 
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
     """
@@ -345,23 +347,26 @@ def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
         Path(tmpdirname).joinpath(i).touch()
 
 
-def _preserve_config_files(tmpdirname: str) -> None:
+def _preserve_config_files(command: str, tmpdirname: str) -> None:
     """
     Copy local files to temporary directory so config files will be there.
 
     Parameters
     ----------
-    notebook
-        Notebook third-party tool is being run against.
+    command
+        Third-party tool (e.g. mypy).
     tmpdirname
         Temporary directory to store converted notebooks in.
     """
-    config_files = (i for i in Path.cwd().glob("*") if i.is_file())
-    for i in config_files:
-        Path(tmpdirname).joinpath(i.relative_to(Path.cwd())).parent.mkdir(
-            parents=True, exist_ok=True
-        )
-        shutil.copy(str(i), str(Path(tmpdirname).joinpath(i.relative_to(Path.cwd()))))
+    for config_file in CONFIG_FILES.get(command, []):
+        config_files = (i for i in Path.cwd().rglob(config_file) if i.is_file())
+        for i in config_files:
+            Path(tmpdirname).joinpath(i.relative_to(Path.cwd())).parent.mkdir(
+                parents=True, exist_ok=True
+            )
+            shutil.copy(
+                str(i), str(Path(tmpdirname).joinpath(i.relative_to(Path.cwd())))
+            )
 
 
 def _ensure_cell_separators_remain(temp_python_file: Path) -> None:
@@ -515,7 +520,7 @@ def _run_on_one_root_dir(root_dir: str, command: str, kwargs: List[str]) -> int:
             save_source.main(notebook, temp_python_file)
             replace_magics.main(temp_python_file)
             _create_blank_init_files(notebook, tmpdirname)
-        _preserve_config_files(tmpdirname)
+        _preserve_config_files(command, tmpdirname)
 
         config = configparser.ConfigParser(allow_no_value=True)
         config.read(".nbqa.ini")
