@@ -32,7 +32,7 @@ def test_mypy_works(tmp_notebook_for_testing: "Path", capsys: "CaptureFixture") 
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
-        main(["mypy", "--ignore-missing-imports", "tests"])
+        main(["mypy", "--ignore-missing-imports", "--allow-untyped-defs", "tests"])
 
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()

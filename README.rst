@@ -133,6 +133,7 @@ In practice, here are the tools it's been tested with:
 Configuration
 -------------
 
+By default, `nbQA` will use your tools' standard configuration files (e.g. :code:`setup.cfg`, :code:`mypy.ini`).
 You can pass extra configurations to your tools either via the command line (as in the
 examples above), or in a :code:`.nbqa.ini` file, which could look something like this:
 
