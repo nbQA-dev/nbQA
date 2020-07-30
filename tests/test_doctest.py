@@ -42,6 +42,7 @@ def test_pytest_doctest_works(
 
     # check out and err
     out, err = capsys.readouterr()
+    print(out)
     expected_err = ""
     assert f"rootdir: {str(Path.cwd())}" in out.splitlines()[2]
     assert any(
