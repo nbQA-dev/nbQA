@@ -8,6 +8,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections import defaultdict
+from itertools import chain
 from pathlib import Path
 from typing import Dict, Iterator, List, Optional, Tuple
 
@@ -19,7 +21,13 @@ from nbqa import (
     save_source,
 )
 
-CONFIG_FILES = {"flake8": [".flake8"]}
+CONFIG_FILES: Dict[str, List[str]] = defaultdict(
+    lambda: ["setup.cfg", "tox.ini", "pyproject.toml", ".editorconfig"]
+)
+CONFIG_FILES["flake8"].extend([".flake8"])
+CONFIG_FILES["mypy"].extend(["mypy.ini", ".mypy.ini"])
+CONFIG_FILES["isort"].extend([".isort.cfg"])
+CONFIG_FILES["pytest"].extend(["pytest.ini"])
 
 
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
@@ -349,7 +357,7 @@ def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
 
 def _preserve_config_files(command: str, tmpdirname: str) -> None:
     """
-    Copy local files to temporary directory so config files will be there.
+    Copy local config files to temporary directory.
 
     Parameters
     ----------
@@ -358,15 +366,16 @@ def _preserve_config_files(command: str, tmpdirname: str) -> None:
     tmpdirname
         Temporary directory to store converted notebooks in.
     """
-    for config_file in CONFIG_FILES.get(command, []):
-        config_files = (i for i in Path.cwd().rglob(config_file) if i.is_file())
-        for i in config_files:
-            Path(tmpdirname).joinpath(i.relative_to(Path.cwd())).parent.mkdir(
-                parents=True, exist_ok=True
-            )
-            shutil.copy(
-                str(i), str(Path(tmpdirname).joinpath(i.relative_to(Path.cwd())))
-            )
+    config_files = (
+        i
+        for i in chain(*(Path.cwd().rglob(j) for j in CONFIG_FILES[command]))
+        if i.is_file()
+    )
+    for i in config_files:
+        Path(tmpdirname).joinpath(i.relative_to(Path.cwd())).parent.mkdir(
+            parents=True, exist_ok=True
+        )
+        shutil.copy(str(i), str(Path(tmpdirname).joinpath(i.relative_to(Path.cwd()))))
 
 
 def _ensure_cell_separators_remain(temp_python_file: Path) -> None:
