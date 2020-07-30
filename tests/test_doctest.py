@@ -32,7 +32,7 @@ def test_pytest_doctest_works(
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
-        main(["pytest", "tests", "--cov", "None"])
+        main(["pytest", "--doctest-modules", "tests"])
 
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()
@@ -42,7 +42,6 @@ def test_pytest_doctest_works(
 
     # check out and err
     out, err = capsys.readouterr()
-    print(out)
     expected_err = ""
     assert f"rootdir: {str(Path.cwd())}" in out.splitlines()[2]
     assert any(
