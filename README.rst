@@ -1,4 +1,4 @@
-.. image:: https://github.com/nbQA-dev/nbQA/raw/master/assets/logo.png
+.. image:: https://github.com/MarcoGorelli/nbQA/raw/master/assets/logo.png
   :width: 400
 
 ====
@@ -108,7 +108,7 @@ Check any examples in your docstrings are correct:
     $ nbqa pytest tweet-sentiment-roberta-pytorch.ipynb --doctest-modules
     ============================= test session starts ==============================
     platform linux -- Python 3.8.2, pytest-5.4.3, py-1.9.0, pluggy-0.13.1
-    rootdir: /home/user/tweet-sentiment-extraction
+    rootdir: /home/marco/tweet-sentiment-extraction
     plugins: cov-2.10.0
     collected 3 items
 
@@ -135,18 +135,17 @@ Configuration
 
 By default, `nbQA` will use your tools' standard configuration files (e.g. :code:`setup.cfg`, :code:`mypy.ini`).
 You can pass extra configurations to your tools either via the command line (as in the
-examples above), or in a :code:`.nbqa.ini` file, which could look something like this:
+examples above), or in a :code:`.nbqa.ini`:
 
 .. code-block:: ini
 
     [black]
-    line-length=96
+    addopts = --line-length=96
 
     [flake8]
-    max-line-length=96
-    ignore=E203,W503,W504
-
-Flags from this :code:`.ini` will be passed to :code:`nbqa` as they're written.
+    addopts = --max-line-length=96 \
+              --ignore=E203,W503,W504 \
+              --quiet
 
 Usage as pre-commit hook
 ------------------------
@@ -156,7 +155,7 @@ could add to your :code:`.pre-commit-config.yaml` file:
 
 .. code-block:: yaml
 
-  - repo: https://github.com/nbQA-dev/nbQA
+  - repo: https://github.com/MarcoGorelli/nbQA
     rev: 0.1.14
     hooks:
       - id: nbqa
