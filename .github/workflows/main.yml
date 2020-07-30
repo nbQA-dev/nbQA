@@ -1,0 +1,24 @@
+name: main
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  main:
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8']
+        os: [windows-latest, ubuntu-18.04]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: install-tox
+      run: pip install --upgrade tox virtualenv setuptools pip
+    - name: run-tox
+      run: tox -e py

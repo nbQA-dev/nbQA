@@ -4,6 +4,7 @@ Check that running :code:`pytest` with the :code:`--doctest-modules` flag works.
 
 import difflib
 import os
+import re
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -43,7 +44,7 @@ def test_pytest_doctest_works(
     # check out and err
     out, err = capsys.readouterr()
     expected_err = ""
-    assert f"rootdir: {str(Path.cwd())}" in out.splitlines()[2]
+    assert any(f"rootdir: {str(Path.cwd())}" in i for i in out.splitlines())
     assert any(
         os.path.join("tests", "data", "notebook_for_testing.ipynb") in i
         for i in out.splitlines()
@@ -56,5 +57,6 @@ def test_pytest_doctest_works(
         os.path.join("tests", "data", "notebook_starting_with_md.ipynb") in i
         for i in out.splitlines()
     )
+    assert re.match(r"\.py\s", out) is None
 
     assert err == expected_err
