@@ -1,4 +1,4 @@
-.. image:: https://github.com/MarcoGorelli/nbQA/raw/master/assets/logo.png
+.. image:: https://github.com/nbQA-dev/nbQA/raw/master/assets/logo.png
   :width: 400
 
 ====
@@ -108,7 +108,7 @@ Check any examples in your docstrings are correct:
     $ nbqa pytest tweet-sentiment-roberta-pytorch.ipynb --doctest-modules
     ============================= test session starts ==============================
     platform linux -- Python 3.8.2, pytest-5.4.3, py-1.9.0, pluggy-0.13.1
-    rootdir: /home/marco/tweet-sentiment-extraction
+    rootdir: /home/user/tweet-sentiment-extraction
     plugins: cov-2.10.0
     collected 3 items
 
@@ -156,7 +156,7 @@ could add to your :code:`.pre-commit-config.yaml` file:
 
 .. code-block:: yaml
 
-  - repo: https://github.com/MarcoGorelli/nbQA
+  - repo: https://github.com/nbQA-dev/nbQA
     rev: 0.1.14
     hooks:
       - id: nbqa
