@@ -8,8 +8,8 @@ nbQA
 .. image:: https://dev.azure.com/megorelli/megorelli/_apis/build/status/MarcoGorelli.nbQA?branchName=master
           :target: https://dev.azure.com/megorelli/megorelli/_build/latest?definitionId=1&branchName=master
 
-.. image:: https://img.shields.io/azure-devops/coverage/megorelli/megorelli/1/master.svg
-          :target: https://dev.azure.com/megorelli/megorelli/_build/latest?definitionId=1&branchName=master
+.. image:: https://codecov.io/gh/nbQA-dev/nbQA/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/nbQA-dev/nbQA
 
 .. image:: https://badge.fury.io/py/nbqa.svg
     :target: https://badge.fury.io/py/nbqa
