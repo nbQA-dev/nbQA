@@ -1,6 +1,4 @@
-"""
-Check :code:`mypy` works as intended.
-"""
+"""Check :code:`mypy` works as intended."""
 
 import difflib
 import os

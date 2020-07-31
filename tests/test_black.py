@@ -1,6 +1,4 @@
-"""
-Check that :code:`black` works as intended.
-"""
+"""Check that :code:`black` works as intended."""
 
 import difflib
 import os

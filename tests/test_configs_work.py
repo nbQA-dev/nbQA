@@ -1,6 +1,4 @@
-"""
-Check local config files are picked up by nbqa.
-"""
+"""Check local config files are picked up by nbqa."""
 
 import difflib
 import os

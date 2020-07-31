@@ -1,6 +1,4 @@
-"""
-Check :code:`isort` works as intended.
-"""
+"""Check :code:`isort` works as intended."""
 
 import difflib
 import os
