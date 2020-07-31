@@ -1,5 +1,6 @@
 """Comment-out magic IPython lines from converted notebook."""
 
+import fileinput
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: nocover
@@ -15,12 +16,8 @@ def main(temp_python_file: "Path") -> None:
     temp_python_file
         Temporary Python file notebook was converted to.
     """
-    with open(str(temp_python_file), "r") as handle:
-        file = handle.readlines()
-
-    file = [
-        i if not (i.startswith("!") or i.startswith("%")) else f"# {i}" for i in file
-    ]
-
-    with open(str(temp_python_file), "w") as handle:
-        handle.writelines(file)
+    for i in fileinput.input(str(temp_python_file), inplace=True):
+        if not (i.startswith("!") or i.startswith("%")):
+            print(i, end="")
+        else:
+            print(f"# {i}", end="")
