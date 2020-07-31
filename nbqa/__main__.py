@@ -534,11 +534,7 @@ def _run_on_one_root_dir(root_dir: str, command: str, kwargs: List[str]) -> int:
         config = configparser.ConfigParser(allow_no_value=True)
         config.read(".nbqa.ini")
         if command in config.sections():
-            configs = [
-                [f"--{key}", val] if val is not None else [f"--{key}"]
-                for key, val in config[command].items()
-            ]
-            kwargs.extend([j for i in configs for j in i])
+            kwargs.extend(config[command]["addopts"].split())
         out, err, output_code = _run_command(
             command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
         )

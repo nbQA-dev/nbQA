@@ -135,18 +135,17 @@ Configuration
 
 By default, `nbQA` will use your tools' standard configuration files (e.g. :code:`setup.cfg`, :code:`mypy.ini`).
 You can pass extra configurations to your tools either via the command line (as in the
-examples above), or in a :code:`.nbqa.ini` file, which could look something like this:
+examples above), or in a :code:`.nbqa.ini`:
 
 .. code-block:: ini
 
     [black]
-    line-length=96
+    addopts = --line-length=96
 
     [flake8]
-    max-line-length=96
-    ignore=E203,W503,W504
-
-Flags from this :code:`.ini` will be passed to :code:`nbqa` as they're written.
+    addopts = --max-line-length=96 \
+              --ignore=E203,W503,W504 \
+              --quiet
 
 Usage as pre-commit hook
 ------------------------
