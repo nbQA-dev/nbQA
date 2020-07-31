@@ -577,5 +577,5 @@ def main(raw_args: Optional[List[str]] = None) -> None:
     sys.exit(int(any(output_codes)))
 
 
-if __name__ == "__main__":  # pragma: nocover
+if __name__ == "__main__":
     main()
