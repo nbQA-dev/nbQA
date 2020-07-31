@@ -1,0 +1,11 @@
+[run]
+source = nbqa
+
+[report]
+exclude_lines =
+    pragma: nocover
+    raise NotImplementedError
+    if __name__ == .__main__.:
+ignore_errors = True
+omit =
+    tests/*
