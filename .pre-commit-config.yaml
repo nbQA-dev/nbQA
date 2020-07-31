@@ -23,3 +23,19 @@ repos:
     rev: v0.782
     hooks:
     -   id: mypy
+-   repo: https://github.com/PyCQA/pydocstyle
+    rev: 5.0.2
+    hooks:
+    -   id: pydocstyle
+        exclude: 'docs'
+-   repo: https://github.com/econchick/interrogate
+    rev: 1.2.0
+    hooks:
+    -   id: interrogate
+        args: [-v, --fail-under=100]
+        exclude: 'docs'
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.782
+    hooks:
+    -   id: mypy
+        exclude: 'docs'

@@ -1,6 +1,4 @@
-"""
-Check :code:`flake8` works as intended.
-"""
+"""Check :code:`flake8` works as intended."""
 
 import difflib
 import os

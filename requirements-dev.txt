@@ -1,10 +1,6 @@
 black
 flake8
-interrogate
 isort
 mypy
-pre-commit
-pydocstyle
-pylint
 pytest
 pytest-cov
