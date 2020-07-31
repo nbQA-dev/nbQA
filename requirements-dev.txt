@@ -1,10 +1,6 @@
-black==19.10b0
-flake8==3.8.3
-interrogate==1.2.0
-isort==4.3.21
-mypy==0.782
-pre-commit==2.6.0
-pydocstyle==5.0.2
-pylint==2.5.3
-pytest==5.4.3
-pytest-cov==2.10.0
+black
+flake8
+isort
+mypy
+pytest
+pytest-cov

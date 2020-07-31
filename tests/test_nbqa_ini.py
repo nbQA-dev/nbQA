@@ -1,6 +1,4 @@
-"""
-Check configs from :code:`.nbqa.ini` are picked up.
-"""
+"""Check configs from :code:`.nbqa.ini` are picked up."""
 
 import difflib
 import os

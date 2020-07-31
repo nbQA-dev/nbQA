@@ -75,7 +75,7 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
                 "nbqa flake8 my_notebook.ipynb"
             )
             raise ValueError(msg) from exception
-        sys.exit(0)
+        sys.exit(0)  # pragma: nocover
     command = args.command
     root_dirs = args.root_dirs
     return command, root_dirs, kwargs
@@ -577,5 +577,5 @@ def main(raw_args: Optional[List[str]] = None) -> None:
     sys.exit(int(any(output_codes)))
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: nocover
     main()
