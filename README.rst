@@ -35,7 +35,10 @@ nbQA
 .. image:: https://img.shields.io/badge/pylint-10/10-brightgreen.svg
    :target: https://github.com/PyCQA/pylint
 
-Adapter to run any code-quality tool on a Jupyter notebook. Documentation is hosted here_.
+Adapter to run any code-quality tool on a Jupyter notebook.
+This is intended to be run as a `pre-commit`_ hook and/or during continuous integration.
+
+Documentation is hosted here_.
 
 Prerequisites
 -------------
@@ -71,28 +74,10 @@ The general syntax is
 
     nbqa <command> <notebook or directory> <args>
 
-, where :code:`command` is any standard Python code quality tool. For example, you could run:
-
-.. code-block:: bash
-
-    $ nbqa flake8 my_notebook.ipynb
-    $ nbqa black my_notebook.ipynb --check
-    $ nbqa mypy my_notebook.ipynb --ignore-missing-imports
-    $ nbqa pytest my_notebook.ipynb --doctest-modules
-
-You can also pass an entire directory instead of a single file, e.g. :code:`nbqa flake8 my_notebooks`.
+where :code:`command` is any standard Python code quality tool.
 
 Examples
 --------
-
-Format your notebooks using :code:`black`:
-
-.. code-block:: bash
-
-    $ nbqa black . --line-length=96
-    reformatted tweet-sentiment-roberta-pytorch.ipynb
-    All done! ✨ 🍰 ✨
-    1 files reformatted.
 
 Check static type annotations:
 
@@ -116,26 +101,24 @@ Check any examples in your docstrings are correct:
 
     ============================== 1 passed in 0.03s ===============================
 
-Supported third party packages
-------------------------------
+Format your notebooks using :code:`black`:
 
-In theory, :code:`nbqa` can adapt any Python code-quality tool to a Jupyter Notebook.
+.. code-block:: bash
 
-In practice, here are the tools it's been tested with:
+    $ nbqa black . --line-length=96 --allow-mutation
+    reformatted tweet-sentiment-roberta-pytorch.ipynb
+    All done! ✨ 🍰 ✨
+    1 files reformatted.
 
-- flake8_
-- black_
-- pytest_
-- isort_
-- mypy_ (you will need to have `__init__` files in each subdirectory)
-- doctest_ (as long as you run it via pytest_ with the `--doctest-modules` flag)
+Note that if, as in this last example, you expect your notebooks to be modified, you will need to
+pass the :code:`--allow-mutation` flag.
 
 Configuration
 -------------
 
 By default, `nbQA` will use your tools' standard configuration files (e.g. :code:`setup.cfg`, :code:`mypy.ini`).
 You can pass extra configurations to your tools either via the command line (as in the
-examples above), or in a :code:`.nbqa.ini`:
+examples above), or in a :code:`.nbqa.ini` file:
 
 .. code-block:: ini
 
@@ -163,13 +146,27 @@ could add to your :code:`.pre-commit-config.yaml` file:
         name: nbqa-flake8
         additional_dependencies: ['flake8']
       - id: nbqa
-        args: ['isort']
+        args: ['isort', '--allow-mutation']
         name: nbqa-isort
         additional_dependencies: ['isort']
       - id: nbqa
         args: ['mypy']
         name: nbqa-mypy
         additional_dependencies: ['mypy']
+
+Supported third party packages
+------------------------------
+
+In theory, :code:`nbqa` can adapt any Python code-quality tool to a Jupyter Notebook.
+
+In practice, here are the tools it's been tested with:
+
+- flake8_
+- black_
+- pytest_
+- isort_
+- mypy_ (you will need to have `__init__` files in each subdirectory)
+- doctest_ (as long as you run it via pytest_ with the `--doctest-modules` flag)
 
 See Also
 --------
