@@ -23,7 +23,7 @@ from nbqa import (
 
 def _parse_args(
     raw_args: Optional[List[str]],
-) -> Tuple[str, str, bool, Path, List[str]]:
+) -> Tuple[str, str, bool, Optional[str], List[str]]:
     """
     Parse command-line arguments.
 
@@ -40,6 +40,8 @@ def _parse_args(
         The notebooks or directories to run third-party tool on.
     allow_mutation
         Whether to allow 3rd party tools to modify notebooks.
+    nbqa_config
+        Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
     kwargs
         Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
 
@@ -82,8 +84,8 @@ def _parse_args(
     command = args.command
     root_dirs = args.root_dirs
     allow_mutation = args.nbqa_mutate
-    config = args.nbqa_config
-    return command, root_dirs, allow_mutation, config, kwargs
+    nbqa_config = args.nbqa_config
+    return command, root_dirs, allow_mutation, nbqa_config, kwargs
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
@@ -360,7 +362,7 @@ def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
         Path(tmpdirname).joinpath(i).touch()
 
 
-def _preserve_config_files(config: Path, tmpdirname: str) -> None:
+def _preserve_config_files(config: Optional[str], tmpdirname: str) -> None:
     """
     Copy local config files to temporary directory.
 
@@ -533,7 +535,7 @@ def _run_command(
 def _run_on_one_root_dir(
     root_dir: str,
     command: str,
-    nbqa_config: Path,
+    nbqa_config: Optional[str],
     allow_mutation: bool,
     kwargs: List[str],
 ) -> int:
@@ -573,12 +575,12 @@ def _run_on_one_root_dir(
                 kwargs.extend(config[command]["addopts"].split())
             if nbqa_config is None:
                 nbqa_config = config[command].get("config")
+        _preserve_config_files(nbqa_config, tmpdirname)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             save_source.main(notebook, temp_python_file)
             replace_magics.main(temp_python_file)
             _create_blank_init_files(notebook, tmpdirname)
-        _preserve_config_files(nbqa_config, tmpdirname)
 
         out, err, output_code, mutated = _run_command(
             command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
