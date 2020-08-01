@@ -11,9 +11,11 @@ import tempfile
 from collections import defaultdict
 from itertools import chain
 from pathlib import Path
+from textwrap import dedent
 from typing import Dict, Iterator, List, Optional, Tuple
 
-from watchdog.events import FileModifiedEvent
+from watchdog.events import FileModifiedEvent, PatternMatchingEventHandler
+from watchdog.observers import Observer
 
 from nbqa import (
     __version__,
@@ -493,9 +495,6 @@ def _run_command(
             "Please make sure you have it installed before running nbQA on it."
         )
 
-    from watchdog.events import PatternMatchingEventHandler
-    from watchdog.observers import Observer
-
     patterns = ["*   .py"]
     ignore_patterns = ""
     ignore_directories = True
@@ -584,8 +583,6 @@ def _run_on_one_root_dir(
                 temp_python_file, notebook, out, err
             )
             if mutated and not allow_mutation:
-                from textwrap import dedent
-
                 raise SystemExit(
                     dedent(
                         """\
