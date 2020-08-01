@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 def test_black_works(
-    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture",
+    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture"
 ) -> None:
     """
     Check black works. Should only reformat code cells.
@@ -51,8 +51,5 @@ def test_black_works(
         [f"reformatted {path}", "All done!   ", "1 file reformatted."]
     )
     assert out == expected_out
-    for i in (
-        0,
-        2,
-    ):  # haven't figured out how to test the emojis part
+    for i in (0, 2):  # haven't figured out how to test the emojis part
         assert err.splitlines()[i] == expected_err.splitlines()[i]

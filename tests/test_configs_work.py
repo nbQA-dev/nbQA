@@ -13,9 +13,7 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-def test_configs_work(
-    tmp_notebook_for_testing: Path, capsys: "CaptureFixture",
-) -> None:
+def test_configs_work(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> None:
     """
     Check a flake8 cfg file is picked up by nbqa.
 

@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 def test_nbqa_ini_works(
-    tmp_notebook_for_testing: Path, capsys: "CaptureFixture",
+    tmp_notebook_for_testing: Path, capsys: "CaptureFixture"
 ) -> None:
     """
     Check .nbqa.ini config is picked up works.

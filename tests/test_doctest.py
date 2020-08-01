@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 def test_pytest_doctest_works(
-    tmp_notebook_for_testing: Path, capsys: "CaptureFixture",
+    tmp_notebook_for_testing: Path, capsys: "CaptureFixture"
 ) -> None:
     """
     Check pytest --doctest-modules works.
@@ -42,8 +42,6 @@ def test_pytest_doctest_works(
     # check out and err
     out, err = capsys.readouterr()
     expected_err = ""
-    print(out)
-    print(err)
     assert any(f"rootdir: {str(Path.cwd())}" in i for i in out.splitlines())
     assert any(
         os.path.join("tests", "data", "notebook_for_testing.ipynb") in i
