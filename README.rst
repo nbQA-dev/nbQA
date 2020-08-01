@@ -111,7 +111,20 @@ Format your notebooks using :code:`black`:
     1 files reformatted.
 
 Note that if, as in this last example, you expect your notebooks to be modified, you will need to
-pass the :code:`--nbqa-mutate` flag.
+pass the :code:`--nbqa-mutate` flag (alternatively, you could set :code:`mutate=1` in your :code:`.nbqa.ini`
+file, see "Configuration").
+
+Empty :code:`__init__.py` files
+-------------------------------
+
+Some tools, such as :code:`mypy`, require (possibly empty) :code:`__init__.py` files to be in each subdirectory you wish to analyse. To make :code:`nbQA` aware of this,
+you need to pass the :code:`--nbqa-preserve-init` flag, e.g.
+
+.. code-block:: bash
+
+    nbqa mypy my_dir/my_subdir/my_notebook.ipynb --nbqa-preserve-init
+
+Alternatively, you could set :code:`preserve_init=1` in your :code:`.nbqa.ini` file (see "Configuration").
 
 Configuration
 -------------
@@ -124,7 +137,7 @@ file _and_ with the :code:`--pretty` flag, then you could either run
 
 .. code-block:: bash
 
-    nbqa mypy my_notebook.ipynb --pretty --nbqa-config .mypy.ini
+    nbqa mypy my_notebook.ipynb --pretty --nbqa-config .mypy.ini --nbqa-preserve-init
 
 or, you could put the following in your :code:`.nbqa.ini` file
 
@@ -133,6 +146,7 @@ or, you could put the following in your :code:`.nbqa.ini` file
     [mypy]
     addopts = --pretty
     config = .mypy.ini
+    preserve_init = 1
 
 and then simply run
 
@@ -140,17 +154,12 @@ and then simply run
 
     nbqa mypy my_notebook.ipynb
 
-Empty :code:`__init__.py` files
--------------------------------
+You can also tell :code:`nbQA` to allow mutations, e.g.
 
-Some tools, such as :code:`mypy`, require (possibly empty) :code:`__init__.py` files to be in each subdirectory you wish to analyse. To make :code:`nbQA` aware of this,
-you need to pass the :code:`--nbqa-preserve-init` flag, or set :code:`preserve_init=1` in your :code:`.nbqa.ini` file.
+.. code-block:: ini
 
-Example of the first option:
-
-.. code-block:: bash
-
-    nbqa mypy my_dir/my_subdir/my_notebook.ipynb --nbqa-preserve-init
+    [black]
+    mutate=1
 
 Usage as pre-commit hook
 ------------------------

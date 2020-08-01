@@ -542,12 +542,8 @@ def _run_command(
 
 
 def _get_configs(
-    command: str,
-    kwargs: List[str],
-    nbqa_config: Optional[str],
-    nbqa_preserve_init: bool,
-    tmpdirname: str,
-) -> bool:
+    args: argparse.Namespace, kwargs: List[str], tmpdirname: str,
+) -> Tuple[bool, bool]:
     """
     Deal with extra configs for 3rd party tool.
 
@@ -568,19 +564,26 @@ def _get_configs(
     -------
     bool
         Whether or not to copy __init__.py to temporary directory.
+    bool
+        Whether to allow nbqa to modify notebooks.
     """
     config = configparser.ConfigParser()
     config.read(".nbqa.ini")
-    if command in config.sections():
-        addopts = config[command].get("addopts")
+    nbqa_config = args.nbqa_config
+    nbqa_preserve_init = args.nbqa_preserve_init
+    allow_mutation = args.nbqa_mutate
+    if args.command in config.sections():
+        addopts = config[args.command].get("addopts")
         if addopts is not None:
-            kwargs.extend(config[command]["addopts"].split())
+            kwargs.extend(config[args.command]["addopts"].split())
         if nbqa_config is None:
-            nbqa_config = config[command].get("config")
+            nbqa_config = config[args.command].get("config")
         if not nbqa_preserve_init:
-            nbqa_preserve_init = bool(config[command].get("preserve_init"))
+            nbqa_preserve_init = bool(config[args.command].get("preserve_init"))
+        if not allow_mutation:
+            allow_mutation = bool(config[args.command].get("mutate"))
     _preserve_config_files(nbqa_config, tmpdirname)
-    return nbqa_preserve_init
+    return nbqa_preserve_init, allow_mutation
 
 
 def _run_on_one_root_dir(
@@ -591,16 +594,8 @@ def _run_on_one_root_dir(
 
     Parameters
     ----------
-    root_dir
-        Notebook or directory to run 3rd-party tool on.
-    command
-        Third-party tool (e.g. :code:`mypy`)
-    nbqa_config
-        Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
-    allow_mutation
-        Whether to allow 3rd party tool to modify notebooks.
-    nbqa_preserve_init
-        Whether to copy __init__.py files to temp directory
+    args
+        Arguments passed to nbqa.
     kwargs
         Additional flags to pass to 3rd party tool
 
@@ -618,9 +613,7 @@ def _run_on_one_root_dir(
             for notebook in notebooks
         }
 
-        nbqa_preserve_init = _get_configs(
-            args.command, kwargs, args.nbqa_config, args.nbqa_preserve_init, tmpdirname
-        )
+        nbqa_preserve_init, allow_mutation = _get_configs(args, kwargs, tmpdirname)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             save_source.main(notebook, temp_python_file)
@@ -637,7 +630,7 @@ def _run_on_one_root_dir(
             out, err = _replace_temp_python_file_references_in_out_err(
                 temp_python_file, notebook, out, err
             )
-            if mutated and not args.nbqa_mutate:
+            if mutated and not allow_mutation:
                 raise SystemExit(
                     dedent(
                         """\
