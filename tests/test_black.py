@@ -2,6 +2,8 @@
 
 import difflib
 import os
+from pathlib import Path
+from textwrap import dedent
 from typing import TYPE_CHECKING
 
 import pytest
@@ -9,7 +11,6 @@ import pytest
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:
-    from pathlib import Path
 
     from _pytest.capture import CaptureFixture
 
@@ -31,8 +32,19 @@ def test_black_works(
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
+
+    with open(".nbqa.ini", "w") as handle:
+        handle.write(
+            dedent(
+                """\
+            [black]
+            mutate=1
+            """
+            )
+        )
     with pytest.raises(SystemExit):
-        main(["black", path, "--nbqa-mutate"])
+        main(["black", path])
+    Path(".nbqa.ini").unlink()
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()
 
