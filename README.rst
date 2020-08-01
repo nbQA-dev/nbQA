@@ -118,7 +118,23 @@ You can configure :code:`nbQA` either at the command line, or by using a :code:`
 Extra flags
 ~~~~~~~~~~~
 
-If you wish to pass, say, :code:`--pretty` to :code:`mypy`, you can either run
+If you wish to pass extra flags (e.g. :code:`--ignore W503` to :code:`flake8`) you can either run
+
+.. code-block:: bash
+
+    nbqa flake8 my_notebook.ipynb --ignore W503
+
+or you can put the following in your :code:`.nbqa.ini` file
+
+.. code-block:: ini
+
+    [flake8]
+    addopts = --ignore W503
+
+Config file
+~~~~~~~~~~~
+
+If you already have a config file for your third-party tool (e.g. :code:`.mypy.ini` for :code:`mypy`), you can run
 
 .. code-block:: bash
 
@@ -130,13 +146,6 @@ or you can put the following in your :code:`.nbqa.ini` file
 
     [mypy]
     config = .mypy.ini
-
-Config file
-~~~~~~~~~~~
-
-If you already have a config file for your third-party tool (e.g. :code:`.mypy.ini` for :code:`mypy`), you can run
-
-
 
 Allow mutations
 ~~~~~~~~~~~~~~~
