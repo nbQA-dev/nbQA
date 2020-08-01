@@ -672,7 +672,7 @@ def main(raw_args: Optional[List[str]] = None) -> None:
         Command-line arguments (if calling this function directly), defaults to
         :code:`None` if calling via command-line.
     """
-    (args, kwargs,) = _parse_args(raw_args)
+    args, kwargs = _parse_args(raw_args)
 
     output_codes = [_run_on_one_root_dir(i, args, kwargs) for i in args.root_dirs]
 
