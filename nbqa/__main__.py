@@ -21,9 +21,7 @@ from nbqa import (
 )
 
 
-def _parse_args(
-    raw_args: Optional[List[str]],
-) -> Tuple[str, str, bool, Optional[str], List[str]]:
+def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
     """
     Parse command-line arguments.
 
@@ -66,6 +64,11 @@ def _parse_args(
         "--nbqa-mutate", action="store_true", help="Allows `nbqa` to modify notebooks.",
     )
     parser.add_argument(
+        "--nbqa-preserve-init",
+        action="store_true",
+        help="Use this if your 3rd party tool requires blank `__init__.py` files.",
+    )
+    parser.add_argument(
         "--nbqa-config",
         required=False,
         help="Config file for third-party tool (e.g. `setup.cfg`)",
@@ -81,11 +84,7 @@ def _parse_args(
             )
             raise ValueError(msg) from exception
         sys.exit(0)  # pragma: nocover
-    command = args.command
-    root_dirs = args.root_dirs
-    allow_mutation = args.nbqa_mutate
-    nbqa_config = args.nbqa_config
-    return command, root_dirs, allow_mutation, nbqa_config, kwargs
+    return args, kwargs
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
@@ -344,17 +343,23 @@ def _replace_tmpdir_references(
     return new_out, new_err
 
 
-def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
+def _create_blank_init_files(
+    nbqa_preserve_init: bool, notebook: Path, tmpdirname: str
+) -> None:
     """
     Replicate local (possibly blank) __init__ files to temporary directory.
 
     Parameters
     ----------
+    nbqa_preserve_init
+        Whether to copy __init__.py files to temp directory
     notebook
         Notebook third-party tool is being run against.
     tmpdirname
         Temporary directory to store converted notebooks in.
     """
+    if not nbqa_preserve_init:
+        return
     parts = notebook.resolve().relative_to(Path.cwd()).parts
     init_files = Path(parts[0]).rglob("__init__.py")
     for i in init_files:
@@ -537,8 +542,12 @@ def _run_command(
 
 
 def _get_configs(
-    command: str, kwargs: List[str], nbqa_config: Optional[str], tmpdirname: str
-) -> None:
+    command: str,
+    kwargs: List[str],
+    nbqa_config: Optional[str],
+    nbqa_preserve_init: bool,
+    tmpdirname: str,
+) -> bool:
     """
     Deal with extra configs for 3rd party tool.
 
@@ -550,8 +559,15 @@ def _get_configs(
         Extra flags for third party tool
     nbqa_config
         Config file for 3rd party tool
+    nbqa_preserve_init
+        Whether to copy __init__.py files to temp directory
     tmpdirname
         Temporary directory where notebooks are copied to.
+
+    Returns
+    -------
+    bool
+        Whether or not to copy __init__.py to temporary directory.
     """
     config = configparser.ConfigParser()
     config.read(".nbqa.ini")
@@ -561,15 +577,14 @@ def _get_configs(
             kwargs.extend(config[command]["addopts"].split())
         if nbqa_config is None:
             nbqa_config = config[command].get("config")
+        if not nbqa_preserve_init:
+            nbqa_preserve_init = bool(config[command].get("preserve_init"))
     _preserve_config_files(nbqa_config, tmpdirname)
+    return nbqa_preserve_init
 
 
 def _run_on_one_root_dir(
-    root_dir: str,
-    command: str,
-    nbqa_config: Optional[str],
-    allow_mutation: bool,
-    kwargs: List[str],
+    root_dir: str, args: argparse.Namespace, kwargs: List[str]
 ) -> int:
     """
     Run third-party tool on a single notebook or directory.
@@ -584,6 +599,8 @@ def _run_on_one_root_dir(
         Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
     allow_mutation
         Whether to allow 3rd party tool to modify notebooks.
+    nbqa_preserve_init
+        Whether to copy __init__.py files to temp directory
     kwargs
         Additional flags to pass to 3rd party tool
 
@@ -601,15 +618,17 @@ def _run_on_one_root_dir(
             for notebook in notebooks
         }
 
-        _get_configs(command, kwargs, nbqa_config, tmpdirname)
+        nbqa_preserve_init = _get_configs(
+            args.command, kwargs, args.nbqa_config, args.nbqa_preserve_init, tmpdirname
+        )
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             save_source.main(notebook, temp_python_file)
             replace_magics.main(temp_python_file)
-            _create_blank_init_files(notebook, tmpdirname)
+            _create_blank_init_files(nbqa_preserve_init, notebook, tmpdirname)
 
         out, err, output_code, mutated = _run_command(
-            command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
+            args.command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
         )
 
         out, err = _replace_tmpdir_references(out, err)
@@ -618,7 +637,7 @@ def _run_on_one_root_dir(
             out, err = _replace_temp_python_file_references_in_out_err(
                 temp_python_file, notebook, out, err
             )
-            if mutated and not allow_mutation:
+            if mutated and not args.nbqa_mutate:
                 raise SystemExit(
                     dedent(
                         """\
@@ -653,12 +672,9 @@ def main(raw_args: Optional[List[str]] = None) -> None:
         Command-line arguments (if calling this function directly), defaults to
         :code:`None` if calling via command-line.
     """
-    command, root_dirs, allow_mutation, config, kwargs = _parse_args(raw_args)
+    args, kwargs = _parse_args(raw_args)
 
-    output_codes = [
-        _run_on_one_root_dir(i, command, config, allow_mutation, kwargs)
-        for i in root_dirs
-    ]
+    output_codes = [_run_on_one_root_dir(i, args, kwargs) for i in args.root_dirs]
 
     sys.exit(int(any(output_codes)))
 
