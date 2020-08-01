@@ -122,14 +122,21 @@ If you wish to pass, say, :code:`--pretty` to :code:`mypy`, you can either run
 
 .. code-block:: bash
 
-    nbqa mypy my_notebook.ipynb --pretty
+    nbqa mypy my_notebook.ipynb --nbqa-config .mypy.ini
 
 or you can put the following in your :code:`.nbqa.ini` file
 
 .. code-block:: ini
 
     [mypy]
-    addopts = --pretty
+    config = .mypy.ini
+
+Config file
+~~~~~~~~~~~
+
+If you already have a config file for your third-party tool (e.g. :code:`.mypy.ini` for :code:`mypy`), you can run
+
+
 
 Allow mutations
 ~~~~~~~~~~~~~~~
