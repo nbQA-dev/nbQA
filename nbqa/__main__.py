@@ -21,7 +21,7 @@ from nbqa import (
 )
 
 
-def _parse_args(raw_args: Optional[List[str]],) -> Tuple[argparse.Namespace, List[str]]:
+def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
     """
     Parse command-line arguments.
 
