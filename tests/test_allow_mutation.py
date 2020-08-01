@@ -12,12 +12,8 @@ from nbqa.__main__ import main
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from _pytest.capture import CaptureFixture
 
-
-def test_allow_mutation(
-    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture",
-) -> None:
+def test_allow_mutation(tmp_notebook_for_testing: "Path",) -> None:
     """
     Check black, without --allow-mutation, errors and doesn't modify notebook.
 
