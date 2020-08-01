@@ -185,7 +185,7 @@ could add to your :code:`.pre-commit-config.yaml` file:
         name: nbqa-isort
         additional_dependencies: ['isort']
       - id: nbqa
-        args: ['mypy']
+        args: ['mypy', '--nbqa-preserve-init']
         name: nbqa-mypy
         additional_dependencies: ['mypy']
 
@@ -200,7 +200,7 @@ In practice, here are the tools it's been tested with:
 - black_
 - pytest_
 - isort_
-- mypy_ (you will need to have `__init__` files in each subdirectory)
+- mypy_
 - doctest_ (as long as you run it via pytest_ with the `--doctest-modules` flag)
 
 See Also
