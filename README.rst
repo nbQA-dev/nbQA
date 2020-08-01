@@ -110,56 +110,60 @@ Format your notebooks using :code:`black`:
     All done! ✨ 🍰 ✨
     1 files reformatted.
 
-Note that if, as in this last example, you expect your notebooks to be modified, you will need to
-pass the :code:`--nbqa-mutate` flag (alternatively, you could set :code:`mutate=1` in your :code:`.nbqa.ini`
-file, see "Configuration").
-
-Empty :code:`__init__.py` files
--------------------------------
-
-Some tools, such as :code:`mypy`, require (possibly empty) :code:`__init__.py` files to be in each subdirectory you wish to analyse. To make :code:`nbQA` aware of this,
-you need to pass the :code:`--nbqa-preserve-init` flag, e.g.
-
-.. code-block:: bash
-
-    nbqa mypy my_dir/my_subdir/my_notebook.ipynb --nbqa-preserve-init
-
-Alternatively, you could set :code:`preserve_init=1` in your :code:`.nbqa.ini` file (see "Configuration").
-
 Configuration
 -------------
 
-You can tell `nbQA` which config file to use either by using the :code:`--nbqa-config` flag, or by
-specifying it in a :code:`.nbqa.ini` file.
+You can configure :code:`nbQA` either at the command line, or by using a :code:`.nbqa.ini` file. We'll see some examples below.
 
-So for example, if you wanted to run :code:`mypy` in such a way that it respects your :code:`.mypy.ini`
-file _and_ with the :code:`--pretty` flag, then you could either run
+Extra flags
+~~~~~~~~~~~
+
+If you wish to pass, say, :code:`--pretty` to :code:`mypy`, you can either run
 
 .. code-block:: bash
 
-    nbqa mypy my_notebook.ipynb --pretty --nbqa-config .mypy.ini --nbqa-preserve-init
+    nbqa mypy my_notebook.ipynb --pretty
 
-or, you could put the following in your :code:`.nbqa.ini` file
+or you can put the following in your :code:`.nbqa.ini` file
 
 .. code-block:: ini
 
     [mypy]
     addopts = --pretty
-    config = .mypy.ini
-    preserve_init = 1
 
-and then simply run
+Allow mutations
+~~~~~~~~~~~~~~~
+
+By default, :code:`nbQA` won't modify your notebooks. If you wish to let your third-party tool modify your notebooks, you can
+either pass the :code:`--nbqa-mutate` flag at the command-line, e.g.
 
 .. code-block:: bash
 
-    nbqa mypy my_notebook.ipynb
+    nbqa black my_notebook.ipynb --nbqa-mutate
 
-You can also tell :code:`nbQA` to allow mutations, e.g.
+or you can put the following in your :code:`.nbqa.ini` file
 
 .. code-block:: ini
 
     [black]
-    mutate=1
+    mutate = 1
+
+Empty :code:`__init__.py` files
+-------------------------------
+
+Some tools, such as :code:`mypy`, require (possibly empty) :code:`__init__.py` files to be in each subdirectory you wish to analyse.
+To make :code:`nbQA` aware of this, you can either pass the :code:`--nbqa-preserve-init` flag, e.g.
+
+.. code-block:: bash
+
+    nbqa mypy my_dir/my_subdir/my_notebook.ipynb --nbqa-preserve-init
+
+or you can put the following in your :code:`.nbqa.ini` file
+
+.. code-block:: ini
+
+    [mypy]
+    preserve_init = 1
 
 Usage as pre-commit hook
 ------------------------
