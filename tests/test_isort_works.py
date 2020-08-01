@@ -50,7 +50,7 @@ def test_isort_works(
 
 
 def test_isort_initial_md(
-    tmp_notebook_starting_with_md: "Path", capsys: "CaptureFixture",
+    tmp_notebook_starting_with_md: "Path", capsys: "CaptureFixture"
 ) -> None:
     """
     Check isort works when a notebook starts with a markdown cell.

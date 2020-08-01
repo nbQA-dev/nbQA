@@ -46,6 +46,8 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, bool, List[str
         The third-party tool to run (e.g. :code:`mypy`).
     root_dirs
         The notebooks or directories to run third-party tool on.
+    allow_mutation
+        Whether to allow 3rd party tools to modify notebooks.
     kwargs
         Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
 
@@ -494,6 +496,8 @@ def _run_command(
         Captured stderr from running third-party tool.
     output_code
         Return code from third-party tool.
+    mutated
+        Whether 3rd party tool modified any files.
 
     Raises
     ------
@@ -543,6 +547,8 @@ def _run_on_one_root_dir(
         Notebook or directory to run 3rd-party tool on.
     command
         Third-party tool (e.g. :code:`mypy`)
+    allow_mutation
+        Whether to allow 3rd party tool to modify notebooks.
     kwargs
         Additional flags to pass to 3rd party tool
 
