@@ -549,14 +549,10 @@ def _get_configs(
 
     Parameters
     ----------
-    command
-        3rd party tool (e.g. :code:`mypy`)
+    args
+        Arguments passed to nbqa
     kwargs
         Extra flags for third party tool
-    nbqa_config
-        Config file for 3rd party tool
-    nbqa_preserve_init
-        Whether to copy __init__.py files to temp directory
     tmpdirname
         Temporary directory where notebooks are copied to.
 
