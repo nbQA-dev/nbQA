@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 def test_flake8_works(
-    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture",
+    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture"
 ) -> None:
     """
     Check flake8 works. Shouldn't alter the notebook content.

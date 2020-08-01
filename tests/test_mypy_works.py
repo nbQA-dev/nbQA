@@ -15,9 +15,7 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-def test_mypy_works(
-    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture",
-) -> None:
+def test_mypy_works(tmp_notebook_for_testing: "Path", capsys: "CaptureFixture") -> None:
     """
     Check mypy works. Shouldn't alter the notebook content.
 

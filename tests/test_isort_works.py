@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 def test_isort_works(
-    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture",
+    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture"
 ) -> None:
     """
     Check isort works.
