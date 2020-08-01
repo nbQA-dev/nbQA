@@ -362,25 +362,29 @@ def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
         Path(tmpdirname).joinpath(i).touch()
 
 
-def _preserve_config_files(config: Optional[str], tmpdirname: str) -> None:
+def _preserve_config_files(nbqa_config: Optional[str], tmpdirname: str) -> None:
     """
-    Copy local config files to temporary directory.
+    Copy local config file to temporary directory.
 
     Parameters
     ----------
-    command
-        Third-party tool (e.g. mypy).
+    nbqa_config
+        Config file for third-party tool (e.g. mypy).
     tmpdirname
         Temporary directory to store converted notebooks in.
     """
-    if config is None:
+    if nbqa_config is None:
         return
     Path(tmpdirname).joinpath(
-        Path(config).resolve().relative_to(Path.cwd())
+        Path(nbqa_config).resolve().relative_to(Path.cwd())
     ).parent.mkdir(parents=True, exist_ok=True)
     shutil.copy(
-        str(config),
-        str(Path(tmpdirname).joinpath(Path(config).resolve().relative_to(Path.cwd()))),
+        str(nbqa_config),
+        str(
+            Path(tmpdirname).joinpath(
+                Path(nbqa_config).resolve().relative_to(Path.cwd())
+            )
+        ),
     )
 
 
