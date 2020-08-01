@@ -3,7 +3,7 @@
 import fileinput
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:  # pragma: nocover
+if TYPE_CHECKING:
     from pathlib import Path
 
 

@@ -32,7 +32,7 @@ def test_isort_works(
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     with pytest.raises(SystemExit):
-        main(["isort", path])
+        main(["isort", path, "--allow-mutation"])
 
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()
@@ -69,7 +69,7 @@ def test_isort_initial_md(
         os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
     )
     with pytest.raises(SystemExit):
-        main(["isort", path])
+        main(["isort", path, "--allow-mutation"])
 
     with open(tmp_notebook_starting_with_md, "r") as handle:
         after = handle.readlines()

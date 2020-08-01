@@ -6,6 +6,7 @@ exclude_lines =
     pragma: nocover
     raise NotImplementedError
     if __name__ == .__main__.:
+    if TYPE_CHECKING:
 ignore_errors = True
 omit =
     tests/*
