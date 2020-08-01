@@ -358,6 +358,8 @@ def _create_blank_init_files(
 
     Parameters
     ----------
+    nbqa_preserve_init
+        Whether to copy __init__.py files to temp directory
     notebook
         Notebook third-party tool is being run against.
     tmpdirname
@@ -564,6 +566,8 @@ def _get_configs(
         Extra flags for third party tool
     nbqa_config
         Config file for 3rd party tool
+    nbqa_preserve_init
+        Whether to copy __init__.py files to temp directory
     tmpdirname
         Temporary directory where notebooks are copied to.
 
@@ -607,6 +611,8 @@ def _run_on_one_root_dir(
         Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
     allow_mutation
         Whether to allow 3rd party tool to modify notebooks.
+    nbqa_preserve_init
+        Whether to copy __init__.py files to temp directory
     kwargs
         Additional flags to pass to 3rd party tool
 
