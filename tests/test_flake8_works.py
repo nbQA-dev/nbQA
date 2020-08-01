@@ -51,7 +51,7 @@ def test_flake8_works(
     expected = ""
     assert result == expected
 
-    (out, err) = capsys.readouterr()
+    out, err = capsys.readouterr()
     expected_out = dedent(
         f"""\
         {path_0}:cell_1:1:1: F401 'os' imported but unused

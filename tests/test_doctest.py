@@ -40,7 +40,7 @@ def test_pytest_doctest_works(
     assert result == expected
 
     # check out and err
-    (out, err) = capsys.readouterr()
+    out, err = capsys.readouterr()
     expected_err = ""
     print(out)
     print(err)

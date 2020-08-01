@@ -41,7 +41,7 @@ def test_mypy_works(
     assert result == expected
 
     # check out and err
-    (out, err) = capsys.readouterr()
+    out, err = capsys.readouterr()
     path_0 = os.path.join("tests", "data", "notebook_for_testing.ipynb")
     path_1 = os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
     path_2 = os.path.join("tests", "data", "notebook_starting_with_md.ipynb")

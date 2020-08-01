@@ -45,7 +45,7 @@ def test_black_works(
     assert result == expected
 
     # check out and err
-    (out, err) = capsys.readouterr()
+    out, err = capsys.readouterr()
     expected_out = ""
     expected_err = os.linesep.join(
         [f"reformatted {path}", "All done!   ", "1 file reformatted."]

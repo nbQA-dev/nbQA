@@ -54,7 +54,7 @@ def test_nbqa_ini_works(
     assert result == expected
 
     # check out and err
-    (out, err) = capsys.readouterr()
+    out, err = capsys.readouterr()
     notebook = os.path.abspath(
         os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
     )
