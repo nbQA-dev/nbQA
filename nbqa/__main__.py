@@ -584,7 +584,7 @@ def _get_configs(
 
 
 def _run_on_one_root_dir(
-    root_dir: str, args: argparse.Namespace, kwargs: List[str],
+    root_dir: str, args: argparse.Namespace, kwargs: List[str]
 ) -> int:
     """
     Run third-party tool on a single notebook or directory.
