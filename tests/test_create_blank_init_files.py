@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from py._path.local import LocalPath
 
 
-def test_create_blank_init_files(tmpdir: "LocalPath") -> None:
+def test_create_blank_init_files(tmpdir: "LocalPath",) -> None:
     """
     Check that if a notebook is in current working directory then no init file is made.
 
@@ -24,11 +24,11 @@ def test_create_blank_init_files(tmpdir: "LocalPath") -> None:
         Pytest fixture, gives us a temporary directory.
     """
     _create_blank_init_files(
-        Path(os.path.join("tests", "data", "notebook_for_testing.ipynb")), tmpdir
+        Path(os.path.join("tests", "data", "notebook_for_testing.ipynb",)), tmpdir,
     )
     result = list(Path(tmpdir).rglob("__init__.py"))
     expected = [
-        Path(tmpdir).joinpath(os.path.join("tests", "__init__.py")),
-        Path(tmpdir).joinpath(os.path.join("tests", "data", "__init__.py")),
+        Path(tmpdir).joinpath(os.path.join("tests", "__init__.py",)),
+        Path(tmpdir).joinpath(os.path.join("tests", "data", "__init__.py",)),
     ]
     assert result == expected

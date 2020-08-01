@@ -13,7 +13,9 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-def test_configs_work(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> None:
+def test_configs_work(
+    tmp_notebook_for_testing: Path, capsys: "CaptureFixture",
+) -> None:
     """
     Check a flake8 cfg file is picked up by nbqa.
 
@@ -24,27 +26,27 @@ def test_configs_work(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") 
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with open(".flake8", "w") as handle:
+    with open(".flake8", "w",) as handle:
         handle.write("[flake8]\nignore=F401\nselect=E303\nquiet=1\n")
 
     # check diff
-    with open(tmp_notebook_for_testing, "r") as handle:
+    with open(tmp_notebook_for_testing, "r",) as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
         main(["flake8", "tests", "--ignore", "E302"])
 
     Path(".flake8").unlink()
 
-    with open(tmp_notebook_for_testing, "r") as handle:
+    with open(tmp_notebook_for_testing, "r",) as handle:
         after = handle.readlines()
-    result = "".join(difflib.unified_diff(before, after))
+    result = "".join(difflib.unified_diff(before, after,))
     expected = ""
     assert result == expected
 
     # check out and err
-    out, err = capsys.readouterr()
+    (out, err,) = capsys.readouterr()
     notebook = os.path.abspath(
-        os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
+        os.path.join("tests", "data", "notebook_starting_with_md.ipynb",)
     )
     expected_out = f"{notebook}\n"
     expected_err = ""

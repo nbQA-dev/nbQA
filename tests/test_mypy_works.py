@@ -15,7 +15,9 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-def test_mypy_works(tmp_notebook_for_testing: "Path", capsys: "CaptureFixture") -> None:
+def test_mypy_works(
+    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture",
+) -> None:
     """
     Check mypy works. Shouldn't alter the notebook content.
 
@@ -27,22 +29,22 @@ def test_mypy_works(tmp_notebook_for_testing: "Path", capsys: "CaptureFixture") 
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_for_testing, "r") as handle:
+    with open(tmp_notebook_for_testing, "r",) as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
         main(["mypy", "--ignore-missing-imports", "--allow-untyped-defs", "tests"])
 
-    with open(tmp_notebook_for_testing, "r") as handle:
+    with open(tmp_notebook_for_testing, "r",) as handle:
         after = handle.readlines()
-    result = "".join(difflib.unified_diff(before, after))
+    result = "".join(difflib.unified_diff(before, after,))
     expected = ""
     assert result == expected
 
     # check out and err
-    out, err = capsys.readouterr()
-    path_0 = os.path.join("tests", "data", "notebook_for_testing.ipynb")
-    path_1 = os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
-    path_2 = os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
+    (out, err,) = capsys.readouterr()
+    path_0 = os.path.join("tests", "data", "notebook_for_testing.ipynb",)
+    path_1 = os.path.join("tests", "data", "notebook_for_testing_copy.ipynb",)
+    path_2 = os.path.join("tests", "data", "notebook_starting_with_md.ipynb",)
     expected_out = dedent(
         f"""\
         {path_2}:cell_3:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"

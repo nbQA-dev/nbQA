@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 def test_flake8_works(
-    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture"
+    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture",
 ) -> None:
     """
     Check flake8 works. Shouldn't alter the notebook content.
@@ -30,28 +30,28 @@ def test_flake8_works(
     """
     # check out and err
     path_0 = os.path.abspath(
-        os.path.join("tests", "data", "notebook_for_testing.ipynb")
+        os.path.join("tests", "data", "notebook_for_testing.ipynb",)
     )
     path_1 = os.path.abspath(
-        os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
+        os.path.join("tests", "data", "notebook_for_testing_copy.ipynb",)
     )
     path_2 = os.path.abspath(
-        os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
+        os.path.join("tests", "data", "notebook_starting_with_md.ipynb",)
     )
 
     # check diff
-    with open(tmp_notebook_for_testing, "r") as handle:
+    with open(tmp_notebook_for_testing, "r",) as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
         main(["flake8", path_0, path_1, path_2])
 
-    with open(tmp_notebook_for_testing, "r") as handle:
+    with open(tmp_notebook_for_testing, "r",) as handle:
         after = handle.readlines()
-    result = "".join(difflib.unified_diff(before, after))
+    result = "".join(difflib.unified_diff(before, after,))
     expected = ""
     assert result == expected
 
-    out, err = capsys.readouterr()
+    (out, err,) = capsys.readouterr()
     expected_out = dedent(
         f"""\
         {path_0}:cell_1:1:1: F401 'os' imported but unused

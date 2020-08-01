@@ -13,6 +13,8 @@ from itertools import chain
 from pathlib import Path
 from typing import Dict, Iterator, List, Optional, Tuple
 
+from watchdog.events import FileModifiedEvent
+
 from nbqa import (
     __version__,
     put_magics_back_in,
@@ -30,7 +32,7 @@ CONFIG_FILES["isort"].extend([".isort.cfg"])
 CONFIG_FILES["pytest"].extend(["pytest.ini"])
 
 
-def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
+def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, bool, List[str]]:
     """
     Parse command-line arguments.
 
@@ -65,6 +67,11 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
     parser.add_argument(
         "root_dirs", nargs="+", help="Notebooks or directories to run command on."
     )
+    parser.add_argument(
+        "--allow-mutation",
+        action="store_true",
+        help="Allows `nbqa` to modify notebooks.",
+    )
     parser.add_argument("--version", action="version", version=f"nbQA {__version__}")
     try:
         args, kwargs = parser.parse_known_args(raw_args)
@@ -78,7 +85,8 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
         sys.exit(0)  # pragma: nocover
     command = args.command
     root_dirs = args.root_dirs
-    return command, root_dirs, kwargs
+    allow_mutation = args.allow_mutation
+    return command, root_dirs, allow_mutation, kwargs
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
@@ -443,7 +451,7 @@ def _run_command(
     tmpdirname: str,
     nb_to_py_mapping: Dict[Path, Path],
     kwargs: List[str],
-) -> Tuple[str, str, int]:
+) -> Tuple[str, str, int, bool]:
     """
     Run third-party tool against given file or directory.
 
@@ -484,6 +492,33 @@ def _run_command(
             f"Command `{command}` not found. "
             "Please make sure you have it installed before running nbQA on it."
         )
+
+    from watchdog.events import PatternMatchingEventHandler
+    from watchdog.observers import Observer
+
+    patterns = ["*   .py"]
+    ignore_patterns = ""
+    ignore_directories = True
+    case_sensitive = True
+    my_event_handler = PatternMatchingEventHandler(
+        patterns, ignore_patterns, ignore_directories, case_sensitive
+    )
+
+    mutated = False
+
+    def on_modified(_: FileModifiedEvent) -> None:
+        """If a file is modified, change `modified` to True."""
+        nonlocal mutated
+        mutated = True
+
+    my_event_handler.on_modified = on_modified
+    path = str(arg)
+    go_recursively = True
+    my_observer = Observer()
+    my_observer.schedule(my_event_handler, path, recursive=go_recursively)
+    my_observer.start()
+    mutated = False
+
     output = subprocess.run(
         [command, str(arg), *kwargs],
         stderr=subprocess.PIPE,
@@ -491,14 +526,17 @@ def _run_command(
         cwd=tmpdirname,
         env=env,
     )
+    my_observer.stop()
     output_code = output.returncode
 
     out = output.stdout.decode()
     err = output.stderr.decode()
-    return out, err, output_code
+    return out, err, output_code, mutated
 
 
-def _run_on_one_root_dir(root_dir: str, command: str, kwargs: List[str]) -> int:
+def _run_on_one_root_dir(
+    root_dir: str, command: str, allow_mutation: bool, kwargs: List[str]
+) -> int:
     """
     Run third-party tool on a single notebook or directory.
 
@@ -535,7 +573,7 @@ def _run_on_one_root_dir(root_dir: str, command: str, kwargs: List[str]) -> int:
         config.read(".nbqa.ini")
         if command in config.sections():
             kwargs.extend(config[command]["addopts"].split())
-        out, err, output_code = _run_command(
+        out, err, output_code, mutated = _run_command(
             command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
         )
 
@@ -545,10 +583,26 @@ def _run_on_one_root_dir(root_dir: str, command: str, kwargs: List[str]) -> int:
             out, err = _replace_temp_python_file_references_in_out_err(
                 temp_python_file, notebook, out, err
             )
+            if mutated and not allow_mutation:
+                from textwrap import dedent
 
-            put_magics_back_in.main(temp_python_file)
-            _ensure_cell_separators_remain(temp_python_file)
-            replace_source.main(temp_python_file, notebook)
+                raise SystemExit(
+                    dedent(
+                        """\
+                        💥 Mutation detected, will not reformat!
+
+                        To allow for mutation, please use the `--allow-mutation` flag, e.g.
+
+                        ```
+                        nbqa black my_notebook.ipynb --allow-mutation
+                        ```
+                        """
+                    )
+                )
+            elif mutated:
+                put_magics_back_in.main(temp_python_file)
+                _ensure_cell_separators_remain(temp_python_file)
+                replace_source.main(temp_python_file, notebook)
 
         sys.stdout.write(out)
         sys.stderr.write(err)
@@ -566,9 +620,11 @@ def main(raw_args: Optional[List[str]] = None) -> None:
         Command-line arguments (if calling this function directly), defaults to
         :code:`None` if calling via command-line.
     """
-    command, root_dirs, kwargs = _parse_args(raw_args)
+    command, root_dirs, allow_mutation, kwargs = _parse_args(raw_args)
 
-    output_codes = [_run_on_one_root_dir(i, command, kwargs) for i in root_dirs]
+    output_codes = [
+        _run_on_one_root_dir(i, command, allow_mutation, kwargs) for i in root_dirs
+    ]
 
     sys.exit(int(any(output_codes)))
 

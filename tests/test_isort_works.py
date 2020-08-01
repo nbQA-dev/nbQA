@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 def test_isort_works(
-    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture"
+    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture",
 ) -> None:
     """
     Check isort works.
@@ -28,21 +28,21 @@ def test_isort_works(
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_for_testing, "r") as handle:
+    with open(tmp_notebook_for_testing, "r",) as handle:
         before = handle.readlines()
-    path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
+    path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb",))
     with pytest.raises(SystemExit):
-        main(["isort", path])
+        main(["isort", path, "--allow-mutation"])
 
-    with open(tmp_notebook_for_testing, "r") as handle:
+    with open(tmp_notebook_for_testing, "r",) as handle:
         after = handle.readlines()
-    diff = difflib.unified_diff(before, after)
+    diff = difflib.unified_diff(before, after,)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
     expected = '+    "import glob\\n",\n-    "\\n",\n-    "import glob\\n",\n'
     assert result == expected
 
     # check out and err
-    out, err = capsys.readouterr()
+    (out, err,) = capsys.readouterr()
     expected_out = f"Fixing {path}{os.linesep}"
     expected_err = ""
     assert out == expected_out
@@ -50,7 +50,7 @@ def test_isort_works(
 
 
 def test_isort_initial_md(
-    tmp_notebook_starting_with_md: "Path", capsys: "CaptureFixture"
+    tmp_notebook_starting_with_md: "Path", capsys: "CaptureFixture",
 ) -> None:
     """
     Check isort works when a notebook starts with a markdown cell.
@@ -63,23 +63,23 @@ def test_isort_initial_md(
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_starting_with_md, "r") as handle:
+    with open(tmp_notebook_starting_with_md, "r",) as handle:
         before = handle.readlines()
     path = os.path.abspath(
-        os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
+        os.path.join("tests", "data", "notebook_starting_with_md.ipynb",)
     )
     with pytest.raises(SystemExit):
-        main(["isort", path])
+        main(["isort", path, "--allow-mutation"])
 
-    with open(tmp_notebook_starting_with_md, "r") as handle:
+    with open(tmp_notebook_starting_with_md, "r",) as handle:
         after = handle.readlines()
-    diff = difflib.unified_diff(before, after)
+    diff = difflib.unified_diff(before, after,)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
     expected = '+    "import glob\\n",\n-    "\\n",\n-    "import glob\\n",\n'
     assert result == expected
 
     # check out and err
-    out, err = capsys.readouterr()
+    (out, err,) = capsys.readouterr()
     expected_out = f"Fixing {path}{os.linesep}"
     expected_err = ""
     assert out == expected_out

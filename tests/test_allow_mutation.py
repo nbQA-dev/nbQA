@@ -2,6 +2,7 @@
 
 import difflib
 import os
+from textwrap import dedent
 from typing import TYPE_CHECKING
 
 import pytest
@@ -14,11 +15,11 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-def test_black_works(
+def test_allow_mutation(
     tmp_notebook_for_testing: "Path", capsys: "CaptureFixture",
 ) -> None:
     """
-    Check black works. Should only reformat code cells.
+    Check black, without --allow-mutation, errors and doesn't modify notebook.
 
     Parameters
     ----------
@@ -31,28 +32,25 @@ def test_black_works(
     with open(tmp_notebook_for_testing, "r",) as handle:
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb",))
-    with pytest.raises(SystemExit):
-        main(["black", path, "--allow-mutation"])
+    msg = dedent(
+        """\
+        💥 Mutation detected, will not reformat!
+
+        To allow for mutation, please use the `--allow-mutation` flag, e.g.
+
+        ```
+        nbqa black my_notebook.ipynb --allow-mutation
+        ```
+        """
+    )
+    with pytest.raises(
+        SystemExit, match=msg,
+    ):
+        main(["black", path])
     with open(tmp_notebook_for_testing, "r",) as handle:
         after = handle.readlines()
 
     diff = difflib.unified_diff(before, after,)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
-    expected = (
-        "-    \"    return f'hello {name}'\\n\",\n"
-        '+    "    return f\\"hello {name}\\"\\n",\n'
-    )
+    expected = ""
     assert result == expected
-
-    # check out and err
-    (out, err,) = capsys.readouterr()
-    expected_out = ""
-    expected_err = os.linesep.join(
-        [f"reformatted {path}", "All done!   ", "1 file reformatted."]
-    )
-    assert out == expected_out
-    for i in (
-        0,
-        2,
-    ):  # haven't figured out how to test the emojis part
-        assert err.splitlines()[i] == expected_err.splitlines()[i]

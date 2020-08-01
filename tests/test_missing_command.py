@@ -16,5 +16,7 @@ def test_missing_command() -> None:
         f"Command `{command}` not found. "
         "Please make sure you have it installed before running nbQA on it."
     )
-    with pytest.raises(ValueError, match=msg):
+    with pytest.raises(
+        ValueError, match=msg,
+    ):
         main([command, "tests", "--some-flag"])
