@@ -63,7 +63,7 @@ Check your installation with
 .. code-block:: bash
 
     $ nbqa --version
-    nbqa 0.1.16
+    nbqa 0.1.17
 
 Quickstart
 ----------
@@ -170,7 +170,7 @@ could add to your :code:`.pre-commit-config.yaml` file:
 .. code-block:: yaml
 
   - repo: https://github.com/nbQA-dev/nbQA
-    rev: 0.1.16
+    rev: 0.1.17
     hooks:
       - id: nbqa
         args: ['flake8']
