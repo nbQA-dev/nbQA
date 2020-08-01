@@ -21,9 +21,7 @@ from nbqa import (
 )
 
 
-def _parse_args(
-    raw_args: Optional[List[str]],
-) -> Tuple[str, str, bool, Optional[str], bool, List[str]]:
+def _parse_args(raw_args: Optional[List[str]],) -> Tuple[argparse.Namespace, List[str]]:
     """
     Parse command-line arguments.
 
@@ -86,12 +84,7 @@ def _parse_args(
             )
             raise ValueError(msg) from exception
         sys.exit(0)  # pragma: nocover
-    command = args.command
-    root_dirs = args.root_dirs
-    allow_mutation = args.nbqa_mutate
-    nbqa_config = args.nbqa_config
-    nbqa_preserve_init = args.nbqa_preserve_init
-    return command, root_dirs, allow_mutation, nbqa_config, nbqa_preserve_init, kwargs
+    return args, kwargs
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
@@ -591,12 +584,7 @@ def _get_configs(
 
 
 def _run_on_one_root_dir(
-    root_dir: str,
-    command: str,
-    nbqa_config: Optional[str],
-    allow_mutation: bool,
-    nbqa_preserve_init: bool,
-    kwargs: List[str],
+    root_dir: str, args: argparse.Namespace, kwargs: List[str],
 ) -> int:
     """
     Run third-party tool on a single notebook or directory.
@@ -631,7 +619,7 @@ def _run_on_one_root_dir(
         }
 
         nbqa_preserve_init = _get_configs(
-            command, kwargs, nbqa_config, nbqa_preserve_init, tmpdirname
+            args.command, kwargs, args.nbqa_config, args.nbqa_preserve_init, tmpdirname
         )
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
@@ -640,7 +628,7 @@ def _run_on_one_root_dir(
             _create_blank_init_files(nbqa_preserve_init, notebook, tmpdirname)
 
         out, err, output_code, mutated = _run_command(
-            command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
+            args.command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
         )
 
         out, err = _replace_tmpdir_references(out, err)
@@ -649,7 +637,7 @@ def _run_on_one_root_dir(
             out, err = _replace_temp_python_file_references_in_out_err(
                 temp_python_file, notebook, out, err
             )
-            if mutated and not allow_mutation:
+            if mutated and not args.nbqa_mutate:
                 raise SystemExit(
                     dedent(
                         """\
@@ -684,21 +672,9 @@ def main(raw_args: Optional[List[str]] = None) -> None:
         Command-line arguments (if calling this function directly), defaults to
         :code:`None` if calling via command-line.
     """
-    (
-        command,
-        root_dirs,
-        allow_mutation,
-        nbqa_config,
-        nbqa_preserve_init,
-        kwargs,
-    ) = _parse_args(raw_args)
+    (args, kwargs,) = _parse_args(raw_args)
 
-    output_codes = [
-        _run_on_one_root_dir(
-            i, command, nbqa_config, allow_mutation, nbqa_preserve_init, kwargs
-        )
-        for i in root_dirs
-    ]
+    output_codes = [_run_on_one_root_dir(i, args, kwargs) for i in args.root_dirs]
 
     sys.exit(int(any(output_codes)))
 
