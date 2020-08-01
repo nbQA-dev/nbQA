@@ -29,9 +29,9 @@ def test_allow_mutation(
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_for_testing, "r",) as handle:
+    with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
-    path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb",))
+    path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     msg = dedent(
         """\
         💥 Mutation detected, will not reformat!
@@ -47,10 +47,10 @@ def test_allow_mutation(
         SystemExit, match=msg,
     ):
         main(["black", path])
-    with open(tmp_notebook_for_testing, "r",) as handle:
+    with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()
 
-    diff = difflib.unified_diff(before, after,)
+    diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
     expected = ""
     assert result == expected

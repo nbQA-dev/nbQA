@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture
-def tmp_notebook_for_testing(tmpdir: "LocalPath",) -> Iterator[Path]:
+def tmp_notebook_for_testing(tmpdir: "LocalPath") -> Iterator[Path]:
     """
     Make temporary copy of test notebook before it's operated on, then revert it.
 
@@ -37,7 +37,7 @@ def tmp_notebook_for_testing(tmpdir: "LocalPath",) -> Iterator[Path]:
 
 
 @pytest.fixture
-def tmp_notebook_starting_with_md(tmpdir: "LocalPath",) -> Iterator[Path]:
+def tmp_notebook_starting_with_md(tmpdir: "LocalPath") -> Iterator[Path]:
     """
     Make temporary copy of test notebook before it's operated on, then revert it.
 

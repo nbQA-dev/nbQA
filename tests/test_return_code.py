@@ -3,8 +3,8 @@
 import os
 import subprocess
 
-DIRTY_NOTEBOOK = os.path.join("tests", "data", "notebook_for_testing.ipynb",)
-CLEAN_NOTEBOOK = os.path.join("tests", "data", "clean_notebook.ipynb",)
+DIRTY_NOTEBOOK = os.path.join("tests", "data", "notebook_for_testing.ipynb")
+CLEAN_NOTEBOOK = os.path.join("tests", "data", "clean_notebook.ipynb")
 
 
 def test_flake8_return_code() -> None:
