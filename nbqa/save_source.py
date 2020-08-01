@@ -7,7 +7,7 @@ Markdown cells, output, and metadata are ignored.
 import json
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:  # pragma: nocover
+if TYPE_CHECKING:
     from pathlib import Path
 
 CODE_SEPARATOR = "\n\n# %%\n"

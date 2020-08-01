@@ -7,7 +7,7 @@ The converted file will have had the third-party tool run against it by now.
 import json
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:  # pragma: nocover
+if TYPE_CHECKING:
     from pathlib import Path
 
 
