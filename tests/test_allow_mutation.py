@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 def test_allow_mutation(tmp_notebook_for_testing: "Path",) -> None:
     """
-    Check black, without --allow-mutation, errors and doesn't modify notebook.
+    Check black, without --nbqa-mutate, errors and doesn't modify notebook.
 
     Parameters
     ----------
@@ -32,10 +32,10 @@ def test_allow_mutation(tmp_notebook_for_testing: "Path",) -> None:
         """\
         💥 Mutation detected, will not reformat!
 
-        To allow for mutation, please use the `--allow-mutation` flag, e.g.
+        To allow for mutation, please use the `--nbqa-mutate` flag, e.g.
 
         ```
-        nbqa black my_notebook.ipynb --allow-mutation
+        nbqa black my_notebook.ipynb --nbqa-mutate
         ```
         """
     )
