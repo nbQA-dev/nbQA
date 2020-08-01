@@ -140,6 +140,18 @@ and then simply run
 
     nbqa mypy my_notebook.ipynb
 
+Empty :code:`__init__.py` files
+-------------------------------
+
+Some tools, such as :code:`mypy`, require (possibly empty) :code:`__init__.py` files to be in each subdirectory you wish to analyse. To make :code:`nbQA` aware of this,
+you need to pass the :code:`--nbqa-preserve-init` flag, or set :code:`preserve_init=1` in your :code:`.nbqa.ini` file.
+
+Example of the first option:
+
+.. code-block:: bash
+
+    nbqa mypy my_dir/my_subdir/my_notebook.ipynb --nbqa-preserve-init
+
 Usage as pre-commit hook
 ------------------------
 
