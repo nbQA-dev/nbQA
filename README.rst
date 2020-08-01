@@ -222,14 +222,13 @@ In practice, here are the tools it's been tested with:
 See Also
 --------
 
-Here are some specialised code quality tools for Jupyter Notebooks:
+Here are some other code quality tools for Jupyter Notebooks:
 
-- `flake8-nb`_;
-- `black-nb`_.
+- `flake8-nb`_ (apply `flake8`_ to notebook);
+- `black-nb`_ (apply `black`_ to notebook);
+- `nbstripout`_ (clear notebook cells' outputs);
+- `jupyterlab_code_formatter`_ (Jupyter Lab plugin);
 
-Project template from cookiecutter_.
-
-.. _cookiecutter: https://github.com/cookiecutter/cookiecutter
 .. _flake8: https://flake8.pycqa.org/en/latest/
 .. _black: https://black.readthedocs.io/en/stable/
 .. _pytest: https://docs.pytest.org/en/latest/
@@ -240,3 +239,5 @@ Project template from cookiecutter_.
 .. _flake8-nb: https://flake8-nb.readthedocs.io/en/latest/readme.html
 .. _here: https://nbqa.readthedocs.io/en/latest/
 .. _`pre-commit`: https://pre-commit.com/
+.. _`nbstripout`: https://github.com/kynan/nbstripout
+.. _`jupyterlab_code_formatter`: https://github.com/ryantam626/jupyterlab_code_formatter
