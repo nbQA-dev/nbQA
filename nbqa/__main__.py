@@ -12,10 +12,7 @@ from collections import defaultdict
 from itertools import chain
 from pathlib import Path
 from textwrap import dedent
-from typing import Dict, Iterator, List, Optional, Tuple
-
-from watchdog.events import FileModifiedEvent, PatternMatchingEventHandler
-from watchdog.observers import Observer
+from typing import Dict, Iterator, List, Optional, Set, Tuple
 
 from nbqa import (
     __version__,
@@ -447,6 +444,25 @@ def _get_arg(
     return arg
 
 
+def _get_mtimes(arg: Path) -> Set[float]:
+    """
+    Get the modification times of any converted notebooks.
+
+    Parameters
+    ----------
+    arg
+        Notebook or directory to run 3rd party tool on.
+
+    Returns
+    -------
+    Set
+        Modification times of any converted notebooks.
+    """
+    if not arg.is_dir():
+        return {os.path.getmtime(str(arg))}
+    return {os.path.getmtime(str(i)) for i in arg.rglob("*   .py")}
+
+
 def _run_command(
     command: str,
     root_dir: str,
@@ -495,28 +511,7 @@ def _run_command(
             "Please make sure you have it installed before running nbQA on it."
         )
 
-    patterns = ["*   .py"]
-    ignore_patterns = ""
-    ignore_directories = True
-    case_sensitive = True
-    my_event_handler = PatternMatchingEventHandler(
-        patterns, ignore_patterns, ignore_directories, case_sensitive
-    )
-
-    mutated = False
-
-    def on_modified(_: FileModifiedEvent) -> None:
-        """If a file is modified, change `modified` to True."""
-        nonlocal mutated
-        mutated = True
-
-    my_event_handler.on_modified = on_modified
-    path = str(arg)
-    go_recursively = True
-    my_observer = Observer()
-    my_observer.schedule(my_event_handler, path, recursive=go_recursively)
-    my_observer.start()
-    mutated = False
+    before = _get_mtimes(arg)
 
     output = subprocess.run(
         [command, str(arg), *kwargs],
@@ -525,7 +520,10 @@ def _run_command(
         cwd=tmpdirname,
         env=env,
     )
-    my_observer.stop()
+
+    after = _get_mtimes(arg)
+    mutated = after != before
+
     output_code = output.returncode
 
     out = output.stdout.decode()
@@ -596,7 +594,7 @@ def _run_on_one_root_dir(
                         """
                     )
                 )
-            elif mutated:
+            if mutated:
                 put_magics_back_in.main(temp_python_file)
                 _ensure_cell_separators_remain(temp_python_file)
                 replace_source.main(temp_python_file, notebook)
