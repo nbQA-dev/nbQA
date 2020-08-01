@@ -32,7 +32,7 @@ def test_black_works(
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     with pytest.raises(SystemExit):
-        main(["black", path, "--allow-mutation"])
+        main(["black", path, "--nbqa-mutate"])
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()
 

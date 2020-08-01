@@ -105,30 +105,40 @@ Format your notebooks using :code:`black`:
 
 .. code-block:: bash
 
-    $ nbqa black . --line-length=96 --allow-mutation
+    $ nbqa black . --line-length=96 --nbqa-mutate
     reformatted tweet-sentiment-roberta-pytorch.ipynb
     All done! ✨ 🍰 ✨
     1 files reformatted.
 
 Note that if, as in this last example, you expect your notebooks to be modified, you will need to
-pass the :code:`--allow-mutation` flag.
+pass the :code:`--nbqa-mutate` flag.
 
 Configuration
 -------------
 
-By default, `nbQA` will use your tools' standard configuration files (e.g. :code:`setup.cfg`, :code:`mypy.ini`).
-You can pass extra configurations to your tools either via the command line (as in the
-examples above), or in a :code:`.nbqa.ini` file:
+You can tell `nbQA` which config file to use either by using the :code:`--nbqa-config` flag, or by
+specifying it in a :code:`.nbqa.ini` file.
+
+So for example, if you wanted to run :code:`mypy` in such a way that it respects your :code:`.mypy.ini`
+file _and_ with the :code:`--pretty` flag, then you could either run
+
+.. code-block:: bash
+
+    nbqa mypy my_notebook.ipynb --pretty --nbqa-config .mypy.ini
+
+or, you could put the following in your :code:`.nbqa.ini` file
 
 .. code-block:: ini
 
-    [black]
-    addopts = --line-length=96
+    [mypy]
+    addopts = --pretty
+    config = .mypy.ini
 
-    [flake8]
-    addopts = --max-line-length=96 \
-              --ignore=E203,W503,W504 \
-              --quiet
+and then simply run
+
+.. code-block:: bash
+
+    nbqa mypy my_notebook.ipynb
 
 Usage as pre-commit hook
 ------------------------
@@ -146,7 +156,7 @@ could add to your :code:`.pre-commit-config.yaml` file:
         name: nbqa-flake8
         additional_dependencies: ['flake8']
       - id: nbqa
-        args: ['isort', '--allow-mutation']
+        args: ['isort', '--nbqa-mutate']
         name: nbqa-isort
         additional_dependencies: ['isort']
       - id: nbqa

@@ -8,8 +8,6 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from collections import defaultdict
-from itertools import chain
 from pathlib import Path
 from textwrap import dedent
 from typing import Dict, Iterator, List, Optional, Set, Tuple
@@ -22,16 +20,10 @@ from nbqa import (
     save_source,
 )
 
-CONFIG_FILES: Dict[str, List[str]] = defaultdict(
-    lambda: ["setup.cfg", "tox.ini", "pyproject.toml", ".editorconfig"]
-)
-CONFIG_FILES["flake8"].extend([".flake8"])
-CONFIG_FILES["mypy"].extend(["mypy.ini", ".mypy.ini"])
-CONFIG_FILES["isort"].extend([".isort.cfg"])
-CONFIG_FILES["pytest"].extend(["pytest.ini"])
 
-
-def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, bool, List[str]]:
+def _parse_args(
+    raw_args: Optional[List[str]],
+) -> Tuple[str, str, bool, Path, List[str]]:
     """
     Parse command-line arguments.
 
@@ -69,9 +61,12 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, bool, List[str
         "root_dirs", nargs="+", help="Notebooks or directories to run command on."
     )
     parser.add_argument(
-        "--allow-mutation",
-        action="store_true",
-        help="Allows `nbqa` to modify notebooks.",
+        "--nbqa-mutate", action="store_true", help="Allows `nbqa` to modify notebooks.",
+    )
+    parser.add_argument(
+        "--nbqa-config",
+        required=False,
+        help="Config file for third-party tool (e.g. `setup.cfg`)",
     )
     parser.add_argument("--version", action="version", version=f"nbQA {__version__}")
     try:
@@ -86,8 +81,9 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, bool, List[str
         sys.exit(0)  # pragma: nocover
     command = args.command
     root_dirs = args.root_dirs
-    allow_mutation = args.allow_mutation
-    return command, root_dirs, allow_mutation, kwargs
+    allow_mutation = args.nbqa_mutate
+    config = args.nbqa_config
+    return command, root_dirs, allow_mutation, config, kwargs
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
@@ -364,7 +360,7 @@ def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
         Path(tmpdirname).joinpath(i).touch()
 
 
-def _preserve_config_files(command: str, tmpdirname: str) -> None:
+def _preserve_config_files(config: Path, tmpdirname: str) -> None:
     """
     Copy local config files to temporary directory.
 
@@ -375,16 +371,15 @@ def _preserve_config_files(command: str, tmpdirname: str) -> None:
     tmpdirname
         Temporary directory to store converted notebooks in.
     """
-    config_files = (
-        i
-        for i in chain(*(Path.cwd().rglob(j) for j in CONFIG_FILES[command]))
-        if i.is_file()
+    if config is None:
+        return
+    Path(tmpdirname).joinpath(
+        Path(config).resolve().relative_to(Path.cwd())
+    ).parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(
+        str(config),
+        str(Path(tmpdirname).joinpath(Path(config).resolve().relative_to(Path.cwd()))),
     )
-    for i in config_files:
-        Path(tmpdirname).joinpath(i.relative_to(Path.cwd())).parent.mkdir(
-            parents=True, exist_ok=True
-        )
-        shutil.copy(str(i), str(Path(tmpdirname).joinpath(i.relative_to(Path.cwd()))))
 
 
 def _ensure_cell_separators_remain(temp_python_file: Path) -> None:
@@ -536,7 +531,11 @@ def _run_command(
 
 
 def _run_on_one_root_dir(
-    root_dir: str, command: str, allow_mutation: bool, kwargs: List[str]
+    root_dir: str,
+    command: str,
+    nbqa_config: Path,
+    allow_mutation: bool,
+    kwargs: List[str],
 ) -> int:
     """
     Run third-party tool on a single notebook or directory.
@@ -566,16 +565,21 @@ def _run_on_one_root_dir(
             for notebook in notebooks
         }
 
+        config = configparser.ConfigParser(allow_no_value=True)
+        config.read(".nbqa.ini")
+        if command in config.sections():
+            addopts = config[command].get("addopts")
+            if addopts is not None:
+                kwargs.extend(config[command]["addopts"].split())
+            if nbqa_config is None:
+                nbqa_config = config[command].get("config")
+
         for notebook, temp_python_file in nb_to_py_mapping.items():
             save_source.main(notebook, temp_python_file)
             replace_magics.main(temp_python_file)
             _create_blank_init_files(notebook, tmpdirname)
-        _preserve_config_files(command, tmpdirname)
+        _preserve_config_files(nbqa_config, tmpdirname)
 
-        config = configparser.ConfigParser(allow_no_value=True)
-        config.read(".nbqa.ini")
-        if command in config.sections():
-            kwargs.extend(config[command]["addopts"].split())
         out, err, output_code, mutated = _run_command(
             command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
         )
@@ -592,10 +596,10 @@ def _run_on_one_root_dir(
                         """\
                         💥 Mutation detected, will not reformat!
 
-                        To allow for mutation, please use the `--allow-mutation` flag, e.g.
+                        To allow for mutation, please use the `--nbqa-mutate` flag, e.g.
 
                         ```
-                        nbqa black my_notebook.ipynb --allow-mutation
+                        nbqa black my_notebook.ipynb --nbqa-mutate
                         ```
                         """
                     )
@@ -621,10 +625,11 @@ def main(raw_args: Optional[List[str]] = None) -> None:
         Command-line arguments (if calling this function directly), defaults to
         :code:`None` if calling via command-line.
     """
-    command, root_dirs, allow_mutation, kwargs = _parse_args(raw_args)
+    command, root_dirs, allow_mutation, config, kwargs = _parse_args(raw_args)
 
     output_codes = [
-        _run_on_one_root_dir(i, command, allow_mutation, kwargs) for i in root_dirs
+        _run_on_one_root_dir(i, command, config, allow_mutation, kwargs)
+        for i in root_dirs
     ]
 
     sys.exit(int(any(output_codes)))
