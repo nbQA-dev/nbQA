@@ -32,11 +32,7 @@ def test_allow_mutation(tmp_notebook_for_testing: "Path",) -> None:
         """\
         💥 Mutation detected, will not reformat!
 
-        To allow for mutation, please use the `--nbqa-mutate` flag, e.g.
-
-        ```
-        nbqa black my_notebook.ipynb --nbqa-mutate
-        ```
+        To allow for mutation, please use the `--nbqa-mutate` flag.
         """
     )
     with pytest.raises(

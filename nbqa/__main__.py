@@ -632,11 +632,7 @@ def _run_on_one_root_dir(
                         """\
                         💥 Mutation detected, will not reformat!
 
-                        To allow for mutation, please use the `--nbqa-mutate` flag, e.g.
-
-                        ```
-                        nbqa black my_notebook.ipynb --nbqa-mutate
-                        ```
+                        To allow for mutation, please use the `--nbqa-mutate` flag.
                         """
                     )
                 )
