@@ -9,7 +9,6 @@ from nbqa.__main__ import main
 
 def test_allow_mutation() -> None:
     """Check black, without --nbqa-mutate, errors."""
-    # check diff
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     msg = f"nbqa black {path} --nbqa-mutate"
     with pytest.raises(
