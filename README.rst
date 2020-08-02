@@ -35,6 +35,14 @@ nbQA
 .. image:: https://img.shields.io/badge/pylint-10/10-brightgreen.svg
    :target: https://github.com/PyCQA/pylint
 
+.. raw:: html
+
+    <p align="center">
+        <a href="#readme">
+            <img alt="demo" src="https://raw.githubusercontent.com/nbQA-dev/nbQA-demo/master/demo.gif">
+        </a>
+    </p>
+
 Adapter to run any code-quality tool on a Jupyter notebook.
 This is intended to be run as a `pre-commit`_ hook and/or during continuous integration.
 
