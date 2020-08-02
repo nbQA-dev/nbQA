@@ -2,27 +2,14 @@
 
 import os
 from textwrap import dedent
-from typing import TYPE_CHECKING
 
 import pytest
 
 from nbqa.__main__ import main
 
-if TYPE_CHECKING:
-    from pathlib import Path
 
-
-def test_allow_mutation(tmp_notebook_for_testing: "Path",) -> None:
-    """
-    Check black, without --nbqa-mutate, errors and doesn't modify notebook.
-
-    Parameters
-    ----------
-    tmp_notebook_for_testing
-        Temporary copy of :code:`notebook_for_testing.ipynb`.
-    capsys
-        Pytest fixture to capture stdout and stderr.
-    """
+def test_allow_mutation() -> None:
+    """Check black, without --nbqa-mutate, errors."""
     # check diff
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     msg = dedent(
