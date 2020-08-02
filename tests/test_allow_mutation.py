@@ -1,6 +1,5 @@
 """Check that :code:`black` works as intended."""
 
-import difflib
 import os
 from textwrap import dedent
 from typing import TYPE_CHECKING
@@ -25,24 +24,48 @@ def test_allow_mutation(tmp_notebook_for_testing: "Path",) -> None:
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_for_testing, "r") as handle:
-        before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     msg = dedent(
-        """\
-        💥 Mutation detected, will not reformat!
+        f"""\
+        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
 
-        To allow for mutation, please use the `--nbqa-mutate` flag.
+            nbqa black {path} --nbqa-mutate
         """
     )
     with pytest.raises(
         SystemExit, match=msg,
     ):
         main(["black", path])
-    with open(tmp_notebook_for_testing, "r") as handle:
-        after = handle.readlines()
+    msg = dedent(
+        f"""\
+        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
 
-    diff = difflib.unified_diff(before, after)
-    result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
-    expected = ""
-    assert result == expected
+            nbqa black {path} --line-length 96 --nbqa-mutate
+        """
+    )
+    with pytest.raises(
+        SystemExit, match=msg,
+    ):
+        main(["black", path, "--line-length", "96"])
+    msg = dedent(
+        f"""\
+        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
+
+            nbqa black {path} --nbqa-config=setup.cfg --nbqa-mutate
+        """
+    )
+    with pytest.raises(
+        SystemExit, match=msg,
+    ):
+        main(["black", path, "--nbqa-config=setup.cfg"])
+    msg = dedent(
+        f"""\
+        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
+
+            nbqa black {path} --nbqa-preserve-init --nbqa-mutate
+        """
+    )
+    with pytest.raises(
+        SystemExit, match=msg,
+    ):
+        main(["black", path, "--nbqa-preserve-init"])

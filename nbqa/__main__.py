@@ -627,12 +627,17 @@ def _run_on_one_root_dir(
                 temp_python_file, notebook, out, err
             )
             if mutated and not allow_mutation:
+                if args.nbqa_config:
+                    kwargs += [f"--nbqa-config={args.nbqa_config}"]
+                if args.nbqa_preserve_init:
+                    kwargs += ["--nbqa-preserve-init"]
+                kwargs += ["--nbqa-mutate"]
                 raise SystemExit(
                     dedent(
-                        """\
-                        💥 Mutation detected, will not reformat!
+                        f"""\
+                        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
 
-                        To allow for mutation, please use the `--nbqa-mutate` flag.
+                            nbqa {args.command} {root_dir} {' '.join(kwargs)}
                         """
                     )
                 )
