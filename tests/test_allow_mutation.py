@@ -14,7 +14,7 @@ def test_allow_mutation() -> None:
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     msg = dedent(
         f"""\
-        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
+        Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
 
             nbqa black {path} --nbqa-mutate
         """
@@ -25,7 +25,7 @@ def test_allow_mutation() -> None:
         main(["black", path])
     msg = dedent(
         f"""\
-        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
+        Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
 
             nbqa black {path} --line-length 96 --nbqa-mutate
         """
@@ -36,7 +36,7 @@ def test_allow_mutation() -> None:
         main(["black", path, "--line-length", "96"])
     msg = dedent(
         f"""\
-        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
+        Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
 
             nbqa black {path} --nbqa-config=setup.cfg --nbqa-mutate
         """
@@ -47,7 +47,7 @@ def test_allow_mutation() -> None:
         main(["black", path, "--nbqa-config=setup.cfg"])
     msg = dedent(
         f"""\
-        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
+        Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
 
             nbqa black {path} --nbqa-preserve-init --nbqa-mutate
         """
