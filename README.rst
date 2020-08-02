@@ -40,30 +40,14 @@ This is intended to be run as a `pre-commit`_ hook and/or during continuous inte
 
 Documentation is hosted here_.
 
-Prerequisites
--------------
-If you don't have `pip`_ installed, this `Python installation guide`_ can guide
-you through the process.
-
-.. _pip: https://pip.pypa.io
-.. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
-
 Installation
 ------------
 
-Install :code:`nbqa` with
+Install :code:`nbqa` with `pip`_:
 
 .. code-block:: bash
 
     $ pip install nbqa
-
-There are **no dependencies** for :code:`nbqa` so installation should be lightning-fast.
-Check your installation with
-
-.. code-block:: bash
-
-    $ nbqa --version
-    nbqa 0.1.17
 
 Quickstart
 ----------
@@ -241,3 +225,4 @@ Here are some other code quality tools for Jupyter Notebooks:
 .. _`pre-commit`: https://pre-commit.com/
 .. _`nbstripout`: https://github.com/kynan/nbstripout
 .. _`jupyterlab_code_formatter`: https://github.com/ryantam626/jupyterlab_code_formatter
+.. _pip: https://pip.pypa.io
