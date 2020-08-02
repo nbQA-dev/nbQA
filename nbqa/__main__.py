@@ -51,9 +51,13 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
     """
     parser = argparse.ArgumentParser(
         description="Adapter to run any code-quality tool on a Jupyter notebook.",
-        usage=(
-            "nbqa <command> <notebook or directory> <flags>\n"
-            "e.g. `nbqa flake8 my_notebook.ipynb --ignore=E203`"
+        usage=dedent(
+            """\
+            nbqa <command> <notebook or directory> <flags>
+            example:
+
+                nbqa flake8 my_notebook.ipynb --ignore=E203\
+            """
         ),
     )
     parser.add_argument("command", help="Command to run, e.g. `flake8`.")
