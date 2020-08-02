@@ -1,52 +1,28 @@
-"""Check that :code:`black` works as intended."""
+"""Check that :code:`black` won't reformat without --nbqa-mutate."""
 
-import difflib
 import os
-from textwrap import dedent
-from typing import TYPE_CHECKING
 
 import pytest
 
 from nbqa.__main__ import main
 
-if TYPE_CHECKING:
-    from pathlib import Path
 
-
-def test_allow_mutation(tmp_notebook_for_testing: "Path",) -> None:
-    """
-    Check black, without --nbqa-mutate, errors and doesn't modify notebook.
-
-    Parameters
-    ----------
-    tmp_notebook_for_testing
-        Temporary copy of :code:`notebook_for_testing.ipynb`.
-    capsys
-        Pytest fixture to capture stdout and stderr.
-    """
-    # check diff
-    with open(tmp_notebook_for_testing, "r") as handle:
-        before = handle.readlines()
+def test_allow_mutation() -> None:
+    """Check black, without --nbqa-mutate, errors."""
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
-    msg = dedent(
-        """\
-        💥 Mutation detected, will not reformat!
-
-        To allow for mutation, please use the `--nbqa-mutate` flag, e.g.
-
-        ```
-        nbqa black my_notebook.ipynb --nbqa-mutate
-        ```
-        """
-    )
-    with pytest.raises(
-        SystemExit, match=msg,
-    ):
+    msg = f"nbqa black {path} --nbqa-mutate"
+    with pytest.raises(SystemExit) as excinfo:
         main(["black", path])
-    with open(tmp_notebook_for_testing, "r") as handle:
-        after = handle.readlines()
-
-    diff = difflib.unified_diff(before, after)
-    result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
-    expected = ""
-    assert result == expected
+    assert msg in str(excinfo.value)
+    msg = f"nbqa black {path} --line-length 96 --nbqa-mutate"
+    with pytest.raises(SystemExit) as excinfo:
+        main(["black", path, "--line-length", "96"])
+    assert msg in str(excinfo.value)
+    msg = f"nbqa black {path} --nbqa-config=setup.cfg --nbqa-mutate"
+    with pytest.raises(SystemExit) as excinfo:
+        main(["black", path, "--nbqa-config=setup.cfg"])
+    assert msg in str(excinfo.value)
+    msg = f"nbqa black {path} --nbqa-preserve-init --nbqa-mutate"
+    with pytest.raises(SystemExit) as excinfo:
+        main(["black", path, "--nbqa-preserve-init"])
+    assert msg in str(excinfo.value)

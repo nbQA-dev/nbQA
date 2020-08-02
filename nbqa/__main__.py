@@ -51,9 +51,13 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
     """
     parser = argparse.ArgumentParser(
         description="Adapter to run any code-quality tool on a Jupyter notebook.",
-        usage=(
-            "nbqa <command> <notebook or directory> <flags>\n"
-            "e.g. `nbqa flake8 my_notebook.ipynb --ignore=E203`"
+        usage=dedent(
+            """\
+            nbqa <command> <notebook or directory> <flags>
+            example:
+
+                nbqa flake8 my_notebook.ipynb --ignore=E203\
+            """
         ),
     )
     parser.add_argument("command", help="Command to run, e.g. `flake8`.")
@@ -627,16 +631,17 @@ def _run_on_one_root_dir(
                 temp_python_file, notebook, out, err
             )
             if mutated and not allow_mutation:
+                if args.nbqa_config:
+                    kwargs += [f"--nbqa-config={args.nbqa_config}"]
+                if args.nbqa_preserve_init:
+                    kwargs += ["--nbqa-preserve-init"]
+                kwargs += ["--nbqa-mutate"]
                 raise SystemExit(
                     dedent(
-                        """\
-                        💥 Mutation detected, will not reformat!
+                        f"""\
+                        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
 
-                        To allow for mutation, please use the `--nbqa-mutate` flag, e.g.
-
-                        ```
-                        nbqa black my_notebook.ipynb --nbqa-mutate
-                        ```
+                            nbqa {args.command} {root_dir} {' '.join(kwargs)}
                         """
                     )
                 )
