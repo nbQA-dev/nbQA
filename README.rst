@@ -39,7 +39,7 @@ nbQA
 
     <p align="center">
         <a href="#readme">
-            <img alt="demo" src="https://raw.githubusercontent.com/nbQA-dev/nbQA/gif/assets/demo.gif">
+            <img alt="demo" src="https://raw.githubusercontent.com/nbQA-dev/nbQA/master/assets/demo.gif">
         </a>
     </p>
 
