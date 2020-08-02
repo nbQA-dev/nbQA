@@ -14,18 +14,15 @@ def test_allow_mutation() -> None:
     with pytest.raises(SystemExit) as excinfo:
         main(["black", path])
     assert msg in str(excinfo.value)
-    # msg = fr".*nbqa black {path} --line-length 96 --nbqa-mutate.*"
-    # with pytest.raises(
-    #     SystemExit, match=msg,
-    # ):
-    #     main(["black", path, "--line-length", "96"])
-    # msg = fr".*nbqa black {path} --nbqa-config=setup.cfg --nbqa-mutate.*"
-    # with pytest.raises(
-    #     SystemExit, match=msg,
-    # ):
-    #     main(["black", path, "--nbqa-config=setup.cfg"])
-    # msg = fr".*nbqa black {path} --nbqa-preserve-init --nbqa-mutate.*"
-    # with pytest.raises(
-    #     SystemExit, match=msg,
-    # ):
-    #     main(["black", path, "--nbqa-preserve-init"])
+    msg = f"nbqa black {path} --line-length 96 --nbqa-mutate"
+    with pytest.raises(SystemExit) as excinfo:
+        main(["black", path, "--line-length", "96"])
+    assert msg in str(excinfo.value)
+    msg = f"nbqa black {path} --nbqa-config=setup.cfg --nbqa-mutate"
+    with pytest.raises(SystemExit) as excinfo:
+        main(["black", path, "--nbqa-config=setup.cfg"])
+    assert msg in str(excinfo.value)
+    msg = f"nbqa black {path} --nbqa-preserve-init --nbqa-mutate"
+    with pytest.raises(SystemExit) as excinfo:
+        main(["black", path, "--nbqa-preserve-init"])
+    assert msg in str(excinfo.value)
