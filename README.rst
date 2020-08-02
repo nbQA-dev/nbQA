@@ -37,7 +37,11 @@ nbQA
 
 .. raw:: html
 
-    <iframe src="https://giphy.com/embed/Q5Ljby6OMFCm15TOUl" width="480" height="228" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/Q5Ljby6OMFCm15TOUl">via GIPHY</a></p>
+    <p align="center">
+        <a href="#readme">
+            <img alt="demo" src="https://raw.githubusercontent.com/nbQA-dev/nbQA/gif/assets/demo.gif">
+        </a>
+    </p>
 
 Adapter to run any code-quality tool on a Jupyter notebook.
 This is intended to be run as a `pre-commit`_ hook and/or during continuous integration.
