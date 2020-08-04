@@ -365,10 +365,14 @@ def _create_blank_init_files(
     if not nbqa_preserve_init:
         return
     parts = notebook.resolve().relative_to(Path.cwd()).parts
-    init_files = Path(parts[0]).rglob("__init__.py")
-    for i in init_files:
-        Path(tmpdirname).joinpath(i).parent.mkdir(parents=True, exist_ok=True)
-        Path(tmpdirname).joinpath(i).touch()
+
+    for n in range(1, len(parts)):
+        init_file = next(Path(os.path.join(*parts[:n])).glob("__init__.py"))
+        if init_file is not None:
+            Path(tmpdirname).joinpath(init_file).parent.mkdir(
+                parents=True, exist_ok=True
+            )
+            Path(tmpdirname).joinpath(init_file).touch()
 
 
 def _preserve_config_files(nbqa_config: Optional[str], tmpdirname: str) -> None:
