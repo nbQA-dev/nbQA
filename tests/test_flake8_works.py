@@ -1,6 +1,4 @@
-"""
-Check :code:`flake8` works as intended.
-"""
+"""Check :code:`flake8` works as intended."""
 
 import difflib
 import os
@@ -30,20 +28,7 @@ def test_flake8_works(
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    # check diff
-    with open(tmp_notebook_for_testing, "r") as handle:
-        before = handle.readlines()
-    with pytest.raises(SystemExit):
-        main(["flake8", "."])
-
-    with open(tmp_notebook_for_testing, "r") as handle:
-        after = handle.readlines()
-    result = "".join(difflib.unified_diff(before, after))
-    expected = ""
-    assert result == expected
-
     # check out and err
-    out, err = capsys.readouterr()
     path_0 = os.path.abspath(
         os.path.join("tests", "data", "notebook_for_testing.ipynb")
     )
@@ -53,6 +38,20 @@ def test_flake8_works(
     path_2 = os.path.abspath(
         os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
     )
+
+    # check diff
+    with open(tmp_notebook_for_testing, "r") as handle:
+        before = handle.readlines()
+    with pytest.raises(SystemExit):
+        main(["flake8", path_0, path_1, path_2])
+
+    with open(tmp_notebook_for_testing, "r") as handle:
+        after = handle.readlines()
+    result = "".join(difflib.unified_diff(before, after))
+    expected = ""
+    assert result == expected
+
+    out, err = capsys.readouterr()
     expected_out = dedent(
         f"""\
         {path_0}:cell_1:1:1: F401 'os' imported but unused

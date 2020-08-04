@@ -4,6 +4,7 @@
 test-output.xml
 .coverage
 coverage.xml
+!.coveragerc
 htmlcov/
 junit
 *.egg*
@@ -11,5 +12,4 @@ docs/_build
 dist
 .tox
 build/
-.coverage*
 docs/api

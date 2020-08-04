@@ -9,7 +9,8 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Dict, Iterator, List, Optional, Tuple
+from textwrap import dedent
+from typing import Dict, Iterator, List, Optional, Set, Tuple
 
 from nbqa import (
     __version__,
@@ -20,7 +21,7 @@ from nbqa import (
 )
 
 
-def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
+def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
     """
     Parse command-line arguments.
 
@@ -33,8 +34,12 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
     -------
     command
         The third-party tool to run (e.g. :code:`mypy`).
-    root_dir
-        The notebook or directory to run third-party tool on.
+    root_dirs
+        The notebooks or directories to run third-party tool on.
+    allow_mutation
+        Whether to allow 3rd party tools to modify notebooks.
+    nbqa_config
+        Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
     kwargs
         Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
 
@@ -46,13 +51,32 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
     """
     parser = argparse.ArgumentParser(
         description="Adapter to run any code-quality tool on a Jupyter notebook.",
-        usage=(
-            "nbqa <command> <notebook or directory> <flags>\n"
-            "e.g. `nbqa flake8 my_notebook.ipynb --ignore=E203`"
+        usage=dedent(
+            """\
+            nbqa <command> <notebook or directory> <flags>
+            example:
+
+                nbqa flake8 my_notebook.ipynb --ignore=E203\
+            """
         ),
     )
     parser.add_argument("command", help="Command to run, e.g. `flake8`.")
-    parser.add_argument("root_dir", help="Notebook or directory to run command on.")
+    parser.add_argument(
+        "root_dirs", nargs="+", help="Notebooks or directories to run command on."
+    )
+    parser.add_argument(
+        "--nbqa-mutate", action="store_true", help="Allows `nbqa` to modify notebooks.",
+    )
+    parser.add_argument(
+        "--nbqa-preserve-init",
+        action="store_true",
+        help="Use this if your 3rd party tool requires blank `__init__.py` files.",
+    )
+    parser.add_argument(
+        "--nbqa-config",
+        required=False,
+        help="Config file for third-party tool (e.g. `setup.cfg`)",
+    )
     parser.add_argument("--version", action="version", version=f"nbQA {__version__}")
     try:
         args, kwargs = parser.parse_known_args(raw_args)
@@ -63,10 +87,8 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[str, str, List[str]]:
                 "nbqa flake8 my_notebook.ipynb"
             )
             raise ValueError(msg) from exception
-        sys.exit(0)
-    command = args.command
-    root_dir = args.root_dir
-    return command, root_dir, kwargs
+        sys.exit(0)  # pragma: nocover
+    return args, kwargs
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
@@ -86,7 +108,7 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
     if not Path(root_dir).is_dir():
         return (i for i in (Path(root_dir),))
     notebooks = (
-        i for i in Path(".").rglob("*.ipynb") if ".ipynb_checkpoints" not in str(i)
+        i for i in Path(root_dir).rglob("*.ipynb") if ".ipynb_checkpoints" not in str(i)
     )
     return notebooks
 
@@ -325,22 +347,54 @@ def _replace_tmpdir_references(
     return new_out, new_err
 
 
-def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
+def _create_blank_init_files(
+    nbqa_preserve_init: bool, notebook: Path, tmpdirname: str
+) -> None:
     """
     Replicate local (possibly blank) __init__ files to temporary directory.
 
     Parameters
     ----------
+    nbqa_preserve_init
+        Whether to copy __init__.py files to temp directory
     notebook
         Notebook third-party tool is being run against.
     tmpdirname
         Temporary directory to store converted notebooks in.
     """
+    if not nbqa_preserve_init:
+        return
     parts = notebook.resolve().relative_to(Path.cwd()).parts
     init_files = Path(parts[0]).rglob("__init__.py")
     for i in init_files:
         Path(tmpdirname).joinpath(i).parent.mkdir(parents=True, exist_ok=True)
         Path(tmpdirname).joinpath(i).touch()
+
+
+def _preserve_config_files(nbqa_config: Optional[str], tmpdirname: str) -> None:
+    """
+    Copy local config file to temporary directory.
+
+    Parameters
+    ----------
+    nbqa_config
+        Config file for third-party tool (e.g. mypy).
+    tmpdirname
+        Temporary directory to store converted notebooks in.
+    """
+    if nbqa_config is None:
+        return
+    Path(tmpdirname).joinpath(
+        Path(nbqa_config).resolve().relative_to(Path.cwd())
+    ).parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(
+        str(nbqa_config),
+        str(
+            Path(tmpdirname).joinpath(
+                Path(nbqa_config).resolve().relative_to(Path.cwd())
+            )
+        ),
+    )
 
 
 def _ensure_cell_separators_remain(temp_python_file: Path) -> None:
@@ -402,13 +456,32 @@ def _get_arg(
     return arg
 
 
+def _get_mtimes(arg: Path) -> Set[float]:
+    """
+    Get the modification times of any converted notebooks.
+
+    Parameters
+    ----------
+    arg
+        Notebook or directory to run 3rd party tool on.
+
+    Returns
+    -------
+    Set
+        Modification times of any converted notebooks.
+    """
+    if not arg.is_dir():
+        return {os.path.getmtime(str(arg))}
+    return {os.path.getmtime(str(i)) for i in arg.rglob("*   .py")}
+
+
 def _run_command(
     command: str,
     root_dir: str,
     tmpdirname: str,
     nb_to_py_mapping: Dict[Path, Path],
     kwargs: List[str],
-) -> Tuple[str, str, int]:
+) -> Tuple[str, str, int, bool]:
     """
     Run third-party tool against given file or directory.
 
@@ -433,6 +506,8 @@ def _run_command(
         Captured stderr from running third-party tool.
     output_code
         Return code from third-party tool.
+    mutated
+        Whether 3rd party tool modified any files.
 
     Raises
     ------
@@ -449,6 +524,9 @@ def _run_command(
             f"Command `{command}` not found. "
             "Please make sure you have it installed before running nbQA on it."
         )
+
+    before = _get_mtimes(arg)
+
     output = subprocess.run(
         [command, str(arg), *kwargs],
         stderr=subprocess.PIPE,
@@ -456,11 +534,126 @@ def _run_command(
         cwd=tmpdirname,
         env=env,
     )
+
+    after = _get_mtimes(arg)
+    mutated = after != before
+
     output_code = output.returncode
 
     out = output.stdout.decode()
     err = output.stderr.decode()
-    return out, err, output_code
+    return out, err, output_code, mutated
+
+
+def _get_configs(
+    args: argparse.Namespace, kwargs: List[str], tmpdirname: str,
+) -> Tuple[bool, bool]:
+    """
+    Deal with extra configs for 3rd party tool.
+
+    Parameters
+    ----------
+    args
+        Arguments passed to nbqa
+    kwargs
+        Extra flags for third party tool
+    tmpdirname
+        Temporary directory where notebooks are copied to.
+
+    Returns
+    -------
+    bool
+        Whether or not to copy __init__.py to temporary directory.
+    bool
+        Whether to allow nbqa to modify notebooks.
+    """
+    config = configparser.ConfigParser()
+    config.read(".nbqa.ini")
+    nbqa_config = args.nbqa_config
+    nbqa_preserve_init = args.nbqa_preserve_init
+    allow_mutation = args.nbqa_mutate
+    if args.command in config.sections():
+        addopts = config[args.command].get("addopts")
+        if addopts is not None:
+            kwargs.extend(config[args.command]["addopts"].split())
+        if nbqa_config is None:
+            nbqa_config = config[args.command].get("config")
+        if not nbqa_preserve_init:
+            nbqa_preserve_init = bool(config[args.command].get("preserve_init"))
+        if not allow_mutation:
+            allow_mutation = bool(config[args.command].get("mutate"))
+    _preserve_config_files(nbqa_config, tmpdirname)
+    return nbqa_preserve_init, allow_mutation
+
+
+def _run_on_one_root_dir(
+    root_dir: str, args: argparse.Namespace, kwargs: List[str]
+) -> int:
+    """
+    Run third-party tool on a single notebook or directory.
+
+    Parameters
+    ----------
+    args
+        Arguments passed to nbqa.
+    kwargs
+        Additional flags to pass to 3rd party tool
+
+    Returns
+    -------
+    int
+        Output code from third-party tool.
+    """
+    notebooks = _get_notebooks(root_dir)
+
+    with tempfile.TemporaryDirectory() as tmpdirname:
+
+        nb_to_py_mapping = {
+            notebook: _temp_python_file_for_notebook(notebook, tmpdirname)
+            for notebook in notebooks
+        }
+
+        nbqa_preserve_init, allow_mutation = _get_configs(args, kwargs, tmpdirname)
+
+        for notebook, temp_python_file in nb_to_py_mapping.items():
+            save_source.main(notebook, temp_python_file)
+            replace_magics.main(temp_python_file)
+            _create_blank_init_files(nbqa_preserve_init, notebook, tmpdirname)
+
+        out, err, output_code, mutated = _run_command(
+            args.command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
+        )
+
+        out, err = _replace_tmpdir_references(out, err)
+
+        for notebook, temp_python_file in nb_to_py_mapping.items():
+            out, err = _replace_temp_python_file_references_in_out_err(
+                temp_python_file, notebook, out, err
+            )
+            if mutated and not allow_mutation:
+                if args.nbqa_config:
+                    kwargs += [f"--nbqa-config={args.nbqa_config}"]
+                if args.nbqa_preserve_init:
+                    kwargs += ["--nbqa-preserve-init"]
+                kwargs += ["--nbqa-mutate"]
+                raise SystemExit(
+                    dedent(
+                        f"""\
+                        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
+
+                            nbqa {args.command} {root_dir} {' '.join(kwargs)}
+                        """
+                    )
+                )
+            if mutated:
+                put_magics_back_in.main(temp_python_file)
+                _ensure_cell_separators_remain(temp_python_file)
+                replace_source.main(temp_python_file, notebook)
+
+        sys.stdout.write(out)
+        sys.stderr.write(err)
+
+    return output_code
 
 
 def main(raw_args: Optional[List[str]] = None) -> None:
@@ -473,49 +666,11 @@ def main(raw_args: Optional[List[str]] = None) -> None:
         Command-line arguments (if calling this function directly), defaults to
         :code:`None` if calling via command-line.
     """
-    command, root_dir, kwargs = _parse_args(raw_args)
+    args, kwargs = _parse_args(raw_args)
 
-    notebooks = _get_notebooks(root_dir)
+    output_codes = [_run_on_one_root_dir(i, args, kwargs) for i in args.root_dirs]
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-
-        nb_to_py_mapping = {
-            notebook: _temp_python_file_for_notebook(notebook, tmpdirname)
-            for notebook in notebooks
-        }
-
-        for notebook, temp_python_file in nb_to_py_mapping.items():
-            save_source.main(notebook, temp_python_file)
-            replace_magics.main(temp_python_file)
-            _create_blank_init_files(notebook, tmpdirname)
-
-        config = configparser.ConfigParser(allow_no_value=True)
-        config.read(".nbqa.ini")
-        if command in config.sections():
-            configs = [
-                [f"--{key}", val] if val is not None else [f"--{key}"]
-                for key, val in config[command].items()
-            ]
-            kwargs.extend([j for i in configs for j in i])
-        out, err, output_code = _run_command(
-            command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
-        )
-
-        out, err = _replace_tmpdir_references(out, err)
-
-        for notebook, temp_python_file in nb_to_py_mapping.items():
-            out, err = _replace_temp_python_file_references_in_out_err(
-                temp_python_file, notebook, out, err
-            )
-
-            put_magics_back_in.main(temp_python_file)
-            _ensure_cell_separators_remain(temp_python_file)
-            replace_source.main(temp_python_file, notebook)
-
-        sys.stdout.write(out)
-        sys.stderr.write(err)
-
-    sys.exit(output_code)
+    sys.exit(int(any(output_codes)))
 
 
 if __name__ == "__main__":

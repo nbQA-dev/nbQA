@@ -1,6 +1,4 @@
-"""
-Check that return code from third-party tool is preserved.
-"""
+"""Check that return code from third-party tool is preserved."""
 
 import os
 import subprocess
@@ -10,9 +8,7 @@ CLEAN_NOTEBOOK = os.path.join("tests", "data", "clean_notebook.ipynb")
 
 
 def test_flake8_return_code() -> None:
-    """
-    Check flake8 returns 0 if it passes, 1 otherwise.
-    """
+    """Check flake8 returns 0 if it passes, 1 otherwise."""
     output = subprocess.run(["python", "-m", "nbqa", "flake8", DIRTY_NOTEBOOK])
     result = output.returncode
     expected = 1
@@ -25,9 +21,7 @@ def test_flake8_return_code() -> None:
 
 
 def test_black_return_code() -> None:
-    """
-    Check black returns 0 if it passes, 1 otherwise.
-    """
+    """Check black returns 0 if it passes, 1 otherwise."""
     output = subprocess.run(
         ["python", "-m", "nbqa", "black", DIRTY_NOTEBOOK, "--check"]
     )
@@ -42,7 +36,7 @@ def test_black_return_code() -> None:
     expected = 0
     assert result == expected
 
-    output = subprocess.run(["python", "-m", "nbqa", "black", "--check", "."])
+    output = subprocess.run(["python", "-m", "nbqa", "black", "--check", "tests"])
     result = output.returncode
     expected = 1
     assert result == expected

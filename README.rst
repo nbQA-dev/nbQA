@@ -1,15 +1,15 @@
-.. image:: https://github.com/MarcoGorelli/nbQA/raw/master/assets/logo.png
+.. image:: https://github.com/nbQA-dev/nbQA/raw/master/assets/logo.png
   :width: 400
 
 ====
 nbQA
 ====
 
-.. image:: https://dev.azure.com/megorelli/megorelli/_apis/build/status/MarcoGorelli.nbQA?branchName=master
-          :target: https://dev.azure.com/megorelli/megorelli/_build/latest?definitionId=1&branchName=master
+.. image:: https://github.com/nbQA-dev/nbQA/workflows/tox/badge.svg
+          :target: https://github.com/nbQA-dev/nbQA/actions?workflow=tox
 
-.. image:: https://img.shields.io/azure-devops/coverage/megorelli/megorelli/1/master.svg
-          :target: https://dev.azure.com/megorelli/megorelli/_build/latest?definitionId=1&branchName=master
+.. image:: https://codecov.io/gh/nbQA-dev/nbQA/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/nbQA-dev/nbQA
 
 .. image:: https://badge.fury.io/py/nbqa.svg
     :target: https://badge.fury.io/py/nbqa
@@ -35,32 +35,27 @@ nbQA
 .. image:: https://img.shields.io/badge/pylint-10/10-brightgreen.svg
    :target: https://github.com/PyCQA/pylint
 
-Adapter to run any code-quality tool on a Jupyter notebook. Documentation is hosted here_.
+.. raw:: html
 
-Prerequisites
--------------
-If you don't have `pip`_ installed, this `Python installation guide`_ can guide
-you through the process.
+    <p align="center">
+        <a href="#readme">
+            <img alt="demo" src="https://raw.githubusercontent.com/nbQA-dev/nbQA-demo/master/demo.gif">
+        </a>
+    </p>
 
-.. _pip: https://pip.pypa.io
-.. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
+Adapter to run any code-quality tool on a Jupyter notebook.
+This is intended to be run as a `pre-commit`_ hook and/or during continuous integration.
+
+Documentation is hosted here_.
 
 Installation
 ------------
 
-Install :code:`nbqa` with
+Install :code:`nbqa` with `pip`_:
 
 .. code-block:: bash
 
     $ pip install nbqa
-
-There are **no dependencies** for :code:`nbqa` so installation should be lightning-fast.
-Check your installation with
-
-.. code-block:: bash
-
-    $ nbqa --version
-    nbqa 0.1.10
 
 Quickstart
 ----------
@@ -71,28 +66,10 @@ The general syntax is
 
     nbqa <command> <notebook or directory> <args>
 
-, where :code:`command` is any standard Python code quality tool. For example, you could run:
-
-.. code-block:: bash
-
-    $ nbqa flake8 my_notebook.ipynb
-    $ nbqa black my_notebook.ipynb --check
-    $ nbqa mypy my_notebook.ipynb --ignore-missing-imports
-    $ nbqa pytest my_notebook.ipynb --doctest-modules
-
-You can also pass an entire directory instead of a single file, e.g. :code:`nbqa flake8 my_notebooks`.
+where :code:`command` is any standard Python code quality tool.
 
 Examples
 --------
-
-Format your notebooks using :code:`black`:
-
-.. code-block:: bash
-
-    $ nbqa black . --line-length=96
-    reformatted tweet-sentiment-roberta-pytorch.ipynb
-    All done! ✨ 🍰 ✨
-    1 files reformatted.
 
 Check static type annotations:
 
@@ -116,6 +93,110 @@ Check any examples in your docstrings are correct:
 
     ============================== 1 passed in 0.03s ===============================
 
+Format your notebooks using :code:`black`:
+
+.. code-block:: bash
+
+    $ nbqa black . --line-length=96 --nbqa-mutate
+    reformatted tweet-sentiment-roberta-pytorch.ipynb
+    All done! ✨ 🍰 ✨
+    1 files reformatted.
+
+Configuration
+-------------
+
+You can configure :code:`nbQA` either at the command line, or by using a :code:`.nbqa.ini` file. We'll see some examples below.
+
+Extra flags
+~~~~~~~~~~~
+
+If you wish to pass extra flags (e.g. :code:`--ignore W503` to :code:`flake8`) you can either run
+
+.. code-block:: bash
+
+    nbqa flake8 my_notebook.ipynb --ignore W503
+
+or you can put the following in your :code:`.nbqa.ini` file
+
+.. code-block:: ini
+
+    [flake8]
+    addopts = --ignore W503
+
+Config file
+~~~~~~~~~~~
+
+If you already have a config file for your third-party tool (e.g. :code:`.mypy.ini` for :code:`mypy`), you can run
+
+.. code-block:: bash
+
+    nbqa mypy my_notebook.ipynb --nbqa-config .mypy.ini
+
+or you can put the following in your :code:`.nbqa.ini` file
+
+.. code-block:: ini
+
+    [mypy]
+    config = .mypy.ini
+
+Allow mutations
+~~~~~~~~~~~~~~~
+
+By default, :code:`nbQA` won't modify your notebooks. If you wish to let your third-party tool modify your notebooks, you can
+either pass the :code:`--nbqa-mutate` flag at the command-line, e.g.
+
+.. code-block:: bash
+
+    nbqa black my_notebook.ipynb --nbqa-mutate
+
+or you can put the following in your :code:`.nbqa.ini` file
+
+.. code-block:: ini
+
+    [black]
+    mutate = 1
+
+Empty :code:`__init__.py` files
+-------------------------------
+
+Some tools, such as :code:`mypy`, require (possibly empty) :code:`__init__.py` files to be in each subdirectory you wish to analyse.
+To make :code:`nbQA` aware of this, you can either pass the :code:`--nbqa-preserve-init` flag, e.g.
+
+.. code-block:: bash
+
+    nbqa mypy my_dir/my_subdir/my_notebook.ipynb --nbqa-preserve-init
+
+or you can put the following in your :code:`.nbqa.ini` file
+
+.. code-block:: ini
+
+    [mypy]
+    preserve_init = 1
+
+Usage as pre-commit hook
+------------------------
+
+If you want to use :code:`nbqa` with `pre-commit`_, here's an example of what you
+could add to your :code:`.pre-commit-config.yaml` file:
+
+.. code-block:: yaml
+
+  - repo: https://github.com/nbQA-dev/nbQA
+    rev: 0.1.19
+    hooks:
+      - id: nbqa
+        args: ['flake8']
+        name: nbqa-flake8
+        additional_dependencies: ['flake8']
+      - id: nbqa
+        args: ['isort', '--nbqa-mutate']
+        name: nbqa-isort
+        additional_dependencies: ['isort']
+      - id: nbqa
+        args: ['mypy', '--nbqa-preserve-init']
+        name: nbqa-mypy
+        additional_dependencies: ['mypy']
+
 Supported third party packages
 ------------------------------
 
@@ -127,61 +208,19 @@ In practice, here are the tools it's been tested with:
 - black_
 - pytest_
 - isort_
-- mypy_ (you will need to have `__init__` files in each subdirectory)
+- mypy_
 - doctest_ (as long as you run it via pytest_ with the `--doctest-modules` flag)
-
-Configuration
--------------
-
-You can pass extra configurations to your tools either via the command line (as in the
-examples above), or in a :code:`.nbqa.ini` file, which could look something like this:
-
-.. code-block:: ini
-
-    [black]
-    line-length=96
-
-    [flake8]
-    max-line-length=96
-    ignore=E203,W503,W504
-
-Flags from this :code:`.ini` will be passed to :code:`nbqa` as they're written.
-
-Usage as pre-commit hook
-------------------------
-
-If you want to use :code:`nbqa` with `pre-commit`_, here's an example of what you
-could add to your :code:`.pre-commit-config.yaml` file:
-
-.. code-block:: yaml
-
-  - repo: https://github.com/MarcoGorelli/nbQA
-    rev: 0.1.10
-    hooks:
-      - id: nbqa
-        args: ['flake8']
-        name: nbqa-flake8
-        additional_dependencies: ['flake8']
-      - id: nbqa
-        args: ['isort']
-        name: nbqa-isort
-        additional_dependencies: ['isort']
-      - id: nbqa
-        args: ['mypy']
-        name: nbqa-mypy
-        additional_dependencies: ['mypy']
 
 See Also
 --------
 
-Here are some specialised code quality tools for Jupyter Notebooks:
+Here are some other code quality tools for Jupyter Notebooks:
 
-- `flake8-nb`_;
-- `black-nb`_.
+- `flake8-nb`_ (apply `flake8`_ to notebook);
+- `black-nb`_ (apply `black`_ to notebook);
+- `nbstripout`_ (clear notebook cells' outputs);
+- `jupyterlab_code_formatter`_ (Jupyter Lab plugin);
 
-Project template from cookiecutter_.
-
-.. _cookiecutter: https://github.com/cookiecutter/cookiecutter
 .. _flake8: https://flake8.pycqa.org/en/latest/
 .. _black: https://black.readthedocs.io/en/stable/
 .. _pytest: https://docs.pytest.org/en/latest/
@@ -192,3 +231,6 @@ Project template from cookiecutter_.
 .. _flake8-nb: https://flake8-nb.readthedocs.io/en/latest/readme.html
 .. _here: https://nbqa.readthedocs.io/en/latest/
 .. _`pre-commit`: https://pre-commit.com/
+.. _`nbstripout`: https://github.com/kynan/nbstripout
+.. _`jupyterlab_code_formatter`: https://github.com/ryantam626/jupyterlab_code_formatter
+.. _pip: https://pip.pypa.io

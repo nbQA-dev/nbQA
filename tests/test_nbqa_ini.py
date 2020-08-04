@@ -1,10 +1,9 @@
-"""
-Check configs from :code:`.nbqa.ini` are picked up.
-"""
+"""Check configs from :code:`.nbqa.ini` are picked up."""
 
 import difflib
 import os
 from pathlib import Path
+from textwrap import dedent
 from typing import TYPE_CHECKING
 
 import pytest
@@ -29,13 +28,22 @@ def test_nbqa_ini_works(
         Pytest fixture to capture stdout and stderr.
     """
     with open(".nbqa.ini", "w") as handle:
-        handle.write("[flake8]\nignore=F401\nselect=E303\nquiet\n")
+        handle.write(
+            dedent(
+                """\
+            [flake8]
+            addopts = --ignore=F401 \
+                      --select=E303 \
+                      --quiet
+            """
+            )
+        )
 
     # check diff
     with open(tmp_notebook_for_testing, "r") as handle:
         before = handle.readlines()
     with pytest.raises(SystemExit):
-        main(["flake8", ".", "--ignore", "E302"])
+        main(["flake8", "tests", "--ignore", "E302"])
 
     Path(".nbqa.ini").unlink()
 
