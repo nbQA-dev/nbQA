@@ -2,7 +2,6 @@
 
 import difflib
 import os
-from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
@@ -11,6 +10,8 @@ import pytest
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from _pytest.capture import CaptureFixture
 
 
