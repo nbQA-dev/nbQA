@@ -156,23 +156,6 @@ or you can put the following in your :code:`.nbqa.ini` file
     [black]
     mutate = 1
 
-Empty :code:`__init__.py` files
--------------------------------
-
-Some tools, such as :code:`mypy`, require (possibly empty) :code:`__init__.py` files to be in each subdirectory you wish to analyse.
-To make :code:`nbQA` aware of this, you can either pass the :code:`--nbqa-preserve-init` flag, e.g.
-
-.. code-block:: bash
-
-    nbqa mypy my_dir/my_subdir/my_notebook.ipynb --nbqa-preserve-init
-
-or you can put the following in your :code:`.nbqa.ini` file
-
-.. code-block:: ini
-
-    [mypy]
-    preserve_init = 1
-
 Usage as pre-commit hook
 ------------------------
 
@@ -193,7 +176,7 @@ could add to your :code:`.pre-commit-config.yaml` file:
         name: nbqa-isort
         additional_dependencies: ['isort']
       - id: nbqa
-        args: ['mypy', '--nbqa-preserve-init']
+        args: ['mypy']
         name: nbqa-mypy
         additional_dependencies: ['mypy']
 

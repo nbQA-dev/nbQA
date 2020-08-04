@@ -22,7 +22,3 @@ def test_allow_mutation() -> None:
     with pytest.raises(SystemExit) as excinfo:
         main(["black", path, "--nbqa-config=setup.cfg"])
     assert msg in str(excinfo.value)
-    msg = f"nbqa black {path} --nbqa-preserve-init --nbqa-mutate"
-    with pytest.raises(SystemExit) as excinfo:
-        main(["black", path, "--nbqa-preserve-init"])
-    assert msg in str(excinfo.value)

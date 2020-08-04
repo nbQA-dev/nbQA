@@ -68,11 +68,6 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
         "--nbqa-mutate", action="store_true", help="Allows `nbqa` to modify notebooks.",
     )
     parser.add_argument(
-        "--nbqa-preserve-init",
-        action="store_true",
-        help="Use this if your 3rd party tool requires blank `__init__.py` files.",
-    )
-    parser.add_argument(
         "--nbqa-config",
         required=False,
         help="Config file for third-party tool (e.g. `setup.cfg`)",
@@ -347,23 +342,17 @@ def _replace_tmpdir_references(
     return new_out, new_err
 
 
-def _create_blank_init_files(
-    nbqa_preserve_init: bool, notebook: Path, tmpdirname: str
-) -> None:
+def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
     """
     Replicate local (possibly blank) __init__ files to temporary directory.
 
     Parameters
     ----------
-    nbqa_preserve_init
-        Whether to copy __init__.py files to temp directory
     notebook
         Notebook third-party tool is being run against.
     tmpdirname
         Temporary directory to store converted notebooks in.
     """
-    if not nbqa_preserve_init:
-        return
     parts = notebook.resolve().relative_to(Path.cwd()).parts
 
     for n in range(1, len(parts)):
@@ -574,7 +563,6 @@ def _get_configs(
     config = configparser.ConfigParser()
     config.read(".nbqa.ini")
     nbqa_config = args.nbqa_config
-    nbqa_preserve_init = args.nbqa_preserve_init
     allow_mutation = args.nbqa_mutate
     if args.command in config.sections():
         addopts = config[args.command].get("addopts")
@@ -582,12 +570,10 @@ def _get_configs(
             kwargs.extend(config[args.command]["addopts"].split())
         if nbqa_config is None:
             nbqa_config = config[args.command].get("config")
-        if not nbqa_preserve_init:
-            nbqa_preserve_init = bool(config[args.command].get("preserve_init"))
         if not allow_mutation:
             allow_mutation = bool(config[args.command].get("mutate"))
     _preserve_config_files(nbqa_config, tmpdirname)
-    return nbqa_preserve_init, allow_mutation
+    return allow_mutation
 
 
 def _run_on_one_root_dir(
@@ -617,12 +603,12 @@ def _run_on_one_root_dir(
             for notebook in notebooks
         }
 
-        nbqa_preserve_init, allow_mutation = _get_configs(args, kwargs, tmpdirname)
+        allow_mutation = _get_configs(args, kwargs, tmpdirname)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             save_source.main(notebook, temp_python_file)
             replace_magics.main(temp_python_file)
-            _create_blank_init_files(nbqa_preserve_init, notebook, tmpdirname)
+            _create_blank_init_files(notebook, tmpdirname)
 
         out, err, output_code, mutated = _run_command(
             args.command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
@@ -637,8 +623,6 @@ def _run_on_one_root_dir(
             if mutated and not allow_mutation:
                 if args.nbqa_config:
                     kwargs += [f"--nbqa-config={args.nbqa_config}"]
-                if args.nbqa_preserve_init:
-                    kwargs += ["--nbqa-preserve-init"]
                 kwargs += ["--nbqa-mutate"]
                 raise SystemExit(
                     dedent(
