@@ -355,8 +355,8 @@ def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
     """
     parts = notebook.resolve().relative_to(Path.cwd()).parts
 
-    for n in range(1, len(parts)):
-        init_file = next(Path(os.path.join(*parts[:n])).glob("__init__.py"))
+    for idx in range(1, len(parts)):
+        init_file = next(Path(os.path.join(*parts[:idx])).glob("__init__.py"))
         if init_file is not None:
             Path(tmpdirname).joinpath(init_file).parent.mkdir(
                 parents=True, exist_ok=True
