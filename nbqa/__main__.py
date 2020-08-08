@@ -244,8 +244,8 @@ def _map_python_line_to_nb_lines(
         """Replace Python line with corresponding Jupyter notebook cell."""
         return str(cell_mapping[int(match.group())])
 
-    out = re.sub(pattern, substitution, out,)
-    err = re.sub(pattern, substitution, err,)
+    out = re.sub(pattern, substitution, out)
+    err = re.sub(pattern, substitution, err)
     return out, err
 
 
