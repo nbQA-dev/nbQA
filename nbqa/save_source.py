@@ -29,11 +29,22 @@ def main(notebook: "Path", temp_python_file: "Path") -> None:
 
     cells = parsed_notebook["cells"]
 
-    result = [
-        f"{CODE_SEPARATOR}{''.join(i['source'])}\n"
-        for i in cells
-        if i["cell_type"] == "code"
-    ]
+    result = []
+    mapping = {}
+    total = 0
+    code_cells = 0
+    for i in cells:
+        if i['cell_type'] != 'code':
+            continue
+        parsed_cell = f"{CODE_SEPARATOR}{''.join(i['source'])}\n"
+        result.append(parsed_cell)
+        split_parsed_cell = parsed_cell.split('\n')
+        mapping.update({j+total+1: f"cell_{code_cells+1}:{j}" for j in range(len(split_parsed_cell)-1)})
+        total += len(split_parsed_cell)-1
+        code_cells += 1
+        breakpoint()
 
     with open(str(temp_python_file), "w") as handle:
         handle.write("".join(result)[len("\n\n") : -len("\n")])
+
+    return mapping

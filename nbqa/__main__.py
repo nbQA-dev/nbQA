@@ -213,7 +213,7 @@ def _replace_relative_path_out_err(
 
 
 def _map_python_line_to_nb_lines(
-    out: str, err: str, temp_python_file: Path, notebook: Path
+    out: str, err: str, temp_python_file: Path, notebook: Path, mapping
 ) -> Tuple[str, str]:
     """
     Make sure stdout and stderr make reference to Jupyter Notebook cells and lines.
@@ -240,7 +240,7 @@ def _map_python_line_to_nb_lines(
     """
     with open(str(temp_python_file), "r") as handle:
         cells = handle.readlines()
-    mapping = {}
+    old = {}
     cell_no = 0
     cell_count = None
     for idx, cell in enumerate(cells):
@@ -250,7 +250,8 @@ def _map_python_line_to_nb_lines(
         else:
             assert cell_count is not None
             cell_count += 1
-        mapping[idx + 1] = f"cell_{cell_no}:{cell_count}"
+        old[idx + 1] = f"cell_{cell_no}:{cell_count}"
+    breakpoint()
     out = re.sub(
         rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), out,
     )
@@ -261,7 +262,7 @@ def _map_python_line_to_nb_lines(
 
 
 def _replace_temp_python_file_references_in_out_err(
-    temp_python_file: Path, notebook: Path, out: str, err: str
+    temp_python_file: Path, notebook: Path, out: str, err: str, mapping
 ) -> Tuple[str, str]:
     """
     Replace references to temporary Python file with references to notebook.
@@ -286,7 +287,7 @@ def _replace_temp_python_file_references_in_out_err(
     """
     out, err = _replace_full_path_out_err(out, err, temp_python_file, notebook)
     out, err = _replace_relative_path_out_err(out, err, notebook)
-    out, err = _map_python_line_to_nb_lines(out, err, temp_python_file, notebook)
+    out, err = _map_python_line_to_nb_lines(out, err, temp_python_file, notebook, mapping)
     return out, err
 
 
@@ -606,7 +607,7 @@ def _run_on_one_root_dir(
         allow_mutation = _get_configs(args, kwargs, tmpdirname)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
-            save_source.main(notebook, temp_python_file)
+            mapping = save_source.main(notebook, temp_python_file)
             replace_magics.main(temp_python_file)
             _create_blank_init_files(notebook, tmpdirname)
 
@@ -618,7 +619,7 @@ def _run_on_one_root_dir(
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(
-                temp_python_file, notebook, out, err
+                temp_python_file, notebook, out, err, mapping
             )
             if mutated and not allow_mutation:
                 if args.nbqa_config:
