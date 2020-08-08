@@ -213,7 +213,7 @@ def _replace_relative_path_out_err(
 
 
 def _map_python_line_to_nb_lines(
-    out: str, err: str, notebook: Path, mapping: Dict[int, str]
+    out: str, err: str, notebook: Path, cell_mapping: Dict[int, str]
 ) -> Tuple[str, str]:
     """
     Make sure stdout and stderr make reference to Jupyter Notebook cells and lines.
@@ -239,10 +239,10 @@ def _map_python_line_to_nb_lines(
         to notebook's cells and lines.
     """
     out = re.sub(
-        rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), out,
+        rf"(?<={notebook.name}:)\d+", lambda x: str(cell_mapping[int(x.group())]), out,
     )
     err = re.sub(
-        rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), err,
+        rf"(?<={notebook.name}:)\d+", lambda x: str(cell_mapping[int(x.group())]), err,
     )
     return out, err
 
