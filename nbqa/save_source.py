@@ -44,12 +44,11 @@ def main(notebook: "Path", temp_python_file: "Path") -> Dict[int, str]:
         parsed_cell = f"{CODE_SEPARATOR}{''.join(i['source'])}\n"
         result.append(parsed_cell)
         split_parsed_cell = parsed_cell.splitlines()
-        cell_mapping.update(
-            {
-                j + line_number + 1: f"cell_{cell_number+1}:{j}"
-                for j in range(len(split_parsed_cell))
-            }
-        )
+        mapping = {
+            j + line_number + 1: f"cell_{cell_number+1}:{j}"
+            for j in range(len(split_parsed_cell))
+        }
+        cell_mapping.update(mapping)
         line_number += len(split_parsed_cell)
         cell_number += 1
 
