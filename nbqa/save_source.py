@@ -5,7 +5,7 @@ Markdown cells, output, and metadata are ignored.
 """
 
 import json
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 CODE_SEPARATOR = "\n\n# %%\n"
 
 
-def main(notebook: "Path", temp_python_file: "Path") -> None:
+def main(notebook: "Path", temp_python_file: "Path") -> Dict[int, str]:
     """
     Extract code cells from notebook and save them in temporary Python file.
 
@@ -34,15 +34,19 @@ def main(notebook: "Path", temp_python_file: "Path") -> None:
     total = 0
     code_cells = 0
     for i in cells:
-        if i['cell_type'] != 'code':
+        if i["cell_type"] != "code":
             continue
         parsed_cell = f"{CODE_SEPARATOR}{''.join(i['source'])}\n"
         result.append(parsed_cell)
-        split_parsed_cell = parsed_cell.split('\n')
-        mapping.update({j+total+1: f"cell_{code_cells+1}:{j}" for j in range(len(split_parsed_cell)-1)})
-        total += len(split_parsed_cell)-1
+        split_parsed_cell = parsed_cell.splitlines()
+        mapping.update(
+            {
+                j + total + 1: f"cell_{code_cells+1}:{j}"
+                for j in range(len(split_parsed_cell))
+            }
+        )
+        total += len(split_parsed_cell)
         code_cells += 1
-        breakpoint()
 
     with open(str(temp_python_file), "w") as handle:
         handle.write("".join(result)[len("\n\n") : -len("\n")])
