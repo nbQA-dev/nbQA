@@ -213,7 +213,7 @@ def _replace_relative_path_out_err(
 
 
 def _map_python_line_to_nb_lines(
-    out: str, err: str, temp_python_file: Path, notebook: Path, mapping: Dict[int, str]
+    out: str, err: str, notebook: Path, mapping: Dict[int, str]
 ) -> Tuple[str, str]:
     """
     Make sure stdout and stderr make reference to Jupyter Notebook cells and lines.
@@ -238,19 +238,6 @@ def _map_python_line_to_nb_lines(
         Stderr with references to temporary Python file's lines replaced with references
         to notebook's cells and lines.
     """
-    with open(str(temp_python_file), "r") as handle:
-        cells = handle.readlines()
-    old = {}
-    cell_no = 0
-    cell_count = None
-    for idx, cell in enumerate(cells):
-        if cell == "# %%\n":
-            cell_no += 1
-            cell_count = 0
-        else:
-            assert cell_count is not None
-            cell_count += 1
-        old[idx + 1] = f"cell_{cell_no}:{cell_count}"
     out = re.sub(
         rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), out,
     )
@@ -286,9 +273,7 @@ def _replace_temp_python_file_references_in_out_err(
     """
     out, err = _replace_full_path_out_err(out, err, temp_python_file, notebook)
     out, err = _replace_relative_path_out_err(out, err, notebook)
-    out, err = _map_python_line_to_nb_lines(
-        out, err, temp_python_file, notebook, mapping
-    )
+    out, err = _map_python_line_to_nb_lines(out, err, notebook, mapping)
     return out, err
 
 
