@@ -240,7 +240,7 @@ def _map_python_line_to_nb_lines(
     """
     pattern = rf"(?<={notebook.name}:)\d+"
 
-    def substitution(match: re.Match) -> str:
+    def substitution(match: "re.Match") -> str:
         """Replace Python line with corresponding Jupyter notebook cell."""
         return str(cell_mapping[int(match.group())])
 
