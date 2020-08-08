@@ -170,14 +170,17 @@ could add to your :code:`.pre-commit-config.yaml` file:
       - id: nbqa
         args: ['flake8']
         name: nbqa-flake8
+        alias: nbqa-flake8
         additional_dependencies: ['flake8']
       - id: nbqa
         args: ['isort', '--nbqa-mutate']
         name: nbqa-isort
+        alias: nbqa-isort
         additional_dependencies: ['isort']
       - id: nbqa
         args: ['mypy']
         name: nbqa-mypy
+        alias: nbqa-mypy
         additional_dependencies: ['mypy']
 
 Supported third party packages
