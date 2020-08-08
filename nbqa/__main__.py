@@ -224,10 +224,10 @@ def _map_python_line_to_nb_lines(
         Captured stdout from third-party tool.
     err
         Captured stderr from third-party tool.
-    temp_python_file
-        Temporary Python file where notebook was converted to.
     notebook
         Original Jupyter notebook.
+    cell_mapping
+        Mapping from Python file lines to Jupyter notebook cells.
 
     Returns
     -------
@@ -248,7 +248,11 @@ def _map_python_line_to_nb_lines(
 
 
 def _replace_temp_python_file_references_in_out_err(
-    temp_python_file: Path, notebook: Path, out: str, err: str, mapping: Dict[int, str]
+    temp_python_file: Path,
+    notebook: Path,
+    out: str,
+    err: str,
+    cell_mapping: Dict[int, str],
 ) -> Tuple[str, str]:
     """
     Replace references to temporary Python file with references to notebook.
@@ -263,6 +267,8 @@ def _replace_temp_python_file_references_in_out_err(
         Captured stdout from third-party tool.
     err
         Captured stderr from third-party tool.
+    cell_mapping
+        Mapping from Python lines to Jupyter notebook cells.
 
     Returns
     -------
@@ -273,7 +279,7 @@ def _replace_temp_python_file_references_in_out_err(
     """
     out, err = _replace_full_path_out_err(out, err, temp_python_file, notebook)
     out, err = _replace_relative_path_out_err(out, err, notebook)
-    out, err = _map_python_line_to_nb_lines(out, err, notebook, mapping)
+    out, err = _map_python_line_to_nb_lines(out, err, notebook, cell_mapping)
     return out, err
 
 
@@ -594,8 +600,8 @@ def _run_on_one_root_dir(
         allow_mutation = _get_configs(args, kwargs, tmpdirname)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
-            mapping = save_source.main(notebook, temp_python_file)
-            cell_mappings[notebook] = mapping
+            cell_mapping = save_source.main(notebook, temp_python_file)
+            cell_mappings[notebook] = cell_mapping
             replace_magics.main(temp_python_file)
             _create_blank_init_files(notebook, tmpdirname)
 
