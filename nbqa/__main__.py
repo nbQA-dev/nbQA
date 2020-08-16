@@ -351,12 +351,13 @@ def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
     parts = notebook.resolve().relative_to(Path.cwd()).parts
 
     for idx in range(1, len(parts)):
-        init_file = next(Path(os.path.join(*parts[:idx])).glob("__init__.py"))
-        if init_file is not None:
+        init_files = Path(os.path.join(*parts[:idx])).glob("__init__.py")
+        for init_file in init_files:
             Path(tmpdirname).joinpath(init_file).parent.mkdir(
                 parents=True, exist_ok=True
             )
             Path(tmpdirname).joinpath(init_file).touch()
+            break  # Only need to copy one __init__ file.
 
 
 def _preserve_config_files(nbqa_config: Optional[str], tmpdirname: str) -> None:
