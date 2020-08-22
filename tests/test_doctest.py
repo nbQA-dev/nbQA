@@ -1,7 +1,6 @@
 """Check that running :code:`doctest` works."""
 
 import os
-from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
@@ -17,16 +16,12 @@ WRONG_EXAMPLE_NOTEBOOK = os.path.join(
 )
 
 
-def test_doctest_works(
-    tmp_notebook_for_testing: Path, capsys: "CaptureFixture"
-) -> None:
+def test_doctest_works(capsys: "CaptureFixture") -> None:
     """
     Check doctest works.
 
     Parameters
     ----------
-    tmp_notebook_for_testing
-        Temporary copy of :code:`notebook_for_testing.ipynb`.
     capsys
         Pytest fixture to capture stdout and stderr.
     """
