@@ -193,7 +193,7 @@ See Also
 Here are some other code quality tools for Jupyter Notebooks:
 
 - `flake8-nb`_ (apply `flake8`_ to notebook);
-- `black-nb`_ (apply `black`_ to notebook);
+- `nb_black`_ and `black-nb`_ (apply `black`_ to notebook);
 - `nbstripout`_ (clear notebook cells' outputs);
 - `jupyterlab_code_formatter`_ (Jupyter Lab plugin);
 
@@ -209,3 +209,4 @@ Here are some other code quality tools for Jupyter Notebooks:
 .. _`nbstripout`: https://github.com/kynan/nbstripout
 .. _`jupyterlab_code_formatter`: https://github.com/ryantam626/jupyterlab_code_formatter
 .. _pip: https://pip.pypa.io
+.. _nb_black: https://github.com/dnanhkhoa/nb_black
