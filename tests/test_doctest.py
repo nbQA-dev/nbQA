@@ -57,5 +57,5 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
         """
     )
 
-    assert out == expected_out
+    assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
     assert err == ""
