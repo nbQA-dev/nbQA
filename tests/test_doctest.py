@@ -39,6 +39,7 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
     # check out and err
     out, err = capsys.readouterr()
 
+    # pylint: disable=C0301
     expected_out = dedent(
         f"""\
         **********************************************************************
