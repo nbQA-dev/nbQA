@@ -213,8 +213,8 @@ def _replace_relative_path_out_err(
 
 
 def _map_python_line_to_nb_lines(
-    out: str, err: str, notebook: Path, cell_mapping: Dict[int, str]
-) -> Tuple[str, str]:
+    out: str, notebook: Path, cell_mapping: Dict[int, str]
+) -> str:
     """
     Make sure stdout and stderr make reference to Jupyter Notebook cells and lines.
 
@@ -222,8 +222,6 @@ def _map_python_line_to_nb_lines(
     ----------
     out
         Captured stdout from third-party tool.
-    err
-        Captured stderr from third-party tool.
     notebook
         Original Jupyter notebook.
     cell_mapping
@@ -234,9 +232,6 @@ def _map_python_line_to_nb_lines(
     out
         Stdout with references to temporary Python file's lines replaced with references
         to notebook's cells and lines.
-    err
-        Stderr with references to temporary Python file's lines replaced with references
-        to notebook's cells and lines.
     """
     pattern = rf"(?<={notebook.name}:)\d+"
 
@@ -245,8 +240,14 @@ def _map_python_line_to_nb_lines(
         return str(cell_mapping[int(match.group())])
 
     out = re.sub(pattern, substitution, out)
-    err = re.sub(pattern, substitution, err)
-    return out, err
+
+    # doctest pattern
+    pattern = rf'(?<={notebook.name}", line )\d+'
+    if re.search(pattern, out) is not None:
+        out = re.sub(pattern, substitution, out)
+        out = out.replace(f'{notebook.name}", line ', f'{notebook.name}", ')
+
+    return out
 
 
 def _replace_temp_python_file_references_in_out_err(
@@ -281,60 +282,8 @@ def _replace_temp_python_file_references_in_out_err(
     """
     out, err = _replace_full_path_out_err(out, err, temp_python_file, notebook)
     out, err = _replace_relative_path_out_err(out, err, notebook)
-    out, err = _map_python_line_to_nb_lines(out, err, notebook, cell_mapping)
+    out = _map_python_line_to_nb_lines(out, notebook, cell_mapping)
     return out, err
-
-
-def _replace_tmpdir_references(
-    out: str, err: str, cwd: Optional[Path] = None
-) -> Tuple[str, str]:
-    r"""
-    Replace references to temporary directory name with current working directory.
-
-    Parameters
-    ----------
-    out
-        Captured stdout from third-party tool.
-    err
-        Captured stderr from third-party tool.
-    cwd
-        Current working directory.
-
-    Returns
-    -------
-    out
-        Stdout with references to temporary Python replaced with references to notebook.
-    err
-        Stderr with references to temporary Python replaced with references to notebook.
-
-    Examples
-    --------
-    >>> out = f"rootdir: {os.path.join('tmp', 'tmpdir')}\\n"
-    >>> err = ""
-    >>> cwd = Path("nbQA-dev")
-    >>> out, err = _replace_tmpdir_references(out, err, cwd)
-    >>> out.strip(os.linesep)
-    'rootdir: nbQA-dev'
-    """
-    if cwd is None:
-        cwd = Path.cwd().resolve()
-    new_out = os.linesep.join(
-        [
-            i if not i.startswith("rootdir: ") else f"rootdir: {str(cwd)}"
-            for i in out.splitlines()
-        ]
-    )
-    new_err = os.linesep.join(
-        [
-            i if not i.startswith("rootdir: ") else f"rootdir: {str(cwd)}"
-            for i in err.splitlines()
-        ]
-    )
-    if new_out:
-        new_out += os.linesep
-    if new_err:
-        new_err += os.linesep
-    return new_out, new_err
 
 
 def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
@@ -508,7 +457,7 @@ def _run_command(
 
     arg = _get_arg(root_dir, tmpdirname, nb_to_py_mapping)
 
-    if shutil.which(command) is None:
+    if command != "doctest" and shutil.which(command) is None:
         raise ValueError(
             f"Command `{command}` not found. "
             "Please make sure you have it installed before running nbQA on it."
@@ -517,7 +466,7 @@ def _run_command(
     before = _get_mtimes(arg)
 
     output = subprocess.run(
-        [command, str(arg), *kwargs],
+        ["python", "-m", command, str(arg), *kwargs],
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         cwd=tmpdirname,
@@ -611,8 +560,6 @@ def _run_on_one_root_dir(
         out, err, output_code, mutated = _run_command(
             args.command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
         )
-
-        out, err = _replace_tmpdir_references(out, err)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(

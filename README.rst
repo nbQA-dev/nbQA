@@ -78,20 +78,11 @@ Check static type annotations:
     $ nbqa mypy tweet-sentiment-roberta-pytorch.ipynb --ignore-missing-imports
     tweet-sentiment-roberta-pytorch.ipynb:cell_10:5: error: Argument "batch_size" to "get_test_loader" has incompatible type "str"; expected "int"
 
-Check any examples in your docstrings are correct:
+Check the examples in your docstrings are correct:
 
 .. code-block:: bash
 
-    $ nbqa pytest tweet-sentiment-roberta-pytorch.ipynb --doctest-modules
-    ============================= test session starts ==============================
-    platform linux -- Python 3.8.2, pytest-5.4.3, py-1.9.0, pluggy-0.13.1
-    rootdir: /home/marco/tweet-sentiment-extraction
-    plugins: cov-2.10.0
-    collected 3 items
-
-    tweet-sentiment-roberta-pytorch.ipynb .                                  [100%]
-
-    ============================== 1 passed in 0.03s ===============================
+    $ nbqa doctest tweet-sentiment-roberta-pytorch.ipynb
 
 Format your notebooks using :code:`black`:
 
@@ -192,10 +183,9 @@ In practice, here are the tools it's been tested with:
 
 - flake8_
 - black_
-- pytest_
 - isort_
 - mypy_
-- doctest_ (as long as you run it via pytest_ with the `--doctest-modules` flag)
+- doctest_
 
 See Also
 --------
@@ -209,7 +199,6 @@ Here are some other code quality tools for Jupyter Notebooks:
 
 .. _flake8: https://flake8.pycqa.org/en/latest/
 .. _black: https://black.readthedocs.io/en/stable/
-.. _pytest: https://docs.pytest.org/en/latest/
 .. _isort: https://timothycrosley.github.io/isort/
 .. _mypy: http://mypy-lang.org/
 .. _doctest: https://docs.python.org/3/library/doctest.html
