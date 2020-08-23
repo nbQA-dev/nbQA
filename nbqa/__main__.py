@@ -457,12 +457,6 @@ def _run_command(
 
     arg = _get_arg(root_dir, tmpdirname, nb_to_py_mapping)
 
-    if command != "doctest" and shutil.which(command) is None:
-        raise ValueError(
-            f"Command `{command}` not found. "
-            "Please make sure you have it installed before running nbQA on it."
-        )
-
     before = _get_mtimes(arg)
 
     output = subprocess.run(
@@ -480,6 +474,13 @@ def _run_command(
 
     out = output.stdout.decode()
     err = output.stderr.decode()
+
+    if "No module named" in err:
+        raise ValueError(
+            f"Command `{command}` not found. "
+            "Please make sure you have it installed before running nbQA on it."
+        )
+
     return out, err, output_code, mutated
 
 
