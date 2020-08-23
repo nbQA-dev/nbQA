@@ -68,11 +68,6 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
         "--nbqa-mutate", action="store_true", help="Allows `nbqa` to modify notebooks.",
     )
     parser.add_argument(
-        "--nbqa-preserve-init",
-        action="store_true",
-        help="Use this if your 3rd party tool requires blank `__init__.py` files.",
-    )
-    parser.add_argument(
         "--nbqa-config",
         required=False,
         help="Config file for third-party tool (e.g. `setup.cfg`)",
@@ -218,8 +213,8 @@ def _replace_relative_path_out_err(
 
 
 def _map_python_line_to_nb_lines(
-    out: str, err: str, temp_python_file: Path, notebook: Path
-) -> Tuple[str, str]:
+    out: str, notebook: Path, cell_mapping: Dict[int, str]
+) -> str:
     """
     Make sure stdout and stderr make reference to Jupyter Notebook cells and lines.
 
@@ -227,46 +222,40 @@ def _map_python_line_to_nb_lines(
     ----------
     out
         Captured stdout from third-party tool.
-    err
-        Captured stderr from third-party tool.
-    temp_python_file
-        Temporary Python file where notebook was converted to.
     notebook
         Original Jupyter notebook.
+    cell_mapping
+        Mapping from Python file lines to Jupyter notebook cells.
 
     Returns
     -------
     out
         Stdout with references to temporary Python file's lines replaced with references
         to notebook's cells and lines.
-    err
-        Stderr with references to temporary Python file's lines replaced with references
-        to notebook's cells and lines.
     """
-    with open(str(temp_python_file), "r") as handle:
-        cells = handle.readlines()
-    mapping = {}
-    cell_no = 0
-    cell_count = None
-    for idx, cell in enumerate(cells):
-        if cell == "# %%\n":
-            cell_no += 1
-            cell_count = 0
-        else:
-            assert cell_count is not None
-            cell_count += 1
-        mapping[idx + 1] = f"cell_{cell_no}:{cell_count}"
-    out = re.sub(
-        rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), out,
-    )
-    err = re.sub(
-        rf"(?<={notebook.name}:)\d+", lambda x: str(mapping[int(x.group())]), err,
-    )
-    return out, err
+    pattern = rf"(?<={notebook.name}:)\d+"
+
+    def substitution(match: "re.Match") -> str:
+        """Replace Python line with corresponding Jupyter notebook cell."""
+        return str(cell_mapping[int(match.group())])
+
+    out = re.sub(pattern, substitution, out)
+
+    # doctest pattern
+    pattern = rf'(?<={notebook.name}", line )\d+'
+    if re.search(pattern, out) is not None:
+        out = re.sub(pattern, substitution, out)
+        out = out.replace(f'{notebook.name}", line ', f'{notebook.name}", ')
+
+    return out
 
 
 def _replace_temp_python_file_references_in_out_err(
-    temp_python_file: Path, notebook: Path, out: str, err: str
+    temp_python_file: Path,
+    notebook: Path,
+    out: str,
+    err: str,
+    cell_mapping: Dict[int, str],
 ) -> Tuple[str, str]:
     """
     Replace references to temporary Python file with references to notebook.
@@ -281,6 +270,8 @@ def _replace_temp_python_file_references_in_out_err(
         Captured stdout from third-party tool.
     err
         Captured stderr from third-party tool.
+    cell_mapping
+        Mapping from Python lines to Jupyter notebook cells.
 
     Returns
     -------
@@ -291,84 +282,31 @@ def _replace_temp_python_file_references_in_out_err(
     """
     out, err = _replace_full_path_out_err(out, err, temp_python_file, notebook)
     out, err = _replace_relative_path_out_err(out, err, notebook)
-    out, err = _map_python_line_to_nb_lines(out, err, temp_python_file, notebook)
+    out = _map_python_line_to_nb_lines(out, notebook, cell_mapping)
     return out, err
 
 
-def _replace_tmpdir_references(
-    out: str, err: str, cwd: Optional[Path] = None
-) -> Tuple[str, str]:
-    r"""
-    Replace references to temporary directory name with current working directory.
-
-    Parameters
-    ----------
-    out
-        Captured stdout from third-party tool.
-    err
-        Captured stderr from third-party tool.
-    cwd
-        Current working directory.
-
-    Returns
-    -------
-    out
-        Stdout with references to temporary Python replaced with references to notebook.
-    err
-        Stderr with references to temporary Python replaced with references to notebook.
-
-    Examples
-    --------
-    >>> out = f"rootdir: {os.path.join('tmp', 'tmpdir')}\\n"
-    >>> err = ""
-    >>> cwd = Path("nbQA-dev")
-    >>> out, err = _replace_tmpdir_references(out, err, cwd)
-    >>> out.strip(os.linesep)
-    'rootdir: nbQA-dev'
-    """
-    if cwd is None:
-        cwd = Path.cwd().resolve()
-    new_out = os.linesep.join(
-        [
-            i if not i.startswith("rootdir: ") else f"rootdir: {str(cwd)}"
-            for i in out.splitlines()
-        ]
-    )
-    new_err = os.linesep.join(
-        [
-            i if not i.startswith("rootdir: ") else f"rootdir: {str(cwd)}"
-            for i in err.splitlines()
-        ]
-    )
-    if new_out:
-        new_out += os.linesep
-    if new_err:
-        new_err += os.linesep
-    return new_out, new_err
-
-
-def _create_blank_init_files(
-    nbqa_preserve_init: bool, notebook: Path, tmpdirname: str
-) -> None:
+def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
     """
     Replicate local (possibly blank) __init__ files to temporary directory.
 
     Parameters
     ----------
-    nbqa_preserve_init
-        Whether to copy __init__.py files to temp directory
     notebook
         Notebook third-party tool is being run against.
     tmpdirname
         Temporary directory to store converted notebooks in.
     """
-    if not nbqa_preserve_init:
-        return
     parts = notebook.resolve().relative_to(Path.cwd()).parts
-    init_files = Path(parts[0]).rglob("__init__.py")
-    for i in init_files:
-        Path(tmpdirname).joinpath(i).parent.mkdir(parents=True, exist_ok=True)
-        Path(tmpdirname).joinpath(i).touch()
+
+    for idx in range(1, len(parts)):
+        init_files = Path(os.path.join(*parts[:idx])).glob("__init__.py")
+        for init_file in init_files:
+            Path(tmpdirname).joinpath(init_file).parent.mkdir(
+                parents=True, exist_ok=True
+            )
+            Path(tmpdirname).joinpath(init_file).touch()
+            break  # Only need to copy one __init__ file.
 
 
 def _preserve_config_files(nbqa_config: Optional[str], tmpdirname: str) -> None:
@@ -519,16 +457,10 @@ def _run_command(
 
     arg = _get_arg(root_dir, tmpdirname, nb_to_py_mapping)
 
-    if shutil.which(command) is None:
-        raise ValueError(
-            f"Command `{command}` not found. "
-            "Please make sure you have it installed before running nbQA on it."
-        )
-
     before = _get_mtimes(arg)
 
     output = subprocess.run(
-        [command, str(arg), *kwargs],
+        ["python", "-m", command, str(arg), *kwargs],
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         cwd=tmpdirname,
@@ -542,6 +474,13 @@ def _run_command(
 
     out = output.stdout.decode()
     err = output.stderr.decode()
+
+    if "No module named" in err:
+        raise ValueError(
+            f"Command `{command}` not found. "
+            "Please make sure you have it installed before running nbQA on it."
+        )
+
     return out, err, output_code, mutated
 
 
@@ -570,7 +509,6 @@ def _get_configs(
     config = configparser.ConfigParser()
     config.read(".nbqa.ini")
     nbqa_config = args.nbqa_config
-    nbqa_preserve_init = args.nbqa_preserve_init
     allow_mutation = args.nbqa_mutate
     if args.command in config.sections():
         addopts = config[args.command].get("addopts")
@@ -578,12 +516,10 @@ def _get_configs(
             kwargs.extend(config[args.command]["addopts"].split())
         if nbqa_config is None:
             nbqa_config = config[args.command].get("config")
-        if not nbqa_preserve_init:
-            nbqa_preserve_init = bool(config[args.command].get("preserve_init"))
         if not allow_mutation:
             allow_mutation = bool(config[args.command].get("mutate"))
     _preserve_config_files(nbqa_config, tmpdirname)
-    return nbqa_preserve_init, allow_mutation
+    return allow_mutation
 
 
 def _run_on_one_root_dir(
@@ -612,29 +548,27 @@ def _run_on_one_root_dir(
             notebook: _temp_python_file_for_notebook(notebook, tmpdirname)
             for notebook in notebooks
         }
+        cell_mappings = {}
 
-        nbqa_preserve_init, allow_mutation = _get_configs(args, kwargs, tmpdirname)
+        allow_mutation = _get_configs(args, kwargs, tmpdirname)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
-            save_source.main(notebook, temp_python_file)
+            cell_mapping = save_source.main(notebook, temp_python_file)
+            cell_mappings[notebook] = cell_mapping
             replace_magics.main(temp_python_file)
-            _create_blank_init_files(nbqa_preserve_init, notebook, tmpdirname)
+            _create_blank_init_files(notebook, tmpdirname)
 
         out, err, output_code, mutated = _run_command(
             args.command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
         )
 
-        out, err = _replace_tmpdir_references(out, err)
-
         for notebook, temp_python_file in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(
-                temp_python_file, notebook, out, err
+                temp_python_file, notebook, out, err, cell_mappings[notebook]
             )
             if mutated and not allow_mutation:
                 if args.nbqa_config:
                     kwargs += [f"--nbqa-config={args.nbqa_config}"]
-                if args.nbqa_preserve_init:
-                    kwargs += ["--nbqa-preserve-init"]
                 kwargs += ["--nbqa-mutate"]
                 raise SystemExit(
                     dedent(

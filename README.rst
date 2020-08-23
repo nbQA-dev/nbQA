@@ -78,20 +78,11 @@ Check static type annotations:
     $ nbqa mypy tweet-sentiment-roberta-pytorch.ipynb --ignore-missing-imports
     tweet-sentiment-roberta-pytorch.ipynb:cell_10:5: error: Argument "batch_size" to "get_test_loader" has incompatible type "str"; expected "int"
 
-Check any examples in your docstrings are correct:
+Check the examples in your docstrings are correct:
 
 .. code-block:: bash
 
-    $ nbqa pytest tweet-sentiment-roberta-pytorch.ipynb --doctest-modules
-    ============================= test session starts ==============================
-    platform linux -- Python 3.8.2, pytest-5.4.3, py-1.9.0, pluggy-0.13.1
-    rootdir: /home/marco/tweet-sentiment-extraction
-    plugins: cov-2.10.0
-    collected 3 items
-
-    tweet-sentiment-roberta-pytorch.ipynb .                                  [100%]
-
-    ============================== 1 passed in 0.03s ===============================
+    $ nbqa doctest tweet-sentiment-roberta-pytorch.ipynb
 
 Format your notebooks using :code:`black`:
 
@@ -156,23 +147,6 @@ or you can put the following in your :code:`.nbqa.ini` file
     [black]
     mutate = 1
 
-Empty :code:`__init__.py` files
--------------------------------
-
-Some tools, such as :code:`mypy`, require (possibly empty) :code:`__init__.py` files to be in each subdirectory you wish to analyse.
-To make :code:`nbQA` aware of this, you can either pass the :code:`--nbqa-preserve-init` flag, e.g.
-
-.. code-block:: bash
-
-    nbqa mypy my_dir/my_subdir/my_notebook.ipynb --nbqa-preserve-init
-
-or you can put the following in your :code:`.nbqa.ini` file
-
-.. code-block:: ini
-
-    [mypy]
-    preserve_init = 1
-
 Usage as pre-commit hook
 ------------------------
 
@@ -182,19 +156,22 @@ could add to your :code:`.pre-commit-config.yaml` file:
 .. code-block:: yaml
 
   - repo: https://github.com/nbQA-dev/nbQA
-    rev: 0.1.19
+    rev: 0.1.23
     hooks:
       - id: nbqa
         args: ['flake8']
         name: nbqa-flake8
+        alias: nbqa-flake8
         additional_dependencies: ['flake8']
       - id: nbqa
         args: ['isort', '--nbqa-mutate']
         name: nbqa-isort
+        alias: nbqa-isort
         additional_dependencies: ['isort']
       - id: nbqa
-        args: ['mypy', '--nbqa-preserve-init']
+        args: ['mypy']
         name: nbqa-mypy
+        alias: nbqa-mypy
         additional_dependencies: ['mypy']
 
 Supported third party packages
@@ -206,10 +183,9 @@ In practice, here are the tools it's been tested with:
 
 - flake8_
 - black_
-- pytest_
 - isort_
 - mypy_
-- doctest_ (as long as you run it via pytest_ with the `--doctest-modules` flag)
+- doctest_
 
 See Also
 --------
@@ -217,13 +193,12 @@ See Also
 Here are some other code quality tools for Jupyter Notebooks:
 
 - `flake8-nb`_ (apply `flake8`_ to notebook);
-- `black-nb`_ (apply `black`_ to notebook);
+- `nb_black`_ and `black-nb`_ (apply `black`_ to notebook);
 - `nbstripout`_ (clear notebook cells' outputs);
 - `jupyterlab_code_formatter`_ (Jupyter Lab plugin);
 
 .. _flake8: https://flake8.pycqa.org/en/latest/
 .. _black: https://black.readthedocs.io/en/stable/
-.. _pytest: https://docs.pytest.org/en/latest/
 .. _isort: https://timothycrosley.github.io/isort/
 .. _mypy: http://mypy-lang.org/
 .. _doctest: https://docs.python.org/3/library/doctest.html
@@ -234,3 +209,4 @@ Here are some other code quality tools for Jupyter Notebooks:
 .. _`nbstripout`: https://github.com/kynan/nbstripout
 .. _`jupyterlab_code_formatter`: https://github.com/ryantam626/jupyterlab_code_formatter
 .. _pip: https://pip.pypa.io
+.. _nb_black: https://github.com/dnanhkhoa/nb_black
