@@ -93,6 +93,11 @@ Format your notebooks using :code:`black`:
     All done! ✨ 🍰 ✨
     1 files reformatted.
 
+Contributing
+------------
+
+I will give write-access to anyone who contributes - see [here](https://nbqa.readthedocs.io/en/latest/contributing.html) for the contributing guide.
+
 Configuration
 -------------
 
