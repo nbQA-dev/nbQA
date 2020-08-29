@@ -190,7 +190,7 @@ In practice, here are the tools it's been tested with:
 Contributing
 ------------
 
-I will give write-access to anyone who contributes - see `here`_ for the contributing guide.
+I will give write-access to anyone who contributes - see here_ for the contributing guide.
 
 See Also
 --------
