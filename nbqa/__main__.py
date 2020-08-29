@@ -171,9 +171,7 @@ def _replace_full_path_out_err(
     return out, err
 
 
-def _replace_relative_path_out_err(
-    out: str, err: str, notebook: Path
-) -> Tuple[str, str]:
+def _replace_relative_path_out_err(out: str, notebook: Path) -> str:
     """
     Replace references to temporary Python file's relative path with notebook's path.
 
@@ -181,8 +179,6 @@ def _replace_relative_path_out_err(
     ----------
     out
         Captured stdout from third-party tool.
-    err
-        Captured stderr from third-party tool.
     notebook
         Original Jupyter notebook.
 
@@ -190,26 +186,18 @@ def _replace_relative_path_out_err(
     -------
     out
         Stdout with temporary Python file's relative path with notebook's path.
-    err
-        Stderr with temporary Python file's relative path with notebook's path.
     Examples
     --------
     >>> out = "notebook   .py ."
-    >>> err = ""
     >>> notebook = Path('notebook.ipynb')
-    >>> out, err = _replace_relative_path_out_err(out, err, notebook)
-    >>> out
+    >>> _replace_relative_path_out_err(out, notebook)
     'notebook.ipynb .'
     """
     out = out.replace(
         str(notebook.parent.joinpath(f"{notebook.stem}   ").with_suffix(".py")),
         str(notebook),
     )
-    err = err.replace(
-        str(notebook.parent.joinpath(f"{notebook.stem}   ").with_suffix(".py")),
-        str(notebook),
-    )
-    return out, err
+    return out
 
 
 def _map_python_line_to_nb_lines(
@@ -281,7 +269,7 @@ def _replace_temp_python_file_references_in_out_err(
         Stderr with temporary directory replaced by current working directory.
     """
     out, err = _replace_full_path_out_err(out, err, temp_python_file, notebook)
-    out, err = _replace_relative_path_out_err(out, err, notebook)
+    out = _replace_relative_path_out_err(out, notebook)
     out = _map_python_line_to_nb_lines(out, notebook, cell_mapping)
     return out, err
 
