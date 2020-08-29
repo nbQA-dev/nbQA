@@ -93,11 +93,6 @@ Format your notebooks using :code:`black`:
     All done! ✨ 🍰 ✨
     1 files reformatted.
 
-Contributing
-------------
-
-I will give write-access to anyone who contributes - see [here](https://nbqa.readthedocs.io/en/latest/contributing.html) for the contributing guide.
-
 Configuration
 -------------
 
@@ -192,6 +187,11 @@ In practice, here are the tools it's been tested with:
 - mypy_
 - doctest_
 
+Contributing
+------------
+
+I will give write-access to anyone who contributes - see here_ for the contributing guide.
+
 See Also
 --------
 
@@ -215,3 +215,4 @@ Here are some other code quality tools for Jupyter Notebooks:
 .. _`jupyterlab_code_formatter`: https://github.com/ryantam626/jupyterlab_code_formatter
 .. _pip: https://pip.pypa.io
 .. _nb_black: https://github.com/dnanhkhoa/nb_black
+.. _here: https://nbqa.readthedocs.io/en/latest/contributing.html
