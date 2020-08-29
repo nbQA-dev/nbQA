@@ -65,7 +65,7 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
         "root_dirs", nargs="+", help="Notebooks or directories to run command on."
     )
     parser.add_argument(
-        "--nbqa-mutate", action="store_true", help="Allows `nbqa` to modify notebooks.",
+        "--nbqa-mutate", action="store_true", help="Allows `nbqa` to modify notebooks."
     )
     parser.add_argument(
         "--nbqa-config",
@@ -473,7 +473,7 @@ def _run_command(
 
 
 def _get_configs(
-    args: argparse.Namespace, kwargs: List[str], tmpdirname: str,
+    args: argparse.Namespace, kwargs: List[str], tmpdirname: str
 ) -> Tuple[bool, bool]:
     """
     Deal with extra configs for 3rd party tool.
