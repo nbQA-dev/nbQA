@@ -190,7 +190,7 @@ In practice, here are the tools it's been tested with:
 Contributing
 ------------
 
-I will give write-access to anyone who contributes - see the `contributing guide`_ for details on how to do so.
+I will give write-access to anyone who contributes anything useful (e.g. pull request / bug report) - see the `contributing guide`_ for details on how to do so.
 
 See Also
 --------
