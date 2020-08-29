@@ -187,6 +187,11 @@ In practice, here are the tools it's been tested with:
 - mypy_
 - doctest_
 
+Contributing
+------------
+
+I will give write-access to anyone who contributes - see the `contributing guide`_ for details on how to do so.
+
 See Also
 --------
 
@@ -210,3 +215,4 @@ Here are some other code quality tools for Jupyter Notebooks:
 .. _`jupyterlab_code_formatter`: https://github.com/ryantam626/jupyterlab_code_formatter
 .. _pip: https://pip.pypa.io
 .. _nb_black: https://github.com/dnanhkhoa/nb_black
+.. _contributing guide: https://nbqa.readthedocs.io/en/latest/contributing.html
