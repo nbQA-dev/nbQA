@@ -4,6 +4,6 @@ include README.rst
 recursive-exclude tests *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
-recursive-exclude docs/build *
+recursive-exclude docs/_build *
 
 recursive-include docs *.rst conf.py Makefile make.bat *.jpg *.png *.gif
