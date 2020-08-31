@@ -5,4 +5,34 @@ recursive-exclude tests *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 
-recursive-include docs *.rst conf.py Makefile make.bat *.jpg *.png *.gif
+global-exclude *.bz2
+global-exclude *.csv
+global-exclude *.dta
+global-exclude *.feather
+global-exclude *.gz
+global-exclude *.h5
+global-exclude *.html
+global-exclude *.json
+global-exclude *.pickle
+global-exclude *.png
+global-exclude *.pyc
+global-exclude *.pyd
+global-exclude *.ods
+global-exclude *.odt
+global-exclude *.sas7bdat
+global-exclude *.sav
+global-exclude *.so
+global-exclude *.xls
+global-exclude *.xlsm
+global-exclude *.xlsx
+global-exclude *.xpt
+global-exclude *.xz
+global-exclude *.zip
+global-exclude *~
+global-exclude .DS_Store
+global-exclude .git*
+global-exclude \#*
+
+prune docs/_build
+
+recursive-include docs *.rst conf.py Makefile make.bat
