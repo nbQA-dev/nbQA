@@ -28,11 +28,12 @@ def main(python_file: "Path", notebook: "Path") -> None:
     with open(str(python_file), "r") as handle:
         pyfile = handle.read()
 
-    pycells = pyfile[len("# %%") :].split("\n\n\n# %%")
+    pycells = pyfile[len("# %%") :].split("# %%")
 
     # we take [1:] because the first cell is just '\n'
     new_sources = (
-        {"source": i.splitlines(True)[1:], "cell_type": "code"} for i in pycells
+        {"source": f"\n{i.strip()}".splitlines(True)[1:], "cell_type": "code"}
+        for i in pycells
     )
 
     new_cells = []
