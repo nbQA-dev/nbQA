@@ -323,22 +323,6 @@ def _preserve_config_files(nbqa_config: Optional[str], tmpdirname: str) -> None:
     )
 
 
-def _ensure_cell_separators_remain(temp_python_file: Path) -> None:
-    """
-    Reinstate blank line which separates the cells (may be removed by isort).
-
-    Parameters
-    ----------
-    temp_python_file
-        Temporary Python file notebook was converted to.
-    """
-    with open(str(temp_python_file), "r") as handle:
-        py_file = handle.read()
-    py_file = re.sub(r"(?<=\n\n)(?<!\n\n\n)# %%", "\n# %%", py_file)
-    with open(str(temp_python_file), "w") as handle:
-        handle.write(py_file)
-
-
 def _get_arg(
     root_dir: str, tmpdirname: str, nb_to_py_mapping: Dict[Path, Path]
 ) -> Path:
@@ -569,7 +553,6 @@ def _run_on_one_root_dir(
                 )
             if mutated:
                 put_magics_back_in.main(temp_python_file)
-                _ensure_cell_separators_remain(temp_python_file)
                 replace_source.main(temp_python_file, notebook)
 
         sys.stdout.write(out)
