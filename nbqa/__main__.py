@@ -12,7 +12,7 @@ from pathlib import Path
 from textwrap import dedent
 from typing import Dict, Iterator, List, Optional, Set, Tuple
 
-from nbqa import __version__, put_magics_back_in, replace_source, save_source
+from nbqa import __version__, replace_source, save_source
 
 
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
@@ -545,7 +545,6 @@ def _run_on_one_root_dir(
                     )
                 )
             if mutated:
-                put_magics_back_in.main(temp_python_file)
                 replace_source.main(temp_python_file, notebook)
 
         sys.stdout.write(out)

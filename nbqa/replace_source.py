@@ -5,7 +5,9 @@ The converted file will have had the third-party tool run against it by now.
 """
 
 import json
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
+
+from nbqa.save_source import CODE_SEPARATOR, MAGIC
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -28,12 +30,30 @@ def main(python_file: "Path", notebook: "Path") -> None:
     with open(str(python_file), "r") as handle:
         pyfile = handle.read()
 
-    pycells = pyfile[len("# %%") :].split("# %%")
+    pycells = pyfile[len(CODE_SEPARATOR) :].split(CODE_SEPARATOR)
 
-    # we take [1:] because the first cell is just '\n'
+    def _reinstate_magics(source: str) -> List[str]:
+        """
+        Put (commented-out) magics back in.
+
+        Parameters
+        ----------
+        source
+            Portion of Python file between cell separators.
+
+        Returns
+        -------
+        List[str]
+            New source that can be saved into Jupyter Notebook.
+        """
+        # we take [1:] because the first cell is just '\n'
+        return [
+            j if not j.startswith(MAGIC) else j[len(MAGIC) :]
+            for j in f"\n{source.strip()}".splitlines(True)[1:]
+        ]
+
     new_sources = (
-        {"source": f"\n{i.strip()}".splitlines(True)[1:], "cell_type": "code"}
-        for i in pycells
+        {"source": _reinstate_magics(i), "cell_type": "code"} for i in pycells
     )
 
     new_cells = []
