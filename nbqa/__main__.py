@@ -12,13 +12,7 @@ from pathlib import Path
 from textwrap import dedent
 from typing import Dict, Iterator, List, Optional, Set, Tuple
 
-from nbqa import (
-    __version__,
-    put_magics_back_in,
-    replace_magics,
-    replace_source,
-    save_source,
-)
+from nbqa import __version__, put_magics_back_in, replace_source, save_source
 
 
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
@@ -527,7 +521,6 @@ def _run_on_one_root_dir(
         for notebook, temp_python_file in nb_to_py_mapping.items():
             cell_mapping = save_source.main(notebook, temp_python_file)
             cell_mappings[notebook] = cell_mapping
-            replace_magics.main(temp_python_file)
             _create_blank_init_files(notebook, tmpdirname)
 
         out, err, output_code, mutated = _run_command(

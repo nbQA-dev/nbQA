@@ -41,7 +41,11 @@ def main(notebook: "Path", temp_python_file: "Path") -> Dict[int, str]:
     for i in cells:
         if i["cell_type"] != "code":
             continue
-        parsed_cell = f"{CODE_SEPARATOR}{''.join(i['source'])}\n"
+        source = (
+            f"# {j}" if (j.startswith("!") or j.startswith("%")) else j
+            for j in i["source"]
+        )
+        parsed_cell = f"{CODE_SEPARATOR}{''.join(source)}\n"
         result.append(parsed_cell)
         split_parsed_cell = parsed_cell.splitlines()
         mapping = {
