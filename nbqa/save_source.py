@@ -10,7 +10,8 @@ from typing import TYPE_CHECKING, Dict
 if TYPE_CHECKING:
     from pathlib import Path
 
-CODE_SEPARATOR = "\n\n# %%\n"
+CODE_SEPARATOR = "# %%"
+MAGIC = "# NBQAMAGIC"
 
 
 def main(notebook: "Path", temp_python_file: "Path") -> Dict[int, str]:
@@ -41,7 +42,11 @@ def main(notebook: "Path", temp_python_file: "Path") -> Dict[int, str]:
     for i in cells:
         if i["cell_type"] != "code":
             continue
-        parsed_cell = f"{CODE_SEPARATOR}{''.join(i['source'])}\n"
+        source = (
+            f"{MAGIC}{j}" if (j.startswith("!") or j.startswith("%")) else j
+            for j in i["source"]
+        )
+        parsed_cell = f"\n\n{CODE_SEPARATOR}\n{''.join(source)}\n"
         result.append(parsed_cell)
         split_parsed_cell = parsed_cell.splitlines()
         mapping = {
