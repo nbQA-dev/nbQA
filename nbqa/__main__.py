@@ -12,13 +12,7 @@ from pathlib import Path
 from textwrap import dedent
 from typing import Dict, Iterator, List, Optional, Set, Tuple
 
-from nbqa import (
-    __version__,
-    put_magics_back_in,
-    replace_magics,
-    replace_source,
-    save_source,
-)
+from nbqa import __version__, replace_source, save_source
 
 
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
@@ -65,7 +59,7 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
         "root_dirs", nargs="+", help="Notebooks or directories to run command on."
     )
     parser.add_argument(
-        "--nbqa-mutate", action="store_true", help="Allows `nbqa` to modify notebooks.",
+        "--nbqa-mutate", action="store_true", help="Allows `nbqa` to modify notebooks."
     )
     parser.add_argument(
         "--nbqa-config",
@@ -171,9 +165,7 @@ def _replace_full_path_out_err(
     return out, err
 
 
-def _replace_relative_path_out_err(
-    out: str, err: str, notebook: Path
-) -> Tuple[str, str]:
+def _replace_relative_path_out_err(out: str, notebook: Path) -> str:
     """
     Replace references to temporary Python file's relative path with notebook's path.
 
@@ -181,8 +173,6 @@ def _replace_relative_path_out_err(
     ----------
     out
         Captured stdout from third-party tool.
-    err
-        Captured stderr from third-party tool.
     notebook
         Original Jupyter notebook.
 
@@ -190,26 +180,18 @@ def _replace_relative_path_out_err(
     -------
     out
         Stdout with temporary Python file's relative path with notebook's path.
-    err
-        Stderr with temporary Python file's relative path with notebook's path.
     Examples
     --------
     >>> out = "notebook   .py ."
-    >>> err = ""
     >>> notebook = Path('notebook.ipynb')
-    >>> out, err = _replace_relative_path_out_err(out, err, notebook)
-    >>> out
+    >>> _replace_relative_path_out_err(out, notebook)
     'notebook.ipynb .'
     """
     out = out.replace(
         str(notebook.parent.joinpath(f"{notebook.stem}   ").with_suffix(".py")),
         str(notebook),
     )
-    err = err.replace(
-        str(notebook.parent.joinpath(f"{notebook.stem}   ").with_suffix(".py")),
-        str(notebook),
-    )
-    return out, err
+    return out
 
 
 def _map_python_line_to_nb_lines(
@@ -281,7 +263,7 @@ def _replace_temp_python_file_references_in_out_err(
         Stderr with temporary directory replaced by current working directory.
     """
     out, err = _replace_full_path_out_err(out, err, temp_python_file, notebook)
-    out, err = _replace_relative_path_out_err(out, err, notebook)
+    out = _replace_relative_path_out_err(out, notebook)
     out = _map_python_line_to_nb_lines(out, notebook, cell_mapping)
     return out, err
 
@@ -333,22 +315,6 @@ def _preserve_config_files(nbqa_config: Optional[str], tmpdirname: str) -> None:
             )
         ),
     )
-
-
-def _ensure_cell_separators_remain(temp_python_file: Path) -> None:
-    """
-    Reinstate blank line which separates the cells (may be removed by isort).
-
-    Parameters
-    ----------
-    temp_python_file
-        Temporary Python file notebook was converted to.
-    """
-    with open(str(temp_python_file), "r") as handle:
-        py_file = handle.read()
-    py_file = re.sub(r"(?<=\n\n)(?<!\n\n\n)# %%", "\n# %%", py_file)
-    with open(str(temp_python_file), "w") as handle:
-        handle.write(py_file)
 
 
 def _get_arg(
@@ -485,7 +451,7 @@ def _run_command(
 
 
 def _get_configs(
-    args: argparse.Namespace, kwargs: List[str], tmpdirname: str,
+    args: argparse.Namespace, kwargs: List[str], tmpdirname: str
 ) -> Tuple[bool, bool]:
     """
     Deal with extra configs for 3rd party tool.
@@ -555,7 +521,6 @@ def _run_on_one_root_dir(
         for notebook, temp_python_file in nb_to_py_mapping.items():
             cell_mapping = save_source.main(notebook, temp_python_file)
             cell_mappings[notebook] = cell_mapping
-            replace_magics.main(temp_python_file)
             _create_blank_init_files(notebook, tmpdirname)
 
         out, err, output_code, mutated = _run_command(
@@ -580,8 +545,6 @@ def _run_on_one_root_dir(
                     )
                 )
             if mutated:
-                put_magics_back_in.main(temp_python_file)
-                _ensure_cell_separators_remain(temp_python_file)
                 replace_source.main(temp_python_file, notebook)
 
         sys.stdout.write(out)
