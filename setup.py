@@ -45,6 +45,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/MarcoGorelli/nbQA",
-    version="0.1.26",
+    version="0.1.27",
     zip_safe=False,
 )
