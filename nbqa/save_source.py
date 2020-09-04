@@ -39,13 +39,21 @@ def main(notebook: "Path", temp_python_file: "Path") -> Dict[int, str]:
     cell_mapping = {}
     line_number = 0
     cell_number = 0
+
+    def _replace_magics(source):
+        bash_cell = source and any(
+            source[0].startswith(i) for i in ("%%script", "%%bash")
+        )
+        for j in source:
+            if (j.startswith("!") or j.startswith("%")) or bash_cell:
+                yield f"{MAGIC}{j}"
+            else:
+                yield j
+
     for i in cells:
         if i["cell_type"] != "code":
             continue
-        source = (
-            f"{MAGIC}{j}" if (j.startswith("!") or j.startswith("%")) else j
-            for j in i["source"]
-        )
+        source = _replace_magics(i["source"])
         parsed_cell = f"\n\n{CODE_SEPARATOR}\n{''.join(source)}\n"
         result.append(parsed_cell)
         split_parsed_cell = parsed_cell.splitlines()
