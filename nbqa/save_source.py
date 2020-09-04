@@ -5,7 +5,7 @@ Markdown cells, output, and metadata are ignored.
 """
 
 import json
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING, Dict, Iterator, List
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -40,7 +40,22 @@ def main(notebook: "Path", temp_python_file: "Path") -> Dict[int, str]:
     line_number = 0
     cell_number = 0
 
-    def _replace_magics(source):
+    def _replace_magics(source: List[str]) -> Iterator[str]:
+        """
+        Comment out lines with magic commands.
+
+        If it's a script/bash cell, comment out the entire cell.
+
+        Parameters
+        ----------
+        source
+            Source from notebook cell.
+
+        Yields
+        ------
+        str
+            Line from cell, possibly commented out.
+        """
         bash_cell = source and any(
             source[0].startswith(i) for i in ("%%script", "%%bash")
         )
