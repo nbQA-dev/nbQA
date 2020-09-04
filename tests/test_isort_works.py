@@ -11,7 +11,6 @@ import pytest
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:
-
     from _pytest.capture import CaptureFixture
 
 
