@@ -425,6 +425,7 @@ def _run_command(
     arg = _get_arg(root_dir, tmpdirname, nb_to_py_mapping)
 
     before = _get_mtimes(arg)
+
     output = subprocess.run(
         ["python", "-m", command, str(arg), *kwargs],
         stderr=subprocess.PIPE,
