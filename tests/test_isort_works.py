@@ -2,6 +2,8 @@
 
 import difflib
 import os
+from pathlib import Path
+from textwrap import dedent
 from typing import TYPE_CHECKING
 
 import pytest
@@ -9,7 +11,6 @@ import pytest
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:
-    from pathlib import Path
 
     from _pytest.capture import CaptureFixture
 
@@ -81,6 +82,45 @@ def test_isort_initial_md(
     # check out and err
     out, err = capsys.readouterr()
     expected_out = f"Fixing {path}{os.linesep}"
+    expected_err = ""
+    assert out == expected_out
+    assert err == expected_err
+
+
+def test_isort_separated_imports(capsys: "CaptureFixture") -> None:
+    """
+    Check isort works when a notebook has imports in different cells.
+
+    We will pass --treat-comment-as-code '# %%'.
+
+    Parameters
+    ----------
+    tmp_notebook_starting_with_md
+        Temporary copy of :code:`notebook_for_testing.ipynb`.
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    with open(".nbqa.ini", "w") as handle:
+        handle.write(
+            dedent(
+                """\
+            [isort]
+            addopts = --treat-comment-as-code "# %%%%"
+            """
+            )
+        )
+
+    path = os.path.abspath(
+        os.path.join("tests", "data", "notebook_with_separated_imports.ipynb")
+    )
+    with pytest.raises(SystemExit):
+        main(["isort", path, "--nbqa-mutate"])
+
+    Path(".nbqa.ini").unlink()
+
+    # check out and err
+    out, err = capsys.readouterr()
+    expected_out = ""
     expected_err = ""
     assert out == expected_out
     assert err == expected_err

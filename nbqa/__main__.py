@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from shlex import split
 from textwrap import dedent
 from typing import Dict, Iterator, List, Optional, Set, Tuple
 
@@ -424,7 +425,6 @@ def _run_command(
     arg = _get_arg(root_dir, tmpdirname, nb_to_py_mapping)
 
     before = _get_mtimes(arg)
-
     output = subprocess.run(
         ["python", "-m", command, str(arg), *kwargs],
         stderr=subprocess.PIPE,
@@ -479,7 +479,7 @@ def _get_configs(
     if args.command in config.sections():
         addopts = config[args.command].get("addopts")
         if addopts is not None:
-            kwargs.extend(config[args.command]["addopts"].split())
+            kwargs.extend(split(config[args.command]["addopts"]))
         if nbqa_config is None:
             nbqa_config = config[args.command].get("config")
         if not allow_mutation:
