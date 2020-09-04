@@ -1,6 +1,6 @@
 black
 coverage
 flake8
-isort
+isort>=5.4.2
 mypy
 pytest

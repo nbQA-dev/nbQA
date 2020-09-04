@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from shlex import split
 from textwrap import dedent
 from typing import Dict, Iterator, List, Optional, Set, Tuple
 
@@ -479,7 +480,7 @@ def _get_configs(
     if args.command in config.sections():
         addopts = config[args.command].get("addopts")
         if addopts is not None:
-            kwargs.extend(config[args.command]["addopts"].split())
+            kwargs.extend(split(config[args.command]["addopts"]))
         if nbqa_config is None:
             nbqa_config = config[args.command].get("config")
         if not allow_mutation:
