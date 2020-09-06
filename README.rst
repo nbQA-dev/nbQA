@@ -71,7 +71,7 @@ where :code:`command` is any standard Python code quality tool.
 Examples
 --------
 
-Here's some examples of how :code:`nbQA` can reformat / find errors in your notebooks:
+Reformat your notebook with `black`_:
 
 .. code-block:: bash
 
@@ -80,15 +80,21 @@ Here's some examples of how :code:`nbQA` can reformat / find errors in your note
     All done! ✨ 🍰 ✨
     1 files reformatted.
 
+Sort your imports with `isort`_:
+
 .. code-block:: bash
 
     $ nbqa isort my_notebook.ipynb --treat-comment-as-code='# %%' --nbqa-mutate
     Fixing my_notebook.ipynb
 
+Check your type annotations with `mypy`_:
+
 .. code-block:: bash
 
     $ nbqa mypy my_notebook.ipynb --ignore-missing-imports
     my_notebook.ipynb:cell_10:5: error: Argument "num1" to "add" has incompatible type "str"; expected "int"
+
+Run your docstring tests with `doctest`_:
 
 .. code-block:: bash
 
