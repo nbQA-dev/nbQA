@@ -43,10 +43,7 @@ nbQA
         </a>
     </p>
 
-Adapter to run any standard code-quality tool on a Jupyter notebook.
-This is intended to be run as a `pre-commit`_ hook and/or during continuous integration.
-
-Documentation is hosted here_.
+Adapter to run any standard code-quality tool on a Jupyter notebook. Documentation is hosted here_.
 
 Installation
 ------------
