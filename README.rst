@@ -75,15 +75,15 @@ Check static type annotations:
 
 .. code-block:: bash
 
-    $ nbqa mypy tweet-sentiment-roberta-pytorch.ipynb --ignore-missing-imports
-    tweet-sentiment-roberta-pytorch.ipynb:cell_10:5: error: Argument "batch_size" to "get_test_loader" has incompatible type "str"; expected "int"
-    $ nbqa black tweet-sentiment-roberta-pytorch.ipynb --line-length=96 --nbqa-mutate
-    reformatted tweet-sentiment-roberta-pytorch.ipynb
+    $ nbqa mypy my_notebook.ipynb --ignore-missing-imports
+    my_notebook.ipynb:cell_10:5: error: Argument "batch_size" to "get_test_loader" has incompatible type "str"; expected "int"
+    $ nbqa black my_notebook.ipynb --line-length=96 --nbqa-mutate
+    reformatted my_notebook.ipynb
     All done! ✨ 🍰 ✨
     1 files reformatted.
-    $ nbqa isort tweet-sentiment-roberta-pytorch.ipynb --treat-comment-as-code='# %%' --nbqa-mutate
-    Fixing tweet-sentiment-roberta-pytorch.ipynb
-    $ nbqa doctest tweet-sentiment-roberta-pytorch.ipynb
+    $ nbqa isort my_notebook.ipynb --treat-comment-as-code='# %%' --nbqa-mutate
+    Fixing my_notebook.ipynb
+    $ nbqa doctest my_notebook.ipynb
 
 Configuration
 -------------
