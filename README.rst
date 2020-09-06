@@ -55,18 +55,7 @@ Install :code:`nbqa` with `pip`_:
 
 .. code-block:: bash
 
-    $ pip install nbqa
-
-Quickstart
-----------
-
-The general syntax is
-
-.. code-block:: bash
-
-    nbqa <command> <notebook or directory> <args>
-
-where :code:`command` is any standard Python code quality tool.
+    pip install -U nbqa
 
 Examples
 --------
@@ -124,10 +113,6 @@ Here's an example :code:`nbqa.ini` file - see `configuration`_ for more on confi
     mutate = 1
     addopts = --treat-comment-as-code '# %%%%'
 
-    [black]
-    config = pyproject.toml
-    mutate = 1
-
     [flake8]
     config = setup.cfg
 
@@ -152,11 +137,6 @@ could add to your :code:`.pre-commit-config.yaml` file:
         name: nbqa-isort
         alias: nbqa-isort
         additional_dependencies: ['isort']
-      - id: nbqa
-        args: ['mypy']
-        name: nbqa-mypy
-        alias: nbqa-mypy
-        additional_dependencies: ['mypy']
 
 Supported third party packages
 ------------------------------
@@ -175,16 +155,6 @@ Contributing
 ------------
 
 I will give write-access to anyone who contributes anything useful (e.g. pull request / bug report) - see the `contributing guide`_ for details on how to do so.
-
-See Also
---------
-
-Here are some other code quality tools for Jupyter Notebooks:
-
-- `flake8-nb`_ (apply `flake8`_ to notebook);
-- `nb_black`_ and `black-nb`_ (apply `black`_ to notebook);
-- `nbstripout`_ (clear notebook cells' outputs);
-- `jupyterlab_code_formatter`_ (Jupyter Lab plugin);
 
 .. _flake8: https://flake8.pycqa.org/en/latest/
 .. _black: https://black.readthedocs.io/en/stable/
