@@ -71,18 +71,21 @@ where :code:`command` is any standard Python code quality tool.
 Examples
 --------
 
-Check static type annotations:
+Here's some examples of how :code:`nbQA` can reformat / find errors in your notebooks:
 
 .. code-block:: bash
 
-    $ nbqa mypy my_notebook.ipynb --ignore-missing-imports
-    my_notebook.ipynb:cell_10:5: error: Argument "batch_size" to "get_test_loader" has incompatible type "str"; expected "int"
     $ nbqa black my_notebook.ipynb --line-length=96 --nbqa-mutate
     reformatted my_notebook.ipynb
     All done! ✨ 🍰 ✨
     1 files reformatted.
+
     $ nbqa isort my_notebook.ipynb --treat-comment-as-code='# %%' --nbqa-mutate
     Fixing my_notebook.ipynb
+
+    $ nbqa mypy my_notebook.ipynb --ignore-missing-imports
+    my_notebook.ipynb:cell_10:5: error: Argument "batch_size" to "get_test_loader" has incompatible type "str"; expected "int"
+
     $ nbqa doctest my_notebook.ipynb
 
 Configuration
