@@ -173,4 +173,4 @@ Here are some other code quality tools for Jupyter Notebooks:
 .. _pip: https://pip.pypa.io
 .. _nb_black: https://github.com/dnanhkhoa/nb_black
 .. _contributing guide: https://nbqa.readthedocs.io/en/latest/contributing.html
-.. _configuration: https://nbqa.readthedocs.io/en/latest/authors.html
+.. _configuration: https://nbqa.readthedocs.io/en/latest/configuration.html
