@@ -80,11 +80,17 @@ Here's some examples of how :code:`nbQA` can reformat / find errors in your note
     All done! ✨ 🍰 ✨
     1 files reformatted.
 
+.. code-block:: bash
+
     $ nbqa isort my_notebook.ipynb --treat-comment-as-code='# %%' --nbqa-mutate
     Fixing my_notebook.ipynb
 
+.. code-block:: bash
+
     $ nbqa mypy my_notebook.ipynb --ignore-missing-imports
     my_notebook.ipynb:cell_10:5: error: Argument "num1" to "add" has incompatible type "str"; expected "int"
+
+.. code-block:: bash
 
     $ nbqa doctest my_notebook.ipynb
     **********************************************************************
