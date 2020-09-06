@@ -57,6 +57,7 @@ def test_flake8_works(
         {path_0}:cell_1:1:1: F401 'os' imported but unused
         {path_0}:cell_1:3:1: F401 'glob' imported but unused
         {path_0}:cell_1:5:1: F401 'nbqa' imported but unused
+        {path_0}:cell_2:19:9: W291 trailing whitespace
         {path_1}:cell_1:1:1: F401 'os' imported but unused
         {path_1}:cell_1:3:1: F401 'glob' imported but unused
         {path_1}:cell_1:5:1: F401 'nbqa' imported but unused
