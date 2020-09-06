@@ -53,6 +53,8 @@ def test_black_works(
     expected = (
         "-    \"    return f'hello {name}'\\n\",\n"
         '+    "    return f\\"hello {name}\\"\\n",\n'
+        '-    "hello(3)   "\n'
+        '+    "hello(3)"\n'
     )
     assert result == expected
 

@@ -49,7 +49,7 @@ def main(python_file: "Path", notebook: "Path") -> None:
         # we take [1:] because the first cell is just '\n'
         return [
             j if not j.startswith(MAGIC) else j[len(MAGIC) :]
-            for j in f"\n{source.strip()}".splitlines(True)[1:]
+            for j in "\n{}".format(source.strip("\n")).splitlines(True)[1:]
         ]
 
     new_sources = (
