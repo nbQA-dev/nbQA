@@ -9,6 +9,7 @@ nbQA
    :caption: USER DOCS:
 
    readme
+   configuration
    authors
    history
 

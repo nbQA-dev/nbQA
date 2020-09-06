@@ -43,10 +43,7 @@ nbQA
         </a>
     </p>
 
-Adapter to run any code-quality tool on a Jupyter notebook.
-This is intended to be run as a `pre-commit`_ hook and/or during continuous integration.
-
-Documentation is hosted here_.
+Adapter to run any standard code-quality tool on a Jupyter notebook. Documentation is hosted here_.
 
 Installation
 ------------
@@ -55,97 +52,66 @@ Install :code:`nbqa` with `pip`_:
 
 .. code-block:: bash
 
-    $ pip install nbqa
-
-Quickstart
-----------
-
-The general syntax is
-
-.. code-block:: bash
-
-    nbqa <command> <notebook or directory> <args>
-
-where :code:`command` is any standard Python code quality tool.
+    pip install -U nbqa
 
 Examples
 --------
 
-Check static type annotations:
+Reformat your notebook with `black`_:
 
 .. code-block:: bash
 
-    $ nbqa mypy tweet-sentiment-roberta-pytorch.ipynb --ignore-missing-imports
-    tweet-sentiment-roberta-pytorch.ipynb:cell_10:5: error: Argument "batch_size" to "get_test_loader" has incompatible type "str"; expected "int"
-
-Check the examples in your docstrings are correct:
-
-.. code-block:: bash
-
-    $ nbqa doctest tweet-sentiment-roberta-pytorch.ipynb
-
-Format your notebooks using :code:`black`:
-
-.. code-block:: bash
-
-    $ nbqa black . --line-length=96 --nbqa-mutate
-    reformatted tweet-sentiment-roberta-pytorch.ipynb
+    $ nbqa black my_notebook.ipynb --line-length=96 --nbqa-mutate
+    reformatted my_notebook.ipynb
     All done! ✨ 🍰 ✨
     1 files reformatted.
+
+Sort your imports with `isort`_:
+
+.. code-block:: bash
+
+    $ nbqa isort my_notebook.ipynb --treat-comment-as-code='# %%' --nbqa-mutate
+    Fixing my_notebook.ipynb
+
+Check your type annotations with `mypy`_:
+
+.. code-block:: bash
+
+    $ nbqa mypy my_notebook.ipynb --ignore-missing-imports
+    my_notebook.ipynb:cell_10:5: error: Argument "num1" to "add" has incompatible type "str"; expected "int"
+
+Run your docstring tests with `doctest`_:
+
+.. code-block:: bash
+
+    $ nbqa doctest my_notebook.ipynb
+    **********************************************************************
+    File "my_notebook.ipynb", cell_2:11, in my_notebook.add
+    Failed example:
+        add(2, 2)
+    Expected:
+        4
+    Got:
+        5
+    **********************************************************************
+    1 items had failures:
+    1 of   2 in my_notebook.hello
+    ***Test Failed*** 1 failures.
 
 Configuration
 -------------
 
-You can configure :code:`nbQA` either at the command line, or by using a :code:`.nbqa.ini` file. We'll see some examples below.
-
-Extra flags
-~~~~~~~~~~~
-
-If you wish to pass extra flags (e.g. :code:`--ignore W503` to :code:`flake8`) you can either run
-
-.. code-block:: bash
-
-    nbqa flake8 my_notebook.ipynb --ignore W503
-
-or you can put the following in your :code:`.nbqa.ini` file
+Here's an example :code:`nbqa.ini` file - see `configuration`_ for more on configuration:
 
 .. code-block:: ini
+
+    [isort]
+    config = setup.cfg
+    mutate = 1
+    addopts = --treat-comment-as-code '# %%%%'
 
     [flake8]
-    addopts = --ignore W503
-
-Config file
-~~~~~~~~~~~
-
-If you already have a config file for your third-party tool (e.g. :code:`.mypy.ini` for :code:`mypy`), you can run
-
-.. code-block:: bash
-
-    nbqa mypy my_notebook.ipynb --nbqa-config .mypy.ini
-
-or you can put the following in your :code:`.nbqa.ini` file
-
-.. code-block:: ini
-
-    [mypy]
-    config = .mypy.ini
-
-Allow mutations
-~~~~~~~~~~~~~~~
-
-By default, :code:`nbQA` won't modify your notebooks. If you wish to let your third-party tool modify your notebooks, you can
-either pass the :code:`--nbqa-mutate` flag at the command-line, e.g.
-
-.. code-block:: bash
-
-    nbqa black my_notebook.ipynb --nbqa-mutate
-
-or you can put the following in your :code:`.nbqa.ini` file
-
-.. code-block:: ini
-
-    [black]
-    mutate = 1
+    config = setup.cfg
 
 Usage as pre-commit hook
 ------------------------
@@ -168,11 +134,6 @@ could add to your :code:`.pre-commit-config.yaml` file:
         name: nbqa-isort
         alias: nbqa-isort
         additional_dependencies: ['isort']
-      - id: nbqa
-        args: ['mypy']
-        name: nbqa-mypy
-        alias: nbqa-mypy
-        additional_dependencies: ['mypy']
 
 Supported third party packages
 ------------------------------
@@ -192,16 +153,6 @@ Contributing
 
 I will give write-access to anyone who contributes anything useful (e.g. pull request / bug report) - see the `contributing guide`_ for details on how to do so.
 
-See Also
---------
-
-Here are some other code quality tools for Jupyter Notebooks:
-
-- `flake8-nb`_ (apply `flake8`_ to notebook);
-- `nb_black`_ and `black-nb`_ (apply `black`_ to notebook);
-- `nbstripout`_ (clear notebook cells' outputs);
-- `jupyterlab_code_formatter`_ (Jupyter Lab plugin);
-
 .. _flake8: https://flake8.pycqa.org/en/latest/
 .. _black: https://black.readthedocs.io/en/stable/
 .. _isort: https://timothycrosley.github.io/isort/
@@ -216,3 +167,4 @@ Here are some other code quality tools for Jupyter Notebooks:
 .. _pip: https://pip.pypa.io
 .. _nb_black: https://github.com/dnanhkhoa/nb_black
 .. _contributing guide: https://nbqa.readthedocs.io/en/latest/contributing.html
+.. _configuration: https://nbqa.readthedocs.io/en/latest/configuration.html
