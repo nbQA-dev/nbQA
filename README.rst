@@ -84,17 +84,17 @@ Here's some examples of how :code:`nbQA` can reformat / find errors in your note
     Fixing my_notebook.ipynb
 
     $ nbqa mypy my_notebook.ipynb --ignore-missing-imports
-    my_notebook.ipynb:cell_10:5: error: Argument "batch_size" to "get_test_loader" has incompatible type "str"; expected "int"
+    my_notebook.ipynb:cell_10:5: error: Argument "num1" to "add" has incompatible type "str"; expected "int"
 
     $ nbqa doctest my_notebook.ipynb
     **********************************************************************
-    File "my_notebook.ipynb", cell_2:11, in my_notebook.hello
+    File "my_notebook.ipynb", cell_2:11, in my_notebook.add
     Failed example:
-        hello("goodbye")
+        add(2, 2)
     Expected:
-        'hello goodby'
+        4
     Got:
-        'hello goodbye'
+        5
     **********************************************************************
     1 items had failures:
     1 of   2 in my_notebook.hello
