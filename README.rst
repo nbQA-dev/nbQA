@@ -87,6 +87,18 @@ Here's some examples of how :code:`nbQA` can reformat / find errors in your note
     my_notebook.ipynb:cell_10:5: error: Argument "batch_size" to "get_test_loader" has incompatible type "str"; expected "int"
 
     $ nbqa doctest my_notebook.ipynb
+    **********************************************************************
+    File "my_notebook.ipynb", cell_2:11, in my_notebook.hello
+    Failed example:
+        hello("goodbye")
+    Expected:
+        'hello goodby'
+    Got:
+        'hello goodbye'
+    **********************************************************************
+    1 items had failures:
+    1 of   2 in my_notebook.hello
+    ***Test Failed*** 1 failures.
 
 Configuration
 -------------
