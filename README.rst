@@ -43,7 +43,7 @@ nbQA
         </a>
     </p>
 
-Adapter to run any code-quality tool on a Jupyter notebook.
+Adapter to run any standard code-quality tool on a Jupyter notebook.
 This is intended to be run as a `pre-commit`_ hook and/or during continuous integration.
 
 Documentation is hosted here_.
@@ -77,75 +77,32 @@ Check static type annotations:
 
     $ nbqa mypy tweet-sentiment-roberta-pytorch.ipynb --ignore-missing-imports
     tweet-sentiment-roberta-pytorch.ipynb:cell_10:5: error: Argument "batch_size" to "get_test_loader" has incompatible type "str"; expected "int"
-
-Check the examples in your docstrings are correct:
-
-.. code-block:: bash
-
-    $ nbqa doctest tweet-sentiment-roberta-pytorch.ipynb
-
-Format your notebooks using :code:`black`:
-
-.. code-block:: bash
-
-    $ nbqa black . --line-length=96 --nbqa-mutate
+    $ nbqa black tweet-sentiment-roberta-pytorch.ipynb --line-length=96 --nbqa-mutate
     reformatted tweet-sentiment-roberta-pytorch.ipynb
     All done! ✨ 🍰 ✨
     1 files reformatted.
+    $ nbqa isort tweet-sentiment-roberta-pytorch.ipynb --treat-comment-as-code='# %%' --nbqa-mutate
+    Fixing tweet-sentiment-roberta-pytorch.ipynb
+    $ nbqa doctest tweet-sentiment-roberta-pytorch.ipynb
 
 Configuration
 -------------
 
-You can configure :code:`nbQA` either at the command line, or by using a :code:`.nbqa.ini` file. We'll see some examples below.
-
-Extra flags
-~~~~~~~~~~~
-
-If you wish to pass extra flags (e.g. :code:`--ignore W503` to :code:`flake8`) you can either run
-
-.. code-block:: bash
-
-    nbqa flake8 my_notebook.ipynb --ignore W503
-
-or you can put the following in your :code:`.nbqa.ini` file
+Here's an example :code:`nbqa.ini` file - see `configuration`_ for more on configuration:
 
 .. code-block:: ini
 
-    [flake8]
-    addopts = --ignore W503
-
-Config file
-~~~~~~~~~~~
-
-If you already have a config file for your third-party tool (e.g. :code:`.mypy.ini` for :code:`mypy`), you can run
-
-.. code-block:: bash
-
-    nbqa mypy my_notebook.ipynb --nbqa-config .mypy.ini
-
-or you can put the following in your :code:`.nbqa.ini` file
-
-.. code-block:: ini
-
-    [mypy]
-    config = .mypy.ini
-
-Allow mutations
-~~~~~~~~~~~~~~~
-
-By default, :code:`nbQA` won't modify your notebooks. If you wish to let your third-party tool modify your notebooks, you can
-either pass the :code:`--nbqa-mutate` flag at the command-line, e.g.
-
-.. code-block:: bash
-
-    nbqa black my_notebook.ipynb --nbqa-mutate
-
-or you can put the following in your :code:`.nbqa.ini` file
-
-.. code-block:: ini
+    [isort]
+    config = setup.cfg
+    mutate = 1
+    addopts = --treat-comment-as-code '# %%%%'
 
     [black]
+    config = pyproject.toml
     mutate = 1
+
+    [flake8]
+    config = setup.cfg
 
 Usage as pre-commit hook
 ------------------------
@@ -216,3 +173,4 @@ Here are some other code quality tools for Jupyter Notebooks:
 .. _pip: https://pip.pypa.io
 .. _nb_black: https://github.com/dnanhkhoa/nb_black
 .. _contributing guide: https://nbqa.readthedocs.io/en/latest/contributing.html
+.. _configuration: https://nbqa.readthedocs.io/en/latest/authors.html
