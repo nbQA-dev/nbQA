@@ -425,7 +425,6 @@ def _run_command(
     arg = _get_arg(root_dir, tmpdirname, nb_to_py_mapping)
 
     before = _get_mtimes(arg)
-
     output = subprocess.run(
         ["python", "-m", command, str(arg), *kwargs],
         stderr=subprocess.PIPE,
@@ -520,7 +519,7 @@ def _run_on_one_root_dir(
         allow_mutation = _get_configs(args, kwargs, tmpdirname)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
-            cell_mapping = save_source.main(notebook, temp_python_file)
+            cell_mapping = save_source.main(notebook, temp_python_file, args.command)
             cell_mappings[notebook] = cell_mapping
             _create_blank_init_files(notebook, tmpdirname)
 
@@ -546,7 +545,7 @@ def _run_on_one_root_dir(
                     )
                 )
             if mutated:
-                replace_source.main(temp_python_file, notebook)
+                replace_source.main(temp_python_file, notebook, args.command)
 
         sys.stdout.write(out)
         sys.stderr.write(err)

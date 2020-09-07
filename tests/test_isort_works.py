@@ -86,7 +86,14 @@ def test_isort_initial_md(
     assert err == expected_err
 
 
-def test_isort_separated_imports(capsys: "CaptureFixture") -> None:
+@pytest.mark.parametrize(
+    "notebook",
+    [
+        "notebook_with_separated_imports.ipynb",
+        "notebook_with_separated_imports_other.ipynb",
+    ],
+)
+def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> None:
     """
     Check isort works when a notebook has imports in different cells.
 
@@ -109,9 +116,7 @@ def test_isort_separated_imports(capsys: "CaptureFixture") -> None:
             )
         )
 
-    path = os.path.abspath(
-        os.path.join("tests", "data", "notebook_with_separated_imports.ipynb")
-    )
+    path = os.path.abspath(os.path.join("tests", "data", notebook))
     with pytest.raises(SystemExit):
         main(["isort", path, "--nbqa-mutate"])
 
