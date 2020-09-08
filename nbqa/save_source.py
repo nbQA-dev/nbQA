@@ -15,6 +15,30 @@ MAGIC = "# NBQAMAGIC"
 BLANK_SPACES = {"isort": "\n"}
 
 
+def _replace_magics(source: List[str]) -> Iterator[str]:
+    """
+    Comment out lines with magic commands.
+
+    If it's a script/bash cell, comment out the entire cell.
+
+    Parameters
+    ----------
+    source
+        Source from notebook cell.
+
+    Yields
+    ------
+    str
+        Line from cell, possibly commented out.
+    """
+    bash_cell = source and any(source[0].startswith(i) for i in ("%%script", "%%bash"))
+    for j in source:
+        if (j.startswith("!") or j.startswith("%")) or bash_cell:
+            yield f"{MAGIC}{j}"
+        else:
+            yield j
+
+
 def main(notebook: "Path", temp_python_file: "Path", command: str) -> Dict[int, str]:
     """
     Extract code cells from notebook and save them in temporary Python file.
@@ -42,31 +66,6 @@ def main(notebook: "Path", temp_python_file: "Path", command: str) -> Dict[int, 
     cell_mapping = {}
     line_number = 0
     cell_number = 0
-
-    def _replace_magics(source: List[str]) -> Iterator[str]:
-        """
-        Comment out lines with magic commands.
-
-        If it's a script/bash cell, comment out the entire cell.
-
-        Parameters
-        ----------
-        source
-            Source from notebook cell.
-
-        Yields
-        ------
-        str
-            Line from cell, possibly commented out.
-        """
-        bash_cell = source and any(
-            source[0].startswith(i) for i in ("%%script", "%%bash")
-        )
-        for j in source:
-            if (j.startswith("!") or j.startswith("%")) or bash_cell:
-                yield f"{MAGIC}{j}"
-            else:
-                yield j
 
     blank_lines = BLANK_SPACES.get(command, "\n\n")
 
