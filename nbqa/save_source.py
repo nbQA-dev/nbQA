@@ -25,6 +25,8 @@ def main(notebook: "Path", temp_python_file: "Path", command: str) -> Dict[int, 
         Jupyter Notebook third-party tool is being run against.
     temp_python_file
         Temporary Python file to save converted notebook in.
+    command
+        Third party tool which you're running on your notebook.
 
     Returns
     -------
