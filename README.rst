@@ -35,7 +35,7 @@ nbQA
 .. image:: https://img.shields.io/badge/pylint-10/10-brightgreen.svg
    :target: https://github.com/PyCQA/pylint
 
-.. image:: https://img.shields.io/pypi/dm/tqdm.svg?label=pypi%20downloads&logo=PyPI&logoColor=white
+.. image:: https://img.shields.io/pypi/dm/nbqa.svg?label=pypi%20downloads&logo=PyPI&logoColor=white
    :target: https://pypistats.org/packages/nbqa
 
 .. raw:: html
