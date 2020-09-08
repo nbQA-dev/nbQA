@@ -5,6 +5,7 @@ Markdown cells, output, and metadata are ignored.
 """
 
 import json
+from collections import defaultdict
 from typing import TYPE_CHECKING, Dict, Iterator, List
 
 if TYPE_CHECKING:
@@ -12,7 +13,8 @@ if TYPE_CHECKING:
 
 CODE_SEPARATOR = "# %%"
 MAGIC = "# NBQAMAGIC"
-BLANK_SPACES = {"isort": "\n"}
+BLANK_SPACES = defaultdict(lambda: "\n\n")
+BLANK_SPACES["isort"] = "\n"
 
 
 def _replace_magics(source: List[str]) -> Iterator[str]:
@@ -67,13 +69,11 @@ def main(notebook: "Path", temp_python_file: "Path", command: str) -> Dict[int, 
     line_number = 0
     cell_number = 0
 
-    blank_lines = BLANK_SPACES.get(command, "\n\n")
-
     for i in cells:
         if i["cell_type"] != "code":
             continue
         source = _replace_magics(i["source"])
-        parsed_cell = f"{blank_lines}{CODE_SEPARATOR}\n{''.join(source)}\n"
+        parsed_cell = f"{BLANK_SPACES[command]}{CODE_SEPARATOR}\n{''.join(source)}\n"
         result.append(parsed_cell)
         split_parsed_cell = parsed_cell.splitlines()
         mapping = {
@@ -85,6 +85,6 @@ def main(notebook: "Path", temp_python_file: "Path", command: str) -> Dict[int, 
         cell_number += 1
 
     with open(str(temp_python_file), "w") as handle:
-        handle.write("".join(result)[len(blank_lines) : -len("\n")])
+        handle.write("".join(result)[len(BLANK_SPACES[command]) : -len("\n")])
 
     return cell_mapping
