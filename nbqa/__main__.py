@@ -546,7 +546,7 @@ def _run_on_one_root_dir(
                     )
                 )
             if mutated:
-                replace_source.main(temp_python_file, notebook, args.command)
+                replace_source.main(temp_python_file, notebook)
 
         sys.stdout.write(out)
         sys.stderr.write(err)

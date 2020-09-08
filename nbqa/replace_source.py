@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-def main(python_file: "Path", notebook: "Path", command: str) -> None:
+def main(python_file: "Path", notebook: "Path") -> None:
     """
     Replace :code:`source` code cells of original notebook.
 
