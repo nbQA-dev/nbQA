@@ -1,41 +1,43 @@
+default_language_version:
+  # force all unspecified python hooks to run python3
+  python: python3
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.1.0
     hooks:
-    -   id: end-of-file-fixer
-    -   id: requirements-txt-fixer
-    -   id: trailing-whitespace
-    -   id: debug-statements
--   repo: https://github.com/python/black
+      - id: end-of-file-fixer
+      - id: requirements-txt-fixer
+      - id: trailing-whitespace
+      - id: debug-statements
+  - repo: https://github.com/python/black
     rev: 20.8b1
     hooks:
-    -   id: black
-        language_version: python3
--   repo: https://gitlab.com/pycqa/flake8
+      - id: black
+  - repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.3
     hooks:
-    -   id: flake8
--   repo: https://github.com/timothycrosley/isort
+      - id: flake8
+  - repo: https://github.com/timothycrosley/isort
     rev: 5.0.9
     hooks:
-    -   id: isort
--   repo: https://github.com/pre-commit/mirrors-mypy
+      - id: isort
+  - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v0.782
     hooks:
-    -   id: mypy
--   repo: https://github.com/PyCQA/pydocstyle
+      - id: mypy
+  - repo: https://github.com/PyCQA/pydocstyle
     rev: 5.0.2
     hooks:
-    -   id: pydocstyle
-        exclude: 'docs'
--   repo: https://github.com/econchick/interrogate
+      - id: pydocstyle
+        exclude: "docs"
+  - repo: https://github.com/econchick/interrogate
     rev: 1.2.0
     hooks:
-    -   id: interrogate
+      - id: interrogate
         args: [-v, --fail-under=100]
         exclude: (docs|__init__.py)
--   repo: https://github.com/pre-commit/mirrors-mypy
+  - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v0.782
     hooks:
-    -   id: mypy
-        exclude: 'docs'
+      - id: mypy
+        exclude: "docs"
