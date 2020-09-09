@@ -11,7 +11,7 @@ import tempfile
 from pathlib import Path
 from shlex import split
 from textwrap import dedent
-from typing import Dict, Iterator, List, Optional, Set, Tuple
+from typing import Dict, Iterator, List, Match, Optional, Set, Tuple
 
 from nbqa import __version__, replace_source, save_source
 
@@ -218,7 +218,7 @@ def _map_python_line_to_nb_lines(
     """
     pattern = rf"(?<={notebook.name}:)\d+"
 
-    def substitution(match: "re.Match") -> str:
+    def substitution(match: Match[str]) -> str:
         """Replace Python line with corresponding Jupyter notebook cell."""
         return str(cell_mapping[int(match.group())])
 
