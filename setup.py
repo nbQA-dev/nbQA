@@ -1,17 +1,11 @@
 #!/usr/bin/env python
 
-# pylint: disable=line-too-long
-
 """The setup script."""
+from pathlib import Path
 
 from setuptools import find_packages, setup
 
-with open("README.rst", encoding="utf8") as readme_file:
-    readme = readme_file.read()
-    readme = readme.replace(
-        '.. raw:: html\n\n    <p align="center">\n        <a href="#readme">\n            <img alt="demo" src="https://raw.githubusercontent.com/nbQA-dev/nbQA-demo/master/demo.gif">\n        </a>\n    </p>\n\n',  # noqa
-        "",
-    )
+readme = Path("README.md").read_text(encoding="utf8")
 
 requirements = []
 
@@ -38,7 +32,7 @@ setup(
     install_requires=requirements,
     license="MIT license",
     long_description=readme,
-    long_description_content_type="text/x-rst",
+    long_description_content_type="text/markdown",
     include_package_data=True,
     keywords="nbqa",
     name="nbqa",

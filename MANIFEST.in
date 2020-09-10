@@ -1,5 +1,5 @@
 include LICENSE
-include README.rst
+include README.md
 
 recursive-exclude tests *
 recursive-exclude * __pycache__
