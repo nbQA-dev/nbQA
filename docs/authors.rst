@@ -2,13 +2,10 @@
 Credits
 =======
 
-Development Lead
-----------------
+Authors (in chronological order of first contribution)
+------------------------------------------------------
 
-* Marco Gorelli
-
-Contributors
-------------
-
-- s-weigand
+- MarcoGorelli (Marco Gorelli)
+- s-weigand (Sebastian Weigand)
 - fcatus
+- girip11 (Girish Pasupathy)
