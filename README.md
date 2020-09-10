@@ -13,6 +13,7 @@
 [![image](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![image](https://img.shields.io/badge/pylint-10/10-brightgreen.svg)](https://github.com/PyCQA/pylint)
 [![image](https://img.shields.io/pypi/dm/nbqa.svg?label=pypi%20downloads&logo=PyPI&logoColor=white)](https://pypistats.org/packages/nbqa)
+[![All Contributors](https://img.shields.io/github/all-contributors/nbQA-dev/nbQA)](#contributors)
 
 <p align="center">
     <a href="#readme">
