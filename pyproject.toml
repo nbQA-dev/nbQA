@@ -1,3 +1,6 @@
 [tool.interrogate]
 ignore-init-method = true
 fail-under = 100
+
+[tool.isort]
+profile = "black"
