@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# pylint: disable=line-too-long
+
 """The setup script."""
 
 from setuptools import find_packages, setup
