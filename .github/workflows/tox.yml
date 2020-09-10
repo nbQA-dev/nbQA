@@ -9,23 +9,23 @@ jobs:
   tox:
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8']
+        python-version: ["3.6", "3.7", "3.8"]
         os: [windows-latest, ubuntu-18.04]
 
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: install-tox
-      run: python -m pip install --upgrade tox virtualenv setuptools pip
-    - name: run-tox
-      run: tox -e py
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
-      if: matrix.python-version == '3.8' && matrix.os == 'ubuntu-18.04'
-      with:
-        env_vars: OS,PYTHON
-        name: codecov-umbrella
-        fail_ci_if_error: true
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: install-tox
+        run: python -m pip install --upgrade tox virtualenv setuptools pip
+      - name: run-tox
+        run: tox -e py
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        if: matrix.python-version == '3.8' && matrix.os == 'ubuntu-18.04'
+        with:
+          env_vars: OS,PYTHON
+          name: codecov-umbrella
+          fail_ci_if_error: true
