@@ -13,6 +13,10 @@ repos:
     rev: 20.8b1
     hooks:
       - id: black
+  - repo: https://github.com/prettier/prettier
+    rev: 2.1.1
+    hooks:
+      - id: prettier
   - repo: https://github.com/pycqa/pylint
     rev: pylint-2.6.0
     hooks:
