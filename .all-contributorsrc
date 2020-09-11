@@ -1,0 +1,28 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "MarcoGorelli",
+      "name": "Marco Gorelli",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/33491632?v=4",
+      "profile": "https://github.com/MarcoGorelli",
+      "contributions": [
+        "code",
+        "maintenance",
+        "review",
+        "test",
+        "ideas"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "nbQA",
+  "projectOwner": "nbQA-dev",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
