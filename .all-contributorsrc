@@ -17,6 +17,15 @@
         "test",
         "ideas"
       ]
+    },
+    {
+      "login": "s-weigand",
+      "name": "Sebastian Weigand",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/9513634?v=4",
+      "profile": "https://github.com/s-weigand",
+      "contributions": [
+        "tool"
+      ]
     }
   ],
   "contributorsPerLine": 7,
