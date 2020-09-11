@@ -4,3 +4,18 @@ fail-under = 100
 
 [tool.isort]
 profile = "black"
+
+[tool.coverage.run]
+source = ["nbqa"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: nocover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    ]
+ignore_errors = true
+omit = [
+    "tests/*",
+    ]
