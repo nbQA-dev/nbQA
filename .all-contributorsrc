@@ -37,6 +37,15 @@
         "code",
         "infra"
       ]
+    },
+    {
+      "login": "fcatus",
+      "name": "fcatus",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/56323389?v=4",
+      "profile": "https://github.com/fcatus",
+      "contributions": [
+        "infra"
+      ]
     }
   ],
   "contributorsPerLine": 7,
