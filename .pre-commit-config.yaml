@@ -17,6 +17,7 @@ repos:
     rev: 2.1.1
     hooks:
       - id: prettier
+        exclude: README.md
   - repo: https://github.com/pycqa/pylint
     rev: pylint-2.6.0
     hooks:
