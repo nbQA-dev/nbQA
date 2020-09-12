@@ -131,7 +131,6 @@ def _temp_python_file_for_notebook(
         .with_suffix(".py")
     )
     temp_python_file.parent.mkdir(parents=True, exist_ok=True)
-    # OK, this is correct
     return temp_python_file
 
 
