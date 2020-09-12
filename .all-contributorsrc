@@ -46,6 +46,15 @@
       "contributions": [
         "infra"
       ]
+    },
+    {
+      "login": "HD23me",
+      "name": "HD23me",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/68745664?v=4",
+      "profile": "https://github.com/HD23me",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
