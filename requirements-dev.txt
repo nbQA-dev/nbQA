@@ -3,4 +3,5 @@ coverage[toml]
 flake8
 isort>=5.4.2
 mypy
+pylint
 pytest

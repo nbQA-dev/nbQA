@@ -25,7 +25,9 @@
       "profile": "https://github.com/s-weigand",
       "contributions": [
         "tool",
-        "review"
+        "review",
+        "doc",
+        "ideas"
       ]
     },
     {
@@ -35,7 +37,9 @@
       "profile": "https://github.com/girip11",
       "contributions": [
         "code",
-        "infra"
+        "infra",
+        "bug",
+        "review"
       ]
     },
     {
@@ -45,6 +49,15 @@
       "profile": "https://github.com/fcatus",
       "contributions": [
         "infra"
+      ]
+    },
+    {
+      "login": "HD23me",
+      "name": "HD23me",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/68745664?v=4",
+      "profile": "https://github.com/HD23me",
+      "contributions": [
+        "bug"
       ]
     }
   ],
