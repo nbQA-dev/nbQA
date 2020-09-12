@@ -29,9 +29,9 @@ def test_running_in_different_dir_works(arg: Path, cwd: Path) -> None:
         handle.write(
             dedent(
                 """\
-            [flake8]
-            addopts = --ignore=F401 \
-            """
+                [flake8]
+                addopts = --ignore=F401 \
+                """
             )
         )
 
