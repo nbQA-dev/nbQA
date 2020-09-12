@@ -1,6 +1,6 @@
 [tool.interrogate]
-ignore-init-method = true
 fail-under = 100
+ignore-init-method = true
 
 [tool.isort]
 profile = "black"
@@ -10,20 +10,19 @@ source = ["nbqa"]
 
 [tool.coverage.report]
 exclude_lines = [
-    "pragma: nocover",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
-    "if TYPE_CHECKING:",
-    ]
+  "pragma: nocover",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
 ignore_errors = true
 omit = [
-    "tests/*",
-    ]
+  "tests/*",
+]
 
 [tool.pylint.messages_control]
-disable =[
-    "C0330",  # to work well with `black`
-    "R0801",  # Unfortunately I do need some duplication, e.g. with imports
-    "W1510",  # I need to run subprocess.run without check because it's OK if it fails
-    "E0401",  # import error: I run pylint in a separate environment so it's OK
-    ]
+disable = [
+  "C0330", # to work well with `black`
+  "R0801", # Unfortunately I do need some duplication, e.g. with imports
+  "W1510", # I need to run subprocess.run without check because it's OK if it fails
+]

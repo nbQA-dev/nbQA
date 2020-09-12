@@ -11,4 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
+      # This is required since pylint is used in pre-commit as a local hook
+      - name: install-pylint
+        run: python -m pip install --upgrade pip pylint
       - uses: pre-commit/action@v2.0.0
