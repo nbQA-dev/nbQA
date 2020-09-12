@@ -67,6 +67,11 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
         required=False,
         help="Config file for third-party tool (e.g. `setup.cfg`)",
     )
+    parser.add_argument(
+        "--nbqa-magic",
+        required=False,
+        help="Config file for third-party tool (e.g. `setup.cfg`)",
+    )
     parser.add_argument("--version", action="version", version=f"nbQA {__version__}")
     try:
         args, kwargs = parser.parse_known_args(raw_args)
