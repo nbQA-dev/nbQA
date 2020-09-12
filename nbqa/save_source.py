@@ -6,7 +6,7 @@ Markdown cells, output, and metadata are ignored.
 
 import json
 from collections import defaultdict
-from typing import TYPE_CHECKING, Dict, Iterator, List
+from typing import TYPE_CHECKING, Dict, Iterator, List, Optional
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -18,7 +18,7 @@ BLANK_SPACES["isort"] = "\n"
 MAGIC = ["%%script", "%%bash"]
 
 
-def _replace_magics(source: List[str], magic) -> Iterator[str]:
+def _replace_magics(source: List[str], magic: Optional[str]) -> Iterator[str]:
     """
     Comment out lines with magic commands.
 
@@ -47,7 +47,7 @@ def _replace_magics(source: List[str], magic) -> Iterator[str]:
 
 
 def main(
-    notebook: "Path", temp_python_file: "Path", command: str, magic
+    notebook: "Path", temp_python_file: "Path", command: str, magic: Optional[str]
 ) -> Dict[int, str]:
     """
     Extract code cells from notebook and save them in temporary Python file.
@@ -83,11 +83,12 @@ def main(
         parsed_cell = f"{BLANK_SPACES[command]}{CODE_SEPARATOR}\n{''.join(source)}\n"
         result.append(parsed_cell)
         split_parsed_cell = parsed_cell.splitlines()
-        mapping = {
-            j + line_number + 1: f"cell_{cell_number+1}:{j}"
-            for j in range(len(split_parsed_cell))
-        }
-        cell_mapping.update(mapping)
+        cell_mapping.update(
+            {
+                j + line_number + 1: f"cell_{cell_number+1}:{j}"
+                for j in range(len(split_parsed_cell))
+            }
+        )
         line_number += len(split_parsed_cell)
         cell_number += 1
 

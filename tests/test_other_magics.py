@@ -1,10 +1,14 @@
 """Check user can check for other magics."""
 import os
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
 from nbqa.__main__ import main
+
+if TYPE_CHECKING:
+    from _pytest.capture import CaptureFixture
 
 
 @pytest.mark.parametrize(
@@ -14,7 +18,8 @@ from nbqa.__main__ import main
         ("--nbqa-magic=%%custommagic,%%anothercustommagic", ""),
     ],
 )
-def test_cli(magic, expected, capsys):
+def test_cli(magic: str, expected: str, capsys: "CaptureFixture") -> None:
+    """Check that we can ignore extra cell magics via the CLI."""
     path = Path("tests") / "data/notebook_with_other_magics.ipynb"
 
     with pytest.raises(SystemExit):
@@ -23,5 +28,4 @@ def test_cli(magic, expected, capsys):
     out, _ = capsys.readouterr()
     if expected:
         expected = f"{str(path.resolve())}:{expected}{os.linesep}"
-    breakpoint()
     assert out == expected
