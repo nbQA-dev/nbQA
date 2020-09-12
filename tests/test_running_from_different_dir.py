@@ -1,18 +1,9 @@
 """Check configs from :code:`.nbqa.ini` are picked up."""
-
-import difflib
-import os
 import subprocess
 from pathlib import Path
 from textwrap import dedent
-from typing import TYPE_CHECKING
 
 import pytest
-
-from nbqa.__main__ import main
-
-if TYPE_CHECKING:
-    from _pytest.capture import CaptureFixture
 
 
 @pytest.mark.parametrize(
@@ -23,7 +14,7 @@ if TYPE_CHECKING:
         ("notebook_for_testing.ipynb", Path.cwd() / "tests/data"),
     ],
 )
-def test_running_in_different_dir_works(arg: Path, cwd) -> None:
+def test_running_in_different_dir_works(arg: Path, cwd: Path) -> None:
     """
     Check .nbqa.ini config is picked up works.
 

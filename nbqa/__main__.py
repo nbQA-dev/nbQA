@@ -16,8 +16,6 @@ from typing import Dict, Iterator, List, Match, Optional, Set, Tuple
 from nbqa import __version__, replace_source, save_source
 from nbqa.find_root import find_project_root
 
-def get_project_root(root_dirs):
-    return find_project_root(tuple(root_dirs))
 
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
     """
@@ -106,7 +104,9 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
     return notebooks
 
 
-def _temp_python_file_for_notebook(notebook: Path, tmpdir: str, project_root) -> Path:
+def _temp_python_file_for_notebook(
+    notebook: Path, tmpdir: str, project_root: Path
+) -> Path:
     """
     Get temporary file to save converted notebook into.
 
@@ -273,7 +273,9 @@ def _replace_temp_python_file_references_in_out_err(
     return out, err
 
 
-def _create_blank_init_files(notebook: Path, tmpdirname: str, project_root) -> None:
+def _create_blank_init_files(
+    notebook: Path, tmpdirname: str, project_root: Path
+) -> None:
     """
     Replicate local (possibly blank) __init__ files to temporary directory.
 
@@ -296,7 +298,9 @@ def _create_blank_init_files(notebook: Path, tmpdirname: str, project_root) -> N
             break  # Only need to copy one __init__ file.
 
 
-def _preserve_config_files(nbqa_config: Optional[str], tmpdirname: str, project_root) -> None:
+def _preserve_config_files(
+    nbqa_config: Optional[str], tmpdirname: str, project_root: Path
+) -> None:
     """
     Copy local config file to temporary directory.
 
@@ -323,7 +327,10 @@ def _preserve_config_files(nbqa_config: Optional[str], tmpdirname: str, project_
 
 
 def _get_arg(
-    root_dir: str, tmpdirname: str, nb_to_py_mapping: Dict[Path, Path], project_root
+    root_dir: str,
+    tmpdirname: str,
+    nb_to_py_mapping: Dict[Path, Path],
+    project_root: Path,
 ) -> Path:
     """
     Get argument to run command against.
@@ -388,11 +395,9 @@ def _get_mtimes(arg: Path) -> Set[float]:
 
 def _run_command(
     command: str,
-    root_dir: str,
     tmpdirname: str,
-    nb_to_py_mapping: Dict[Path, Path],
     kwargs: List[str],
-    project_root
+    arg: Path,
 ) -> Tuple[str, str, int, bool]:
     """
     Run third-party tool against given file or directory.
@@ -428,7 +433,6 @@ def _run_command(
     """
     env = os.environ.copy()
     env["PYTHONPATH"] = os.getcwd()
-    arg = _get_arg(root_dir, tmpdirname, nb_to_py_mapping, project_root)
 
     before = _get_mtimes(arg)
 
@@ -458,7 +462,7 @@ def _run_command(
 
 
 def _get_configs(
-    args: argparse.Namespace, kwargs: List[str], tmpdirname: str, project_root
+    args: argparse.Namespace, kwargs: List[str], tmpdirname: str, project_root: Path
 ) -> Tuple[bool, bool]:
     """
     Deal with extra configs for 3rd party tool.
@@ -514,7 +518,7 @@ def _run_on_one_root_dir(
         Output code from third-party tool.
     """
     notebooks = _get_notebooks(root_dir)
-    project_root = get_project_root(args.root_dirs)
+    project_root = find_project_root(tuple(args.root_dirs))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
 
@@ -527,12 +531,16 @@ def _run_on_one_root_dir(
         allow_mutation = _get_configs(args, kwargs, tmpdirname, project_root)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
-            cell_mapping = save_source.main(notebook, temp_python_file, args.command)
-            cell_mappings[notebook] = cell_mapping
+            cell_mappings[notebook] = save_source.main(
+                notebook, temp_python_file, args.command
+            )
             _create_blank_init_files(notebook, tmpdirname, project_root)
 
         out, err, output_code, mutated = _run_command(
-            args.command, root_dir, tmpdirname, nb_to_py_mapping, kwargs, project_root
+            args.command,
+            tmpdirname,
+            kwargs,
+            _get_arg(root_dir, tmpdirname, nb_to_py_mapping, project_root),
         )
 
         for notebook, temp_python_file in nb_to_py_mapping.items():

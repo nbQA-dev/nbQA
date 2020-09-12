@@ -1,10 +1,19 @@
-from pathlib import Path
+"""
+Find project root.
+
+Taken from https://github.com/psf/black/blob/master/src/black/__init__.py
+"""
+
 from functools import lru_cache
+from pathlib import Path
 from typing import Iterable
+
 
 @lru_cache()
 def find_project_root(srcs: Iterable[str]) -> Path:
-    """Return a directory containing .git, .hg, or pyproject.toml.
+    """
+    Return a directory containing .git, .hg, or nbqa.ini.
+
     That directory will be a common parent of all files and directories
     passed in `srcs`.
     If no directory in the tree contains a marker that would specify it's the
@@ -36,4 +45,4 @@ def find_project_root(srcs: Iterable[str]) -> Path:
         if (directory / ".nbqa.ini").is_file():
             return directory
 
-    return directory
+    return Path("/").resolve()
