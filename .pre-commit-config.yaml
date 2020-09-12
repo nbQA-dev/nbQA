@@ -27,6 +27,8 @@ repos:
         types: [python]
         require_serial: true
         exclude: "docs"
+        args:
+          - "--rcfile=pyproject.toml"
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.3
     hooks:
