@@ -12,12 +12,13 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 CODE_SEPARATOR = "# %%"
-MAGIC = "# NBQAMAGIC"
+MAGIC_SEPARATOR = "# NBQAMAGIC"
 BLANK_SPACES = defaultdict(lambda: "\n\n")
 BLANK_SPACES["isort"] = "\n"
+MAGIC = ["%%script", "%%bash"]
 
 
-def _replace_magics(source: List[str]) -> Iterator[str]:
+def _replace_magics(source: List[str], magic) -> Iterator[str]:
     """
     Comment out lines with magic commands.
 
@@ -33,15 +34,21 @@ def _replace_magics(source: List[str]) -> Iterator[str]:
     str
         Line from cell, possibly commented out.
     """
-    bash_cell = source and any(source[0].startswith(i) for i in ("%%script", "%%bash"))
+    if magic is not None:
+        all_magic = MAGIC + magic.split(",")
+    else:
+        all_magic = MAGIC
+    magic_cell = source and any(source[0].startswith(i) for i in all_magic)
     for j in source:
-        if (j.startswith("!") or j.startswith("%")) or bash_cell:
-            yield f"{MAGIC}{j}"
+        if (j.startswith("!") or j.startswith("%")) or magic_cell:
+            yield f"{MAGIC_SEPARATOR}{j}"
         else:
             yield j
 
 
-def main(notebook: "Path", temp_python_file: "Path", command: str) -> Dict[int, str]:
+def main(
+    notebook: "Path", temp_python_file: "Path", command: str, magic
+) -> Dict[int, str]:
     """
     Extract code cells from notebook and save them in temporary Python file.
 
@@ -72,7 +79,7 @@ def main(notebook: "Path", temp_python_file: "Path", command: str) -> Dict[int, 
     for i in cells:
         if i["cell_type"] != "code":
             continue
-        source = _replace_magics(i["source"])
+        source = _replace_magics(i["source"], magic)
         parsed_cell = f"{BLANK_SPACES[command]}{CODE_SEPARATOR}\n{''.join(source)}\n"
         result.append(parsed_cell)
         split_parsed_cell = parsed_cell.splitlines()

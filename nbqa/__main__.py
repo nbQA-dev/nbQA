@@ -525,7 +525,9 @@ def _run_on_one_root_dir(
         allow_mutation = _get_configs(args, kwargs, tmpdirname)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
-            cell_mapping = save_source.main(notebook, temp_python_file, args.command)
+            cell_mapping = save_source.main(
+                notebook, temp_python_file, args.command, args.nbqa_magic
+            )
             cell_mappings[notebook] = cell_mapping
             _create_blank_init_files(notebook, tmpdirname)
 
