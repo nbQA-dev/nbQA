@@ -1,4 +1,4 @@
-"""Check configs from :code:`.nbqa.ini` are picked up."""
+"""Check configs are picked up when running in different directory."""
 import subprocess
 from pathlib import Path
 from textwrap import dedent
@@ -16,14 +16,14 @@ import pytest
 )
 def test_running_in_different_dir_works(arg: Path, cwd: Path) -> None:
     """
-    Check .nbqa.ini config is picked up works.
+    Check .nbqa.ini config is picked up when running from non-root directory.
 
     Parameters
     ----------
-    tmp_notebook_for_testing
-        Temporary copy of :code:`notebook_for_testing.ipynb`.
-    capsys
-        Pytest fixture to capture stdout and stderr.
+    arg
+        Directory or notebook to run command on.
+    cwd
+        Directory from which to run command.
     """
     with open(".nbqa.ini", "w") as handle:
         handle.write(

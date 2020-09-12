@@ -116,6 +116,8 @@ def _temp_python_file_for_notebook(
         Notebook that third-party tool will be run on.
     tmpdir
         Temporary directory where converted notebooks will be saved.
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
 
     Returns
     -------
@@ -284,6 +286,8 @@ def _create_blank_init_files(
         Notebook third-party tool is being run against.
     tmpdirname
         Temporary directory to store converted notebooks in.
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
     """
     parts = notebook.resolve().relative_to(project_root).parts
 
@@ -309,6 +313,8 @@ def _preserve_config_files(
         Config file for third-party tool (e.g. mypy).
     tmpdirname
         Temporary directory to store converted notebooks in.
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
     """
     if nbqa_config is None:
         return
@@ -347,6 +353,8 @@ def _get_arg(
         Temporary directory where converted notebooks are stored.
     nb_to_py_mapping
         Mapping between notebooks and Python files corresponding to converted notebooks.
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
 
     Returns
     -------
@@ -405,14 +413,12 @@ def _run_command(
     ----------
     command
         Third-party tool (e.g. :code:`mypy`) to run against notebook.
-    root_dir
-        Notebook or directory to run third-party tool on.
     tmpdirname
         Temporary directory where converted notebooks will be stored.
-    nb_to_py_mapping
-        Mapping between notebooks and Python files corresponding to converted notebooks.
     kwargs
         Flags to pass to third-party tool (e.g. :code:`--verbose`).
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
 
     Returns
     -------
@@ -474,6 +480,8 @@ def _get_configs(
         Extra flags for third party tool
     tmpdirname
         Temporary directory where notebooks are copied to.
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
 
     Returns
     -------
