@@ -18,6 +18,7 @@ exclude_lines = [
 ignore_errors = true
 omit = [
     "tests/*",
+    "nbqa/find_root.py"  # This is taken directly from `black` so I'll trust it
     ]
 
 [tool.pylint.messages_control]
