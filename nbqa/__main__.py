@@ -87,12 +87,9 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
         "--nbqa-ignore-cells",
         required=False,
         help=dedent(
-            """
+            r"""
             Ignore cells whose first line starts with this. You can pass multiple options,
-            e.g.
-
-                nbqa black my_notebook.ipynb --nbqa-ignore-cells %%cython,%%html
-
+            e.g. `nbqa black my_notebook.ipynb --nbqa-ignore-cells %%%%cython,%%%%html`
             by placing commas between them.
             """
         ),

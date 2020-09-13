@@ -51,3 +51,20 @@ or you can put the following in your :code:`.nbqa.ini` file
 
     [black]
     mutate = 1
+
+Ignore cells
+~~~~~~~~~~~~
+
+By default, :code:`nbQA` will ignore line magics (e.g. :code:`%matplotlib inline`), and :code:`%%bash` and :code:`%%script` cell magics.
+To ignore extra cells, you can use the :code:`--nbqa-ignore-cells` CLI argument, e.g.
+
+.. code-block:: bash
+
+    nbqa black my_notebook.ipynb --nbqa-ignore-cells %%html,%%cython
+
+, or the :code:`ignore_cells` option in your :code:`.nbqa.ini` file, e.g.
+
+.. code-block:: ini
+
+    [black]
+    ignore_cells = 1

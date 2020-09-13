@@ -43,7 +43,7 @@ def test_cli(magic: str, expected: str, capsys: "CaptureFixture") -> None:
     ],
 )
 def test_ini(magic: str, expected: str, capsys: "CaptureFixture") -> None:
-    """Check that we can ignore extra cell magics via the CLI."""
+    """Check that we can ignore extra cell magics via the config file."""
     path = Path("tests") / "data/notebook_with_other_magics.ipynb"
 
     with open(".nbqa.ini", "w") as handle:
