@@ -15,8 +15,11 @@ if TYPE_CHECKING:
 @pytest.mark.parametrize(
     "magic, expected",
     [
-        ("--nbqa-magic=%%custommagic", "cell_2:3:1: F401 'glob' imported but unused"),
-        ("--nbqa-magic=%%custommagic,%%anothercustommagic", ""),
+        (
+            "--nbqa-ignore-cells=%%custommagic",
+            "cell_2:3:1: F401 'glob' imported but unused",
+        ),
+        ("--nbqa-ignore-cells=%%custommagic,%%anothercustommagic", ""),
     ],
 )
 def test_cli(magic: str, expected: str, capsys: "CaptureFixture") -> None:
@@ -35,8 +38,8 @@ def test_cli(magic: str, expected: str, capsys: "CaptureFixture") -> None:
 @pytest.mark.parametrize(
     "magic, expected",
     [
-        ("magic=%%%%custommagic", "cell_2:3:1: F401 'glob' imported but unused"),
-        ("magic=%%%%custommagic,%%%%anothercustommagic", ""),
+        ("ignore_cells=%%%%custommagic", "cell_2:3:1: F401 'glob' imported but unused"),
+        ("ignore_cells=%%%%custommagic,%%%%anothercustommagic", ""),
     ],
 )
 def test_ini(magic: str, expected: str, capsys: "CaptureFixture") -> None:

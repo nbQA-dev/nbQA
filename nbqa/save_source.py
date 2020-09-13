@@ -18,7 +18,7 @@ BLANK_SPACES["isort"] = "\n"
 MAGIC = ["%%script", "%%bash"]
 
 
-def _replace_magics(source: List[str], magic: Optional[str]) -> Iterator[str]:
+def _replace_magics(source: List[str], ignore_cells: Optional[str]) -> Iterator[str]:
     """
     Comment out lines with magic commands.
 
@@ -28,26 +28,31 @@ def _replace_magics(source: List[str], magic: Optional[str]) -> Iterator[str]:
     ----------
     source
         Source from notebook cell.
+    ignore_cells
+        Extra cells which nbqa should ignore.
 
     Yields
     ------
     str
         Line from cell, possibly commented out.
     """
-    if magic is not None:
-        all_magic = MAGIC + magic.split(",")
+    if ignore_cells is not None:
+        ignore = MAGIC + ignore_cells.split(",")
     else:
-        all_magic = MAGIC
-    magic_cell = source and any(source[0].startswith(i) for i in all_magic)
+        ignore = MAGIC
+    ignore_cell = source and any(source[0].startswith(i) for i in ignore)
     for j in source:
-        if (j.startswith("!") or j.startswith("%")) or magic_cell:
+        if (j.startswith("!") or j.startswith("%")) or ignore_cell:
             yield f"{MAGIC_SEPARATOR}{j}"
         else:
             yield j
 
 
 def main(
-    notebook: "Path", temp_python_file: "Path", command: str, magic: Optional[str]
+    notebook: "Path",
+    temp_python_file: "Path",
+    command: str,
+    ignore_cells: Optional[str],
 ) -> Dict[int, str]:
     """
     Extract code cells from notebook and save them in temporary Python file.
@@ -60,6 +65,8 @@ def main(
         Temporary Python file to save converted notebook in.
     command
         Third party tool which you're running on your notebook.
+    ignore_cells
+        Extra cells which nbqa should ignore.
 
     Returns
     -------
@@ -79,7 +86,7 @@ def main(
     for i in cells:
         if i["cell_type"] != "code":
             continue
-        source = _replace_magics(i["source"], magic)
+        source = _replace_magics(i["source"], ignore_cells)
         parsed_cell = f"{BLANK_SPACES[command]}{CODE_SEPARATOR}\n{''.join(source)}\n"
         result.append(parsed_cell)
         split_parsed_cell = parsed_cell.splitlines()

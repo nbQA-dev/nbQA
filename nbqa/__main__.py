@@ -24,12 +24,12 @@ class Configs(NamedTuple):
     ----------
     allow_mutation
         Whether to allow nbqa to modify notebooks.
-    nbqa_magic
-        Extra cell-magics which nbqa should ignore.
+    ignore_cells
+        Extra cells which nbqa should ignore.
     """
 
     allow_mutation: bool
-    nbqa_magic: Optional[str]
+    ignore_cells: Optional[str]
 
 
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
@@ -84,9 +84,18 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
         help="Config file for third-party tool (e.g. `setup.cfg`)",
     )
     parser.add_argument(
-        "--nbqa-magic",
+        "--nbqa-ignore-cells",
         required=False,
-        help="Config file for third-party tool (e.g. `setup.cfg`)",
+        help=dedent(
+            """
+            Ignore cells whose first line starts with this. You can pass multiple options,
+            e.g.
+
+                nbqa black my_notebook.ipynb --nbqa-ignore-cells %%cython,%%html
+
+            by placing commas between them.
+            """
+        ),
     )
     parser.add_argument("--version", action="version", version=f"nbQA {__version__}")
     try:
@@ -496,7 +505,7 @@ def _get_configs(
     config.read(".nbqa.ini")
     nbqa_config = args.nbqa_config
     allow_mutation = args.nbqa_mutate
-    nbqa_magic = args.nbqa_magic
+    ignore_cells = args.nbqa_ignore_cells
     if args.command in config.sections():
         addopts = config[args.command].get("addopts")
         if addopts is not None:
@@ -505,10 +514,10 @@ def _get_configs(
             nbqa_config = config[args.command].get("config")
         if not allow_mutation:
             allow_mutation = bool(config[args.command].get("mutate"))
-        if nbqa_magic is None:
-            nbqa_magic = config[args.command].get("magic")
+        if ignore_cells is None:
+            ignore_cells = config[args.command].get("ignore_cells")
     _preserve_config_files(nbqa_config, tmpdirname)
-    return Configs(allow_mutation, nbqa_magic)
+    return Configs(allow_mutation, ignore_cells)
 
 
 def _run_on_one_root_dir(
@@ -543,7 +552,7 @@ def _run_on_one_root_dir(
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             cell_mapping = save_source.main(
-                notebook, temp_python_file, args.command, configs.nbqa_magic
+                notebook, temp_python_file, args.command, configs.ignore_cells
             )
             cell_mappings[notebook] = cell_mapping
             _create_blank_init_files(notebook, tmpdirname)
