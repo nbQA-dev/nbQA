@@ -303,19 +303,21 @@ def _preserve_config_files(nbqa_config: Optional[str], tmpdirname: str) -> None:
     tmpdirname
         Temporary directory to store converted notebooks in.
     """
-    if nbqa_config is None:
-        return
-    Path(tmpdirname).joinpath(
-        Path(nbqa_config).resolve().relative_to(Path.cwd())
-    ).parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy(
-        str(nbqa_config),
-        str(
-            Path(tmpdirname).joinpath(
-                Path(nbqa_config).resolve().relative_to(Path.cwd())
-            )
-        ),
-    )
+    config_files = ["setup.cfg", "pyproject.toml"]
+    if nbqa_config is not None:
+        config_files = [nbqa_config]
+    for config_file_ in config_files:
+        Path(tmpdirname).joinpath(
+            Path(config_file_).resolve().relative_to(Path.cwd())
+        ).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(
+            str(config_file_),
+            str(
+                Path(tmpdirname).joinpath(
+                    Path(config_file_).resolve().relative_to(Path.cwd())
+                )
+            ),
+        )
 
 
 def _get_arg(
