@@ -118,7 +118,7 @@ def test_setupcfg_is_preserved(
     tmp_notebook_for_testing: Path, capsys: "CaptureFixture"
 ) -> None:
     """
-    Check a flake8 cfg file is picked up by nbqa.
+    Check setup.cfg file is automatically picked up by nbqa.
 
     Parameters
     ----------
