@@ -1,4 +1,4 @@
-"""Check configs from :code:`.nbqa.ini` are picked up."""
+"""Check configs from :code:`setup.cfg` are picked up."""
 
 import difflib
 import os
@@ -18,7 +18,7 @@ def test_nbqa_ini_works(
     tmp_notebook_for_testing: Path, capsys: "CaptureFixture"
 ) -> None:
     """
-    Check .nbqa.ini config is picked up works.
+    Check setup.cfg config is picked up works.
 
     Parameters
     ----------
@@ -27,11 +27,11 @@ def test_nbqa_ini_works(
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with open(".nbqa.ini", "w") as handle:
+    with open("setup.cfg", "w") as handle:
         handle.write(
             dedent(
                 """\
-            [flake8]
+            [nbqa.flake8]
             addopts = --ignore=F401 \
                       --select=E303 \
                       --quiet
@@ -45,7 +45,7 @@ def test_nbqa_ini_works(
     with pytest.raises(SystemExit):
         main(["flake8", "tests", "--ignore", "E302"])
 
-    Path(".nbqa.ini").unlink()
+    Path("setup.cfg").unlink()
 
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()

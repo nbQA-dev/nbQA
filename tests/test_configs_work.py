@@ -78,11 +78,11 @@ def test_configs_work_in_nbqa_ini(
             )
         )
 
-    with open(".nbqa.ini", "w") as handle:
+    with open("setup.cfg", "w") as handle:
         handle.write(
             dedent(
                 """\
-            [flake8]
+            [nbqa.flake8]
             config=.flake8
             """
             )
@@ -95,7 +95,7 @@ def test_configs_work_in_nbqa_ini(
         main(["flake8", "tests", "--ignore", "E302"])
 
     Path(".flake8").unlink()
-    Path(".nbqa.ini").unlink()
+    Path("setup.cfg").unlink()
 
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()

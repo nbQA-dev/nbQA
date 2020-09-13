@@ -1,7 +1,7 @@
 Configuration
 -------------
 
-You can configure :code:`nbQA` either at the command line, or by using a :code:`.nbqa.ini` file. We'll see some examples below.
+You can configure :code:`nbQA` either at the command line, or by using a :code:`setup.cfg` file. We'll see some examples below.
 
 Extra flags
 ~~~~~~~~~~~
@@ -12,7 +12,7 @@ If you wish to pass extra flags (e.g. :code:`--ignore W503` to :code:`flake8`) y
 
     nbqa flake8 my_notebook.ipynb --ignore W503
 
-or you can put the following in your :code:`.nbqa.ini` file
+or you can put the following in your :code:`setup.cfg` file
 
 .. code-block:: ini
 
@@ -28,7 +28,7 @@ If you already have a config file for your third-party tool (e.g. :code:`.mypy.i
 
     nbqa mypy my_notebook.ipynb --nbqa-config .mypy.ini
 
-or you can put the following in your :code:`.nbqa.ini` file
+or you can put the following in your :code:`setup.cfg` file
 
 .. code-block:: ini
 
@@ -45,7 +45,7 @@ either pass the :code:`--nbqa-mutate` flag at the command-line, e.g.
 
     nbqa black my_notebook.ipynb --nbqa-mutate
 
-or you can put the following in your :code:`.nbqa.ini` file
+or you can put the following in your :code:`setup.cfg` file
 
 .. code-block:: ini
 

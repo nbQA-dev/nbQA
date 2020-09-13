@@ -474,17 +474,17 @@ def _get_configs(
         Whether to allow nbqa to modify notebooks.
     """
     config = configparser.ConfigParser()
-    config.read(".nbqa.ini")
+    config.read("setup.cfg")
     nbqa_config = args.nbqa_config
     allow_mutation = args.nbqa_mutate
-    if args.command in config.sections():
-        addopts = config[args.command].get("addopts")
+    if f"nbqa.{args.command}" in config.sections():
+        addopts = config[f"nbqa.{args.command}"].get("addopts")
         if addopts is not None:
-            kwargs.extend(split(config[args.command]["addopts"]))
+            kwargs.extend(split(config[f"nbqa.{args.command}"]["addopts"]))
         if nbqa_config is None:
-            nbqa_config = config[args.command].get("config")
+            nbqa_config = config[f"nbqa.{args.command}"].get("config")
         if not allow_mutation:
-            allow_mutation = bool(config[args.command].get("mutate"))
+            allow_mutation = bool(config[f"nbqa.{args.command}"].get("mutate"))
     _preserve_config_files(nbqa_config, tmpdirname)
     return allow_mutation
 

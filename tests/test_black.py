@@ -33,18 +33,18 @@ def test_black_works(
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
 
-    with open(".nbqa.ini", "w") as handle:
+    with open("setup.cfg", "w") as handle:
         handle.write(
             dedent(
                 """\
-            [black]
+            [nbqa.black]
             mutate=1
             """
             )
         )
     with pytest.raises(SystemExit):
         main(["black", path])
-    Path(".nbqa.ini").unlink()
+    Path("setup.cfg").unlink()
     with open(tmp_notebook_for_testing, "r") as handle:
         after = handle.readlines()
 
