@@ -307,16 +307,13 @@ def _preserve_config_files(nbqa_config: Optional[str], tmpdirname: str) -> None:
     if nbqa_config is not None:
         config_files = [nbqa_config]
     for config_file_ in config_files:
-        Path(tmpdirname).joinpath(
+        target_location = Path(tmpdirname).joinpath(
             Path(config_file_).resolve().relative_to(Path.cwd())
-        ).parent.mkdir(parents=True, exist_ok=True)
+        )
+        target_location.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(
             str(config_file_),
-            str(
-                Path(tmpdirname).joinpath(
-                    Path(config_file_).resolve().relative_to(Path.cwd())
-                )
-            ),
+            str(target_location),
         )
 
 
