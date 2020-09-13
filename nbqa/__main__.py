@@ -11,9 +11,25 @@ import tempfile
 from pathlib import Path
 from shlex import split
 from textwrap import dedent
-from typing import Dict, Iterator, List, Match, Optional, Set, Tuple
+from typing import Dict, Iterator, List, Match, NamedTuple, Optional, Set, Tuple
 
 from nbqa import __version__, replace_source, save_source
+
+
+class Configs(NamedTuple):
+    """
+    Options with which to run nbqa.
+
+    Attributes
+    ----------
+    allow_mutation
+        Whether to allow nbqa to modify notebooks.
+    nbqa_magic
+        Extra cell-magics which nbqa should ignore.
+    """
+
+    allow_mutation: bool
+    nbqa_magic: Optional[str]
 
 
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
@@ -458,7 +474,7 @@ def _run_command(
 
 def _get_configs(
     args: argparse.Namespace, kwargs: List[str], tmpdirname: str
-) -> Tuple[bool, bool]:
+) -> Configs:
     """
     Deal with extra configs for 3rd party tool.
 
@@ -473,15 +489,14 @@ def _get_configs(
 
     Returns
     -------
-    bool
-        Whether or not to copy __init__.py to temporary directory.
-    bool
-        Whether to allow nbqa to modify notebooks.
+    Configs
+        Taken from CLI (if given), else from .nbqa.ini.
     """
     config = configparser.ConfigParser()
     config.read(".nbqa.ini")
     nbqa_config = args.nbqa_config
     allow_mutation = args.nbqa_mutate
+    nbqa_magic = args.nbqa_magic
     if args.command in config.sections():
         addopts = config[args.command].get("addopts")
         if addopts is not None:
@@ -490,8 +505,10 @@ def _get_configs(
             nbqa_config = config[args.command].get("config")
         if not allow_mutation:
             allow_mutation = bool(config[args.command].get("mutate"))
+        if nbqa_magic is None:
+            nbqa_magic = config[args.command].get("magic")
     _preserve_config_files(nbqa_config, tmpdirname)
-    return allow_mutation
+    return Configs(allow_mutation, nbqa_magic)
 
 
 def _run_on_one_root_dir(
@@ -522,11 +539,11 @@ def _run_on_one_root_dir(
         }
         cell_mappings = {}
 
-        allow_mutation = _get_configs(args, kwargs, tmpdirname)
+        configs = _get_configs(args, kwargs, tmpdirname)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             cell_mapping = save_source.main(
-                notebook, temp_python_file, args.command, args.nbqa_magic
+                notebook, temp_python_file, args.command, configs.nbqa_magic
             )
             cell_mappings[notebook] = cell_mapping
             _create_blank_init_files(notebook, tmpdirname)
@@ -539,7 +556,7 @@ def _run_on_one_root_dir(
             out, err = _replace_temp_python_file_references_in_out_err(
                 temp_python_file, notebook, out, err, cell_mappings[notebook]
             )
-            if mutated and not allow_mutation:
+            if mutated and not configs.allow_mutation:
                 if args.nbqa_config:
                     kwargs += [f"--nbqa-config={args.nbqa_config}"]
                 kwargs += ["--nbqa-mutate"]
