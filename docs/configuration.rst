@@ -14,15 +14,16 @@ If you wish to pass extra flags (e.g. :code:`--ignore W503` to :code:`flake8`) y
 
 or you can put the following in your :code:`setup.cfg` file
 
-.. code-block:: ini
+.. code-block:: cfg
 
-    [flake8]
+    [nbqa.flake8]
     addopts = --ignore W503
 
 Config file
 ~~~~~~~~~~~
 
-If you already have a config file for your third-party tool (e.g. :code:`.mypy.ini` for :code:`mypy`), you can run
+By default, :code:`nbQA` will use :code:`setup.cfg` to get the configs for your third-party tool.
+If you want to use a different config file for your third-party tool (e.g. :code:`.mypy.ini` for :code:`mypy`), you can run
 
 .. code-block:: bash
 
@@ -30,9 +31,9 @@ If you already have a config file for your third-party tool (e.g. :code:`.mypy.i
 
 or you can put the following in your :code:`setup.cfg` file
 
-.. code-block:: ini
+.. code-block:: cfg
 
-    [mypy]
+    [nbqa.mypy]
     config = .mypy.ini
 
 Allow mutations
@@ -47,7 +48,7 @@ either pass the :code:`--nbqa-mutate` flag at the command-line, e.g.
 
 or you can put the following in your :code:`setup.cfg` file
 
-.. code-block:: ini
+.. code-block:: cfg
 
-    [black]
+    [nbqa.black]
     mutate = 1
