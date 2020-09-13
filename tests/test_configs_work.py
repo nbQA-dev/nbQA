@@ -114,16 +114,12 @@ def test_configs_work_in_nbqa_ini(
     assert sorted(err.splitlines()) == sorted(expected_err.splitlines())
 
 
-def test_setupcfg_is_preserved(
-    tmp_notebook_for_testing: Path, capsys: "CaptureFixture"
-) -> None:
+def test_setupcfg_is_preserved(capsys: "CaptureFixture") -> None:
     """
     Check setup.cfg file is automatically picked up by nbqa.
 
     Parameters
     ----------
-    tmp_notebook_for_testing
-        Temporary copy of :code:`notebook_for_testing.ipynb`.
     capsys
         Pytest fixture to capture stdout and stderr.
     """
@@ -139,17 +135,8 @@ def test_setupcfg_is_preserved(
             )
         )
 
-    # check diff
-    with open(tmp_notebook_for_testing, "r") as handle:
-        before = handle.readlines()
     with pytest.raises(SystemExit):
         main(["flake8", "tests", "--ignore", "E302"])
-
-    with open(tmp_notebook_for_testing, "r") as handle:
-        after = handle.readlines()
-    result = "".join(difflib.unified_diff(before, after))
-    expected = ""
-    assert result == expected
 
     # check out and err
     out, err = capsys.readouterr()
