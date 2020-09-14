@@ -9,9 +9,9 @@ import pytest
 @pytest.mark.parametrize(
     "arg, cwd",
     [
-        ("tests", Path.cwd()),
-        ("data", Path.cwd() / "tests"),
-        ("notebook_for_testing.ipynb", Path.cwd() / "tests/data"),
+        (Path("tests"), Path.cwd()),
+        (Path("data"), Path.cwd() / "tests"),
+        (Path("notebook_for_testing.ipynb"), Path.cwd() / "tests/data"),
         (Path.cwd() / "tests/data/notebook_for_testing.ipynb", Path.cwd().parent),
     ],
 )
