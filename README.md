@@ -79,7 +79,7 @@ Got:
 
 ## Configuration
 
-Here\'s an example `nbqa.ini` file - see
+Here\'s an example `.nbqa.ini` file - see
 [configuration](https://nbqa.readthedocs.io/en/latest/configuration.html)
 for more on configuration:
 
