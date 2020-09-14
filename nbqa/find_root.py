@@ -8,10 +8,22 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Iterable
 
+# files and folders known to indicate a project root
+KNOWN_PROJECT_ROOT_DIRS = [".git", ".hg"]
+KNOW_PROJECT_ROOT_FILES = [
+    ".nbqa.ini",
+    "setup.py",
+    "setup.cfg",
+    "pyproject.toml",
+    "MANIFEST.in",
+]
+
 
 @lru_cache()
 def find_project_root(
-    srcs: Iterable[str], root_files: Iterable[str] = (".git", ".hg", ".nbqa.ini")
+    srcs: Iterable[str],
+    root_files: Iterable[str] = tuple(KNOW_PROJECT_ROOT_FILES),
+    root_dirs: Iterable[str] = tuple(KNOWN_PROJECT_ROOT_DIRS),
 ) -> Path:
     """
     Return a directory containing .git, .hg, or nbqa.ini.
@@ -47,7 +59,12 @@ def find_project_root(
     )
 
     for directory in (common_base, *common_base.parents):
-        if any((directory / i).exists() for i in root_files):
-            return directory
+
+        for known_project_root_dir in root_dirs:
+            if (directory / known_project_root_dir).is_dir():
+                return directory
+        for know_project_root_file in root_files:
+            if (directory / know_project_root_file).is_file():
+                return directory
 
     return Path("/").resolve()
