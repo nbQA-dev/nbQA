@@ -12,6 +12,7 @@ import pytest
         ("tests", Path.cwd()),
         ("data", Path.cwd() / "tests"),
         ("notebook_for_testing.ipynb", Path.cwd() / "tests/data"),
+        (Path.cwd() / "tests/data/notebook_for_testing.ipynb", Path.cwd().parent),
     ],
 )
 def test_running_in_different_dir_works(arg: Path, cwd: Path) -> None:

@@ -10,7 +10,9 @@ from typing import Iterable
 
 
 @lru_cache()
-def find_project_root(srcs: Iterable[str]) -> Path:
+def find_project_root(
+    srcs: Iterable[str], root_files: Iterable[str] = (".git", ".hg", ".nbqa.ini")
+) -> Path:
     """
     Return a directory containing .git, .hg, or nbqa.ini.
 
@@ -18,10 +20,19 @@ def find_project_root(srcs: Iterable[str]) -> Path:
     passed in `srcs`.
     If no directory in the tree contains a marker that would specify it's the
     project root, the root of the file system is returned.
-    """
-    if not srcs:
-        return Path("/").resolve()
 
+    Parameters
+    ----------
+    srcs
+        Source paths.
+    root_files
+        Files indicating that the current directory is the project root.
+
+    Returns
+    -------
+    Path
+        Project root.
+    """
     path_srcs = [Path(Path.cwd(), src).resolve() for src in srcs]
 
     # A list of lists of parents for each 'src'. 'src' is included as a
@@ -36,13 +47,7 @@ def find_project_root(srcs: Iterable[str]) -> Path:
     )
 
     for directory in (common_base, *common_base.parents):
-        if (directory / ".git").exists():
-            return directory
-
-        if (directory / ".hg").is_dir():
-            return directory
-
-        if (directory / ".nbqa.ini").is_file():
+        if any((directory / i).exists() for i in root_files):
             return directory
 
     return Path("/").resolve()
