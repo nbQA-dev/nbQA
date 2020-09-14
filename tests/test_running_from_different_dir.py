@@ -37,7 +37,10 @@ def test_running_in_different_dir_works(arg: Path, cwd: Path) -> None:
         )
 
     output = subprocess.run(
-        ["nbqa", "flake8", arg], stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=cwd
+        ["nbqa", "flake8", arg],
+        stderr=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        cwd=str(cwd),
     )
 
     Path(".nbqa.ini").unlink()
