@@ -362,9 +362,7 @@ def _get_arg(
     'tmpdir/my_notebook   .py'
     """
     if Path(root_dir).is_dir():
-        arg = Path(tmpdirname).joinpath(
-            Path(root_dir).resolve().relative_to(project_root)
-        )
+        arg = Path(tmpdirname) / Path(root_dir).resolve().relative_to(project_root)
     else:
         assert len(nb_to_py_mapping) == 1
         arg = next(iter(nb_to_py_mapping.values()))
