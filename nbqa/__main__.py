@@ -126,12 +126,8 @@ def _temp_python_file_for_notebook(
         inside the temporary directory.
     """
     # Add 3 extra whitespaces because `ipynb` is 3 chars longer than `py`.
-    temp_python_file = (
-        Path(tmpdir)
-        .joinpath(notebook.resolve().relative_to(project_root).parent)
-        .joinpath(f"{notebook.stem}   ")
-        .with_suffix(".py")
-    )
+    relative_notebook_dir = notebook.resolve().relative_to(project_root).parent
+    temp_python_file = Path(tmpdir) / relative_notebook_dir / f"{notebook.stem}   .py"
     temp_python_file.parent.mkdir(parents=True, exist_ok=True)
     return temp_python_file
 
