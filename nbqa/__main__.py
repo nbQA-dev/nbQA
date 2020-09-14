@@ -36,7 +36,7 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
         Whether to allow 3rd party tools to modify notebooks.
     nbqa_config
         Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
-    kwargs
+    cmd_args
         Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
 
     Raises
@@ -70,7 +70,7 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
     )
     parser.add_argument("--version", action="version", version=f"nbQA {__version__}")
     try:
-        args, kwargs = parser.parse_known_args(raw_args)
+        args, cmd_args = parser.parse_known_args(raw_args)
     except SystemExit as exception:
         if exception.code != 0:
             msg = (
@@ -79,7 +79,7 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
             )
             raise ValueError(msg) from exception
         sys.exit(0)  # pragma: nocover
-    return args, kwargs
+    return args, cmd_args
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
@@ -391,7 +391,7 @@ def _get_mtimes(arg: Path) -> Set[float]:
 def _run_command(
     command: str,
     tmpdirname: str,
-    kwargs: List[str],
+    cmd_args: List[str],
     arg: Path,
 ) -> Tuple[str, str, int, bool]:
     """
@@ -403,7 +403,7 @@ def _run_command(
         Third-party tool (e.g. :code:`mypy`) to run against notebook.
     tmpdirname
         Temporary directory where converted notebooks will be stored.
-    kwargs
+    cmd_args
         Flags to pass to third-party tool (e.g. :code:`--verbose`).
     project_root
         Root of repository, where .git / .hg / .nbqa.ini file is.
@@ -430,7 +430,7 @@ def _run_command(
     before = _get_mtimes(arg)
 
     output = subprocess.run(
-        ["python", "-m", command, str(arg), *kwargs],
+        ["python", "-m", command, str(arg), *cmd_args],
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         cwd=tmpdirname,
@@ -455,8 +455,8 @@ def _run_command(
 
 
 def _get_configs(
-    args: argparse.Namespace, kwargs: List[str], tmpdirname: str, project_root: Path
-) -> Tuple[bool, bool]:
+    args: argparse.Namespace, cmd_args: List[str], tmpdirname: str, project_root: Path
+) -> bool:
     """
     Deal with extra configs for 3rd party tool.
 
@@ -464,7 +464,7 @@ def _get_configs(
     ----------
     args
         Arguments passed to nbqa
-    kwargs
+    cmd_args
         Extra flags for third party tool
     tmpdirname
         Temporary directory where notebooks are copied to.
@@ -481,11 +481,11 @@ def _get_configs(
     config = configparser.ConfigParser()
     config.read(project_root / ".nbqa.ini")
     nbqa_config = args.nbqa_config
-    allow_mutation = args.nbqa_mutate
+    allow_mutation: bool = args.nbqa_mutate
     if args.command in config.sections():
         addopts = config[args.command].get("addopts")
         if addopts is not None:
-            kwargs.extend(split(config[args.command]["addopts"]))
+            cmd_args.extend(split(config[args.command]["addopts"]))
         if nbqa_config is None:
             nbqa_config = config[args.command].get("config")
         if not allow_mutation:
@@ -495,7 +495,7 @@ def _get_configs(
 
 
 def _run_on_one_root_dir(
-    root_dir: str, args: argparse.Namespace, kwargs: List[str]
+    root_dir: str, args: argparse.Namespace, cmd_args: List[str]
 ) -> int:
     """
     Run third-party tool on a single notebook or directory.
@@ -504,7 +504,7 @@ def _run_on_one_root_dir(
     ----------
     args
         Arguments passed to nbqa.
-    kwargs
+    cmd_args
         Additional flags to pass to 3rd party tool
 
     Returns
@@ -523,7 +523,7 @@ def _run_on_one_root_dir(
         }
         cell_mappings = {}
 
-        allow_mutation = _get_configs(args, kwargs, tmpdirname, project_root)
+        allow_mutation = _get_configs(args, cmd_args, tmpdirname, project_root)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             cell_mappings[notebook] = save_source.main(
@@ -534,7 +534,7 @@ def _run_on_one_root_dir(
         out, err, output_code, mutated = _run_command(
             args.command,
             tmpdirname,
-            kwargs,
+            cmd_args,
             _get_arg(root_dir, tmpdirname, nb_to_py_mapping, project_root),
         )
 
@@ -544,14 +544,14 @@ def _run_on_one_root_dir(
             )
             if mutated and not allow_mutation:
                 if args.nbqa_config:
-                    kwargs += [f"--nbqa-config={args.nbqa_config}"]
-                kwargs += ["--nbqa-mutate"]
+                    cmd_args += [f"--nbqa-config={args.nbqa_config}"]
+                cmd_args += ["--nbqa-mutate"]
                 raise SystemExit(
                     dedent(
                         f"""\
                         💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
 
-                            nbqa {args.command} {root_dir} {' '.join(kwargs)}
+                            nbqa {args.command} {root_dir} {' '.join(cmd_args)}
                         """
                     )
                 )
@@ -574,9 +574,9 @@ def main(raw_args: Optional[List[str]] = None) -> None:
         Command-line arguments (if calling this function directly), defaults to
         :code:`None` if calling via command-line.
     """
-    args, kwargs = _parse_args(raw_args)
+    args, cmd_args = _parse_args(raw_args)
 
-    output_codes = [_run_on_one_root_dir(i, args, kwargs) for i in args.root_dirs]
+    output_codes = [_run_on_one_root_dir(i, args, cmd_args) for i in args.root_dirs]
 
     sys.exit(int(any(output_codes)))
 

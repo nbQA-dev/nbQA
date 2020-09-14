@@ -1,7 +1,6 @@
 """Check configs are picked up when running in different directory."""
 import subprocess
 from pathlib import Path
-from textwrap import dedent
 
 import pytest
 
@@ -26,21 +25,14 @@ def test_running_in_different_dir_works(arg: Path, cwd: Path) -> None:
     cwd
         Directory from which to run command.
     """
-    with open(".nbqa.ini", "w") as handle:
-        handle.write(
-            dedent(
-                """\
-                [flake8]
-                addopts = --ignore=F401 \
-                """
-            )
-        )
+    config_path = Path(".nbqa.ini")
+    config_path.write_text("[flake8]\naddopts = --ignore=F401")
 
     output = subprocess.run(
         ["nbqa", "flake8", arg], stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=cwd
     )
 
-    Path(".nbqa.ini").unlink()
+    config_path.unlink()
 
     out = output.stdout.decode()
     assert "W291" in out
