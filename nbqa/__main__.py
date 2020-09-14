@@ -314,17 +314,11 @@ def _preserve_config_files(
     """
     if nbqa_config is None:
         return
-    Path(tmpdirname).joinpath(
-        Path(project_root / nbqa_config).resolve().relative_to(project_root)
-    ).parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy(
-        str(project_root / nbqa_config),
-        str(
-            Path(tmpdirname).joinpath(
-                Path(project_root / nbqa_config).resolve().relative_to(project_root)
-            )
-        ),
-    )
+    temp_config_path = Path(tmpdirname) / Path(
+        project_root / nbqa_config
+    ).resolve().relative_to(project_root)
+    temp_config_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(str(project_root / nbqa_config), str(temp_config_path))
 
 
 def _get_arg(
