@@ -26,18 +26,18 @@ def test_running_in_different_dir_works(arg: Path, cwd: Path) -> None:
     cwd
         Directory from which to run command.
     """
-    with open(".nbqa.ini", "w") as handle:
-        handle.write(
-            dedent(
-                """\
-                [flake8]
-                addopts = --ignore=F401 \
-                """
-            )
+    config_path = Path(".nbqa.ini")
+    config_path.write_text(
+        dedent(
+            """\
+            [flake8]
+            addopts = --ignore=F401 \
+            """
         )
+    )
 
     output = subprocess.run(
-        ["nbqa", "flake8", arg],
+        ["nbqa", "flake8", str(arg)],
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         cwd=str(cwd),
