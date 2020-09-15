@@ -119,9 +119,9 @@ def test_configs_work_in_nbqaini(capsys: "CaptureFixture") -> None:
     Path(".nbqa.ini").write_text(
         dedent(
             """\
-                [flake8]
-                config=.flake8
-                """
+            [flake8]
+            config=.flake8
+            """
         )
     )
 
