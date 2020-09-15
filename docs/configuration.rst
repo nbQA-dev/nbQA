@@ -16,8 +16,8 @@ or you can put the following in your :code:`setup.cfg` file
 
 .. code-block:: cfg
 
-    [nbqa.flake8]
-    addopts = --ignore W503
+    [nbqa.addopts]
+    flake8 = --ignore W503
 
 Config file
 ~~~~~~~~~~~
@@ -33,8 +33,8 @@ or you can put the following in your :code:`setup.cfg` file
 
 .. code-block:: cfg
 
-    [nbqa.mypy]
-    config = .mypy.ini
+    [nbqa.config]
+    mypy = .mypy.ini
 
 Allow mutations
 ~~~~~~~~~~~~~~~
@@ -50,5 +50,5 @@ or you can put the following in your :code:`setup.cfg` file
 
 .. code-block:: cfg
 
-    [nbqa.black]
-    mutate = 1
+    [nbqa.mutate]
+    black = 1
