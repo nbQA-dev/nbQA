@@ -15,6 +15,8 @@ from typing import Dict, Iterator, List, Match, Optional, Set, Tuple
 
 from nbqa import __version__, replace_source, save_source
 
+CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
+
 
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
     """
@@ -303,9 +305,10 @@ def _preserve_config_files(nbqa_config: Optional[str], tmpdirname: str) -> None:
     tmpdirname
         Temporary directory to store converted notebooks in.
     """
-    config_files = ["setup.cfg", "pyproject.toml"]
     if nbqa_config is not None:
         config_files = [nbqa_config]
+    else:
+        config_files = CONFIG_FILES
     for config_file in config_files:
         target_location = Path(tmpdirname) / Path(config_file).resolve().relative_to(
             Path.cwd()

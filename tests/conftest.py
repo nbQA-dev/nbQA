@@ -21,7 +21,7 @@ def temporarily_delete_setupcfg(tmpdir: "LocalPath") -> Iterator[None]:
         Pytest fixture, gives us a temporary directory.
     """
     filename = Path("setup.cfg")
-    temp_file = Path(tmpdir) / "setup.cfg"
+    temp_file = Path(tmpdir) / filename
     shutil.copy(str(filename), str(temp_file))
     yield
     shutil.copy(str(temp_file), str(filename))
