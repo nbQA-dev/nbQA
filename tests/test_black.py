@@ -37,8 +37,8 @@ def test_black_works(
         handle.write(
             dedent(
                 """\
-            [nbqa.black]
-            mutate=1
+            [nbqa.mutate]
+            black=1
             """
             )
         )

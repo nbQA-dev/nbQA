@@ -31,8 +31,8 @@ def test_nbqa_ini_works(
         handle.write(
             dedent(
                 """\
-            [nbqa.flake8]
-            addopts = --ignore=F401 \
+            [nbqa.addopts]
+            flake8 = --ignore=F401 \
                       --select=E303 \
                       --quiet
             """
