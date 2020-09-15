@@ -18,6 +18,8 @@ from nbqa import __version__, replace_source, save_source
 
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
 NBQA_CONFIG_SECTION = ["config", "mutate", "addopts"]
+CONFIG_PREFIX = "nbqa."
+HISTORIC_CONFIG_FILE = ".nbqa.ini"
 
 
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
@@ -475,19 +477,17 @@ def _find_config_file(
     config_prefix
         Prefix of sections in config file.
     """
-    config_files = CONFIG_FILES
-    for config_file in config_files:
+    config = configparser.ConfigParser()
+    for config_file in CONFIG_FILES:
         if config_file == "pyproject.toml":
             continue  # Will be supported in a future PR.
-        config = configparser.ConfigParser()
         config.read(config_file)
         for section in NBQA_CONFIG_SECTION:
-            if config.has_section(f"nbqa.{section}"):
-                return config_file, config, "nbqa."
-    config = configparser.ConfigParser()
-    config.read(".nbqa.ini")
+            if config.has_section(f"{CONFIG_PREFIX}{section}"):
+                return config_file, config, CONFIG_PREFIX
+    config.read(HISTORIC_CONFIG_FILE)
     if config.has_section(command):
-        return ".nbqa.ini", config, ""
+        return HISTORIC_CONFIG_FILE, config, ""
     return None, None, None
 
 
