@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from configparser import ConfigParser
 from pathlib import Path
 from shlex import split
 from textwrap import dedent
@@ -15,6 +16,11 @@ from typing import Dict, Iterator, List, Match, Optional, Set, Tuple
 
 from nbqa import __version__, replace_source, save_source
 from nbqa.find_root import find_project_root
+
+CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
+NBQA_CONFIG_SECTION = ["config", "mutate", "addopts"]
+CONFIG_PREFIX = "nbqa."
+HISTORIC_CONFIG_FILE = ".nbqa.ini"
 
 
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
@@ -454,6 +460,71 @@ def _run_command(
     return out, err, output_code, mutated
 
 
+def _find_config_file(
+    command: str, project_root: Path
+) -> Tuple[Optional[str], Optional[ConfigParser], Optional[str]]:
+    """
+    Find config file.
+
+    Parameters
+    ----------
+    command
+        Third-party tool being run.
+
+    Returns
+    -------
+    config_file
+        Name of config file.
+    config
+        ConfigParser object which has read in config file.
+    config_prefix
+        Prefix of sections in config file.
+    """
+    config = configparser.ConfigParser()
+    for config_file in CONFIG_FILES:
+        if config_file == "pyproject.toml":
+            continue  # Will be supported in a future PR.
+        config.read(project_root / config_file)
+        for section in NBQA_CONFIG_SECTION:
+            if config.has_section(f"{CONFIG_PREFIX}{section}"):
+                return config_file, config, CONFIG_PREFIX
+    config.read(project_root / HISTORIC_CONFIG_FILE)
+    if config.has_section(command):
+        return HISTORIC_CONFIG_FILE, config, ""
+    return None, None, None
+
+
+def _get_option(
+    config_file: str, config: ConfigParser, section: str, option: str
+) -> Optional[str]:
+    """
+    Get option from config file.
+
+    Parameters
+    ----------
+    config_file
+        Name of config file.
+    config
+        ConfigParser object which has read in config file.
+    section
+        e.g. config, mutate, ...
+    option
+        e.g. flake8, black, ...
+
+    Returns
+    -------
+    str
+        Parsed option.
+    """
+    if config_file != ".nbqa.ini":
+        if config.has_section(section):
+            return config[section].get(option)
+    else:
+        if config.has_section(option):
+            return config[option].get(section)
+    return None
+
+
 def _get_configs(
     args: argparse.Namespace, cmd_args: List[str], tmpdirname: str, project_root: Path
 ) -> bool:
@@ -478,18 +549,26 @@ def _get_configs(
     bool
         Whether to allow nbqa to modify notebooks.
     """
-    config = configparser.ConfigParser()
-    config.read(project_root / ".nbqa.ini")
+    config_file, config, config_prefix = _find_config_file(args.command, project_root)
     nbqa_config = args.nbqa_config
-    allow_mutation: bool = args.nbqa_mutate
-    if args.command in config.sections():
-        addopts = config[args.command].get("addopts")
+    allow_mutation = args.nbqa_mutate
+    if config is not None:
+        assert config_file is not None
+        assert config_prefix is not None
+
+        addopts = _get_option(
+            config_file, config, f"{config_prefix}addopts", args.command
+        )
         if addopts is not None:
-            cmd_args.extend(split(config[args.command]["addopts"]))
+            cmd_args.extend(split(addopts))
         if nbqa_config is None:
-            nbqa_config = config[args.command].get("config")
+            nbqa_config = _get_option(
+                config_file, config, f"{config_prefix}config", args.command
+            )
         if not allow_mutation:
-            allow_mutation = bool(config[args.command].get("mutate"))
+            allow_mutation = bool(
+                _get_option(config_file, config, f"{config_prefix}mutate", args.command)
+            )
     _preserve_config_files(nbqa_config, tmpdirname, project_root)
     return allow_mutation
 
