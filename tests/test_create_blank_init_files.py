@@ -24,7 +24,9 @@ def test_create_blank_init_files(tmpdir: "LocalPath") -> None:
         Pytest fixture, gives us a temporary directory.
     """
     _create_blank_init_files(
-        Path(os.path.join("tests", "data", "notebook_for_testing.ipynb")), tmpdir
+        Path(os.path.join("tests", "data", "notebook_for_testing.ipynb")),
+        tmpdir,
+        Path.cwd(),
     )
     result = list(Path(tmpdir).rglob("__init__.py"))
     expected = [
