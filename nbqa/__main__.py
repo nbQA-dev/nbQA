@@ -8,12 +8,19 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from configparser import ConfigParser
 from pathlib import Path
 from shlex import split
 from textwrap import dedent
 from typing import Dict, Iterator, List, Match, Optional, Set, Tuple
 
 from nbqa import __version__, replace_source, save_source
+from nbqa.find_root import find_project_root
+
+CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
+NBQA_CONFIG_SECTION = ["config", "mutate", "addopts"]
+CONFIG_PREFIX = "nbqa."
+HISTORIC_CONFIG_FILE = ".nbqa.ini"
 
 
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
@@ -35,7 +42,7 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
         Whether to allow 3rd party tools to modify notebooks.
     nbqa_config
         Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
-    kwargs
+    cmd_args
         Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
 
     Raises
@@ -69,7 +76,7 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
     )
     parser.add_argument("--version", action="version", version=f"nbQA {__version__}")
     try:
-        args, kwargs = parser.parse_known_args(raw_args)
+        args, cmd_args = parser.parse_known_args(raw_args)
     except SystemExit as exception:
         if exception.code != 0:
             msg = (
@@ -78,7 +85,7 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
             )
             raise ValueError(msg) from exception
         sys.exit(0)  # pragma: nocover
-    return args, kwargs
+    return args, cmd_args
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
@@ -103,7 +110,9 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
     return notebooks
 
 
-def _temp_python_file_for_notebook(notebook: Path, tmpdir: str) -> Path:
+def _temp_python_file_for_notebook(
+    notebook: Path, tmpdir: str, project_root: Path
+) -> Path:
     """
     Get temporary file to save converted notebook into.
 
@@ -113,6 +122,8 @@ def _temp_python_file_for_notebook(notebook: Path, tmpdir: str) -> Path:
         Notebook that third-party tool will be run on.
     tmpdir
         Temporary directory where converted notebooks will be saved.
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
 
     Returns
     -------
@@ -121,12 +132,8 @@ def _temp_python_file_for_notebook(notebook: Path, tmpdir: str) -> Path:
         inside the temporary directory.
     """
     # Add 3 extra whitespaces because `ipynb` is 3 chars longer than `py`.
-    temp_python_file = (
-        Path(tmpdir)
-        .joinpath(notebook.resolve().relative_to(Path.cwd()).parent)
-        .joinpath(f"{notebook.stem}   ")
-        .with_suffix(".py")
-    )
+    relative_notebook_dir = notebook.resolve().relative_to(project_root).parent
+    temp_python_file = Path(tmpdir) / relative_notebook_dir / f"{notebook.stem}   .py"
     temp_python_file.parent.mkdir(parents=True, exist_ok=True)
     return temp_python_file
 
@@ -269,7 +276,9 @@ def _replace_temp_python_file_references_in_out_err(
     return out, err
 
 
-def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
+def _create_blank_init_files(
+    notebook: Path, tmpdirname: str, project_root: Path
+) -> None:
     """
     Replicate local (possibly blank) __init__ files to temporary directory.
 
@@ -279,8 +288,10 @@ def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
         Notebook third-party tool is being run against.
     tmpdirname
         Temporary directory to store converted notebooks in.
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
     """
-    parts = notebook.resolve().relative_to(Path.cwd()).parts
+    parts = notebook.resolve().relative_to(project_root).parts
 
     for idx in range(1, len(parts)):
         init_files = Path(os.path.join(*parts[:idx])).glob("__init__.py")
@@ -292,7 +303,9 @@ def _create_blank_init_files(notebook: Path, tmpdirname: str) -> None:
             break  # Only need to copy one __init__ file.
 
 
-def _preserve_config_files(nbqa_config: Optional[str], tmpdirname: str) -> None:
+def _preserve_config_files(
+    nbqa_config: Optional[str], tmpdirname: str, project_root: Path
+) -> None:
     """
     Copy local config file to temporary directory.
 
@@ -302,24 +315,23 @@ def _preserve_config_files(nbqa_config: Optional[str], tmpdirname: str) -> None:
         Config file for third-party tool (e.g. mypy).
     tmpdirname
         Temporary directory to store converted notebooks in.
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
     """
     if nbqa_config is None:
         return
-    Path(tmpdirname).joinpath(
-        Path(nbqa_config).resolve().relative_to(Path.cwd())
-    ).parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy(
-        str(nbqa_config),
-        str(
-            Path(tmpdirname).joinpath(
-                Path(nbqa_config).resolve().relative_to(Path.cwd())
-            )
-        ),
-    )
+    temp_config_path = Path(tmpdirname) / Path(
+        project_root / nbqa_config
+    ).resolve().relative_to(project_root)
+    temp_config_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(str(project_root / nbqa_config), str(temp_config_path))
 
 
 def _get_arg(
-    root_dir: str, tmpdirname: str, nb_to_py_mapping: Dict[Path, Path]
+    root_dir: str,
+    tmpdirname: str,
+    nb_to_py_mapping: Dict[Path, Path],
+    project_root: Path,
 ) -> Path:
     """
     Get argument to run command against.
@@ -337,6 +349,8 @@ def _get_arg(
         Temporary directory where converted notebooks are stored.
     nb_to_py_mapping
         Mapping between notebooks and Python files corresponding to converted notebooks.
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
 
     Returns
     -------
@@ -354,7 +368,7 @@ def _get_arg(
     'tmpdir/my_notebook   .py'
     """
     if Path(root_dir).is_dir():
-        arg = Path(tmpdirname).joinpath(root_dir)
+        arg = Path(tmpdirname) / Path(root_dir).resolve().relative_to(project_root)
     else:
         assert len(nb_to_py_mapping) == 1
         arg = next(iter(nb_to_py_mapping.values()))
@@ -382,10 +396,9 @@ def _get_mtimes(arg: Path) -> Set[float]:
 
 def _run_command(
     command: str,
-    root_dir: str,
     tmpdirname: str,
-    nb_to_py_mapping: Dict[Path, Path],
-    kwargs: List[str],
+    cmd_args: List[str],
+    arg: Path,
 ) -> Tuple[str, str, int, bool]:
     """
     Run third-party tool against given file or directory.
@@ -394,14 +407,12 @@ def _run_command(
     ----------
     command
         Third-party tool (e.g. :code:`mypy`) to run against notebook.
-    root_dir
-        Notebook or directory to run third-party tool on.
     tmpdirname
         Temporary directory where converted notebooks will be stored.
-    nb_to_py_mapping
-        Mapping between notebooks and Python files corresponding to converted notebooks.
-    kwargs
+    cmd_args
         Flags to pass to third-party tool (e.g. :code:`--verbose`).
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
 
     Returns
     -------
@@ -422,12 +433,10 @@ def _run_command(
     env = os.environ.copy()
     env["PYTHONPATH"] = os.getcwd()
 
-    arg = _get_arg(root_dir, tmpdirname, nb_to_py_mapping)
-
     before = _get_mtimes(arg)
 
     output = subprocess.run(
-        ["python", "-m", command, str(arg), *kwargs],
+        ["python", "-m", command, str(arg), *cmd_args],
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         cwd=tmpdirname,
@@ -451,9 +460,74 @@ def _run_command(
     return out, err, output_code, mutated
 
 
+def _find_config_file(
+    command: str, project_root: Path
+) -> Tuple[Optional[str], Optional[ConfigParser], Optional[str]]:
+    """
+    Find config file.
+
+    Parameters
+    ----------
+    command
+        Third-party tool being run.
+
+    Returns
+    -------
+    config_file
+        Name of config file.
+    config
+        ConfigParser object which has read in config file.
+    config_prefix
+        Prefix of sections in config file.
+    """
+    config = configparser.ConfigParser()
+    for config_file in CONFIG_FILES:
+        if config_file == "pyproject.toml":
+            continue  # Will be supported in a future PR.
+        config.read(project_root / config_file)
+        for section in NBQA_CONFIG_SECTION:
+            if config.has_section(f"{CONFIG_PREFIX}{section}"):
+                return config_file, config, CONFIG_PREFIX
+    config.read(project_root / HISTORIC_CONFIG_FILE)
+    if config.has_section(command):
+        return HISTORIC_CONFIG_FILE, config, ""
+    return None, None, None
+
+
+def _get_option(
+    config_file: str, config: ConfigParser, section: str, option: str
+) -> Optional[str]:
+    """
+    Get option from config file.
+
+    Parameters
+    ----------
+    config_file
+        Name of config file.
+    config
+        ConfigParser object which has read in config file.
+    section
+        e.g. config, mutate, ...
+    option
+        e.g. flake8, black, ...
+
+    Returns
+    -------
+    str
+        Parsed option.
+    """
+    if config_file != ".nbqa.ini":
+        if config.has_section(section):
+            return config[section].get(option)
+    else:
+        if config.has_section(option):
+            return config[option].get(section)
+    return None
+
+
 def _get_configs(
-    args: argparse.Namespace, kwargs: List[str], tmpdirname: str
-) -> Tuple[bool, bool]:
+    args: argparse.Namespace, cmd_args: List[str], tmpdirname: str, project_root: Path
+) -> bool:
     """
     Deal with extra configs for 3rd party tool.
 
@@ -461,10 +535,12 @@ def _get_configs(
     ----------
     args
         Arguments passed to nbqa
-    kwargs
+    cmd_args
         Extra flags for third party tool
     tmpdirname
         Temporary directory where notebooks are copied to.
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
 
     Returns
     -------
@@ -473,24 +549,32 @@ def _get_configs(
     bool
         Whether to allow nbqa to modify notebooks.
     """
-    config = configparser.ConfigParser()
-    config.read(".nbqa.ini")
+    config_file, config, config_prefix = _find_config_file(args.command, project_root)
     nbqa_config = args.nbqa_config
     allow_mutation = args.nbqa_mutate
-    if args.command in config.sections():
-        addopts = config[args.command].get("addopts")
+    if config is not None:
+        assert config_file is not None
+        assert config_prefix is not None
+
+        addopts = _get_option(
+            config_file, config, f"{config_prefix}addopts", args.command
+        )
         if addopts is not None:
-            kwargs.extend(split(config[args.command]["addopts"]))
+            cmd_args.extend(split(addopts))
         if nbqa_config is None:
-            nbqa_config = config[args.command].get("config")
+            nbqa_config = _get_option(
+                config_file, config, f"{config_prefix}config", args.command
+            )
         if not allow_mutation:
-            allow_mutation = bool(config[args.command].get("mutate"))
-    _preserve_config_files(nbqa_config, tmpdirname)
+            allow_mutation = bool(
+                _get_option(config_file, config, f"{config_prefix}mutate", args.command)
+            )
+    _preserve_config_files(nbqa_config, tmpdirname, project_root)
     return allow_mutation
 
 
 def _run_on_one_root_dir(
-    root_dir: str, args: argparse.Namespace, kwargs: List[str]
+    root_dir: str, args: argparse.Namespace, cmd_args: List[str]
 ) -> int:
     """
     Run third-party tool on a single notebook or directory.
@@ -499,7 +583,7 @@ def _run_on_one_root_dir(
     ----------
     args
         Arguments passed to nbqa.
-    kwargs
+    cmd_args
         Additional flags to pass to 3rd party tool
 
     Returns
@@ -508,24 +592,29 @@ def _run_on_one_root_dir(
         Output code from third-party tool.
     """
     notebooks = _get_notebooks(root_dir)
+    project_root = find_project_root(tuple(args.root_dirs))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
 
         nb_to_py_mapping = {
-            notebook: _temp_python_file_for_notebook(notebook, tmpdirname)
+            notebook: _temp_python_file_for_notebook(notebook, tmpdirname, project_root)
             for notebook in notebooks
         }
         cell_mappings = {}
 
-        allow_mutation = _get_configs(args, kwargs, tmpdirname)
+        allow_mutation = _get_configs(args, cmd_args, tmpdirname, project_root)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
-            cell_mapping = save_source.main(notebook, temp_python_file, args.command)
-            cell_mappings[notebook] = cell_mapping
-            _create_blank_init_files(notebook, tmpdirname)
+            cell_mappings[notebook] = save_source.main(
+                notebook, temp_python_file, args.command
+            )
+            _create_blank_init_files(notebook, tmpdirname, project_root)
 
         out, err, output_code, mutated = _run_command(
-            args.command, root_dir, tmpdirname, nb_to_py_mapping, kwargs
+            args.command,
+            tmpdirname,
+            cmd_args,
+            _get_arg(root_dir, tmpdirname, nb_to_py_mapping, project_root),
         )
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
@@ -534,14 +623,14 @@ def _run_on_one_root_dir(
             )
             if mutated and not allow_mutation:
                 if args.nbqa_config:
-                    kwargs += [f"--nbqa-config={args.nbqa_config}"]
-                kwargs += ["--nbqa-mutate"]
+                    cmd_args += [f"--nbqa-config={args.nbqa_config}"]
+                cmd_args += ["--nbqa-mutate"]
                 raise SystemExit(
                     dedent(
                         f"""\
                         💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
 
-                            nbqa {args.command} {root_dir} {' '.join(kwargs)}
+                            nbqa {args.command} {root_dir} {' '.join(cmd_args)}
                         """
                     )
                 )
@@ -564,9 +653,9 @@ def main(raw_args: Optional[List[str]] = None) -> None:
         Command-line arguments (if calling this function directly), defaults to
         :code:`None` if calling via command-line.
     """
-    args, kwargs = _parse_args(raw_args)
+    args, cmd_args = _parse_args(raw_args)
 
-    output_codes = [_run_on_one_root_dir(i, args, kwargs) for i in args.root_dirs]
+    output_codes = [_run_on_one_root_dir(i, args, cmd_args) for i in args.root_dirs]
 
     sys.exit(int(any(output_codes)))
 

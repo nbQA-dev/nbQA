@@ -10,6 +10,23 @@ if TYPE_CHECKING:
     from py._path.local import LocalPath
 
 
+@pytest.fixture(autouse=True)
+def temporarily_delete_setupcfg(tmpdir: "LocalPath") -> Iterator[None]:
+    """
+    Temporarily delete setup.cfg so it can be recreated during tests.
+
+    Parameters
+    ----------
+    tmpdir
+        Pytest fixture, gives us a temporary directory.
+    """
+    filename = Path("setup.cfg")
+    temp_file = Path(tmpdir) / filename
+    shutil.copy(str(filename), str(temp_file))
+    yield
+    shutil.copy(str(temp_file), str(filename))
+
+
 @pytest.fixture
 def tmp_notebook_for_testing(tmpdir: "LocalPath") -> Iterator[Path]:
     """
