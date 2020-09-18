@@ -101,7 +101,7 @@ here\'s an example of what you could add to your
 
 ```yaml
 - repo: https://github.com/nbQA-dev/nbQA
-  rev: 0.1.30
+  rev: 0.1.31
   hooks:
     - id: nbqa
       args: ["flake8"]
