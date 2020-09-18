@@ -79,7 +79,7 @@ Got:
 
 ## Configuration
 
-Here\'s an example `nbqa.ini` file - see
+Here\'s an example `.nbqa.ini` file - see
 [configuration](https://nbqa.readthedocs.io/en/latest/configuration.html)
 for more on configuration:
 
@@ -101,7 +101,7 @@ here\'s an example of what you could add to your
 
 ```yaml
 - repo: https://github.com/nbQA-dev/nbQA
-  rev: 0.1.29
+  rev: 0.1.30
   hooks:
     - id: nbqa
       args: ["flake8"]
