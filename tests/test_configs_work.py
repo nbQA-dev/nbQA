@@ -140,3 +140,37 @@ def test_configs_work_in_nbqaini(capsys: "CaptureFixture") -> None:
     expected_err = ""
     assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
     assert sorted(err.splitlines()) == sorted(expected_err.splitlines())
+
+
+def test_setupcfg_is_preserved(capsys: "CaptureFixture") -> None:
+    """
+    Check setup.cfg file is automatically picked up by nbqa.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    Path("setup.cfg").write_text(
+        dedent(
+            """\
+            [flake8]
+            ignore=F401
+            select=E303
+            quiet=1
+            """
+        )
+    )
+
+    with pytest.raises(SystemExit):
+        main(["flake8", "tests", "--ignore", "E302"])
+
+    # check out and err
+    out, err = capsys.readouterr()
+    notebook = os.path.abspath(
+        os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
+    )
+    expected_out = f"{notebook}\n"
+    expected_err = ""
+    assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
+    assert sorted(err.splitlines()) == sorted(expected_err.splitlines())

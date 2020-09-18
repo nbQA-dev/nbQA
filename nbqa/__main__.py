@@ -22,6 +22,8 @@ NBQA_CONFIG_SECTION = ["config", "mutate", "addopts"]
 CONFIG_PREFIX = "nbqa."
 HISTORIC_CONFIG_FILE = ".nbqa.ini"
 
+CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
+
 
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
     """
@@ -318,13 +320,19 @@ def _preserve_config_files(
     project_root
         Root of repository, where .git / .hg / .nbqa.ini file is.
     """
-    if nbqa_config is None:
-        return
-    temp_config_path = Path(tmpdirname) / Path(
-        project_root / nbqa_config
-    ).resolve().relative_to(project_root)
-    temp_config_path.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy(str(project_root / nbqa_config), str(temp_config_path))
+    if nbqa_config is not None:
+        config_files = [nbqa_config]
+    else:
+        config_files = CONFIG_FILES
+    for config_file in config_files:
+        target_location = Path(tmpdirname) / Path(
+            project_root / config_file
+        ).resolve().relative_to(project_root)
+        target_location.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(
+            str(project_root / config_file),
+            str(target_location),
+        )
 
 
 def _get_arg(
