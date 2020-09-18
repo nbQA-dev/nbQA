@@ -40,6 +40,7 @@ def test_cli(magic: str, expected: str, capsys: "CaptureFixture") -> None:
     [
         ("ignore_cells=%%%%custommagic", "cell_2:3:1: F401 'glob' imported but unused"),
         ("ignore_cells=%%%%custommagic,%%%%anothercustommagic", ""),
+        ("ignore_cells=%%%%custommagic, %%%%anothercustommagic", ""),
     ],
 )
 def test_ini(magic: str, expected: str, capsys: "CaptureFixture") -> None:

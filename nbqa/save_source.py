@@ -37,7 +37,7 @@ def _replace_magics(source: List[str], ignore_cells: Optional[str]) -> Iterator[
         Line from cell, possibly commented out.
     """
     if ignore_cells is not None:
-        ignore = MAGIC + ignore_cells.split(",")
+        ignore = MAGIC + [i.strip() for i in ignore_cells.split(",")]
     else:
         ignore = MAGIC
     ignore_cell = source and any(source[0].startswith(i) for i in ignore)
