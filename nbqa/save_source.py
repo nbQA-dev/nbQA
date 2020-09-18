@@ -33,7 +33,9 @@ def _replace_magics(source: List[str]) -> Iterator[str]:
     str
         Line from cell, possibly commented out.
     """
-    bash_cell = source and any(source[0].startswith(i) for i in ("%%script", "%%bash"))
+    bash_cell = source and any(
+        source[0].lstrip().startswith(i) for i in ("%%script", "%%bash")
+    )
     for j in source:
         if (j.lstrip().startswith("!") or j.lstrip().startswith("%")) or bash_cell:
             yield f"{MAGIC}{j}"
