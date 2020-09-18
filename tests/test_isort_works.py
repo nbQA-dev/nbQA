@@ -106,11 +106,11 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with open(".nbqa.ini", "w") as handle:
+    with open("setup.cfg", "w") as handle:
         handle.write(
             dedent(
                 """\
-            [isort]
+            [nbqa.isort]
             addopts = --treat-comment-as-code "# %%%%"
             """
             )
@@ -120,7 +120,7 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
     with pytest.raises(SystemExit):
         main(["isort", path, "--nbqa-mutate"])
 
-    Path(".nbqa.ini").unlink()
+    Path("setup.cfg").unlink()
 
     # check out and err
     out, err = capsys.readouterr()
