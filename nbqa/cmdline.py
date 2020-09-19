@@ -1,3 +1,4 @@
+"""Parses the command line arguments provided."""
 import argparse
 import sys
 from textwrap import dedent
@@ -7,6 +8,23 @@ from nbqa import __version__
 
 
 class CLIArgs:
+    """
+    Stores the command line arguments passed.
+
+    Attributes
+    ----------
+    command
+        Command to run e.g: flake8
+    root_dirs
+        Notebooks or directories to run command on.
+    nbqa_addopts:
+        Additional options passed to the tool to run
+    nbqa_mutate:
+        Whether to allow nbqa to modify the source notebooks
+    nbqa_config:
+        Configuration file for the third party tool
+    """
+
     command: str
     root_dirs: List[str]
     nbqa_addopts: List[str]
@@ -14,6 +32,16 @@ class CLIArgs:
     nbqa_config: Optional[str] = None
 
     def __init__(self, args: argparse.Namespace, cmd_args: List[str]) -> None:
+        """
+        Initialize this instance with the parsed command line arguments.
+
+        Parameters
+        ----------
+        args (argparse.Namespace):
+            Command line arguments passed to nbqa
+        cmd_args (List[str]):
+            Additional options to pass to the tool
+        """
         self.command = args.command
         self.root_dirs = args.root_dirs
         self.nbqa_addopts = cmd_args
@@ -22,6 +50,7 @@ class CLIArgs:
             self.nbqa_config = args.nbqa_config
 
     def __str__(self) -> str:
+        """Return the command from the parsed command line arguments."""
         args: List[str] = ["nbqa", self.command]
         args.extend(self.root_dirs)
         if self.nbqa_mutate:
@@ -36,6 +65,7 @@ class CLIArgs:
     def parse_args(raw_args: Optional[List[str]]) -> "CLIArgs":
         """
         Parse command-line arguments.
+
         Parameters
         ----------
         raw_args

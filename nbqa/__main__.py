@@ -598,10 +598,10 @@ def _run_on_one_root_dir(root_dir: str, cli_args: CLIArgs, project_root: Path) -
                     raise SystemExit(
                         dedent(
                             f"""\
-                            💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
+                    💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
 
-                                {str(cli_args)}
-                            """
+                        {" ".join([str(cli_args), "--nbqa-mutate"])}
+                    """
                         )
                     )
 
@@ -624,7 +624,6 @@ def main(raw_args: Optional[List[str]] = None) -> None:
         :code:`None` if calling via command-line.
     """
     cli_args: CLIArgs = CLIArgs.parse_args(raw_args)
-    print(cli_args)
     project_root: Path = find_project_root(tuple(cli_args.root_dirs))
 
     output_codes = [
