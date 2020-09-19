@@ -14,15 +14,15 @@ class CLIArgs:
     Attributes
     ----------
     command
-        Command to run e.g: flake8
+        The third-party tool to run (e.g. :code:`mypy`).
     root_dirs
-        Notebooks or directories to run command on.
-    nbqa_addopts:
-        Additional options passed to the tool to run
-    nbqa_mutate:
-        Whether to allow nbqa to modify the source notebooks
-    nbqa_config:
-        Configuration file for the third party tool
+        The notebooks or directories to run third-party tool on.
+    nbqa_mutate
+        Whether to allow 3rd party tools to modify notebooks.
+    nbqa_config
+        Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
+    nbqa_addopts
+        Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
     """
 
     command: str
@@ -72,16 +72,8 @@ class CLIArgs:
             Passed via command-line.
         Returns
         -------
-        command
-            The third-party tool to run (e.g. :code:`mypy`).
-        root_dirs
-            The notebooks or directories to run third-party tool on.
-        allow_mutation
-            Whether to allow 3rd party tools to modify notebooks.
-        nbqa_config
-            Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
-        cmd_args
-            Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
+        CLIArgs
+            Object that holds all the parsed command line arguments.
         Raises
         ------
         ValueError
