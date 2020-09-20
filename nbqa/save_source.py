@@ -40,9 +40,9 @@ def _replace_magics(source: List[str], ignore_cells: Optional[str]) -> Iterator[
         ignore = MAGIC + [i.strip() for i in ignore_cells.split(",")]
     else:
         ignore = MAGIC
-    ignore_cell = source and any(source[0].startswith(i) for i in ignore)
+    ignore_cell = source and any(source[0].lstrip().startswith(i) for i in ignore)
     for j in source:
-        if (j.startswith("!") or j.startswith("%")) or ignore_cell:
+        if (j.lstrip().startswith("!") or j.lstrip().startswith("%")) or ignore_cell:
             yield f"{MAGIC_SEPARATOR}{j}"
         else:
             yield j
