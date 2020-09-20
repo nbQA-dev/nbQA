@@ -1,6 +1,5 @@
 """Check :code:`mypy` works as intended."""
 
-import difflib
 import os
 from textwrap import dedent
 from typing import TYPE_CHECKING
@@ -15,28 +14,17 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-def test_mypy_works(tmp_notebook_for_testing: "Path", capsys: "CaptureFixture") -> None:
+def test_mypy_works(capsys: "CaptureFixture") -> None:
     """
     Check mypy works. Shouldn't alter the notebook content.
 
     Parameters
     ----------
-    tmp_notebook_for_testing
-        Temporary copy of :code:`notebook_for_testing.ipynb`.
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    # check diff
-    with open(tmp_notebook_for_testing, "r") as handle:
-        before = handle.readlines()
     with pytest.raises(SystemExit):
         main(["mypy", "--ignore-missing-imports", "--allow-untyped-defs", "tests"])
-
-    with open(tmp_notebook_for_testing, "r") as handle:
-        after = handle.readlines()
-    result = "".join(difflib.unified_diff(before, after))
-    expected = ""
-    assert result == expected
 
     # check out and err
     out, err = capsys.readouterr()
