@@ -54,8 +54,9 @@ def main(python_file: "Path", notebook: "Path", trailing_semicolons: List[int]) 
         List[str]
             New source that can be saved into Jupyter Notebook.
         """
-        if cell_number in trailing_semicolons:
-            source = source.rstrip("\n") + ";"
+        rstripped_source = source.rstrip("\n")
+        if cell_number in trailing_semicolons and not rstripped_source.endswith(";"):
+            source = rstripped_source + ";"
         # we take [1:] because the first cell is just '\n'
         return [
             j if not j.startswith(MAGIC_SEPARATOR) else j[len(MAGIC_SEPARATOR) :]
