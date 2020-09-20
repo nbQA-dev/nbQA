@@ -99,7 +99,7 @@ def test_black_works_with_trailing_semicolons(
             )
         )
     with pytest.raises(SystemExit):
-        main(["black", path])
+        main(["black", path, "--line-length=10"])
     Path("setup.cfg").unlink()
     with open(tmp_notebook_with_trailing_semicolon, "r") as handle:
         after = handle.readlines()
