@@ -20,8 +20,6 @@ def test_flake8_works(capsys: "CaptureFixture") -> None:
 
     Parameters
     ----------
-    tmp_notebook_for_testing
-        Temporary copy of :code:`notebook_for_testing.ipynb`.
     capsys
         Pytest fixture to capture stdout and stderr.
     """
