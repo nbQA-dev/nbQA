@@ -107,10 +107,12 @@ def test_black_works_with_trailing_semicolons(
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
     expected = (
-        "-    \"    return f'hello {name}'\\n\",\n"
-        '+    "    return f\\"hello {name}\\"\\n",\n'
-        '-    "hello(3)   "\n'
-        '+    "hello(3)"\n'
+        '-    "import glob;\\n",\n'
+        '+    "import glob\\n",\n'
+        '-    "def func(a, b):\\n",\n'
+        '+    "def func(\\n",\n'
+        '+    "    a, b\\n",\n'
+        '+    "):\\n",\n'
     )
     assert result == expected
 
