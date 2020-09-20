@@ -2,6 +2,7 @@
 
 import argparse
 import configparser
+import fileinput
 import os
 import re
 import shutil
@@ -444,11 +445,12 @@ def _run_command(
     before = _get_mtimes(arg)
 
     if command == "black":
-        trailing_commas = [
-            n
-            for n, i in enumerate(arg.read_text().splitlines())
-            if i.strip().endswith(";")
-        ]
+        with open(str(arg)) as handle:
+            trailing_semicolons = [
+                n for n, i in enumerate(handle) if i.rstrip().endswith(";")
+            ]
+    else:
+        trailing_semicolons = []
 
     output = subprocess.run(
         ["python", "-m", command, str(arg), *cmd_args],
@@ -458,19 +460,14 @@ def _run_command(
         env=env,
     )
 
-    after = _get_mtimes(arg)
-    mutated = after != before
+    mutated = _get_mtimes(arg) != before
 
-    if command == "black" and mutated:
-        arg.write_text(
-            "\n".join(
-                [
-                    i if n not in trailing_commas else i + ";"
-                    for n, i in enumerate(arg.read_text().splitlines())
-                ]
-            )
-        )
-
+    if command == "black" and mutated and trailing_semicolons:
+        for line_number, line in enumerate(fileinput.FileInput(str(arg), inplace=True)):
+            if line_number in trailing_semicolons:
+                print(f"{line.rstrip()};{os.linesep}", end="")
+            else:
+                print(line, end="")
     output_code = output.returncode
 
     out = output.stdout.decode()
