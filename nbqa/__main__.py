@@ -443,6 +443,13 @@ def _run_command(
 
     before = _get_mtimes(arg)
 
+    if command == "black":
+        trailing_commas = [
+            n
+            for n, i in enumerate(arg.read_text().splitlines())
+            if i.strip().endswith(";")
+        ]
+
     output = subprocess.run(
         ["python", "-m", command, str(arg), *cmd_args],
         stderr=subprocess.PIPE,
@@ -453,6 +460,16 @@ def _run_command(
 
     after = _get_mtimes(arg)
     mutated = after != before
+
+    if command == "black" and mutated:
+        arg.write_text(
+            "\n".join(
+                [
+                    i if n not in trailing_commas else i + ";"
+                    for n, i in enumerate(arg.read_text().splitlines())
+                ]
+            )
+        )
 
     output_code = output.returncode
 

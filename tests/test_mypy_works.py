@@ -43,12 +43,14 @@ def test_mypy_works(tmp_notebook_for_testing: "Path", capsys: "CaptureFixture") 
     path_0 = os.path.join("tests", "data", "notebook_for_testing.ipynb")
     path_1 = os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
     path_2 = os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
+    path_3 = os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
     expected_out = dedent(
         f"""\
         {path_2}:cell_3:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
         {path_1}:cell_2:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
         {path_0}:cell_2:19: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
-        Found 3 errors in 3 files (checked 8 source files)
+        {path_3}:cell_2:19: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
+        Found 4 errors in 4 files (checked 9 source files)
         """  # noqa
     )
     expected_err = ""

@@ -67,3 +67,59 @@ def test_black_works(
     assert out == expected_out
     for i in (0, 2):  # haven't figured out how to test the emojis part
         assert err.splitlines()[i] == expected_err.splitlines()[i]
+
+
+def test_black_works_with_trailing_semicolons(
+    tmp_notebook_with_trailing_semicolon: "Path", capsys: "CaptureFixture"
+) -> None:
+    """
+    Check black works. Should only reformat code cells.
+
+    Parameters
+    ----------
+    tmp_notebook_with_trailing_semicolon
+        Temporary copy of :code:`notebook_with_trailing_semicolon.ipynb`.
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    # check diff
+    with open(tmp_notebook_with_trailing_semicolon, "r") as handle:
+        before = handle.readlines()
+    path = os.path.abspath(
+        os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
+    )
+
+    with open("setup.cfg", "w") as handle:
+        handle.write(
+            dedent(
+                """\
+            [nbqa.mutate]
+            black=1
+            """
+            )
+        )
+    with pytest.raises(SystemExit):
+        main(["black", path])
+    Path("setup.cfg").unlink()
+    with open(tmp_notebook_with_trailing_semicolon, "r") as handle:
+        after = handle.readlines()
+
+    diff = difflib.unified_diff(before, after)
+    result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
+    expected = (
+        "-    \"    return f'hello {name}'\\n\",\n"
+        '+    "    return f\\"hello {name}\\"\\n",\n'
+        '-    "hello(3)   "\n'
+        '+    "hello(3)"\n'
+    )
+    assert result == expected
+
+    # check out and err
+    out, err = capsys.readouterr()
+    expected_out = ""
+    expected_err = os.linesep.join(
+        [f"reformatted {path}", "All done!   ", "1 file reformatted."]
+    )
+    assert out == expected_out
+    for i in (0, 2):  # haven't figured out how to test the emojis part
+        assert err.splitlines()[i] == expected_err.splitlines()[i]
