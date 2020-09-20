@@ -50,8 +50,8 @@ or you can put the following in your :code:`setup.cfg` file
 
 .. code-block:: cfg
 
-    [black]
-    mutate = 1
+    [nbqa.mutate]
+    black = 1
 
 Ignore cells
 ~~~~~~~~~~~~
@@ -65,7 +65,7 @@ To ignore extra cells, you can use the :code:`--nbqa-ignore-cells` CLI argument,
 
 , or the :code:`ignore_cells` option in your :code:`.nbqa.ini` file, e.g.
 
-.. code-block:: ini
+.. code-block:: cfg
 
-    [black]
-    ignore_cells = %%html,%%cython
+    [nbqa.ignore_cells]
+    black = %%html,%%cython
