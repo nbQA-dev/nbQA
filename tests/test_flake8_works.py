@@ -9,8 +9,6 @@ import pytest
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from _pytest.capture import CaptureFixture
 
 
