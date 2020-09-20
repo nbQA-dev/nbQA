@@ -34,7 +34,6 @@ def test_flake8_works(capsys: "CaptureFixture") -> None:
         os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
     )
 
-    # check diff
     with pytest.raises(SystemExit):
         main(["flake8", path_0, path_1, path_2])
 
