@@ -6,18 +6,19 @@ Markdown cells, output, and metadata are ignored.
 
 import json
 from collections import defaultdict
-from typing import TYPE_CHECKING, Dict, Iterator, List
+from typing import TYPE_CHECKING, Dict, Iterator, List, Optional
 
 if TYPE_CHECKING:
     from pathlib import Path
 
 CODE_SEPARATOR = "# %%"
-MAGIC = "# NBQAMAGIC"
+MAGIC_SEPARATOR = "# NBQAMAGIC"
 BLANK_SPACES = defaultdict(lambda: "\n\n")
 BLANK_SPACES["isort"] = "\n"
+MAGIC = ["%%script", "%%bash"]
 
 
-def _replace_magics(source: List[str]) -> Iterator[str]:
+def _replace_magics(source: List[str], ignore_cells: Optional[str]) -> Iterator[str]:
     """
     Comment out lines with magic commands.
 
@@ -27,23 +28,32 @@ def _replace_magics(source: List[str]) -> Iterator[str]:
     ----------
     source
         Source from notebook cell.
+    ignore_cells
+        Extra cells which nbqa should ignore.
 
     Yields
     ------
     str
         Line from cell, possibly commented out.
     """
-    bash_cell = source and any(
-        source[0].lstrip().startswith(i) for i in ("%%script", "%%bash")
-    )
+    if ignore_cells is not None:
+        ignore = MAGIC + [i.strip() for i in ignore_cells.split(",")]
+    else:
+        ignore = MAGIC
+    ignore_cell = source and any(source[0].lstrip().startswith(i) for i in ignore)
     for j in source:
-        if (j.lstrip().startswith("!") or j.lstrip().startswith("%")) or bash_cell:
-            yield f"{MAGIC}{j}"
+        if (j.lstrip().startswith("!") or j.lstrip().startswith("%")) or ignore_cell:
+            yield f"{MAGIC_SEPARATOR}{j}"
         else:
             yield j
 
 
-def main(notebook: "Path", temp_python_file: "Path", command: str) -> Dict[int, str]:
+def main(
+    notebook: "Path",
+    temp_python_file: "Path",
+    command: str,
+    ignore_cells: Optional[str],
+) -> Dict[int, str]:
     """
     Extract code cells from notebook and save them in temporary Python file.
 
@@ -55,6 +65,8 @@ def main(notebook: "Path", temp_python_file: "Path", command: str) -> Dict[int, 
         Temporary Python file to save converted notebook in.
     command
         Third party tool which you're running on your notebook.
+    ignore_cells
+        Extra cells which nbqa should ignore.
 
     Returns
     -------
@@ -74,15 +86,16 @@ def main(notebook: "Path", temp_python_file: "Path", command: str) -> Dict[int, 
     for i in cells:
         if i["cell_type"] != "code":
             continue
-        source = _replace_magics(i["source"])
+        source = _replace_magics(i["source"], ignore_cells)
         parsed_cell = f"{BLANK_SPACES[command]}{CODE_SEPARATOR}\n{''.join(source)}\n"
         result.append(parsed_cell)
         split_parsed_cell = parsed_cell.splitlines()
-        mapping = {
-            j + line_number + 1: f"cell_{cell_number+1}:{j}"
-            for j in range(len(split_parsed_cell))
-        }
-        cell_mapping.update(mapping)
+        cell_mapping.update(
+            {
+                j + line_number + 1: f"cell_{cell_number+1}:{j}"
+                for j in range(len(split_parsed_cell))
+            }
+        )
         line_number += len(split_parsed_cell)
         cell_number += 1
 

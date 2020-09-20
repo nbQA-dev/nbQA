@@ -12,7 +12,7 @@ from configparser import ConfigParser
 from pathlib import Path
 from shlex import split
 from textwrap import dedent
-from typing import Dict, Iterator, List, Match, Optional, Set, Tuple
+from typing import Dict, Iterator, List, Match, NamedTuple, Optional, Set, Tuple
 
 from nbqa import __version__, replace_source, save_source
 from nbqa.find_root import find_project_root
@@ -23,6 +23,22 @@ CONFIG_PREFIX = "nbqa."
 HISTORIC_CONFIG_FILE = ".nbqa.ini"
 
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
+
+
+class Configs(NamedTuple):
+    """
+    Options with which to run nbqa.
+
+    Attributes
+    ----------
+    allow_mutation
+        Whether to allow nbqa to modify notebooks.
+    ignore_cells
+        Extra cells which nbqa should ignore.
+    """
+
+    allow_mutation: bool
+    ignore_cells: Optional[str]
 
 
 def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
@@ -75,6 +91,17 @@ def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List
         "--nbqa-config",
         required=False,
         help="Config file for third-party tool (e.g. `setup.cfg`)",
+    )
+    parser.add_argument(
+        "--nbqa-ignore-cells",
+        required=False,
+        help=dedent(
+            r"""
+            Ignore cells whose first line starts with this. You can pass multiple options,
+            e.g. `nbqa black my_notebook.ipynb --nbqa-ignore-cells %%%%cython,%%%%html`
+            by placing commas between them.
+            """
+        ),
     )
     parser.add_argument("--version", action="version", version=f"nbQA {__version__}")
     try:
@@ -535,7 +562,7 @@ def _get_option(
 
 def _get_configs(
     args: argparse.Namespace, cmd_args: List[str], tmpdirname: str, project_root: Path
-) -> bool:
+) -> Configs:
     """
     Deal with extra configs for 3rd party tool.
 
@@ -552,14 +579,14 @@ def _get_configs(
 
     Returns
     -------
-    bool
-        Whether or not to copy __init__.py to temporary directory.
-    bool
-        Whether to allow nbqa to modify notebooks.
+    Configs
+        Taken from CLI (if given), else from .nbqa.ini.
     """
     config_file, config, config_prefix = _find_config_file(args.command, project_root)
     nbqa_config = args.nbqa_config
     allow_mutation = args.nbqa_mutate
+    ignore_cells = args.nbqa_ignore_cells
+
     if config is not None:
         assert config_file is not None
         assert config_prefix is not None
@@ -577,8 +604,12 @@ def _get_configs(
             allow_mutation = bool(
                 _get_option(config_file, config, f"{config_prefix}mutate", args.command)
             )
+        if ignore_cells is None:
+            ignore_cells = _get_option(
+                config_file, config, f"{config_prefix}ignore_cells", args.command
+            )
     _preserve_config_files(nbqa_config, tmpdirname, project_root)
-    return allow_mutation
+    return Configs(allow_mutation, ignore_cells)
 
 
 def _run_on_one_root_dir(
@@ -610,11 +641,11 @@ def _run_on_one_root_dir(
         }
         cell_mappings = {}
 
-        allow_mutation = _get_configs(args, cmd_args, tmpdirname, project_root)
+        configs = _get_configs(args, cmd_args, tmpdirname, project_root)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             cell_mappings[notebook] = save_source.main(
-                notebook, temp_python_file, args.command
+                notebook, temp_python_file, args.command, configs.ignore_cells
             )
             _create_blank_init_files(notebook, tmpdirname, project_root)
 
@@ -629,7 +660,7 @@ def _run_on_one_root_dir(
             out, err = _replace_temp_python_file_references_in_out_err(
                 temp_python_file, notebook, out, err, cell_mappings[notebook]
             )
-            if mutated and not allow_mutation:
+            if mutated and not configs.allow_mutation:
                 if args.nbqa_config:
                     cmd_args += [f"--nbqa-config={args.nbqa_config}"]
                 cmd_args += ["--nbqa-mutate"]
