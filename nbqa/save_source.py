@@ -6,7 +6,7 @@ Markdown cells, output, and metadata are ignored.
 
 import json
 from collections import defaultdict
-from typing import TYPE_CHECKING, Dict, Iterator, List, Optional
+from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -53,7 +53,7 @@ def main(
     temp_python_file: "Path",
     command: str,
     ignore_cells: Optional[str],
-) -> Dict[int, str]:
+) -> Tuple[Dict[int, str], List[int]]:
     """
     Extract code cells from notebook and save them in temporary Python file.
 
@@ -72,16 +72,17 @@ def main(
     -------
     cell_mapping
         Mapping from Python line numbers to Jupyter notebooks cells.
+    trailing_semicolons
+        Cell numbers where there were originally trailing semicolons.
     """
     with open(notebook, "r") as handle:
-        parsed_notebook = json.load(handle)
-
-    cells = parsed_notebook["cells"]
+        cells = json.load(handle)["cells"]
 
     result = []
     cell_mapping = {}
     line_number = 0
     cell_number = 0
+    trailing_semicolons = []
 
     for i in cells:
         if i["cell_type"] != "code":
@@ -96,10 +97,12 @@ def main(
                 for j in range(len(split_parsed_cell))
             }
         )
+        if parsed_cell.rstrip().endswith(";"):
+            trailing_semicolons.append(cell_number)
         line_number += len(split_parsed_cell)
         cell_number += 1
 
     with open(str(temp_python_file), "w") as handle:
         handle.write("".join(result)[len(BLANK_SPACES[command]) : -len("\n")])
 
-    return cell_mapping
+    return cell_mapping, trailing_semicolons
