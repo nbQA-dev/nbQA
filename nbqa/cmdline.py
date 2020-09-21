@@ -21,6 +21,8 @@ class CLIArgs:
         Whether to allow 3rd party tools to modify notebooks.
     nbqa_config
         Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
+    nbqa_ignore_cells
+        Ignore cells whose first line starts with the input token
     nbqa_addopts
         Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
     """
@@ -29,7 +31,8 @@ class CLIArgs:
     root_dirs: List[str]
     nbqa_addopts: List[str]
     nbqa_mutate: bool
-    nbqa_config: Optional[str] = None
+    nbqa_ignore_cells: Optional[str]
+    nbqa_config: Optional[str]
 
     def __init__(self, args: argparse.Namespace, cmd_args: List[str]) -> None:
         """
@@ -46,8 +49,8 @@ class CLIArgs:
         self.root_dirs = args.root_dirs
         self.nbqa_addopts = cmd_args
         self.nbqa_mutate = args.nbqa_mutate or False
-        if args.nbqa_config is not None:
-            self.nbqa_config = args.nbqa_config
+        self.nbqa_config = args.nbqa_config or None
+        self.nbqa_ignore_cells = args.nbqa_ignore_cells or None
 
     def __str__(self) -> str:
         """Return the command from the parsed command line arguments."""
@@ -57,6 +60,8 @@ class CLIArgs:
             args.append("--nbqa-mutate")
         if self.nbqa_config:
             args.append(f"--nbqa-config={self.nbqa_config}")
+        if self.nbqa_ignore_cells:
+            args.append(f"--nbqa-ignore-cells={self.nbqa_ignore_cells}")
         args.extend(self.nbqa_addopts)
 
         return " ".join(args)
@@ -103,6 +108,17 @@ class CLIArgs:
             "--nbqa-config",
             required=False,
             help="Config file for third-party tool (e.g. `setup.cfg`)",
+        )
+        parser.add_argument(
+            "--nbqa-ignore-cells",
+            required=False,
+            help=dedent(
+                r"""
+                Ignore cells whose first line starts with this. You can pass multiple options,
+                e.g. `nbqa black my_notebook.ipynb --nbqa-ignore-cells %%%%cython,%%%%html`
+                by placing commas between them.
+                """
+            ),
         )
         parser.add_argument(
             "--version", action="version", version=f"nbQA {__version__}"

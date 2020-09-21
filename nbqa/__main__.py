@@ -1,6 +1,5 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
 
-import argparse
 import configparser
 import os
 import re
@@ -12,7 +11,7 @@ from configparser import ConfigParser
 from pathlib import Path
 from shlex import split
 from textwrap import dedent
-from typing import Dict, Iterator, List, Match, Optional, Set, Tuple
+from typing import Dict, Iterator, List, Match, NamedTuple, Optional, Set, Tuple
 
 from nbqa import replace_source, save_source
 from nbqa.cmdline import CLIArgs
@@ -34,13 +33,18 @@ class Configs(NamedTuple):
     ----------
     allow_mutation
         Whether to allow nbqa to modify notebooks.
+    config
+        Configuration of the third party tool.
     ignore_cells
         Extra cells which nbqa should ignore.
+    addopts
+        Additional arguments passed to the third party tool
     """
 
     allow_mutation: bool
+    config: Optional[str]
     ignore_cells: Optional[str]
-
+    addopts: List[str]
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
@@ -431,6 +435,8 @@ def _find_config_file(
     ----------
     command
         Third-party tool being run.
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
 
     Returns
     -------
@@ -486,9 +492,7 @@ def _get_option(
     return None
 
 
-def _get_configs(
-    cli_args: CLIArgs, cmd_args: List[str], tmpdirname: str, project_root: Path
-) -> Configs:
+def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     """
     Deal with extra configs for 3rd party tool.
 
@@ -496,10 +500,6 @@ def _get_configs(
     ----------
     args
         Commandline arguments passed to nbqa
-    cmd_args
-        Extra flags for third party tool
-    tmpdirname
-        Temporary directory where notebooks are copied to.
     project_root
         Root of repository, where .git / .hg / .nbqa.ini file is.
 
@@ -513,7 +513,8 @@ def _get_configs(
     )
     nbqa_config: Optional[str] = cli_args.nbqa_config
     allow_mutation: bool = cli_args.nbqa_mutate
-    ignore_cells = args.nbqa_ignore_cells
+    ignore_cells: Optional[str] = cli_args.nbqa_ignore_cells
+    cmd_args: List[str] = list(cli_args.nbqa_addopts)
 
     if config is not None:
         assert config_file is not None
@@ -539,10 +540,12 @@ def _get_configs(
 
         if ignore_cells is None:
             ignore_cells = _get_option(
-                config_file, config, f"{config_prefix}ignore_cells", args.command
+                config_file, config, f"{config_prefix}ignore_cells", cli_args.command
             )
-    _preserve_config_files(nbqa_config, tmpdirname, project_root)
-    return Configs(allow_mutation, ignore_cells)
+
+    return Configs(
+        allow_mutation, config=nbqa_config, ignore_cells=ignore_cells, addopts=cmd_args
+    )
 
 
 def _run_on_one_root_dir(root_dir: str, cli_args: CLIArgs, project_root: Path) -> int:
@@ -571,10 +574,12 @@ def _run_on_one_root_dir(root_dir: str, cli_args: CLIArgs, project_root: Path) -
             notebook: _temp_python_file_for_notebook(notebook, tmpdirname, project_root)
             for notebook in notebooks
         }
+
         cell_mappings = {}
 
-        cmd_args = list(cli_args.nbqa_addopts)
-        configs = _get_configs(cli_args, cmd_args, tmpdirname, project_root)
+        configs = _get_configs(cli_args, project_root)
+
+        _preserve_config_files(configs.config, tmpdirname, project_root)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             cell_mappings[notebook] = save_source.main(
@@ -585,7 +590,7 @@ def _run_on_one_root_dir(root_dir: str, cli_args: CLIArgs, project_root: Path) -
         out, err, output_code, mutated = _run_command(
             cli_args.command,
             tmpdirname,
-            cmd_args,
+            configs.addopts,
             _get_arg(root_dir, tmpdirname, nb_to_py_mapping, project_root),
         )
 
