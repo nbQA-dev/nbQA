@@ -1,6 +1,5 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
 
-import argparse
 import configparser
 import os
 import re
@@ -14,7 +13,8 @@ from shlex import split
 from textwrap import dedent
 from typing import Dict, Iterator, List, Match, NamedTuple, Optional, Set, Tuple
 
-from nbqa import __version__, replace_source, save_source
+from nbqa import replace_source, save_source
+from nbqa.cmdline import CLIArgs
 from nbqa.find_root import find_project_root
 
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
@@ -33,88 +33,18 @@ class Configs(NamedTuple):
     ----------
     allow_mutation
         Whether to allow nbqa to modify notebooks.
+    config
+        Configuration of the third party tool.
     ignore_cells
         Extra cells which nbqa should ignore.
+    addopts
+        Additional arguments passed to the third party tool
     """
 
     allow_mutation: bool
+    config: Optional[str]
     ignore_cells: Optional[str]
-
-
-def _parse_args(raw_args: Optional[List[str]]) -> Tuple[argparse.Namespace, List[str]]:
-    """
-    Parse command-line arguments.
-
-    Parameters
-    ----------
-    raw_args
-        Passed via command-line.
-
-    Returns
-    -------
-    command
-        The third-party tool to run (e.g. :code:`mypy`).
-    root_dirs
-        The notebooks or directories to run third-party tool on.
-    allow_mutation
-        Whether to allow 3rd party tools to modify notebooks.
-    nbqa_config
-        Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
-    cmd_args
-        Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
-
-    Raises
-    ------
-    ValueError
-        If user doesn't specify both a command and a notebook/directory to run it
-        on (e.g. if the user runs :code:`nbqa flake8` instead of :code:`nbqa flake8 .`).
-    """
-    parser = argparse.ArgumentParser(
-        description="Adapter to run any code-quality tool on a Jupyter notebook.",
-        usage=dedent(
-            """\
-            nbqa <command> <notebook or directory> <flags>
-            example:
-
-                nbqa flake8 my_notebook.ipynb --ignore=E203\
-            """
-        ),
-    )
-    parser.add_argument("command", help="Command to run, e.g. `flake8`.")
-    parser.add_argument(
-        "root_dirs", nargs="+", help="Notebooks or directories to run command on."
-    )
-    parser.add_argument(
-        "--nbqa-mutate", action="store_true", help="Allows `nbqa` to modify notebooks."
-    )
-    parser.add_argument(
-        "--nbqa-config",
-        required=False,
-        help="Config file for third-party tool (e.g. `setup.cfg`)",
-    )
-    parser.add_argument(
-        "--nbqa-ignore-cells",
-        required=False,
-        help=dedent(
-            r"""
-            Ignore cells whose first line starts with this. You can pass multiple options,
-            e.g. `nbqa black my_notebook.ipynb --nbqa-ignore-cells %%%%cython,%%%%html`
-            by placing commas between them.
-            """
-        ),
-    )
-    parser.add_argument("--version", action="version", version=f"nbQA {__version__}")
-    try:
-        args, cmd_args = parser.parse_known_args(raw_args)
-    except SystemExit as exception:
-        if exception.code != 0:
-            msg = (
-                "Please specify both a command and a notebook/directory, e.g.\n"
-                "nbqa flake8 my_notebook.ipynb"
-            )
-            raise ValueError(msg) from exception
-        sys.exit(0)  # pragma: nocover
-    return args, cmd_args
+    addopts: List[str]
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
@@ -504,6 +434,8 @@ def _find_config_file(
     ----------
     command
         Third-party tool being run.
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
 
     Returns
     -------
@@ -559,20 +491,14 @@ def _get_option(
     return None
 
 
-def _get_configs(
-    args: argparse.Namespace, cmd_args: List[str], tmpdirname: str, project_root: Path
-) -> Configs:
+def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     """
     Deal with extra configs for 3rd party tool.
 
     Parameters
     ----------
     args
-        Arguments passed to nbqa
-    cmd_args
-        Extra flags for third party tool
-    tmpdirname
-        Temporary directory where notebooks are copied to.
+        Commandline arguments passed to nbqa
     project_root
         Root of repository, where .git / .hg / .nbqa.ini file is.
 
@@ -581,55 +507,65 @@ def _get_configs(
     Configs
         Taken from CLI (if given), else from .nbqa.ini.
     """
-    config_file, config, config_prefix = _find_config_file(args.command, project_root)
-    nbqa_config = args.nbqa_config
-    allow_mutation = args.nbqa_mutate
-    ignore_cells = args.nbqa_ignore_cells
+    config_file, config, config_prefix = _find_config_file(
+        cli_args.command, project_root
+    )
+    nbqa_config: Optional[str] = cli_args.nbqa_config
+    allow_mutation: bool = cli_args.nbqa_mutate
+    ignore_cells: Optional[str] = cli_args.nbqa_ignore_cells
+    cmd_args: List[str] = list(cli_args.nbqa_addopts)
 
     if config is not None:
         assert config_file is not None
         assert config_prefix is not None
 
         addopts = _get_option(
-            config_file, config, f"{config_prefix}addopts", args.command
+            config_file, config, f"{config_prefix}addopts", cli_args.command
         )
         if addopts is not None:
             cmd_args.extend(split(addopts))
+
         if nbqa_config is None:
             nbqa_config = _get_option(
-                config_file, config, f"{config_prefix}config", args.command
+                config_file, config, f"{config_prefix}config", cli_args.command
             )
+
         if not allow_mutation:
             allow_mutation = bool(
-                _get_option(config_file, config, f"{config_prefix}mutate", args.command)
+                _get_option(
+                    config_file, config, f"{config_prefix}mutate", cli_args.command
+                )
             )
+
         if ignore_cells is None:
             ignore_cells = _get_option(
-                config_file, config, f"{config_prefix}ignore_cells", args.command
+                config_file, config, f"{config_prefix}ignore_cells", cli_args.command
             )
-    _preserve_config_files(nbqa_config, tmpdirname, project_root)
-    return Configs(allow_mutation, ignore_cells)
+
+    return Configs(
+        allow_mutation, config=nbqa_config, ignore_cells=ignore_cells, addopts=cmd_args
+    )
 
 
-def _run_on_one_root_dir(
-    root_dir: str, args: argparse.Namespace, cmd_args: List[str]
-) -> int:
+def _run_on_one_root_dir(root_dir: str, cli_args: CLIArgs, project_root: Path) -> int:
     """
     Run third-party tool on a single notebook or directory.
 
     Parameters
     ----------
-    args
-        Arguments passed to nbqa.
-    cmd_args
-        Additional flags to pass to 3rd party tool
+    root_dir
+        Directory on which nbqa should be run
+    cli_args
+        Commanline arguments passed to nbqa.
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
 
     Returns
     -------
     int
         Output code from third-party tool.
     """
-    project_root = find_project_root(tuple(args.root_dirs))
+    project_root = find_project_root(tuple(cli_args.root_dirs))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
 
@@ -637,21 +573,24 @@ def _run_on_one_root_dir(
             notebook: _temp_python_file_for_notebook(notebook, tmpdirname, project_root)
             for notebook in _get_notebooks(root_dir)
         }
+
         cell_mappings = {}
         trailing_semicolons = {}
 
-        configs = _get_configs(args, cmd_args, tmpdirname, project_root)
+        configs = _get_configs(cli_args, project_root)
+
+        _preserve_config_files(configs.config, tmpdirname, project_root)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             cell_mappings[notebook], trailing_semicolons[notebook] = save_source.main(
-                notebook, temp_python_file, args.command, configs.ignore_cells
+                notebook, temp_python_file, cli_args.command, configs.ignore_cells
             )
             _create_blank_init_files(notebook, tmpdirname, project_root)
 
         out, err, output_code, mutated = _run_command(
-            args.command,
+            cli_args.command,
             tmpdirname,
-            cmd_args,
+            configs.addopts,
             _get_arg(root_dir, tmpdirname, nb_to_py_mapping, project_root),
         )
 
@@ -659,20 +598,18 @@ def _run_on_one_root_dir(
             out, err = _replace_temp_python_file_references_in_out_err(
                 temp_python_file, notebook, out, err, cell_mappings[notebook]
             )
-            if mutated and not configs.allow_mutation:
-                if args.nbqa_config:
-                    cmd_args += [f"--nbqa-config={args.nbqa_config}"]
-                cmd_args += ["--nbqa-mutate"]
-                raise SystemExit(
-                    dedent(
-                        f"""\
-                        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
-
-                            nbqa {args.command} {root_dir} {' '.join(cmd_args)}
-                        """
-                    )
-                )
             if mutated:
+                if not configs.allow_mutation:
+                    raise SystemExit(
+                        dedent(
+                            f"""\
+                    💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
+
+                        {" ".join([str(cli_args), "--nbqa-mutate"])}
+                    """
+                        )
+                    )
+
                 replace_source.main(
                     temp_python_file, notebook, trailing_semicolons[notebook]
                 )
@@ -693,9 +630,12 @@ def main(raw_args: Optional[List[str]] = None) -> None:
         Command-line arguments (if calling this function directly), defaults to
         :code:`None` if calling via command-line.
     """
-    args, cmd_args = _parse_args(raw_args)
+    cli_args: CLIArgs = CLIArgs.parse_args(raw_args)
+    project_root: Path = find_project_root(tuple(cli_args.root_dirs))
 
-    output_codes = [_run_on_one_root_dir(i, args, cmd_args) for i in args.root_dirs]
+    output_codes = [
+        _run_on_one_root_dir(i, cli_args, project_root) for i in cli_args.root_dirs
+    ]
 
     sys.exit(int(any(output_codes)))
 
