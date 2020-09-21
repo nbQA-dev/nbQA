@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-def main(python_file: "Path", notebook: "Path") -> None:
+def main(python_file: "Path", notebook: "Path", trailing_semicolons: List[int]) -> None:
     """
     Replace :code:`source` code cells of original notebook.
 
@@ -23,6 +23,8 @@ def main(python_file: "Path", notebook: "Path") -> None:
         Temporary Python file notebook was converted to.
     notebook
         Jupyter Notebook third-party tool is run against (unmodified).
+    trailing_semicolons
+        Cells which originally had trailing semicolons.
     """
     with open(notebook, "r") as handle:
         notebook_json = json.load(handle)
@@ -32,7 +34,9 @@ def main(python_file: "Path", notebook: "Path") -> None:
 
     pycells = pyfile[len(CODE_SEPARATOR) :].split(CODE_SEPARATOR)
 
-    def _reinstate_magics(source: str) -> List[str]:
+    def _reinstate_magics(
+        source: str, trailing_semicolons: List[int], cell_number: int
+    ) -> List[str]:
         """
         Put (commented-out) magics back in.
 
@@ -40,12 +44,19 @@ def main(python_file: "Path", notebook: "Path") -> None:
         ----------
         source
             Portion of Python file between cell separators.
+        trailing_semicolons
+            List of cells which originally had trailing semicolons.
+        cell_number
+            Number of current cell.
 
         Returns
         -------
         List[str]
             New source that can be saved into Jupyter Notebook.
         """
+        rstripped_source = source.rstrip("\n")
+        if cell_number in trailing_semicolons and not rstripped_source.endswith(";"):
+            source = rstripped_source + ";"
         # we take [1:] because the first cell is just '\n'
         return [
             j if not j.startswith(MAGIC_SEPARATOR) else j[len(MAGIC_SEPARATOR) :]
@@ -53,7 +64,8 @@ def main(python_file: "Path", notebook: "Path") -> None:
         ]
 
     new_sources = (
-        {"source": _reinstate_magics(i), "cell_type": "code"} for i in pycells
+        {"source": _reinstate_magics(i, trailing_semicolons, n), "cell_type": "code"}
+        for n, i in enumerate(pycells)
     )
 
     new_cells = []

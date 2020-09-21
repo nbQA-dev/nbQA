@@ -478,8 +478,7 @@ def _run_command(
         env=env,
     )
 
-    after = _get_mtimes(arg)
-    mutated = after != before
+    mutated = _get_mtimes(arg) != before
 
     output_code = output.returncode
 
@@ -630,21 +629,21 @@ def _run_on_one_root_dir(
     int
         Output code from third-party tool.
     """
-    notebooks = _get_notebooks(root_dir)
     project_root = find_project_root(tuple(args.root_dirs))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
 
         nb_to_py_mapping = {
             notebook: _temp_python_file_for_notebook(notebook, tmpdirname, project_root)
-            for notebook in notebooks
+            for notebook in _get_notebooks(root_dir)
         }
         cell_mappings = {}
+        trailing_semicolons = {}
 
         configs = _get_configs(args, cmd_args, tmpdirname, project_root)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
-            cell_mappings[notebook] = save_source.main(
+            cell_mappings[notebook], trailing_semicolons[notebook] = save_source.main(
                 notebook, temp_python_file, args.command, configs.ignore_cells
             )
             _create_blank_init_files(notebook, tmpdirname, project_root)
@@ -674,7 +673,9 @@ def _run_on_one_root_dir(
                     )
                 )
             if mutated:
-                replace_source.main(temp_python_file, notebook)
+                replace_source.main(
+                    temp_python_file, notebook, trailing_semicolons[notebook]
+                )
 
         sys.stdout.write(out)
         sys.stderr.write(err)

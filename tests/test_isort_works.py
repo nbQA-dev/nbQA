@@ -128,3 +128,31 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
     expected_err = ""
     assert out == expected_out
     assert err == expected_err
+
+
+def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: "Path") -> None:
+    """
+    Check isort works when a notebook starts with a markdown cell.
+
+    Parameters
+    ----------
+    tmp_notebook_starting_with_md
+        Temporary copy of :code:`notebook_for_testing.ipynb`.
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    # check diff
+    with open(tmp_notebook_with_trailing_semicolon, "r") as handle:
+        before = handle.readlines()
+    path = os.path.abspath(
+        os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
+    )
+    with pytest.raises(SystemExit):
+        main(["isort", path, "--nbqa-mutate"])
+
+    with open(tmp_notebook_with_trailing_semicolon, "r") as handle:
+        after = handle.readlines()
+    diff = difflib.unified_diff(before, after)
+    result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
+    expected = '-    "import glob;\\n",\n+    "import glob\\n",\n'
+    assert result == expected
