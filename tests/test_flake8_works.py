@@ -1,6 +1,5 @@
 """Check :code:`flake8` works as intended."""
 
-import difflib
 import os
 from textwrap import dedent
 from typing import TYPE_CHECKING
@@ -10,21 +9,15 @@ import pytest
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from _pytest.capture import CaptureFixture
 
 
-def test_flake8_works(
-    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture"
-) -> None:
+def test_flake8_works(capsys: "CaptureFixture") -> None:
     """
     Check flake8 works. Shouldn't alter the notebook content.
 
     Parameters
     ----------
-    tmp_notebook_for_testing
-        Temporary copy of :code:`notebook_for_testing.ipynb`.
     capsys
         Pytest fixture to capture stdout and stderr.
     """
@@ -39,17 +32,8 @@ def test_flake8_works(
         os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
     )
 
-    # check diff
-    with open(tmp_notebook_for_testing, "r") as handle:
-        before = handle.readlines()
     with pytest.raises(SystemExit):
         main(["flake8", path_0, path_1, path_2])
-
-    with open(tmp_notebook_for_testing, "r") as handle:
-        after = handle.readlines()
-    result = "".join(difflib.unified_diff(before, after))
-    expected = ""
-    assert result == expected
 
     out, err = capsys.readouterr()
     expected_out = dedent(
