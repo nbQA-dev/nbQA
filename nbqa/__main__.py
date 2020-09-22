@@ -282,6 +282,8 @@ def _preserve_config_files(
     else:
         config_files = CONFIG_FILES
     for config_file in config_files:
+        if not (project_root / config_file).exists():
+            continue
         target_location = Path(tmpdirname) / Path(
             project_root / config_file
         ).resolve().relative_to(project_root)
