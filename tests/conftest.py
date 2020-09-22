@@ -23,6 +23,7 @@ def temporarily_delete_setupcfg(tmpdir: "LocalPath") -> Iterator[None]:
     filename = Path("setup.cfg")
     temp_file = Path(tmpdir) / filename
     shutil.copy(str(filename), str(temp_file))
+    filename.unlink()
     yield
     shutil.copy(str(temp_file), str(filename))
 
