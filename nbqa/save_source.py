@@ -6,7 +6,7 @@ Markdown cells, output, and metadata are ignored.
 
 import json
 from collections import defaultdict
-from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, Iterator, List, Tuple
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -18,7 +18,7 @@ BLANK_SPACES["isort"] = "\n"
 MAGIC = ["%%script", "%%bash"]
 
 
-def _replace_magics(source: List[str], ignore_cells: Optional[str]) -> Iterator[str]:
+def _replace_magics(source: List[str], ignore_cells: List[str]) -> Iterator[str]:
     """
     Comment out lines with magic commands.
 
@@ -36,10 +36,8 @@ def _replace_magics(source: List[str], ignore_cells: Optional[str]) -> Iterator[
     str
         Line from cell, possibly commented out.
     """
-    if ignore_cells is not None:
-        ignore = MAGIC + [i.strip() for i in ignore_cells.split(",")]
-    else:
-        ignore = MAGIC
+    ignore = MAGIC + [i.strip() for i in ignore_cells]
+
     ignore_cell = source and any(source[0].lstrip().startswith(i) for i in ignore)
     for j in source:
         if (j.lstrip().startswith("!") or j.lstrip().startswith("%")) or ignore_cell:
@@ -52,7 +50,7 @@ def main(
     notebook: "Path",
     temp_python_file: "Path",
     command: str,
-    ignore_cells: Optional[str],
+    ignore_cells: List[str],
 ) -> Tuple[Dict[int, str], List[int]]:
     """
     Extract code cells from notebook and save them in temporary Python file.

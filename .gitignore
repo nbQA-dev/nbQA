@@ -13,3 +13,4 @@ dist
 .tox
 build/
 docs/api
+.idea
