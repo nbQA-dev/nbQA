@@ -47,7 +47,7 @@ All done! ✨ 🍰 ✨
 Sort your imports with [isort](https://timothycrosley.github.io/isort/):
 
 ```bash
-$ nbqa isort my_notebook.ipynb --treat-comment-as-code='# %%' --nbqa-mutate
+$ nbqa isort my_notebook.ipynb --treat-comment-as-code '# %%' --nbqa-mutate
 Fixing my_notebook.ipynb
 ```
 
