@@ -4,9 +4,11 @@ Extract code cells from notebook and save them to temporary Python file.
 Markdown cells, output, and metadata are ignored.
 """
 
+from ast import parse
 import json
 from collections import defaultdict
 from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple
+import secrets
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -43,9 +45,10 @@ def _replace_magics(source: List[str], ignore_cells: Optional[str]) -> Iterator[
     ignore_cell = source and any(source[0].lstrip().startswith(i) for i in ignore)
     for j in source:
         if (j.lstrip().startswith("!") or j.lstrip().startswith("%")) or ignore_cell:
-            yield f"{MAGIC_SEPARATOR}{j}"
+            token = secrets.token_hex(3)
+            yield f"{' '*(len(j) - len(j.lstrip(' ')))}pass  # nbqa{token}\n", j
         else:
-            yield j
+            yield j, None
 
 
 def main(
@@ -83,12 +86,18 @@ def main(
     line_number = 0
     cell_number = 0
     trailing_semicolons = []
+    old_sources = {}
 
     for i in cells:
         if i["cell_type"] != "code":
             continue
         source = _replace_magics(i["source"], ignore_cells)
-        parsed_cell = f"{BLANK_SPACES[command]}{CODE_SEPARATOR}\n{''.join(source)}\n"
+        parsed_cell = f"{BLANK_SPACES[command]}{CODE_SEPARATOR}\n"
+        for pass_, old in source:
+            parsed_cell += pass_
+            if old is not None:
+                old_sources[pass_] = old
+        parsed_cell += '\n'
         result.append(parsed_cell)
         split_parsed_cell = parsed_cell.splitlines()
         cell_mapping.update(
@@ -105,4 +114,4 @@ def main(
     with open(str(temp_python_file), "w") as handle:
         handle.write("".join(result)[len(BLANK_SPACES[command]) : -len("\n")])
 
-    return cell_mapping, trailing_semicolons
+    return cell_mapping, trailing_semicolons, old_sources

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-def main(python_file: "Path", notebook: "Path", trailing_semicolons: List[int]) -> None:
+def main(python_file: "Path", notebook: "Path", trailing_semicolons: List[int], old_sources) -> None:
     """
     Replace :code:`source` code cells of original notebook.
 
@@ -35,7 +35,7 @@ def main(python_file: "Path", notebook: "Path", trailing_semicolons: List[int]) 
     pycells = pyfile[len(CODE_SEPARATOR) :].split(CODE_SEPARATOR)
 
     def _reinstate_magics(
-        source: str, trailing_semicolons: List[int], cell_number: int
+        source: str, trailing_semicolons: List[int], cell_number: int, old_sources
     ) -> List[str]:
         """
         Put (commented-out) magics back in.
@@ -58,13 +58,15 @@ def main(python_file: "Path", notebook: "Path", trailing_semicolons: List[int]) 
         if cell_number in trailing_semicolons and not rstripped_source.endswith(";"):
             source = rstripped_source + ";"
         # we take [1:] because the first cell is just '\n'
+        for key, val in old_sources.items():
+            source = source.replace(key, val)
         return [
             j if not j.startswith(MAGIC_SEPARATOR) else j[len(MAGIC_SEPARATOR) :]
             for j in "\n{}".format(source.strip("\n")).splitlines(True)[1:]
         ]
 
     new_sources = (
-        {"source": _reinstate_magics(i, trailing_semicolons, n), "cell_type": "code"}
+        {"source": _reinstate_magics(i, trailing_semicolons, n, old_sources), "cell_type": "code"}
         for n, i in enumerate(pycells)
     )
 
