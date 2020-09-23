@@ -1,50 +1,21 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
 
-import configparser
 import os
 import re
 import shutil
 import subprocess
 import sys
 import tempfile
-from configparser import ConfigParser
 from pathlib import Path
-from shlex import split
 from textwrap import dedent
-from typing import Dict, Iterator, List, Match, NamedTuple, Optional, Set, Tuple
+from typing import Dict, Iterator, List, Match, Optional, Set, Tuple
 
-from nbqa import replace_source, save_source
+from nbqa import config_parser, replace_source, save_source
 from nbqa.cmdline import CLIArgs
+from nbqa.config import Configs
 from nbqa.find_root import find_project_root
 
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
-NBQA_CONFIG_SECTION = ["config", "mutate", "addopts"]
-CONFIG_PREFIX = "nbqa."
-HISTORIC_CONFIG_FILE = ".nbqa.ini"
-
-CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
-
-
-class Configs(NamedTuple):
-    """
-    Options with which to run nbqa.
-
-    Attributes
-    ----------
-    allow_mutation
-        Whether to allow nbqa to modify notebooks.
-    config
-        Configuration of the third party tool.
-    ignore_cells
-        Extra cells which nbqa should ignore.
-    addopts
-        Additional arguments passed to the third party tool
-    """
-
-    allow_mutation: bool
-    config: Optional[str]
-    ignore_cells: Optional[str]
-    addopts: List[str]
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
@@ -282,16 +253,16 @@ def _preserve_config_files(
     else:
         config_files = CONFIG_FILES
     for config_file in config_files:
-        if not (project_root / config_file).exists():
-            continue
-        target_location = Path(tmpdirname) / Path(
-            project_root / config_file
-        ).resolve().relative_to(project_root)
-        target_location.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy(
-            str(project_root / config_file),
-            str(target_location),
-        )
+        config_file_path = project_root / config_file
+        if config_file_path.exists():
+            target_location = Path(tmpdirname) / config_file_path.resolve().relative_to(
+                project_root
+            )
+            target_location.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(
+                str(config_file_path),
+                str(target_location),
+            )
 
 
 def _get_arg(
@@ -426,73 +397,6 @@ def _run_command(
     return out, err, output_code, mutated
 
 
-def _find_config_file(
-    command: str, project_root: Path
-) -> Tuple[Optional[str], Optional[ConfigParser], Optional[str]]:
-    """
-    Find config file.
-
-    Parameters
-    ----------
-    command
-        Third-party tool being run.
-    project_root
-        Root of repository, where .git / .hg / .nbqa.ini file is.
-
-    Returns
-    -------
-    config_file
-        Name of config file.
-    config
-        ConfigParser object which has read in config file.
-    config_prefix
-        Prefix of sections in config file.
-    """
-    config = configparser.ConfigParser()
-    for config_file in CONFIG_FILES:
-        if config_file == "pyproject.toml":
-            continue  # Will be supported in a future PR.
-        config.read(project_root / config_file)
-        for section in NBQA_CONFIG_SECTION:
-            if config.has_section(f"{CONFIG_PREFIX}{section}"):
-                return config_file, config, CONFIG_PREFIX
-    config.read(project_root / HISTORIC_CONFIG_FILE)
-    if config.has_section(command):
-        return HISTORIC_CONFIG_FILE, config, ""
-    return None, None, None
-
-
-def _get_option(
-    config_file: str, config: ConfigParser, section: str, option: str
-) -> Optional[str]:
-    """
-    Get option from config file.
-
-    Parameters
-    ----------
-    config_file
-        Name of config file.
-    config
-        ConfigParser object which has read in config file.
-    section
-        e.g. config, mutate, ...
-    option
-        e.g. flake8, black, ...
-
-    Returns
-    -------
-    str
-        Parsed option.
-    """
-    if config_file != ".nbqa.ini":
-        if config.has_section(section):
-            return config[section].get(option)
-    else:
-        if config.has_section(option):
-            return config[option].get(section)
-    return None
-
-
 def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     """
     Deal with extra configs for 3rd party tool.
@@ -509,47 +413,20 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     Configs
         Taken from CLI (if given), else from .nbqa.ini.
     """
-    config_file, config, config_prefix = _find_config_file(
-        cli_args.command, project_root
-    )
-    nbqa_config: Optional[str] = cli_args.nbqa_config
-    allow_mutation: bool = cli_args.nbqa_mutate
-    ignore_cells: Optional[str] = cli_args.nbqa_ignore_cells
-    cmd_args: List[str] = list(cli_args.nbqa_addopts)
-
-    if config is not None:
-        assert config_file is not None
-        assert config_prefix is not None
-
-        addopts = _get_option(
-            config_file, config, f"{config_prefix}addopts", cli_args.command
-        )
-        if addopts is not None:
-            cmd_args.extend(split(addopts))
-
-        if nbqa_config is None:
-            nbqa_config = _get_option(
-                config_file, config, f"{config_prefix}config", cli_args.command
-            )
-
-        if not allow_mutation:
-            allow_mutation = bool(
-                _get_option(
-                    config_file, config, f"{config_prefix}mutate", cli_args.command
-                )
-            )
-
-        if ignore_cells is None:
-            ignore_cells = _get_option(
-                config_file, config, f"{config_prefix}ignore_cells", cli_args.command
-            )
-
-    return Configs(
-        allow_mutation, config=nbqa_config, ignore_cells=ignore_cells, addopts=cmd_args
+    cli_config: Configs = Configs.parse_from_cli_args(cli_args)
+    file_config: Optional[Configs] = config_parser.parse_config_from_file(
+        cli_args, project_root
     )
 
+    if file_config is not None:
+        cli_config = cli_config.merge(file_config)
 
-def _run_on_one_root_dir(root_dir: str, cli_args: CLIArgs, project_root: Path) -> int:
+    return cli_config
+
+
+def _run_on_one_root_dir(
+    root_dir: str, cli_args: CLIArgs, configs: Configs, project_root: Path
+) -> int:
     """
     Run third-party tool on a single notebook or directory.
 
@@ -559,6 +436,8 @@ def _run_on_one_root_dir(root_dir: str, cli_args: CLIArgs, project_root: Path) -
         Directory on which nbqa should be run
     cli_args
         Commanline arguments passed to nbqa.
+    configs
+        Configuration passed to nbqa from commandline or via a config file
     project_root
         Root of repository, where .git / .hg / .nbqa.ini file is.
 
@@ -567,8 +446,6 @@ def _run_on_one_root_dir(root_dir: str, cli_args: CLIArgs, project_root: Path) -
     int
         Output code from third-party tool.
     """
-    project_root = find_project_root(tuple(cli_args.root_dirs))
-
     with tempfile.TemporaryDirectory() as tmpdirname:
 
         nb_to_py_mapping = {
@@ -579,20 +456,18 @@ def _run_on_one_root_dir(root_dir: str, cli_args: CLIArgs, project_root: Path) -
         cell_mappings = {}
         trailing_semicolons = {}
 
-        configs = _get_configs(cli_args, project_root)
-
-        _preserve_config_files(configs.config, tmpdirname, project_root)
+        _preserve_config_files(configs.nbqa_config, tmpdirname, project_root)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             cell_mappings[notebook], trailing_semicolons[notebook] = save_source.main(
-                notebook, temp_python_file, cli_args.command, configs.ignore_cells
+                notebook, temp_python_file, cli_args.command, configs.nbqa_ignore_cells
             )
             _create_blank_init_files(notebook, tmpdirname, project_root)
 
         out, err, output_code, mutated = _run_command(
             cli_args.command,
             tmpdirname,
-            configs.addopts,
+            configs.nbqa_addopts,
             _get_arg(root_dir, tmpdirname, nb_to_py_mapping, project_root),
         )
 
@@ -601,7 +476,7 @@ def _run_on_one_root_dir(root_dir: str, cli_args: CLIArgs, project_root: Path) -
                 temp_python_file, notebook, out, err, cell_mappings[notebook]
             )
             if mutated:
-                if not configs.allow_mutation:
+                if not configs.nbqa_mutate:
                     raise SystemExit(
                         dedent(
                             f"""\
@@ -634,9 +509,11 @@ def main(raw_args: Optional[List[str]] = None) -> None:
     """
     cli_args: CLIArgs = CLIArgs.parse_args(raw_args)
     project_root: Path = find_project_root(tuple(cli_args.root_dirs))
+    configs: Configs = _get_configs(cli_args, project_root)
 
     output_codes = [
-        _run_on_one_root_dir(i, cli_args, project_root) for i in cli_args.root_dirs
+        _run_on_one_root_dir(i, cli_args, configs, project_root)
+        for i in cli_args.root_dirs
     ]
 
     sys.exit(int(any(output_codes)))
