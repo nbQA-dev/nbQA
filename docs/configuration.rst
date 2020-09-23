@@ -1,7 +1,7 @@
 Configuration
 -------------
 
-You can configure :code:`nbQA` either at the command line, or by using a :code:`setup.cfg` file. We'll see some examples below.
+You can configure :code:`nbQA` either at the command line, or by using a :code:`setup.cfg`, :code:`tox.ini` or :code:`pyproject.toml` file. :code:`setup.cfg` and :code:`tox.ini` follow exactly the same format. We'll see some examples below.
 
 Extra flags
 ~~~~~~~~~~~
@@ -19,6 +19,16 @@ or you can put the following in your :code:`setup.cfg` file
     [nbqa.addopts]
     flake8 = --ignore W503
 
+or you can put the following in your :code:`pyproject.toml` file
+
+.. code-block:: toml
+
+    [tool.nbqa.addopts]
+    flake8 = [
+        "--ignore=W503"
+    ]
+
+
 Config file
 ~~~~~~~~~~~
 
@@ -34,6 +44,13 @@ or you can put the following in your :code:`setup.cfg` file
 .. code-block:: cfg
 
     [nbqa.config]
+    mypy = .mypy.ini
+
+or you can put the following in your :code:`pyproject.toml` file
+
+.. code-block:: toml
+
+    [tool.nbqa.config]
     mypy = .mypy.ini
 
 Allow mutations
@@ -53,6 +70,13 @@ or you can put the following in your :code:`setup.cfg` file
     [nbqa.mutate]
     black = 1
 
+or you can put the following in your :code:`pyproject.toml` file
+
+.. code-block:: toml
+
+    [tool.nbqa.mutate]
+    black = 1
+
 Ignore cells
 ~~~~~~~~~~~~
 
@@ -63,9 +87,16 @@ To ignore extra cells, you can use the :code:`--nbqa-ignore-cells` CLI argument,
 
     nbqa black my_notebook.ipynb --nbqa-ignore-cells %%html,%%cython
 
-, or the :code:`ignore_cells` option in your :code:`.nbqa.ini` file, e.g.
+, or the :code:`ignore_cells` option in your :code:`setup.cfg` file, e.g.
 
 .. code-block:: cfg
 
     [nbqa.ignore_cells]
     black = %%html,%%cython
+
+, or the :code:`ignore_cells` option in your :code:`pyproject.toml` file, e.g.
+
+.. code-block:: toml
+
+    [tool.nbqa.ignore_cells]
+    black = "%%html,%%cython"
