@@ -4,11 +4,11 @@ Extract code cells from notebook and save them to temporary Python file.
 Markdown cells, output, and metadata are ignored.
 """
 
-from ast import parse
 import json
+import secrets
+from ast import parse
 from collections import defaultdict
 from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple
-import secrets
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -46,7 +46,10 @@ def _replace_magics(source: List[str], ignore_cells: Optional[str]) -> Iterator[
     for j in source:
         if (j.lstrip().startswith("!") or j.lstrip().startswith("%")) or ignore_cell:
             token = secrets.token_hex(3)
-            yield f"{' '*(len(j) - len(j.lstrip(' ')))}pass  # nbqa{token}\n", j
+            j_tokenised = f"{' '*(len(j) - len(j.lstrip(' ')))}pass  # nbqa{token}"
+            if j.endswith("\n"):
+                j_tokenised += "\n"
+            yield j_tokenised, j
         else:
             yield j, None
 
@@ -97,7 +100,7 @@ def main(
             parsed_cell += pass_
             if old is not None:
                 old_sources[pass_] = old
-        parsed_cell += '\n'
+        parsed_cell += "\n"
         result.append(parsed_cell)
         split_parsed_cell = parsed_cell.splitlines()
         cell_mapping.update(
