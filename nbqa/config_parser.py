@@ -5,12 +5,10 @@ from pathlib import Path
 from typing import Callable, List, Optional, Tuple
 
 from nbqa.cmdline import CLIArgs
-from nbqa.config import Configs, ConfigSections
+from nbqa.config import CONFIG_SECTIONS, Configs
 
 
-def _parse_nbqa_ini_config(
-    command: str, config_sections: List[str], file_path: Path
-) -> Optional[Configs]:
+def _parse_nbqa_ini_config(command: str, file_path: Path) -> Optional[Configs]:
     """
     Parse configuration from .nbqa.ini file.
 
@@ -36,7 +34,7 @@ def _parse_nbqa_ini_config(
 
     if config_parser.has_section(section):
         for option in config_parser.options(section):
-            if option in config_sections:
+            if option in CONFIG_SECTIONS:
                 config.set_config(
                     option, config_parser.get(section, option, fallback=None)
                 )
@@ -45,7 +43,7 @@ def _parse_nbqa_ini_config(
 
 
 def _parse_setupcfg_or_toxini_config(
-    command: str, config_sections: List[str], file_path: Path
+    command: str, file_path: Path
 ) -> Optional[Configs]:
     """
     Parse nbqa configuration from setup.cfg or tox.ini.
@@ -71,14 +69,14 @@ def _parse_setupcfg_or_toxini_config(
     option: str = command
 
     # Check if this file contains the nbqa configuration
-    for section in config_sections:
+    for section in CONFIG_SECTIONS:
         section_name = f"{CONFIG_PREFIX}{section}"
         if config_parser.has_section(section_name):
             config = Configs()
             break
 
     if config is not None:
-        for section in config_sections:
+        for section in CONFIG_SECTIONS:
             section_name = f"{CONFIG_PREFIX}{section}"
 
             # We might not find the setting for a particular tool in any of the sections
@@ -124,9 +122,7 @@ def parse_config_from_file(cli_args: CLIArgs, project_root: Path) -> Optional[Co
         file_path: Path = project_root / config_file
 
         if file_path.is_file() and config_handler is not None:
-            config = config_handler(
-                cli_args.command, ConfigSections.sections(), file_path
-            )
+            config = config_handler(cli_args.command, file_path)
 
         # we found the config. skip other files
         if config is not None:

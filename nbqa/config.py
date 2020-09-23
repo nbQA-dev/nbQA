@@ -1,33 +1,21 @@
 """Module responsible for storing and handling nbqa configuration."""
 
 from shlex import split
-from typing import Any, Callable, ClassVar, Dict, List, Optional
+from typing import Any, Callable, ClassVar, Dict, List, NamedTuple, Optional
 
 from nbqa.cmdline import CLIArgs
 
 
-class ConfigSections:  # pylint: disable=too-few-public-methods
+class _ConfigSections(NamedTuple):
     """Stores all the config section names."""
 
-    ADDOPTS: ClassVar[str] = "addopts"
-    CONFIG: ClassVar[str] = "config"
-    IGNORE_CELLS: ClassVar[str] = "ignore_cells"
-    MUTATE: ClassVar[str] = "mutate"
+    ADDOPTS: str = "addopts"
+    CONFIG: str = "config"
+    IGNORE_CELLS: str = "ignore_cells"
+    MUTATE: str = "mutate"
 
-    @staticmethod
-    def sections() -> List[str]:
-        """
-        Return an iterable of all configuration sections.
 
-        Returns
-        -------
-        Iterable[str]
-            Iterable of config section names
-        """
-        return [
-            getattr(ConfigSections, section)
-            for section in ConfigSections.__annotations__.keys()  # pylint: disable=no-member
-        ]
+CONFIG_SECTIONS = _ConfigSections()
 
 
 class Configs:
@@ -47,12 +35,14 @@ class Configs:
     """
 
     _config_section_parsers: ClassVar[Dict[str, Callable]] = {
-        ConfigSections.ADDOPTS: lambda arg: split(arg) if isinstance(arg, str) else arg,
-        ConfigSections.CONFIG: str,
-        ConfigSections.IGNORE_CELLS: lambda arg: arg.split(",")
+        CONFIG_SECTIONS.ADDOPTS: lambda arg: split(arg)
         if isinstance(arg, str)
         else arg,
-        ConfigSections.MUTATE: bool,
+        CONFIG_SECTIONS.CONFIG: str,
+        CONFIG_SECTIONS.IGNORE_CELLS: lambda arg: arg.split(",")
+        if isinstance(arg, str)
+        else arg,
+        CONFIG_SECTIONS.MUTATE: bool,
     }
 
     _mutate: bool = False
@@ -121,9 +111,9 @@ class Configs:
         """
         config: Configs = Configs()
 
-        config.set_config(ConfigSections.ADDOPTS, cli_args.nbqa_addopts)
-        config.set_config(ConfigSections.CONFIG, cli_args.nbqa_config)
-        config.set_config(ConfigSections.IGNORE_CELLS, cli_args.nbqa_ignore_cells)
-        config.set_config(ConfigSections.MUTATE, cli_args.nbqa_mutate)
+        config.set_config(CONFIG_SECTIONS.ADDOPTS, cli_args.nbqa_addopts)
+        config.set_config(CONFIG_SECTIONS.CONFIG, cli_args.nbqa_config)
+        config.set_config(CONFIG_SECTIONS.IGNORE_CELLS, cli_args.nbqa_ignore_cells)
+        config.set_config(CONFIG_SECTIONS.MUTATE, cli_args.nbqa_mutate)
 
         return config
