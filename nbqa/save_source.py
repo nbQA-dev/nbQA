@@ -79,10 +79,10 @@ def _parse_cell(
         Parsed cell.
     """
     parsed_cell = f"{BLANK_SPACES[command]}{CODE_SEPARATOR}\n"
-    for pass_, old in _replace_magics(source, ignore_cells):
-        parsed_cell += pass_
+    for new, old in _replace_magics(source, ignore_cells):
+        parsed_cell += new
         if old is not None:
-            temporary_lines[pass_] = old
+            temporary_lines[new] = old
     parsed_cell += "\n"
     return parsed_cell
 
