@@ -6,9 +6,8 @@ Markdown cells, output, and metadata are ignored.
 
 import json
 import secrets
-from ast import parse
 from collections import defaultdict
-from typing import TYPE_CHECKING, Dict, Iterator, List, Tuple
+from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -20,7 +19,9 @@ BLANK_SPACES["isort"] = "\n"
 MAGIC = ["%%script", "%%bash"]
 
 
-def _replace_magics(source: List[str], ignore_cells: List[str]) -> Iterator[str]:
+def _replace_magics(
+    source: List[str], ignore_cells: List[str]
+) -> Iterator[Tuple[str, Optional[str]]]:
     """
     Comment out lines with magic commands.
 
@@ -52,12 +53,46 @@ def _replace_magics(source: List[str], ignore_cells: List[str]) -> Iterator[str]
             yield j, None
 
 
+def _parse_cell(
+    source: List[str],
+    command: str,
+    ignore_cells: List[str],
+    temporary_lines: Dict[str, str],
+) -> str:
+    """
+    Parse cell, replacing magics with temporary lines.
+
+    Parameters
+    ----------
+    source
+        Source from notebook cell.
+    command
+        Third-party tool we're running.
+    ignore_cells
+        Extra cells which nbqa should ignore.
+    temporary_lines
+        Mapping from temporary lines to original lines.
+
+    Returns
+    -------
+    str
+        Parsed cell.
+    """
+    parsed_cell = f"{BLANK_SPACES[command]}{CODE_SEPARATOR}\n"
+    for pass_, old in _replace_magics(source, ignore_cells):
+        parsed_cell += pass_
+        if old is not None:
+            temporary_lines[pass_] = old
+    parsed_cell += "\n"
+    return parsed_cell
+
+
 def main(
     notebook: "Path",
     temp_python_file: "Path",
     command: str,
     ignore_cells: List[str],
-) -> Tuple[Dict[int, str], List[int]]:
+) -> Tuple[Dict[int, str], List[int], Dict[str, str]]:
     """
     Extract code cells from notebook and save them in temporary Python file.
 
@@ -87,18 +122,12 @@ def main(
     line_number = 0
     cell_number = 0
     trailing_semicolons = []
-    old_sources = {}
+    temporary_lines: Dict[str, str] = {}
 
     for i in cells:
         if i["cell_type"] != "code":
             continue
-        source = _replace_magics(i["source"], ignore_cells)
-        parsed_cell = f"{BLANK_SPACES[command]}{CODE_SEPARATOR}\n"
-        for pass_, old in source:
-            parsed_cell += pass_
-            if old is not None:
-                old_sources[pass_] = old
-        parsed_cell += "\n"
+        parsed_cell = _parse_cell(i["source"], command, ignore_cells, temporary_lines)
         result.append(parsed_cell)
         split_parsed_cell = parsed_cell.splitlines()
         cell_mapping.update(
@@ -115,4 +144,4 @@ def main(
     with open(str(temp_python_file), "w") as handle:
         handle.write("".join(result)[len(BLANK_SPACES[command]) : -len("\n")])
 
-    return cell_mapping, trailing_semicolons, old_sources
+    return cell_mapping, trailing_semicolons, temporary_lines

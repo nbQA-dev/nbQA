@@ -5,7 +5,7 @@ The converted file will have had the third-party tool run against it by now.
 """
 
 import json
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Dict, List
 
 from nbqa.save_source import CODE_SEPARATOR, MAGIC_SEPARATOR
 
@@ -13,7 +13,12 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-def main(python_file: "Path", notebook: "Path", trailing_semicolons: List[int], old_sources) -> None:
+def main(
+    python_file: "Path",
+    notebook: "Path",
+    trailing_semicolons: List[int],
+    old_sources: Dict[str, str],
+) -> None:
     """
     Replace :code:`source` code cells of original notebook.
 
@@ -35,7 +40,10 @@ def main(python_file: "Path", notebook: "Path", trailing_semicolons: List[int], 
     pycells = pyfile[len(CODE_SEPARATOR) :].split(CODE_SEPARATOR)
 
     def _reinstate_magics(
-        source: str, trailing_semicolons: List[int], cell_number: int, old_sources
+        source: str,
+        trailing_semicolons: List[int],
+        cell_number: int,
+        old_sources: Dict[str, str],
     ) -> List[str]:
         """
         Put (commented-out) magics back in.
@@ -66,7 +74,10 @@ def main(python_file: "Path", notebook: "Path", trailing_semicolons: List[int], 
         ]
 
     new_sources = (
-        {"source": _reinstate_magics(i, trailing_semicolons, n, old_sources), "cell_type": "code"}
+        {
+            "source": _reinstate_magics(i, trailing_semicolons, n, old_sources),
+            "cell_type": "code",
+        }
         for n, i in enumerate(pycells)
     )
 
