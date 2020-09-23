@@ -13,6 +13,11 @@ setup_requirements = []
 
 test_requirements = []
 
+extra_requirements = {
+    # Enable pyproject.toml support.
+    "toml": ["toml"]
+}
+
 setup(
     author="Marco Gorelli",
     author_email="m.e.gorelli@gmail.com",
@@ -30,6 +35,7 @@ setup(
     description="Run any Python code quality tool on a Jupyter Notebook!",
     entry_points={"console_scripts": ["nbqa=nbqa.__main__:main"]},
     install_requires=requirements,
+    extras_require=extra_requirements,
     license="MIT license",
     long_description=readme,
     long_description_content_type="text/markdown",
