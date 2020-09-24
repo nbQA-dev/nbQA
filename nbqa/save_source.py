@@ -13,7 +13,6 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 CODE_SEPARATOR = "# %%"
-MAGIC_SEPARATOR = "# NBQAMAGIC"
 BLANK_SPACES = defaultdict(lambda: "\n\n")
 BLANK_SPACES["isort"] = "\n"
 MAGIC = ["%%script", "%%bash"]

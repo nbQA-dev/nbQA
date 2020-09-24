@@ -7,7 +7,7 @@ The converted file will have had the third-party tool run against it by now.
 import json
 from typing import TYPE_CHECKING, Dict, List
 
-from nbqa.save_source import CODE_SEPARATOR, MAGIC_SEPARATOR
+from nbqa.save_source import CODE_SEPARATOR
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -72,10 +72,7 @@ def main(
         # we take [1:] because the first cell is just '\n'
         for key, val in temporary_lines.items():
             source = source.replace(key, val)
-        return [
-            j if not j.startswith(MAGIC_SEPARATOR) else j[len(MAGIC_SEPARATOR) :]
-            for j in "\n{}".format(source.strip("\n")).splitlines(True)[1:]
-        ]
+        return "\n{}".format(source.strip("\n")).splitlines(True)[1:]
 
     new_sources = (
         {
