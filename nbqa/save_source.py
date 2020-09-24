@@ -125,6 +125,8 @@ def main(
         Mapping from Python line numbers to Jupyter notebooks cells.
     trailing_semicolons
         Cell numbers where there were originally trailing semicolons.
+    temporary_lines
+        Mapping from temporary lines to original lines.
     """
     with open(notebook, "r") as handle:
         cells = json.load(handle)["cells"]
