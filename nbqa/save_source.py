@@ -17,6 +17,8 @@ MAGIC_SEPARATOR = "# NBQAMAGIC"
 BLANK_SPACES = defaultdict(lambda: "\n\n")
 BLANK_SPACES["isort"] = "\n"
 MAGIC = ["%%script", "%%bash"]
+IGNORE_LINE_REPLACEMENT = "pass  # nbqa"
+IGNORE_CELL_REPLACEMENT = "# nbqa"
 
 
 def _replace_magics(
@@ -42,15 +44,25 @@ def _replace_magics(
     ignore = MAGIC + [i.strip() for i in ignore_cells]
 
     ignore_cell = source and any(source[0].lstrip().startswith(i) for i in ignore)
-    for j in source:
-        if (j.lstrip().startswith("!") or j.lstrip().startswith("%")) or ignore_cell:
+    for line in source:
+        if (
+            line.lstrip().startswith("!") or line.lstrip().startswith("%")
+        ) or ignore_cell:
             token = secrets.token_hex(3)
-            j_tokenised = f"{' '*(len(j) - len(j.lstrip(' ')))}pass  # nbqa{token}"
-            if j.endswith("\n"):
-                j_tokenised += "\n"
-            yield j_tokenised, j
+            if ignore_cell:
+                # Comment out entire cell.
+                replacement = IGNORE_CELL_REPLACEMENT
+                leading_space = ""
+            else:
+                # Replace line with `pass`.
+                replacement = IGNORE_LINE_REPLACEMENT
+                leading_space = " " * (len(line) - len(line.lstrip(" ")))
+            line_tokenised = f"{leading_space}{replacement}{token}"
+            if line.endswith("\n"):
+                line_tokenised += "\n"
+            yield line_tokenised, line
         else:
-            yield j, None
+            yield line, None
 
 
 def _parse_cell(
