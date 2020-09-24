@@ -372,6 +372,7 @@ def _run_command(
     env["PYTHONPATH"] = os.getcwd()
 
     before = _get_mtimes(arg)
+
     output = subprocess.run(
         ["python", "-m", command, str(arg), *cmd_args],
         stderr=subprocess.PIPE,
@@ -454,7 +455,7 @@ def _run_on_one_root_dir(
 
         cell_mappings = {}
         trailing_semicolons = {}
-        old_sources = {}
+        temporary_lines = {}
 
         _preserve_config_files(configs.nbqa_config, tmpdirname, project_root)
 
@@ -462,7 +463,7 @@ def _run_on_one_root_dir(
             (
                 cell_mappings[notebook],
                 trailing_semicolons[notebook],
-                old_sources[notebook],
+                temporary_lines[notebook],
             ) = save_source.main(
                 notebook, temp_python_file, cli_args.command, configs.nbqa_ignore_cells
             )
@@ -495,7 +496,7 @@ def _run_on_one_root_dir(
                     temp_python_file,
                     notebook,
                     trailing_semicolons[notebook],
-                    old_sources[notebook],
+                    temporary_lines[notebook],
                 )
 
         sys.stdout.write(out)

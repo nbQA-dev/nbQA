@@ -17,7 +17,7 @@ def main(
     python_file: "Path",
     notebook: "Path",
     trailing_semicolons: List[int],
-    old_sources: Dict[str, str],
+    temporary_lines: Dict[str, str],
 ) -> None:
     """
     Replace :code:`source` code cells of original notebook.
@@ -30,6 +30,8 @@ def main(
         Jupyter Notebook third-party tool is run against (unmodified).
     trailing_semicolons
         Cells which originally had trailing semicolons.
+    temporary_lines
+        Mapping from temporary lines to original lines.
     """
     with open(notebook, "r") as handle:
         notebook_json = json.load(handle)
@@ -43,7 +45,7 @@ def main(
         source: str,
         trailing_semicolons: List[int],
         cell_number: int,
-        old_sources: Dict[str, str],
+        temporary_lines: Dict[str, str],
     ) -> List[str]:
         """
         Put (commented-out) magics back in.
@@ -56,6 +58,8 @@ def main(
             List of cells which originally had trailing semicolons.
         cell_number
             Number of current cell.
+        temporary_lines
+            Mapping from temporary lines to original lines.
 
         Returns
         -------
@@ -66,7 +70,7 @@ def main(
         if cell_number in trailing_semicolons and not rstripped_source.endswith(";"):
             source = rstripped_source + ";"
         # we take [1:] because the first cell is just '\n'
-        for key, val in old_sources.items():
+        for key, val in temporary_lines.items():
             source = source.replace(key, val)
         return [
             j if not j.startswith(MAGIC_SEPARATOR) else j[len(MAGIC_SEPARATOR) :]
@@ -75,7 +79,7 @@ def main(
 
     new_sources = (
         {
-            "source": _reinstate_magics(i, trailing_semicolons, n, old_sources),
+            "source": _reinstate_magics(i, trailing_semicolons, n, temporary_lines),
             "cell_type": "code",
         }
         for n, i in enumerate(pycells)
