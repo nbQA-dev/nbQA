@@ -66,3 +66,42 @@ def test_ini(magic: str, expected: str, capsys: "CaptureFixture") -> None:
     if expected:
         expected = f"{str(path.resolve())}:{expected}{os.linesep}"
     assert out == expected
+
+
+@pytest.mark.parametrize(
+    "magic, expected",
+    [
+        ('flake8=["%%custommagic"]', "cell_2:3:1: F401 'glob' imported but unused"),
+        ('flake8=["%%custommagic", "%%anothercustommagic"]', ""),
+        ('flake8=["%%custommagic", "%%anothercustommagic"]', ""),
+    ],
+)
+def test_toml(
+    temporarily_delete_pyprojecttoml: Path,
+    magic: str,
+    expected: str,
+    capsys: "CaptureFixture",
+) -> None:
+    """Check that we can ignore extra cell magics via the toml config file."""
+    config_file: str = str(temporarily_delete_pyprojecttoml)
+    path = Path("tests") / "data/notebook_with_other_magics.ipynb"
+
+    with open(config_file, "w") as handle:
+        handle.write(
+            dedent(
+                f"""\
+                [tool.nbqa.ignore_cells]
+                {magic}
+                """
+            )
+        )
+
+    with pytest.raises(SystemExit):
+        main(["flake8", str(path)])
+
+    Path(config_file).unlink()
+
+    out, _ = capsys.readouterr()
+    if expected:
+        expected = f"{str(path.resolve())}:{expected}{os.linesep}"
+    assert out == expected
