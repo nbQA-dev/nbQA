@@ -16,8 +16,8 @@ CODE_SEPARATOR = "# %%"
 BLANK_SPACES = defaultdict(lambda: "\n\n")
 BLANK_SPACES["isort"] = "\n"
 MAGIC = ["%%script", "%%bash"]
-IGNORE_LINE_REPLACEMENT = "pass  # nbqa"
 IGNORE_CELL_REPLACEMENT = "# nbqa"
+IGNORE_LINE_REPLACEMENT = "pass  # nbqa"
 
 
 def _replace_magics(
