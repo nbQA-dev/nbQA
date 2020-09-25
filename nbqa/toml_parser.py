@@ -18,8 +18,6 @@ def parse_from_pyproject_toml(command: str, file_path: Path) -> Optional[Configs
     ----------
     command : str
         Third party tool to run
-    config_sections : List[str]
-        Configuration sections supported by nbqa e.g addopts, config, mutate
     file_path : Path
         Configuration file path
 

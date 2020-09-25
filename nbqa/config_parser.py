@@ -17,8 +17,6 @@ def _parse_nbqa_ini_config(command: str, file_path: Path) -> Optional[Configs]:
     ----------
     command : str
         Third party tool to run
-    config_sections : List[str]
-        Configuration sections supported by nbqa
     file_path : Path
         Configuration file path
 
@@ -53,8 +51,6 @@ def _parse_setupcfg_or_toxini_config(
     ----------
     command : str
         Third party tool to run
-    config_sections : List[str]
-        Configuration sections supported by nbqa e.g addopts, config, mutate
     file_path : Path
         Configuration file path
 
