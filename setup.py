@@ -7,7 +7,7 @@ from setuptools import find_packages, setup
 
 readme = Path("README.md").read_text(encoding="utf8")
 
-requirements = Path("requirements.txt").read_text(encoding="utf8").splitlines()
+requirements = ["toml"]
 
 setup_requirements = []
 
