@@ -6,6 +6,7 @@ from typing import Callable, List, Optional, Tuple
 
 from nbqa.cmdline import CLIArgs
 from nbqa.config import CONFIG_SECTIONS, Configs
+from nbqa.toml_parser import parse_from_pyproject_toml
 
 
 def _parse_nbqa_ini_config(command: str, file_path: Path) -> Optional[Configs]:
@@ -16,8 +17,6 @@ def _parse_nbqa_ini_config(command: str, file_path: Path) -> Optional[Configs]:
     ----------
     command : str
         Third party tool to run
-    config_sections : List[str]
-        Configuration sections supported by nbqa
     file_path : Path
         Configuration file path
 
@@ -52,8 +51,6 @@ def _parse_setupcfg_or_toxini_config(
     ----------
     command : str
         Third party tool to run
-    config_sections : List[str]
-        Configuration sections supported by nbqa e.g addopts, config, mutate
     file_path : Path
         Configuration file path
 
@@ -93,9 +90,9 @@ _ConfigHandler = Callable[..., Optional[Configs]]
 CONFIG_PREFIX: str = "nbqa."
 
 _CONFIG_FILE_HANDLERS: List[Tuple[str, Optional[_ConfigHandler]]] = [
+    ("pyproject.toml", parse_from_pyproject_toml),
     ("setup.cfg", _parse_setupcfg_or_toxini_config),
     ("tox.ini", _parse_setupcfg_or_toxini_config),
-    ("pyproject.toml", None),  # TOML support to be added.
     (".nbqa.ini", _parse_nbqa_ini_config),
 ]
 
