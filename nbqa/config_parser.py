@@ -94,9 +94,9 @@ _ConfigHandler = Callable[..., Optional[Configs]]
 CONFIG_PREFIX: str = "nbqa."
 
 _CONFIG_FILE_HANDLERS: List[Tuple[str, Optional[_ConfigHandler]]] = [
+    ("pyproject.toml", parse_from_pyproject_toml),
     ("setup.cfg", _parse_setupcfg_or_toxini_config),
     ("tox.ini", _parse_setupcfg_or_toxini_config),
-    ("pyproject.toml", parse_from_pyproject_toml),  # TOML support to be added.
     (".nbqa.ini", _parse_nbqa_ini_config),
 ]
 

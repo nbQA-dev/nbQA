@@ -1,4 +1,4 @@
-"""Check configs from :code:`setup.cfg` are picked up."""
+"""Check configs from :code:`pyproject.toml` are picked up."""
 
 import os
 from pathlib import Path
