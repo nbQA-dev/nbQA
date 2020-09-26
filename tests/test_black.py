@@ -112,9 +112,11 @@ def test_black_works_with_trailing_semicolons(
         '-    "import glob;\\n",\n'
         '+    "import glob\\n",\n'
         '-    "def func(a, b):\\n",\n'
+        '-    "    pass;\\n"\n'
         '+    "def func(\\n",\n'
         '+    "    a, b\\n",\n'
         '+    "):\\n",\n'
+        '+    "    pass;"\n'
     )
     assert result == expected
 

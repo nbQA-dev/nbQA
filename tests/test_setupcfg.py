@@ -1,6 +1,5 @@
 """Check configs from :code:`setup.cfg` are picked up."""
 
-import os
 from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
@@ -40,11 +39,6 @@ def test_nbqa_ini_works(capsys: "CaptureFixture") -> None:
     Path("setup.cfg").unlink()
 
     # check out and err
-    out, err = capsys.readouterr()
-    notebook = os.path.abspath(
-        os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
-    )
-    expected_out = f"{notebook}\n"
-    expected_err = ""
-    assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
-    assert sorted(err.splitlines()) == sorted(expected_err.splitlines())
+    out, _ = capsys.readouterr()
+    expected_out = ""
+    assert out == expected_out

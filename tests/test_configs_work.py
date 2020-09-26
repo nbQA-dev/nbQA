@@ -1,6 +1,5 @@
 """Check local config files are picked up by nbqa."""
 
-import os
 from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
@@ -33,14 +32,9 @@ def test_configs_work(capsys: "CaptureFixture") -> None:
     Path(".flake8").unlink()
 
     # check out and err
-    out, err = capsys.readouterr()
-    notebook = os.path.abspath(
-        os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
-    )
-    expected_out = f"{notebook}\n"
-    expected_err = ""
-    assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
-    assert sorted(err.splitlines()) == sorted(expected_err.splitlines())
+    out, _ = capsys.readouterr()
+    expected_out = ""
+    assert out == expected_out
 
 
 def test_configs_work_in_setupcfg(capsys: "CaptureFixture") -> None:
@@ -83,14 +77,9 @@ def test_configs_work_in_setupcfg(capsys: "CaptureFixture") -> None:
     Path("setup.cfg").unlink()
 
     # check out and err
-    out, err = capsys.readouterr()
-    notebook = os.path.abspath(
-        os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
-    )
-    expected_out = f"{notebook}\n"
-    expected_err = ""
-    assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
-    assert sorted(err.splitlines()) == sorted(expected_err.splitlines())
+    out, _ = capsys.readouterr()
+    expected_out = ""
+    assert out == expected_out
 
 
 def test_configs_work_in_nbqaini(capsys: "CaptureFixture") -> None:
@@ -132,14 +121,8 @@ def test_configs_work_in_nbqaini(capsys: "CaptureFixture") -> None:
     Path(".nbqa.ini").unlink()
 
     # check out and err
-    out, err = capsys.readouterr()
-    notebook = os.path.abspath(
-        os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
-    )
-    expected_out = f"{notebook}\n"
-    expected_err = ""
-    assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
-    assert sorted(err.splitlines()) == sorted(expected_err.splitlines())
+    out, _ = capsys.readouterr()
+    assert out == ""
 
 
 def test_setupcfg_is_preserved(capsys: "CaptureFixture") -> None:
@@ -166,11 +149,5 @@ def test_setupcfg_is_preserved(capsys: "CaptureFixture") -> None:
         main(["flake8", "tests", "--ignore", "E302"])
 
     # check out and err
-    out, err = capsys.readouterr()
-    notebook = os.path.abspath(
-        os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
-    )
-    expected_out = f"{notebook}\n"
-    expected_err = ""
-    assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
-    assert sorted(err.splitlines()) == sorted(expected_err.splitlines())
+    out, _ = capsys.readouterr()
+    assert out == ""

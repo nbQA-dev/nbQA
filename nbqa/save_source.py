@@ -95,7 +95,7 @@ def _parse_cell(
         parsed_cell += new
         if old is not None:
             temporary_lines[new] = old
-    parsed_cell += "\n"
+    parsed_cell = parsed_cell.rstrip("\n") + "\n"
     return parsed_cell
 
 
@@ -156,6 +156,6 @@ def main(
         cell_number += 1
 
     with open(str(temp_python_file), "w") as handle:
-        handle.write("".join(result)[len(BLANK_SPACES[command]) : -len("\n")])
+        handle.write("".join(result)[len(BLANK_SPACES[command]) :])
 
     return cell_mapping, trailing_semicolons, temporary_lines
