@@ -112,19 +112,14 @@ here\'s an example of what you could add to your
       additional_dependencies: ["isort"]
 ```
 
-## ✨ Supported third party packages
+## 💬 Testimonials
 
-In theory, `nbqa` can adapt any Python code-quality tool to a Jupyter Notebook.
+**Alex Andorra**,
+[Data Scientist, ArviZ & PyMC Dev, Host of 'Learning Bayesian Statistics' Podcast 🎙️](https://learnbayesstats.anvil.app/):
 
-In practice, here are the tools it\'s been tested with:
+> well done on `nbqa` @MarcoGorelli ! Will be super useful in CI 😉
 
-- [flake8](https://flake8.pycqa.org/en/latest/)
-- [black](https://black.readthedocs.io/en/stable/)
-- [isort](https://timothycrosley.github.io/isort/)
-- [mypy](http://mypy-lang.org/)
-- [doctest](https://docs.python.org/3/library/doctest.html)
-
-## 👥Contributing
+## 👥 Contributing
 
 I will give write-access to anyone who contributes anything useful
 (e.g. pull request / bug report) - see the
