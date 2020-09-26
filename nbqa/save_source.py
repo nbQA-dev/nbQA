@@ -7,6 +7,7 @@ Markdown cells, output, and metadata are ignored.
 import json
 import secrets
 from collections import defaultdict
+from itertools import takewhile
 from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple
 
 if TYPE_CHECKING:
@@ -55,7 +56,7 @@ def _replace_magics(
             else:
                 # Replace line with `pass`.
                 replacement = IGNORE_LINE_REPLACEMENT
-                leading_space = " " * (len(line) - len(line.lstrip(" ")))
+                leading_space = "".join(takewhile(lambda c: c == " ", line))
             line_tokenised = f"{leading_space}{replacement}{token}"
             if line.endswith("\n"):
                 line_tokenised += "\n"
