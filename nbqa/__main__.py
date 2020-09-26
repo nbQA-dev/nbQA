@@ -464,9 +464,7 @@ def _run_on_one_root_dir(
                 cell_mappings[notebook],
                 trailing_semicolons[notebook],
                 temporary_lines[notebook],
-            ) = save_source.main(
-                notebook, temp_python_file, cli_args.command, configs.nbqa_ignore_cells
-            )
+            ) = save_source.main(notebook, temp_python_file, configs.nbqa_ignore_cells)
             _create_blank_init_files(notebook, tmpdirname, project_root)
 
         out, err, output_code, mutated = _run_command(
