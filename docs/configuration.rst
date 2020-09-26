@@ -20,6 +20,10 @@ or you can put the following in your :code:`pyproject.toml` file
     flake8 = [
         "--ignore=W503"
     ]
+    isort = [
+        "--treat-comment-as-code",
+        "# %%"
+    ]
 
 
 Config file
@@ -37,7 +41,7 @@ or you can put the following in your :code:`pyproject.toml` file
 .. code-block:: toml
 
     [tool.nbqa.config]
-    mypy = .mypy.ini
+    mypy = ".mypy.ini"
 
 Allow mutations
 ~~~~~~~~~~~~~~~
