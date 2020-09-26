@@ -27,7 +27,7 @@ def test_pyupgrade(tmp_notebook_for_testing: "Path", capsys: "CaptureFixture") -
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_for_testing, "r") as handle:
+    with open(tmp_notebook_for_testing) as handle:
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
 
@@ -45,7 +45,7 @@ def test_pyupgrade(tmp_notebook_for_testing: "Path", capsys: "CaptureFixture") -
     with pytest.raises(SystemExit):
         main(["pyupgrade", path])
     Path("setup.cfg").unlink()
-    with open(tmp_notebook_for_testing, "r") as handle:
+    with open(tmp_notebook_for_testing) as handle:
         after = handle.readlines()
 
     diff = difflib.unified_diff(before, after)
