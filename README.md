@@ -38,7 +38,7 @@ Reformat your notebook with
 [black](https://black.readthedocs.io/en/stable/):
 
 ```bash
-$ nbqa black my_notebook.ipynb --line-length=96 --nbqa-mutate
+$ nbqa black my_notebook.ipynb --nbqa-mutate
 reformatted my_notebook.ipynb
 All done! ✨ 🍰 ✨
 1 files reformatted.
@@ -77,21 +77,18 @@ Got:
 ***Test Failed*** 1 failures.
 ```
 
+Check for style guide enforcement with [flake8](https://flake8.pycqa.org/en/latest/):
+
+```bash
+$ nbqa flake8 my_notebook.ipynb
+my_notebook.ipynb:cell_3:1:1 F401 'import pandas as pd' imported but unused
+```
+
 ## Configuration
 
-Here\'s an example `.nbqa.ini` file - see
+You can configure :code:`nbQA` either at the command line, or by using a :code:`pyproject.toml` file - see
 [configuration](https://nbqa.readthedocs.io/en/latest/configuration.html)
-for more on configuration:
-
-```ini
-[isort]
-config = setup.cfg
-mutate = 1
-addopts = --treat-comment-as-code '# %%%%'
-
-[flake8]
-config = setup.cfg
-```
+for more.
 
 ## Usage as pre-commit hook
 
@@ -101,7 +98,7 @@ here\'s an example of what you could add to your
 
 ```yaml
 - repo: https://github.com/nbQA-dev/nbQA
-  rev: 0.1.32
+  rev: 0.2.0
   hooks:
     - id: nbqa
       args: ["flake8"]
