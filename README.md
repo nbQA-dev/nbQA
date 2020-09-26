@@ -81,7 +81,7 @@ Check for style guide enforcement with [flake8](https://flake8.pycqa.org/en/late
 
 ```bash
 $ nbqa flake8 my_notebook.ipynb
-my_notebook.ipynb:cell_3:1:1 F401 'import pandas as pd' imported but unused
+my_notebook.ipynb:cell_3:1:1: F401 'import pandas as pd' imported but unused
 ```
 
 ## Configuration
