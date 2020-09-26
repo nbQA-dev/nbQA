@@ -5,15 +5,20 @@ The converted file will have had the third-party tool run against it by now.
 """
 
 import json
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Dict, List
 
-from nbqa.save_source import CODE_SEPARATOR, MAGIC_SEPARATOR
+from nbqa.save_source import CODE_SEPARATOR
 
 if TYPE_CHECKING:
     from pathlib import Path
 
 
-def main(python_file: "Path", notebook: "Path", trailing_semicolons: List[int]) -> None:
+def main(
+    python_file: "Path",
+    notebook: "Path",
+    trailing_semicolons: List[int],
+    temporary_lines: Dict[str, str],
+) -> None:
     """
     Replace :code:`source` code cells of original notebook.
 
@@ -25,6 +30,8 @@ def main(python_file: "Path", notebook: "Path", trailing_semicolons: List[int]) 
         Jupyter Notebook third-party tool is run against (unmodified).
     trailing_semicolons
         Cells which originally had trailing semicolons.
+    temporary_lines
+        Mapping from temporary lines to original lines.
     """
     with open(notebook, "r") as handle:
         notebook_json = json.load(handle)
@@ -35,7 +42,10 @@ def main(python_file: "Path", notebook: "Path", trailing_semicolons: List[int]) 
     pycells = pyfile[len(CODE_SEPARATOR) :].split(CODE_SEPARATOR)
 
     def _reinstate_magics(
-        source: str, trailing_semicolons: List[int], cell_number: int
+        source: str,
+        trailing_semicolons: List[int],
+        cell_number: int,
+        temporary_lines: Dict[str, str],
     ) -> List[str]:
         """
         Put (commented-out) magics back in.
@@ -48,6 +58,8 @@ def main(python_file: "Path", notebook: "Path", trailing_semicolons: List[int]) 
             List of cells which originally had trailing semicolons.
         cell_number
             Number of current cell.
+        temporary_lines
+            Mapping from temporary lines to original lines.
 
         Returns
         -------
@@ -58,13 +70,15 @@ def main(python_file: "Path", notebook: "Path", trailing_semicolons: List[int]) 
         if cell_number in trailing_semicolons and not rstripped_source.endswith(";"):
             source = rstripped_source + ";"
         # we take [1:] because the first cell is just '\n'
-        return [
-            j if not j.startswith(MAGIC_SEPARATOR) else j[len(MAGIC_SEPARATOR) :]
-            for j in "\n{}".format(source.strip("\n")).splitlines(True)[1:]
-        ]
+        for key, val in temporary_lines.items():
+            source = source.replace(key, val)
+        return "\n{}".format(source.strip("\n")).splitlines(True)[1:]
 
     new_sources = (
-        {"source": _reinstate_magics(i, trailing_semicolons, n), "cell_type": "code"}
+        {
+            "source": _reinstate_magics(i, trailing_semicolons, n, temporary_lines),
+            "cell_type": "code",
+        }
         for n, i in enumerate(pycells)
     )
 

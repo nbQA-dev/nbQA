@@ -51,6 +51,8 @@ def test_black_works(
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
     expected = (
+        '+    "\\n",\n'
+        '+    "\\n",\n'
         "-    \"    return f'hello {name}'\\n\",\n"
         '+    "    return f\\"hello {name}\\"\\n",\n'
         '-    "hello(3)   "\n'

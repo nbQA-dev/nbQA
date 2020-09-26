@@ -455,11 +455,16 @@ def _run_on_one_root_dir(
 
         cell_mappings = {}
         trailing_semicolons = {}
+        temporary_lines = {}
 
         _preserve_config_files(configs.nbqa_config, tmpdirname, project_root)
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
-            cell_mappings[notebook], trailing_semicolons[notebook] = save_source.main(
+            (
+                cell_mappings[notebook],
+                trailing_semicolons[notebook],
+                temporary_lines[notebook],
+            ) = save_source.main(
                 notebook, temp_python_file, cli_args.command, configs.nbqa_ignore_cells
             )
             _create_blank_init_files(notebook, tmpdirname, project_root)
@@ -488,7 +493,10 @@ def _run_on_one_root_dir(
                     )
 
                 replace_source.main(
-                    temp_python_file, notebook, trailing_semicolons[notebook]
+                    temp_python_file,
+                    notebook,
+                    trailing_semicolons[notebook],
+                    temporary_lines[notebook],
                 )
 
         sys.stdout.write(out)

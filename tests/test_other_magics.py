@@ -2,7 +2,7 @@
 import os
 from pathlib import Path
 from textwrap import dedent
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 import pytest
 
@@ -17,12 +17,15 @@ if TYPE_CHECKING:
     [
         (
             "--nbqa-ignore-cells=%%custommagic",
-            "cell_2:3:1: F401 'glob' imported but unused",
+            [
+                "cell_2:3:1: E402 module level import not at top of file",
+                "cell_2:3:1: F401 'glob' imported but unused",
+            ],
         ),
-        ("--nbqa-ignore-cells=%%custommagic,%%anothercustommagic", ""),
+        ("--nbqa-ignore-cells=%%custommagic,%%anothercustommagic", []),
     ],
 )
-def test_cli(magic: str, expected: str, capsys: "CaptureFixture") -> None:
+def test_cli(magic: str, expected: List[str], capsys: "CaptureFixture") -> None:
     """Check that we can ignore extra cell magics via the CLI."""
     path = Path("tests") / "data/notebook_with_other_magics.ipynb"
 
@@ -30,17 +33,22 @@ def test_cli(magic: str, expected: str, capsys: "CaptureFixture") -> None:
         main(["flake8", str(path), magic])
 
     out, _ = capsys.readouterr()
-    if expected:
-        expected = f"{str(path.resolve())}:{expected}{os.linesep}"
-    assert out == expected
+    expected_out = "".join(f"{str(path.resolve())}:{i}{os.linesep}" for i in expected)
+    assert out == expected_out
 
 
 @pytest.mark.parametrize(
     "magic, expected",
     [
-        ("ignore_cells=%%%%custommagic", "cell_2:3:1: F401 'glob' imported but unused"),
-        ("ignore_cells=%%%%custommagic,%%%%anothercustommagic", ""),
-        ("ignore_cells=%%%%custommagic, %%%%anothercustommagic", ""),
+        (
+            "ignore_cells=%%%%custommagic",
+            [
+                "cell_2:3:1: E402 module level import not at top of file",
+                "cell_2:3:1: F401 'glob' imported but unused",
+            ],
+        ),
+        ("ignore_cells=%%%%custommagic,%%%%anothercustommagic", []),
+        ("ignore_cells=%%%%custommagic, %%%%anothercustommagic", []),
     ],
 )
 def test_ini(magic: str, expected: str, capsys: "CaptureFixture") -> None:
@@ -63,17 +71,22 @@ def test_ini(magic: str, expected: str, capsys: "CaptureFixture") -> None:
     Path(".nbqa.ini").unlink()
 
     out, _ = capsys.readouterr()
-    if expected:
-        expected = f"{str(path.resolve())}:{expected}{os.linesep}"
-    assert out == expected
+    expected_out = "".join(f"{str(path.resolve())}:{i}{os.linesep}" for i in expected)
+    assert out == expected_out
 
 
 @pytest.mark.parametrize(
     "magic, expected",
     [
-        ('flake8=["%%custommagic"]', "cell_2:3:1: F401 'glob' imported but unused"),
-        ('flake8=["%%custommagic", "%%anothercustommagic"]', ""),
-        ('flake8=["%%custommagic", "%%anothercustommagic"]', ""),
+        (
+            'flake8=["%%custommagic"]',
+            [
+                "cell_2:3:1: E402 module level import not at top of file",
+                "cell_2:3:1: F401 'glob' imported but unused",
+            ],
+        ),
+        ('flake8=["%%custommagic", "%%anothercustommagic"]', []),
+        ('flake8=["%%custommagic", "%%anothercustommagic"]', []),
     ],
 )
 def test_toml(
@@ -102,6 +115,5 @@ def test_toml(
     Path(config_file).unlink()
 
     out, _ = capsys.readouterr()
-    if expected:
-        expected = f"{str(path.resolve())}:{expected}{os.linesep}"
-    assert out == expected
+    expected_out = "".join(f"{str(path.resolve())}:{i}{os.linesep}" for i in expected)
+    assert out == expected_out
