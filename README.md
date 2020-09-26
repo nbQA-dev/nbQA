@@ -119,6 +119,11 @@ here\'s an example of what you could add to your
 
 > well done on `nbqa` @MarcoGorelli ! Will be super useful in CI 😉
 
+**Girish Pasupathy**,
+[Software engineer and now core-contributor](https://github.com/girip11):
+
+> thanks a lot for your effort to create such a useful tool
+
 ## 👥 Contributing
 
 I will give write-access to anyone who contributes anything useful
