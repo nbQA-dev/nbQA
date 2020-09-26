@@ -87,7 +87,7 @@ my_notebook.ipynb:cell_3:1:1: F401 'import pandas as pd' imported but unused
 Upgrade your syntax with [pyupgrade](https://github.com/asottile/pyupgrade):
 
 ```bash
-$ nbqa pyupgrade my_notebook.ipynb --py36-plus
+$ nbqa pyupgrade my_notebook.ipynb --py36-plus --nbqa-mutate
 Rewriting my_notebook.ipynb
 ```
 
