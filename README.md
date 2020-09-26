@@ -24,7 +24,7 @@
 Adapter to run any standard code-quality tool on a Jupyter notebook.
 Documentation is hosted [here](https://nbqa.readthedocs.io/en/latest/).
 
-## Installation
+## 🎉 Installation
 
 Install `nbqa` with [pip](https://pip.pypa.io):
 
@@ -32,13 +32,13 @@ Install `nbqa` with [pip](https://pip.pypa.io):
 pip install -U nbqa
 ```
 
-## Examples
+## 🚀 Examples
 
 Reformat your notebook with
 [black](https://black.readthedocs.io/en/stable/):
 
 ```bash
-$ nbqa black my_notebook.ipynb --line-length=96 --nbqa-mutate
+$ nbqa black my_notebook.ipynb --nbqa-mutate
 reformatted my_notebook.ipynb
 All done! ✨ 🍰 ✨
 1 files reformatted.
@@ -77,23 +77,20 @@ Got:
 ***Test Failed*** 1 failures.
 ```
 
-## Configuration
+Check for style guide enforcement with [flake8](https://flake8.pycqa.org/en/latest/):
 
-Here\'s an example `.nbqa.ini` file - see
-[configuration](https://nbqa.readthedocs.io/en/latest/configuration.html)
-for more on configuration:
-
-```ini
-[isort]
-config = setup.cfg
-mutate = 1
-addopts = --treat-comment-as-code '# %%%%'
-
-[flake8]
-config = setup.cfg
+```bash
+$ nbqa flake8 my_notebook.ipynb
+my_notebook.ipynb:cell_3:1:1: F401 'import pandas as pd' imported but unused
 ```
 
-## Usage as pre-commit hook
+## 🔧 Configuration
+
+You can configure `nbQA` either at the command line, or by using a `pyproject.toml` file - see
+[configuration](https://nbqa.readthedocs.io/en/latest/configuration.html)
+for details and examples.
+
+## 👷 Usage as pre-commit hook
 
 If you want to use `nbqa` with [pre-commit](https://pre-commit.com/),
 here\'s an example of what you could add to your
@@ -101,7 +98,7 @@ here\'s an example of what you could add to your
 
 ```yaml
 - repo: https://github.com/nbQA-dev/nbQA
-  rev: 0.1.32
+  rev: 0.2.0
   hooks:
     - id: nbqa
       args: ["flake8"]
@@ -115,7 +112,7 @@ here\'s an example of what you could add to your
       additional_dependencies: ["isort"]
 ```
 
-## Supported third party packages
+## ✨ Supported third party packages
 
 In theory, `nbqa` can adapt any Python code-quality tool to a Jupyter Notebook.
 
@@ -127,14 +124,12 @@ In practice, here are the tools it\'s been tested with:
 - [mypy](http://mypy-lang.org/)
 - [doctest](https://docs.python.org/3/library/doctest.html)
 
-## Contributing
+## 👥Contributing
 
 I will give write-access to anyone who contributes anything useful
 (e.g. pull request / bug report) - see the
 [contributing guide](https://nbqa.readthedocs.io/en/latest/contributing.html)
 for details on how to do so.
-
-## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
@@ -156,4 +151,5 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- prettier-ignore-end -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
+Contributions of any kind welcome!
