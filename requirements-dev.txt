@@ -5,3 +5,4 @@ isort>=5.4.2
 mypy
 pylint
 pytest
+pyupgrade

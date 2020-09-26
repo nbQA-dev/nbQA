@@ -53,8 +53,8 @@ def test_black_works(
     expected = (
         '+    "\\n",\n'
         '+    "\\n",\n'
-        "-    \"    return f'hello {name}'\\n\",\n"
-        '+    "    return f\\"hello {name}\\"\\n",\n'
+        "-    \"    return 'hello {}'.format(name)\\n\",\n"
+        '+    "    return \\"hello {}\\".format(name)\\n",\n'
         '-    "hello(3)   "\n'
         '+    "hello(3)"\n'
     )
