@@ -84,6 +84,13 @@ $ nbqa flake8 my_notebook.ipynb
 my_notebook.ipynb:cell_3:1:1: F401 'import pandas as pd' imported but unused
 ```
 
+Upgrade your syntax with [pyupgrade](https://github.com/asottile/pyupgrade):
+
+```bash
+$ nbqa pyupgrade my_notebook.ipynb --py36-plus
+Rewriting my_notebook.ipynb
+```
+
 ## 🔧 Configuration
 
 You can configure `nbQA` either at the command line, or by using a `pyproject.toml` file - see
