@@ -128,7 +128,7 @@ def main(
     temporary_lines
         Mapping from temporary lines to original lines.
     """
-    with open(notebook, "r") as handle:
+    with open(notebook) as handle:
         cells = json.load(handle)["cells"]
 
     result = []

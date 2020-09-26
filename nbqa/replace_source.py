@@ -33,10 +33,10 @@ def main(
     temporary_lines
         Mapping from temporary lines to original lines.
     """
-    with open(notebook, "r") as handle:
+    with open(notebook) as handle:
         notebook_json = json.load(handle)
 
-    with open(str(python_file), "r") as handle:
+    with open(str(python_file)) as handle:
         pyfile = handle.read()
 
     pycells = pyfile[len(CODE_SEPARATOR) :].split(CODE_SEPARATOR)

@@ -28,13 +28,13 @@ def test_isort_works(
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_for_testing, "r") as handle:
+    with open(tmp_notebook_for_testing) as handle:
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     with pytest.raises(SystemExit):
         main(["isort", path, "--nbqa-mutate"])
 
-    with open(tmp_notebook_for_testing, "r") as handle:
+    with open(tmp_notebook_for_testing) as handle:
         after = handle.readlines()
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
@@ -63,7 +63,7 @@ def test_isort_initial_md(
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_starting_with_md, "r") as handle:
+    with open(tmp_notebook_starting_with_md) as handle:
         before = handle.readlines()
     path = os.path.abspath(
         os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
@@ -71,7 +71,7 @@ def test_isort_initial_md(
     with pytest.raises(SystemExit):
         main(["isort", path, "--nbqa-mutate"])
 
-    with open(tmp_notebook_starting_with_md, "r") as handle:
+    with open(tmp_notebook_starting_with_md) as handle:
         after = handle.readlines()
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
@@ -142,7 +142,7 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: "Path") 
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_with_trailing_semicolon, "r") as handle:
+    with open(tmp_notebook_with_trailing_semicolon) as handle:
         before = handle.readlines()
     path = os.path.abspath(
         os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
@@ -150,7 +150,7 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: "Path") 
     with pytest.raises(SystemExit):
         main(["isort", path, "--nbqa-mutate"])
 
-    with open(tmp_notebook_with_trailing_semicolon, "r") as handle:
+    with open(tmp_notebook_with_trailing_semicolon) as handle:
         after = handle.readlines()
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
