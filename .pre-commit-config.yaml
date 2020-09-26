@@ -53,3 +53,8 @@ repos:
     hooks:
       - id: mypy
         exclude: "docs"
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.7.2
+    hooks:
+      - id: pyupgrade
+        args: ["--py36-plus"]

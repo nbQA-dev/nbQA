@@ -29,7 +29,7 @@ def test_black_works(
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_for_testing, "r") as handle:
+    with open(tmp_notebook_for_testing) as handle:
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
 
@@ -45,7 +45,7 @@ def test_black_works(
     with pytest.raises(SystemExit):
         main(["black", path])
     Path("setup.cfg").unlink()
-    with open(tmp_notebook_for_testing, "r") as handle:
+    with open(tmp_notebook_for_testing) as handle:
         after = handle.readlines()
 
     diff = difflib.unified_diff(before, after)
@@ -85,7 +85,7 @@ def test_black_works_with_trailing_semicolons(
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_with_trailing_semicolon, "r") as handle:
+    with open(tmp_notebook_with_trailing_semicolon) as handle:
         before = handle.readlines()
     path = os.path.abspath(
         os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
@@ -103,7 +103,7 @@ def test_black_works_with_trailing_semicolons(
     with pytest.raises(SystemExit):
         main(["black", path, "--line-length=10"])
     Path("setup.cfg").unlink()
-    with open(tmp_notebook_with_trailing_semicolon, "r") as handle:
+    with open(tmp_notebook_with_trailing_semicolon) as handle:
         after = handle.readlines()
 
     diff = difflib.unified_diff(before, after)
