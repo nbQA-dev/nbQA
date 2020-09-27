@@ -34,11 +34,7 @@ def _replace_line_magics(source: List[str]) -> Iterator[Tuple[str, Optional[str]
         Lines from cell, with line magics replaced with python code
     """
     for line in source:
-        if (
-            line.lstrip().startswith("!")
-            or line.lstrip().startswith("%")
-            or line.rstrip().endswith("?")
-        ):
+        if line.lstrip().startswith(("!", "%", "?")) or line.rstrip().endswith("?"):
             token = secrets.token_hex(3)
             # Replace line with `pass`.
             replacement = IGNORE_LINE_REPLACEMENT

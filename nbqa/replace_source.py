@@ -42,9 +42,9 @@ def _reinstate_magics(
     rstripped_source = source.rstrip()
     if cell_number in trailing_semicolons and not rstripped_source.endswith(";"):
         source = rstripped_source + ";"
-    # we take [1:] because the first cell is just '\n'
     for key, val in temporary_lines.items():
         source = source.replace(key, val)
+    # we take [1:] because the first cell is just '\n'
     return "\n{}".format(source.strip("\n")).splitlines(True)[1:]
 
 
