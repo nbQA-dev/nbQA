@@ -10,6 +10,7 @@ nbQA
 
    readme
    configuration
+   pre-commit
    authors
    history
 
