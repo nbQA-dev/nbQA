@@ -50,7 +50,6 @@ def test_flake8_works(capsys: "CaptureFixture") -> None:
         {path_2}:cell_1:1:1: F401 'os' imported but unused
         {path_2}:cell_1:3:1: F401 'glob' imported but unused
         {path_2}:cell_1:5:1: F401 'nbqa' imported but unused
-        {path_2}:cell_3:0:1: E303 too many blank lines (3)
         {path_2}:cell_3:2:1: E302 expected 2 blank lines, found 0
         """
     )

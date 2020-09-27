@@ -6,7 +6,6 @@ Markdown cells, output, and metadata are ignored.
 
 import json
 import secrets
-from collections import defaultdict
 from itertools import takewhile
 from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple
 
@@ -14,8 +13,6 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 CODE_SEPARATOR = "# %%"
-BLANK_SPACES = defaultdict(lambda: "\n\n")
-BLANK_SPACES["isort"] = "\n"
 MAGIC = ["%%script", "%%bash"]
 IGNORE_CELL_REPLACEMENT = "# nbqa"
 IGNORE_LINE_REPLACEMENT = "pass  # nbqa"
@@ -67,7 +64,6 @@ def _replace_magics(
 
 def _parse_cell(
     source: List[str],
-    command: str,
     ignore_cells: List[str],
     temporary_lines: Dict[str, str],
 ) -> str:
@@ -78,8 +74,6 @@ def _parse_cell(
     ----------
     source
         Source from notebook cell.
-    command
-        Third-party tool we're running.
     ignore_cells
         Extra cells which nbqa should ignore.
     temporary_lines
@@ -90,19 +84,18 @@ def _parse_cell(
     str
         Parsed cell.
     """
-    parsed_cell = f"{BLANK_SPACES[command]}{CODE_SEPARATOR}\n"
+    parsed_cell = f"\n{CODE_SEPARATOR}\n"
     for new, old in _replace_magics(source, ignore_cells):
         parsed_cell += new
         if old is not None:
             temporary_lines[new] = old
-    parsed_cell += "\n"
+    parsed_cell = parsed_cell.rstrip("\n") + "\n"
     return parsed_cell
 
 
 def main(
     notebook: "Path",
     temp_python_file: "Path",
-    command: str,
     ignore_cells: List[str],
 ) -> Tuple[Dict[int, str], List[int], Dict[str, str]]:
     """
@@ -114,8 +107,6 @@ def main(
         Jupyter Notebook third-party tool is being run against.
     temp_python_file
         Temporary Python file to save converted notebook in.
-    command
-        Third party tool which you're running on your notebook.
     ignore_cells
         Extra cells which nbqa should ignore.
 
@@ -141,7 +132,7 @@ def main(
     for i in cells:
         if i["cell_type"] != "code":
             continue
-        parsed_cell = _parse_cell(i["source"], command, ignore_cells, temporary_lines)
+        parsed_cell = _parse_cell(i["source"], ignore_cells, temporary_lines)
         result.append(parsed_cell)
         split_parsed_cell = parsed_cell.splitlines()
         cell_mapping.update(
@@ -156,6 +147,6 @@ def main(
         cell_number += 1
 
     with open(str(temp_python_file), "w") as handle:
-        handle.write("".join(result)[len(BLANK_SPACES[command]) : -len("\n")])
+        handle.write("".join(result)[len("\n") :])
 
     return cell_mapping, trailing_semicolons, temporary_lines

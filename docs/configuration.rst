@@ -60,6 +60,9 @@ or you can put the following in your :code:`pyproject.toml` file
     [tool.nbqa.mutate]
     black = 1
 
+.. note::
+    If you let :code:`nbQA` mutate your notebook, then trailing newlines will be removed from cells.
+
 Ignore cells
 ~~~~~~~~~~~~
 
