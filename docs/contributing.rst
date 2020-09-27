@@ -38,8 +38,8 @@ and "help wanted" is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-nbQA could always use more documentation, whether as part of the
-official nbQA docs, in docstrings, or even on the web in blog posts,
+nbqa could always use more documentation, whether as part of the
+official nbqa docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback

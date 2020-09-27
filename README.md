@@ -93,31 +93,15 @@ Rewriting my_notebook.ipynb
 
 ## 🔧 Configuration
 
-You can configure `nbQA` either at the command line, or by using a `pyproject.toml` file - see
+You can configure `nbqa` either at the command line, or by using a `pyproject.toml` file - see
 [configuration](https://nbqa.readthedocs.io/en/latest/configuration.html)
 for details and examples.
 
 ## 👷 Usage as pre-commit hook
 
-If you want to use `nbqa` with [pre-commit](https://pre-commit.com/),
-here\'s an example of what you could add to your
-`.pre-commit-config.yaml` file:
-
-```yaml
-- repo: https://github.com/nbQA-dev/nbQA
-  rev: 0.2.1
-  hooks:
-    - id: nbqa
-      args: ["flake8"]
-      name: nbqa-flake8
-      alias: nbqa-flake8
-      additional_dependencies: ["flake8"]
-    - id: nbqa
-      args: ["isort", "--nbqa-mutate"]
-      name: nbqa-isort
-      alias: nbqa-isort
-      additional_dependencies: ["isort"]
-```
+You can easily use `nbqa` as a [pre-commit](https://pre-commit.com/) hook by passing your desired
+code quality tool in the `args` and `additional_dependencies` sections - see
+[usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/configuration.html) for examples.
 
 ## 💬 Testimonials
 

@@ -1,4 +1,4 @@
-"""Check that nbQA still works even if __init__ files aren't present."""
+"""Check that nbqa still works even if __init__ files aren't present."""
 
 import os
 import subprocess

@@ -391,7 +391,7 @@ def _run_command(
     if "No module named" in err:
         raise ValueError(
             f"Command `{command}` not found. "
-            "Please make sure you have it installed before running nbQA on it."
+            "Please make sure you have it installed before running nbqa on it."
         )
 
     return out, err, output_code, mutated
