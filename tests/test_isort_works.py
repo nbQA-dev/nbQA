@@ -154,10 +154,5 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: "Path") 
         after = handle.readlines()
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
-    expected = (
-        '-    "import glob;\\n",\n'
-        '+    "import glob\\n",\n'
-        '-    "    pass;\\n"\n'
-        '+    "    pass;"\n'
-    )
+    expected = '-    "import glob;\\n",\n+    "import glob\\n",\n'
     assert result == expected

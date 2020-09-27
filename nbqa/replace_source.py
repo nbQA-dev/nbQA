@@ -66,7 +66,7 @@ def main(
         List[str]
             New source that can be saved into Jupyter Notebook.
         """
-        rstripped_source = source.rstrip("\n")
+        rstripped_source = source.rstrip()
         if cell_number in trailing_semicolons and not rstripped_source.endswith(";"):
             source = rstripped_source + ";"
         # we take [1:] because the first cell is just '\n'
