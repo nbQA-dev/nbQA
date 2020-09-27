@@ -101,7 +101,7 @@ for details and examples.
 
 You can easily use `nbqa` as a [pre-commit](https://pre-commit.com/) hook by passing your desired
 code quality tool in the `args` and `additional_dependencies` sections - see
-[usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/configuration.html) for examples.
+[usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html) for examples.
 
 ## 💬 Testimonials
 
