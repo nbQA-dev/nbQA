@@ -21,6 +21,19 @@ IGNORE_LINE_REPLACEMENT = "pass  # nbqa"
 
 
 def _is_src_code_indentation_valid(source: str) -> bool:
+    """
+    Return True is the indentation of the input source code is valid.
+
+    Parameters
+    ----------
+    source : str
+        Source code present in the notebook cell
+
+    Returns
+    -------
+    bool
+        True if the source indentation is valid otherwise False
+    """
     valid: bool = True
     try:
         ast.parse(source)
@@ -37,6 +50,21 @@ def _is_src_code_indentation_valid(source: str) -> bool:
 def _handle_line_magic_indentation(
     source: List[str], line_magic: str
 ) -> Tuple[str, str]:
+    """
+    Handle the indentation of line magics. Remove unnecessary indentation.
+
+    Parameters
+    ----------
+    source : List[str]
+        Source code of the notebook cell
+    line_magic : str
+        Line magic present in the notebook cell
+
+    Returns
+    -------
+    Tuple[str, str]
+        Tuple of replacement line and the original line magic statement.
+    """
     leading_space = "".join(takewhile(lambda c: c == " ", line_magic))
     token = secrets.token_hex(3)
 
