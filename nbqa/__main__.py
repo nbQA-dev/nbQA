@@ -8,12 +8,13 @@ import sys
 import tempfile
 from pathlib import Path
 from textwrap import dedent
-from typing import Dict, Iterator, List, Match, Optional, Set, Tuple
+from typing import Dict, Iterator, List, Mapping, Match, Optional, Set, Tuple
 
 from nbqa import config_parser, replace_source, save_source
 from nbqa.cmdline import CLIArgs
 from nbqa.config import Configs
 from nbqa.find_root import find_project_root
+from nbqa.notebook_info import NotebookInfo
 
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
 
@@ -133,7 +134,7 @@ def _replace_relative_path_out_err(out: str, notebook: Path) -> str:
 
 
 def _map_python_line_to_nb_lines(
-    out: str, notebook: Path, cell_mapping: Dict[int, str]
+    out: str, notebook: Path, cell_mapping: Mapping[int, str]
 ) -> str:
     """
     Make sure stdout and stderr make reference to Jupyter Notebook cells and lines.
@@ -175,7 +176,7 @@ def _replace_temp_python_file_references_in_out_err(
     notebook: Path,
     out: str,
     err: str,
-    cell_mapping: Dict[int, str],
+    cell_mapping: Mapping[int, str],
 ) -> Tuple[str, str]:
     """
     Replace references to temporary Python file with references to notebook.
@@ -453,18 +454,14 @@ def _run_on_one_root_dir(
             for notebook in _get_notebooks(root_dir)
         }
 
-        cell_mappings = {}
-        trailing_semicolons = {}
-        temporary_lines = {}
-
         _preserve_config_files(configs.nbqa_config, tmpdirname, project_root)
 
+        nb_info_mapping: Dict[Path, NotebookInfo] = {}
+
         for notebook, temp_python_file in nb_to_py_mapping.items():
-            (
-                cell_mappings[notebook],
-                trailing_semicolons[notebook],
-                temporary_lines[notebook],
-            ) = save_source.main(notebook, temp_python_file, configs.nbqa_ignore_cells)
+            nb_info_mapping[notebook] = save_source.main(
+                notebook, temp_python_file, configs.nbqa_ignore_cells
+            )
             _create_blank_init_files(notebook, tmpdirname, project_root)
 
         out, err, output_code, mutated = _run_command(
@@ -476,7 +473,11 @@ def _run_on_one_root_dir(
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(
-                temp_python_file, notebook, out, err, cell_mappings[notebook]
+                temp_python_file,
+                notebook,
+                out,
+                err,
+                nb_info_mapping[notebook].cell_mappings,
             )
             if mutated:
                 if not configs.nbqa_mutate:
@@ -491,10 +492,7 @@ def _run_on_one_root_dir(
                     )
 
                 replace_source.main(
-                    temp_python_file,
-                    notebook,
-                    trailing_semicolons[notebook],
-                    temporary_lines[notebook],
+                    temp_python_file, notebook, nb_info_mapping[notebook]
                 )
 
         sys.stdout.write(out)
