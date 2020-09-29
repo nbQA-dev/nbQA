@@ -121,7 +121,7 @@ class CLIArgs:
             ),
         )
         parser.add_argument(
-            "--version", action="version", version=f"nbQA {__version__}"
+            "--version", action="version", version=f"nbqa {__version__}"
         )
         try:
             args, cmd_args = parser.parse_known_args(raw_args)
