@@ -10,7 +10,7 @@ and sort your imports using ``isort``, you could put the following in your ``.pr
 
     repos:
     - repo: 'https://github.com/nbQA-dev/nbQA'
-        rev: 0.2.1
+        rev: 0.2.2
         hooks:
         - id: nbqa
             args:
