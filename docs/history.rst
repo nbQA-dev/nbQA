@@ -2,6 +2,11 @@
 Changelog
 =========
 
+0.2.2 (2020-10-01)
+------------------
+
+Optimised handling cell-magics and improved support for indented in-line magics (thanks Girish Pasupathy !).
+
 0.2.1 (2020-09-27)
 ------------------
 
