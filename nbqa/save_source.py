@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 CODE_SEPARATOR = "# %%"
 MAGIC = ["%%script", "%%bash"]
-IGNORE_LINE_REPLACEMENT = "pass  # nbqa"
+IGNORE_LINE_REPLACEMENT = '__import__("nbqa.util", fromlist=["nbqa"]).no_op("{}")'
 
 
 def _is_src_code_indentation_valid(source: str) -> bool:
@@ -69,7 +69,7 @@ def _handle_line_magic_indentation(
     token = secrets.token_hex(3)
 
     # preserve the leading spaces and check if the syntax is valid
-    line_tokenised = f"{leading_space}{IGNORE_LINE_REPLACEMENT}{token}"
+    line_tokenised = f"{leading_space}{IGNORE_LINE_REPLACEMENT.format(token)}"
 
     if leading_space and not _is_src_code_indentation_valid(
         "".join(source + [line_tokenised])
