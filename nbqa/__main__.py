@@ -69,70 +69,6 @@ def _temp_python_file_for_notebook(
     return temp_python_file
 
 
-def _replace_full_path_out_err(
-    out: str, err: str, temp_python_file: Path, notebook: Path
-) -> Tuple[str, str]:
-    """
-    Replace references to temporary Python file's full path with notebook's path.
-
-    Parameters
-    ----------
-    out
-        Captured stdout from third-party tool.
-    err
-        Captured stderr from third-party tool.
-    temp_python_file
-        Temporary Python file where notebook was converted to.
-    notebook
-        Original Jupyter notebook.
-
-    Returns
-    -------
-    out
-        Stdout with temporary Python file's full path with notebook's path.
-    err
-        Stderr with temporary Python file's full path with notebook's path.
-    """
-    out = out.replace(str(temp_python_file), str(notebook.resolve()))
-    err = err.replace(str(temp_python_file), str(notebook.resolve()))
-
-    # This next part is necessary to handle cases when `resolve` changes the path.
-    # I couldn't reproduce this locally, but during CI, on the Windows job, I found
-    # that VSSADM~1 was changing into VssAdministrator.
-    out = out.replace(str(temp_python_file.resolve()), str(notebook.resolve()))
-    err = err.replace(str(temp_python_file.resolve()), str(notebook.resolve()))
-    return out, err
-
-
-def _replace_relative_path_out_err(out: str, notebook: Path) -> str:
-    """
-    Replace references to temporary Python file's relative path with notebook's path.
-
-    Parameters
-    ----------
-    out
-        Captured stdout from third-party tool.
-    notebook
-        Original Jupyter notebook.
-
-    Returns
-    -------
-    out
-        Stdout with temporary Python file's relative path with notebook's path.
-    Examples
-    --------
-    >>> out = "notebook   .py ."
-    >>> notebook = Path('notebook.ipynb')
-    >>> _replace_relative_path_out_err(out, notebook)
-    'notebook.ipynb .'
-    """
-    out = out.replace(
-        str(notebook.parent.joinpath(f"{notebook.stem}   ").with_suffix(".py")),
-        str(notebook),
-    )
-    return out
-
-
 def _map_python_line_to_nb_lines(
     out: str, notebook: Path, cell_mapping: Mapping[int, str]
 ) -> str:
@@ -172,7 +108,7 @@ def _map_python_line_to_nb_lines(
 
 
 def _replace_temp_python_file_references_in_out_err(
-    temp_python_file: Path,
+    tempdirname,
     notebook: Path,
     out: str,
     err: str,
@@ -201,8 +137,8 @@ def _replace_temp_python_file_references_in_out_err(
     err
         Stderr with temporary directory replaced by current working directory.
     """
-    out, err = _replace_full_path_out_err(out, err, temp_python_file, notebook)
-    out = _replace_relative_path_out_err(out, notebook)
+    out = out.replace(f"{tempdirname}{os.sep}", "").replace("   .py", ".ipynb")
+    err = err.replace(f"{tempdirname}{os.sep}", "").replace("   .py", ".ipynb")
     out = _map_python_line_to_nb_lines(out, notebook, cell_mapping)
     return out, err
 
@@ -473,7 +409,7 @@ def _run_on_one_root_dir(
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(
-                temp_python_file,
+                tmpdirname,
                 notebook,
                 out,
                 err,

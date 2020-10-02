@@ -31,7 +31,7 @@ def test_black_works(
     # check diff
     with open(tmp_notebook_for_testing) as handle:
         before = handle.readlines()
-    path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
+    path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
 
     with open("setup.cfg", "w") as handle:
         handle.write(
@@ -87,9 +87,7 @@ def test_black_works_with_trailing_semicolons(
     # check diff
     with open(tmp_notebook_with_trailing_semicolon) as handle:
         before = handle.readlines()
-    path = os.path.abspath(
-        os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
-    )
+    path = os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
 
     with open("setup.cfg", "w") as handle:
         handle.write(

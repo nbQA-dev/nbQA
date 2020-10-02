@@ -22,15 +22,9 @@ def test_flake8_works(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     # check out and err
-    path_0 = os.path.abspath(
-        os.path.join("tests", "data", "notebook_for_testing.ipynb")
-    )
-    path_1 = os.path.abspath(
-        os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
-    )
-    path_2 = os.path.abspath(
-        os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
-    )
+    path_0 = os.path.join("tests", "data", "notebook_for_testing.ipynb")
+    path_1 = os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
+    path_2 = os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
 
     with pytest.raises(SystemExit):
         main(["flake8", path_0, path_1, path_2])
