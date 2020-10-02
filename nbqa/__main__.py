@@ -137,8 +137,8 @@ def _replace_temp_python_file_references_in_out_err(
     err
         Stderr with temporary directory replaced by current working directory.
     """
-    out = out.replace(f"{tempdirname}{os.sep}", "").replace("   .py", ".ipynb")
-    err = err.replace(f"{tempdirname}{os.sep}", "").replace("   .py", ".ipynb")
+    out = out.replace(f"{tempdirname}{os.sep}", "").replace(f"{str(Path(tempdirname).resolve())}{os.sep}", "").replace("   .py", ".ipynb")
+    err = err.replace(f"{tempdirname}{os.sep}", "").replace(f"{str(Path(tempdirname).resolve())}{os.sep}", "").replace("   .py", ".ipynb")
     out = _map_python_line_to_nb_lines(out, notebook, cell_mapping)
     return out, err
 
