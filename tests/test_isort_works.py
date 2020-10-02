@@ -45,8 +45,6 @@ def test_isort_works(
     out, err = capsys.readouterr()
     expected_out = f"Fixing {path}{os.linesep}"
     expected_err = ""
-    print(out)
-    print(err)
     assert out == expected_out
     assert err == expected_err
 
