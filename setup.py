@@ -14,8 +14,8 @@ setup_requirements = []
 test_requirements = []
 
 setup(
-    author="Marco Gorelli",
-    author_email="m.e.gorelli@gmail.com",
+    author="Marco Gorelli, Girish Pasupathy",
+    author_email="",
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
