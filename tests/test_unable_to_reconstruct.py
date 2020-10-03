@@ -1,4 +1,4 @@
-"""Check that :code:`black` works as intended."""
+"""Check that users are encouraged to report bugs if reconstructing notebook fails."""
 
 import os
 
