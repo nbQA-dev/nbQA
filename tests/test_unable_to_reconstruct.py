@@ -22,7 +22,7 @@ def test_unable_to_reconstruct_message() -> None:
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
 
     message = dedent(
-        fr"""
+        f"""
         \U0001f62d Error reconstructing {path} \U0001f62d
 
         Please report a bug at https://github.com/nbQA-dev/nbQA/issues \U0001f64f
