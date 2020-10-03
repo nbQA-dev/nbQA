@@ -69,11 +69,11 @@ def _temp_python_file_for_notebook(
     return temp_python_file
 
 
-def _replace_full_path_out_err(
+def _replace_path_out_err(
     out: str, err: str, temp_python_file: Path, notebook: Path
 ) -> Tuple[str, str]:
     """
-    Replace references to temporary Python file's full path with notebook's path.
+    Replace references to temporary Python file with notebook's path.
 
     Parameters
     ----------
@@ -89,9 +89,9 @@ def _replace_full_path_out_err(
     Returns
     -------
     out
-        Stdout with temporary Python file's full path with notebook's path.
+        Stdout with temporary Python file replaced with notebook.
     err
-        Stderr with temporary Python file's full path with notebook's path.
+        Stderr with temporary Python file replaced with notebook.
     """
     out = out.replace(str(temp_python_file), str(notebook))
     err = err.replace(str(temp_python_file), str(notebook))
@@ -175,7 +175,7 @@ def _replace_temp_python_file_references_in_out_err(
     err
         Stderr with temporary directory replaced by current working directory.
     """
-    out, err = _replace_full_path_out_err(out, err, temp_python_file, notebook)
+    out, err = _replace_path_out_err(out, err, temp_python_file, notebook)
     out = _map_python_line_to_nb_lines(out, notebook, cell_mapping)
     return out, err
 
