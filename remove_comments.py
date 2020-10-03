@@ -9,7 +9,7 @@ import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("path")
-    args = parser.parse_args()
+    args, _ = parser.parse_known_args()
     with open(args.path) as handle:
         file_ = handle.read()
     file_ = file_.replace("#", "")
