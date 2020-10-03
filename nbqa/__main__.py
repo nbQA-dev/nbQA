@@ -495,7 +495,7 @@ def _run_on_one_root_dir(
                     replace_source.main(
                         temp_python_file, notebook, nb_info_mapping[notebook]
                     )
-                except StopIteration as exc:
+                except Exception as exc:
                     raise RuntimeError(
                         dedent(
                             f"""
