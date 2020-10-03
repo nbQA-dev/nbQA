@@ -30,7 +30,7 @@ def test_isort_works(
     # check diff
     with open(tmp_notebook_for_testing) as handle:
         before = handle.readlines()
-    path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
+    path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     with pytest.raises(SystemExit):
         main(["isort", path, "--nbqa-mutate"])
 
