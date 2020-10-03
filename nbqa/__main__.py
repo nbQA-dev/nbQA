@@ -496,7 +496,7 @@ def _run_on_one_root_dir(
                         temp_python_file, notebook, nb_info_mapping[notebook]
                     )
                 except StopIteration as exc:
-                    raise ValueError(
+                    raise RuntimeError(
                         dedent(
                             f"""
 

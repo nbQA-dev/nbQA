@@ -23,11 +23,11 @@ def test_unable_to_reconstruct_message() -> None:
 
     message = dedent(
         f"""
-                                😭 Error reconstructing {path} 😭
+        😭 Error reconstructing {path} 😭
 
-                                Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏
-                                """
+        Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏
+        """
     )
 
-    with pytest.raises(ValueError, match=message):
+    with pytest.raises(RuntimeError, match=message):
         main(["remove_comments", path, "--nbqa-mutate"])
