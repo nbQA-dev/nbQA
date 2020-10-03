@@ -491,9 +491,21 @@ def _run_on_one_root_dir(
                         )
                     )
 
-                replace_source.main(
-                    temp_python_file, notebook, nb_info_mapping[notebook]
-                )
+                try:
+                    replace_source.main(
+                        temp_python_file, notebook, nb_info_mapping[notebook]
+                    )
+                except StopIteration as exc:
+                    raise ValueError(
+                        dedent(
+                            f"""
+
+                            😭 Error reconstructing {str(notebook)} 😭
+
+                            Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏
+                            """
+                        )
+                    ) from exc
 
         sys.stdout.write(out)
         sys.stderr.write(err)
