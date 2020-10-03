@@ -99,11 +99,11 @@ def _replace_path_out_err(
     # This next part is necessary to handle cases when `resolve` changes the path.
     # I couldn't reproduce this locally, but during CI, on the Windows job, I found
     # that VSSADM~1 was changing into VssAdministrator.
-    out = out.replace(str(temp_python_file.resolve()), str(notebook.resolve()))
-    err = err.replace(str(temp_python_file.resolve()), str(notebook.resolve()))
+    out = out.replace(str(temp_python_file.resolve()), str(notebook))
+    err = err.replace(str(temp_python_file.resolve()), str(notebook))
 
-    out = out.replace("   .py", ".ipynb")
-    err = err.replace("   .py", ".ipynb")
+    out = out.replace(str(notebook.with_name(f"{notebook.stem}   .py")), str(notebook))
+    err = err.replace(str(notebook.with_name(f"{notebook.stem}   .py")), str(notebook))
 
     return out, err
 
