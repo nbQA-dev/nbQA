@@ -66,7 +66,6 @@ def test_isort_initial_md(
     with open(tmp_notebook_starting_with_md) as handle:
         before = handle.readlines()
     path = os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
-
     with pytest.raises(SystemExit):
         main(["isort", path, "--nbqa-mutate"])
 
