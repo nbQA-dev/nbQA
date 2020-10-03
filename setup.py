@@ -14,8 +14,7 @@ setup_requirements = []
 test_requirements = []
 
 setup(
-    author="Marco Gorelli",
-    author_email="m.e.gorelli@gmail.com",
+    author="Marco Gorelli, Girish Pasupathy",
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
@@ -40,7 +39,7 @@ setup(
     setup_requires=setup_requirements,
     test_suite="tests",
     tests_require=test_requirements,
-    url="https://github.com/MarcoGorelli/nbQA",
+    url="https://github.com/nbQA-dev/nbQA",
     version="0.2.2",
     zip_safe=False,
 )
