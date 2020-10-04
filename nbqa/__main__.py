@@ -474,7 +474,7 @@ def _run_on_one_root_dir(
                 )
             except Exception as exc:
                 raise RuntimeError(
-                    BASE_ERROR_MESSAGE.format(f"😭 Error parsing {str(notebook)} 😭")
+                    BASE_ERROR_MESSAGE.format(f"Error parsing {str(notebook)}")
                 ) from exc
 
             _create_blank_init_files(notebook, tmpdirname, project_root)
@@ -513,7 +513,7 @@ def _run_on_one_root_dir(
                 except Exception as exc:
                     raise RuntimeError(
                         BASE_ERROR_MESSAGE.format(
-                            f"😭 Error reconstructing {str(notebook)} 😭"
+                            f"Error reconstructing {str(notebook)}"
                         )
                     ) from exc
 
