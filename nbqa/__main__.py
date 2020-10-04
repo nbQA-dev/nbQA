@@ -21,9 +21,9 @@ CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
 BASE_ERROR_MESSAGE = dedent(
     """
 
-    \U0001f62d {} \U0001f62d
+    {}
 
-    Please report a bug at https://github.com/nbQA-dev/nbQA/issues \U0001f64f
+    Please report a bug at https://github.com/nbQA-dev/nbQA/issues
     """
 )
 
