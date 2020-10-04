@@ -4,13 +4,9 @@
 
 [![image](https://github.com/nbQA-dev/nbQA/workflows/tox/badge.svg)](https://github.com/nbQA-dev/nbQA/actions?workflow=tox)
 [![image](https://codecov.io/gh/nbQA-dev/nbQA/branch/master/graph/badge.svg)](https://codecov.io/gh/nbQA-dev/nbQA)
-[![image](https://badge.fury.io/py/nbqa.svg)](https://badge.fury.io/py/nbqa)
 [![image](https://readthedocs.org/projects/nbqa/badge/?version=latest)](https://nbqa.readthedocs.io/en/latest/)
 [![image](https://img.shields.io/pypi/pyversions/nbqa.svg)](https://pypi.org/project/nbqa/)
 [![image](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-[![image](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
-[![image](https://interrogate.readthedocs.io/en/latest/_static/interrogate_badge.svg)](https://github.com/econchick/interrogate)
-[![image](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![image](https://img.shields.io/pypi/dm/nbqa.svg?label=pypi%20downloads&logo=PyPI&logoColor=white)](https://pypistats.org/packages/nbqa)
 [![All Contributors](https://img.shields.io/github/all-contributors/nbQA-dev/nbQA)](#contributors)
 
