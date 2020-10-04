@@ -473,10 +473,10 @@ def _run_on_one_root_dir(
                     raise SystemExit(
                         dedent(
                             f"""\
-                        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
+                    💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
 
-                            {" ".join([str(cli_args), "--nbqa-mutate"])}
-                        """
+                        {" ".join([str(cli_args), "--nbqa-mutate"])}
+                    """
                         )
                     )
 
