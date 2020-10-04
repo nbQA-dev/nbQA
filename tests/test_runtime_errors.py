@@ -1,4 +1,4 @@
-"""Check that users are encouraged to report bugs if parsing/reconstructing notebook fails."""
+"""Check that users are encouraged to report bugs if reconstructing notebook fails."""
 
 import os
 from pathlib import Path

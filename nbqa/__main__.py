@@ -18,6 +18,15 @@ from nbqa.notebook_info import NotebookInfo
 
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
 
+BASE_ERROR_MESSAGE = dedent(
+    """
+
+    😭 {} 😭
+
+    Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏
+    """
+)
+
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
     """
@@ -459,9 +468,15 @@ def _run_on_one_root_dir(
         nb_info_mapping: Dict[Path, NotebookInfo] = {}
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
-            nb_info_mapping[notebook] = save_source.main(
-                notebook, temp_python_file, configs.nbqa_ignore_cells
-            )
+            try:
+                nb_info_mapping[notebook] = save_source.main(
+                    notebook, temp_python_file, configs.nbqa_ignore_cells
+                )
+            except Exception as exc:
+                raise RuntimeError(
+                    BASE_ERROR_MESSAGE.format(f"😭 Error parsing {str(notebook)} 😭")
+                ) from exc
+
             _create_blank_init_files(notebook, tmpdirname, project_root)
 
         out, err, output_code, mutated = _run_command(
@@ -484,10 +499,10 @@ def _run_on_one_root_dir(
                     raise SystemExit(
                         dedent(
                             f"""\
-                    💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
+                        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
 
-                        {" ".join([str(cli_args), "--nbqa-mutate"])}
-                    """
+                            {" ".join([str(cli_args), "--nbqa-mutate"])}
+                        """
                         )
                     )
 
@@ -497,13 +512,8 @@ def _run_on_one_root_dir(
                     )
                 except Exception as exc:
                     raise RuntimeError(
-                        dedent(
-                            f"""
-
-                            😭 Error reconstructing {str(notebook)} 😭
-
-                            Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏
-                            """
+                        BASE_ERROR_MESSAGE.format(
+                            f"😭 Error reconstructing {str(notebook)} 😭"
                         )
                     ) from exc
 
