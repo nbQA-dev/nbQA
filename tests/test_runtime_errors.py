@@ -22,7 +22,7 @@ def test_unable_to_parse() -> None:
     path = Path("tests") / "data/invalid_notebook.ipynb"
     path.write_text("foo")
     message = f"Error parsing {str(path)}"
-    with pytest.raises(RuntimeError, match=message) as excinfo:
+    with pytest.raises(RuntimeError) as excinfo:
         main(["flake8", str(path), "--nbqa-mutate"])
     path.unlink()
     assert message in str(excinfo.value)
