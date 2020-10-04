@@ -19,7 +19,7 @@ from nbqa.notebook_info import NotebookInfo
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
 
 BASE_ERROR_MESSAGE = dedent(
-    """
+    r"""
 
     😭 {} 😭
 
