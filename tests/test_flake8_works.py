@@ -21,13 +21,9 @@ def test_flake8_works(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    # check out and err
-    path_0 = os.path.abspath(
-        os.path.join("tests", "data", "notebook_for_testing.ipynb")
-    )
-    path_1 = os.path.abspath(
-        os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
-    )
+    # check passing both absolute and relative paths
+    path_0 = os.path.join("tests", "data", "notebook_for_testing.ipynb")
+    path_1 = os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
     path_2 = os.path.abspath(
         os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
     )
