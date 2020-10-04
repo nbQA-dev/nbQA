@@ -33,7 +33,7 @@ def test_cli(magic: str, expected: List[str], capsys: "CaptureFixture") -> None:
         main(["flake8", str(path), magic])
 
     out, _ = capsys.readouterr()
-    expected_out = "".join(f"{str(path.resolve())}:{i}{os.linesep}" for i in expected)
+    expected_out = "".join(f"{str(path)}:{i}{os.linesep}" for i in expected)
     assert out == expected_out
 
 
@@ -71,7 +71,7 @@ def test_ini(magic: str, expected: str, capsys: "CaptureFixture") -> None:
     Path(".nbqa.ini").unlink()
 
     out, _ = capsys.readouterr()
-    expected_out = "".join(f"{str(path.resolve())}:{i}{os.linesep}" for i in expected)
+    expected_out = "".join(f"{str(path)}:{i}{os.linesep}" for i in expected)
     assert out == expected_out
 
 
@@ -115,5 +115,5 @@ def test_toml(
     Path(config_file).unlink()
 
     out, _ = capsys.readouterr()
-    expected_out = "".join(f"{str(path.resolve())}:{i}{os.linesep}" for i in expected)
+    expected_out = "".join(f"{str(path)}:{i}{os.linesep}" for i in expected)
     assert out == expected_out
