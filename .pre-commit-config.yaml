@@ -58,3 +58,8 @@ repos:
     hooks:
       - id: pyupgrade
         args: ["--py36-plus"]
+  - repo: https://github.com/codespell-project/codespell
+    rev: v1.17.1
+    hooks:
+      - id: codespell
+        files: ".py|.rst|.md"
