@@ -8,6 +8,7 @@ import pytest
 from nbqa.__main__ import main
 
 
+@pytest.mark.usefixtures("tmp_remove_comments")
 def test_unable_to_reconstruct_message() -> None:
     """Check error message shows if we're unable to reconstruct notebook."""
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
