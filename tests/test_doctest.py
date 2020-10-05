@@ -43,7 +43,7 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
     expected_out = dedent(
         f"""\
         **********************************************************************
-        File "{WRONG_EXAMPLE_NOTEBOOK}", cell_2:10, in notebook_for_testing_copy   .hello
+        File "{WRONG_EXAMPLE_NOTEBOOK}", cell_2:10, in notebook_for_testing_copy.hello
         Failed example:
             hello("goodbye")
         Expected:
@@ -52,7 +52,7 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
             'hello goodbye'
         **********************************************************************
         1 items had failures:
-           1 of   2 in notebook_for_testing_copy   .hello
+           1 of   2 in notebook_for_testing_copy.hello
         ***Test Failed*** 1 failures.
         """
     )

@@ -62,9 +62,10 @@ def _temp_python_file_for_notebook(
         Temporary Python file whose location mirrors that of the notebook, but
         inside the temporary directory.
     """
-    # Add 3 extra whitespaces because `ipynb` is 3 chars longer than `py`.
-    relative_notebook_dir = notebook.resolve().relative_to(project_root).parent
-    temp_python_file = Path(tmpdir) / relative_notebook_dir / f"{notebook.stem}   .py"
+    relative_notebook_path = (
+        notebook.resolve().relative_to(project_root).with_suffix(".py")
+    )
+    temp_python_file = Path(tmpdir) / relative_notebook_path
     temp_python_file.parent.mkdir(parents=True, exist_ok=True)
     return temp_python_file
 
@@ -102,8 +103,8 @@ def _replace_path_out_err(
     out = out.replace(str(temp_python_file.resolve()), str(notebook))
     err = err.replace(str(temp_python_file.resolve()), str(notebook))
 
-    out = out.replace(str(notebook.with_name(f"{notebook.stem}   .py")), str(notebook))
-    err = err.replace(str(notebook.with_name(f"{notebook.stem}   .py")), str(notebook))
+    out = out.replace(str(notebook.with_suffix(".py")), str(notebook))
+    err = err.replace(str(notebook.with_suffix(".py")), str(notebook))
 
     return out, err
 
