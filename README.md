@@ -74,7 +74,7 @@ Got:
 Check for style guide enforcement with [flake8](https://flake8.pycqa.org/en/latest/):
 
 ```bash
-$ nbqa flake8 my_notebook.ipynb
+$ nbqa flake8 my_notebook.ipynb --ignore=E203,E302,E305,E703,W503,W504
 my_notebook.ipynb:cell_3:1:1: F401 'import pandas as pd' imported but unused
 ```
 
