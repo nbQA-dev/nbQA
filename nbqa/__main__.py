@@ -18,6 +18,15 @@ from nbqa.notebook_info import NotebookInfo
 
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
 
+BASE_ERROR_MESSAGE = dedent(
+    """
+
+    😭 {} 😭
+
+    Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏
+    """
+)
+
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
     """
@@ -434,9 +443,15 @@ def _run_on_one_root_dir(
         nb_info_mapping: Dict[Path, NotebookInfo] = {}
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
-            nb_info_mapping[notebook] = save_source.main(
-                notebook, temp_python_file, configs.nbqa_ignore_cells
-            )
+            try:
+                nb_info_mapping[notebook] = save_source.main(
+                    notebook, temp_python_file, configs.nbqa_ignore_cells
+                )
+            except Exception as exc:
+                raise RuntimeError(
+                    BASE_ERROR_MESSAGE.format(f"Error parsing {str(notebook)}")
+                ) from exc
+
             _create_blank_init_files(notebook, tmpdirname, project_root)
 
         out, err, output_code, mutated = _run_command(
@@ -466,9 +481,16 @@ def _run_on_one_root_dir(
                         )
                     )
 
-                replace_source.main(
-                    temp_python_file, notebook, nb_info_mapping[notebook]
-                )
+                try:
+                    replace_source.main(
+                        temp_python_file, notebook, nb_info_mapping[notebook]
+                    )
+                except Exception as exc:
+                    raise RuntimeError(
+                        BASE_ERROR_MESSAGE.format(
+                            f"Error reconstructing {str(notebook)}"
+                        )
+                    ) from exc
 
         sys.stdout.write(out)
         sys.stderr.write(err)
