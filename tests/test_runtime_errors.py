@@ -2,10 +2,14 @@
 
 import os
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
 from nbqa.__main__ import main
+
+if TYPE_CHECKING:
+    from _pytest.monkeypatch import MonkeyPatch
 
 
 @pytest.mark.usefixtures("tmp_remove_comments")
@@ -13,6 +17,23 @@ def test_unable_to_reconstruct_message() -> None:
     """Check error message shows if we're unable to reconstruct notebook."""
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     message = f"Error reconstructing {path}"
+    with pytest.raises(RuntimeError) as excinfo:
+        main(["remove_comments", path, "--nbqa-mutate"])
+    assert message in str(excinfo.value)
+
+
+def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") -> None:
+    """
+    Same as ``test_unable_to_reconstruct_message`` but we check ``PYTHONPATH`` updates correctly.
+
+    Parameters
+    ----------
+    monkeypatch
+        Pytest fixture, we use it to override ``PYTHONPATH``.
+    """
+    path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
+    message = f"Error reconstructing {path}"
+    monkeypatch.setenv("PYTHONPATH", os.path.join(os.getcwd(), "tests"))
     with pytest.raises(RuntimeError) as excinfo:
         main(["remove_comments", path, "--nbqa-mutate"])
     assert message in str(excinfo.value)
