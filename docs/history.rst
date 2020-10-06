@@ -2,6 +2,15 @@
 Changelog
 =========
 
+0.2.3 (2020-10-06)
+------------------
+
+Output from third-party tools is more consistent with the path the user passes in. E.g.
+if the user passes a relative path, the output will show a relative path, whilst if the
+user passes an absolute path, the output will show an absolute path.
+Users are also now encouraged to report bugs if there are errors parsing / reconstructing
+notebooks.
+
 0.2.2 (2020-10-01)
 ------------------
 
