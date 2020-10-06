@@ -18,6 +18,15 @@ from nbqa.notebook_info import NotebookInfo
 
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
 
+BASE_ERROR_MESSAGE = dedent(
+    """
+
+    😭 {} 😭
+
+    Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏
+    """
+)
+
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
     """
@@ -62,9 +71,10 @@ def _temp_python_file_for_notebook(
         Temporary Python file whose location mirrors that of the notebook, but
         inside the temporary directory.
     """
-    # Add 3 extra whitespaces because `ipynb` is 3 chars longer than `py`.
-    relative_notebook_dir = notebook.resolve().relative_to(project_root).parent
-    temp_python_file = Path(tmpdir) / relative_notebook_dir / f"{notebook.stem}   .py"
+    relative_notebook_path = (
+        notebook.resolve().relative_to(project_root).with_suffix(".py")
+    )
+    temp_python_file = Path(tmpdir) / relative_notebook_path
     temp_python_file.parent.mkdir(parents=True, exist_ok=True)
     return temp_python_file
 
@@ -102,8 +112,8 @@ def _replace_path_out_err(
     out = out.replace(str(temp_python_file.resolve()), str(notebook))
     err = err.replace(str(temp_python_file.resolve()), str(notebook))
 
-    out = out.replace(str(notebook.with_name(f"{notebook.stem}   .py")), str(notebook))
-    err = err.replace(str(notebook.with_name(f"{notebook.stem}   .py")), str(notebook))
+    out = out.replace(str(notebook.with_suffix(".py")), str(notebook))
+    err = err.replace(str(notebook.with_suffix(".py")), str(notebook))
 
     return out, err
 
@@ -435,9 +445,15 @@ def _run_on_one_root_dir(
         nb_info_mapping: Dict[Path, NotebookInfo] = {}
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
-            nb_info_mapping[notebook] = save_source.main(
-                notebook, temp_python_file, configs.nbqa_ignore_cells
-            )
+            try:
+                nb_info_mapping[notebook] = save_source.main(
+                    notebook, temp_python_file, configs.nbqa_ignore_cells
+                )
+            except Exception as exc:
+                raise RuntimeError(
+                    BASE_ERROR_MESSAGE.format(f"Error parsing {str(notebook)}")
+                ) from exc
+
             _create_blank_init_files(notebook, tmpdirname, project_root)
 
         out, err, output_code, mutated = _run_command(
@@ -467,9 +483,16 @@ def _run_on_one_root_dir(
                         )
                     )
 
-                replace_source.main(
-                    temp_python_file, notebook, nb_info_mapping[notebook]
-                )
+                try:
+                    replace_source.main(
+                        temp_python_file, notebook, nb_info_mapping[notebook]
+                    )
+                except Exception as exc:
+                    raise RuntimeError(
+                        BASE_ERROR_MESSAGE.format(
+                            f"Error reconstructing {str(notebook)}"
+                        )
+                    ) from exc
 
         sys.stdout.write(out)
         sys.stderr.write(err)

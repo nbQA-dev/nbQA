@@ -11,6 +11,7 @@ on:
 
 jobs:
   update-pre-commit:
+    if: github.repository_owner == 'nbQA-dev'
     name: Autoupdate pre-commit config
     runs-on: ubuntu-latest
     steps:

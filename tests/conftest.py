@@ -132,3 +132,12 @@ def tmp_notebook_with_indented_magics(tmpdir: "LocalPath") -> Iterator[Path]:
     shutil.copy(str(filename), str(temp_file))
     yield filename
     shutil.copy(str(temp_file), str(filename))
+
+
+@pytest.fixture
+def tmp_remove_comments() -> Iterator[None]:
+    """Make temporary copy of ``tests/remove_comments.py`` in root dir."""
+    temp_file = Path("remove_comments.py")
+    shutil.copy(str(Path("tests") / temp_file), str(temp_file))
+    yield
+    temp_file.unlink()
