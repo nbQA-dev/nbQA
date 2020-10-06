@@ -7,8 +7,9 @@ Markdown cells, output, and metadata are ignored.
 import ast
 import json
 import secrets
+from collections import defaultdict
 from itertools import takewhile
-from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple
+from typing import TYPE_CHECKING, DefaultDict, Dict, Iterator, List, Optional, Tuple
 
 from nbqa.notebook_info import NotebookInfo
 
@@ -109,8 +110,7 @@ def _replace_line_magics(source: List[str]) -> Iterator[Tuple[str, Optional[str]
 
 
 def _parse_cell(
-    source: List[str],
-    temporary_lines: Dict[str, str],
+    source: List[str], cell_number: int, temporary_lines: Dict[int, Dict[str, str]]
 ) -> str:
     """
     Parse cell, replacing line magics with python code as placeholder.
@@ -119,6 +119,8 @@ def _parse_cell(
     ----------
     source
         Source from notebook cell.
+    cell_number
+        Number identifying the notebook cell
     temporary_lines
         Mapping from placeholder python code to the original statement(line magic).
 
@@ -131,7 +133,7 @@ def _parse_cell(
     for new, old in _replace_line_magics(source):
         parsed_cell += new
         if old is not None:
-            temporary_lines[new] = old
+            temporary_lines[cell_number][new] = old
     parsed_cell = parsed_cell.rstrip("\n") + "\n"
     return parsed_cell
 
@@ -186,7 +188,7 @@ def main(
     line_number = 0
     cell_number = 0
     trailing_semicolons = set()
-    temporary_lines: Dict[str, str] = {}
+    temporary_lines: DefaultDict[int, Dict[str, str]] = defaultdict(dict)
     code_cells_to_ignore = set()
 
     for cell in cells:
@@ -197,7 +199,7 @@ def main(
                 code_cells_to_ignore.add(cell_number)
                 continue
 
-            parsed_cell = _parse_cell(cell["source"], temporary_lines)
+            parsed_cell = _parse_cell(cell["source"], cell_number, temporary_lines)
             result.append(parsed_cell)
             split_parsed_cell = parsed_cell.splitlines()
             cell_mapping.update(

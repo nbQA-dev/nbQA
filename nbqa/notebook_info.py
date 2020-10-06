@@ -18,16 +18,16 @@ class NotebookInfo:
         List of code cell to ignore when modifying the source notebook.
     """
 
-    _cell_mappings: Dict[int, str] = {}
+    _cell_mappings: Mapping[int, str] = {}
     _trailing_semicolons: Set[int] = set()
-    _temporary_lines: Dict[str, str] = {}
+    _temporary_lines: Mapping[int, Dict[str, str]] = {}
     _code_cells_to_ignore: Set[int] = set()
 
     def __init__(
         self,
-        cell_mappings: Dict[int, str],
+        cell_mappings: Mapping[int, str],
         trailing_semicolons: Set[int],
-        temporary_lines: Dict[str, str],
+        temporary_lines: Mapping[int, Dict[str, str]],
         code_cells_to_ignore: Set[int],
     ) -> None:
         """
@@ -39,7 +39,7 @@ class NotebookInfo:
             Mapping from Python line numbers to Jupyter notebooks cells.
         trailing_semicolons : Set[int]
             Cell numbers where there were originally trailing semicolons.
-        temporary_lines : Dict[str, str]
+        temporary_lines : Mapping[int, Dict[str, str]]
             Mapping from temporary lines to original lines.
         code_cells_to_ignore : Set[int]
             List of cell numbers to ignore when modifying the source notebook.
@@ -60,7 +60,7 @@ class NotebookInfo:
         return self._trailing_semicolons
 
     @property
-    def temporary_lines(self) -> Mapping[str, str]:
+    def temporary_lines(self) -> Mapping[int, Dict[str, str]]:
         """Return mapping from temporary lines to original lines."""
         return self._temporary_lines
 
