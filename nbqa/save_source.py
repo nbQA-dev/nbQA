@@ -120,7 +120,7 @@ def _parse_cell(
     source
         Source from notebook cell.
     cell_number
-        Number identifying the notebook cell
+        Number identifying the notebook cell.
     temporary_lines
         Mapping from placeholder python code to the original statement(line magic).
 
