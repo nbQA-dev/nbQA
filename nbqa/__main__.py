@@ -354,7 +354,9 @@ def _run_command(
         If third-party tool isn't found in system.
     """
     env = os.environ.copy()
-    env["PYTHONPATH"] = os.getcwd()
+    env[
+        "PYTHONPATH"
+    ] = f"{env.get('PYTHONPATH', '').rstrip(os.pathsep)}{os.pathsep}{os.getcwd()}"
 
     before = _get_mtimes(arg)
 
