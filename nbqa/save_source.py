@@ -6,7 +6,6 @@ Markdown cells, output, and metadata are ignored.
 
 import ast
 import json
-import secrets
 from collections import defaultdict
 from itertools import takewhile
 from typing import TYPE_CHECKING, DefaultDict, Dict, Iterator, List, Optional, Tuple
@@ -105,7 +104,7 @@ def _replace_line_magics(source: List[str]) -> Iterator[Tuple[str, Optional[str]
     for line_no, line in enumerate(source):
         trimmed_line: str = line.strip()
         if is_ipython_magic(trimmed_line):
-            replacement_line = get_magic_replacement(trimmed_line, secrets.token_hex(3))
+            replacement_line = get_magic_replacement(trimmed_line)
             yield _handle_magic_indentation(source[:line_no], line, replacement_line)
         else:
             yield line, None
