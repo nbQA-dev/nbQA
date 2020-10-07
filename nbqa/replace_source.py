@@ -14,14 +14,16 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-def _reinstate_magics(
+def _restore_semicolon(
     source: str,
     cell_number: int,
     trailing_semicolons: Set[int],
-    temporary_lines: Mapping[str, str],
-) -> List[str]:
+) -> str:
     """
-    Put (preprocessed) line magics back in.
+    Restore the semicolon at the end of the cell.
+
+    Restore the trailing semicolon if the cell originally contained semicolon
+    and the third party tool removed it.
 
     Parameters
     ----------
@@ -31,6 +33,30 @@ def _reinstate_magics(
         Number of current cell.
     trailing_semicolons
         List of cells which originally had trailing semicolons.
+
+    Returns
+    -------
+    str
+        New source with removed semicolon restored.
+    """
+    rstripped_source = source.rstrip()
+    if cell_number in trailing_semicolons and not rstripped_source.endswith(";"):
+        source = rstripped_source + ";"
+
+    return source
+
+
+def _reinstate_magics(
+    source: str,
+    temporary_lines: Mapping[str, str],
+) -> List[str]:
+    """
+    Put (preprocessed) line magics back in.
+
+    Parameters
+    ----------
+    source
+        Portion of Python file between cell separators.
     temporary_lines
         Mapping from temporary lines to original lines.
 
@@ -39,9 +65,6 @@ def _reinstate_magics(
     List[str]
         New source that can be saved into Jupyter Notebook.
     """
-    rstripped_source = source.rstrip()
-    if cell_number in trailing_semicolons and not rstripped_source.endswith(";"):
-        source = rstripped_source + ";"
     for key, val in temporary_lines.items():
         source = source.replace(key, val)
     # we take [1:] because the first cell is just '\n'
@@ -74,11 +97,12 @@ def main(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> 
         if cell["cell_type"] == "code":
             code_cell_number += 1
             if code_cell_number not in notebook_info.code_cells_to_ignore:
+                source = _restore_semicolon(
+                    next(pycells), code_cell_number, notebook_info.trailing_semicolons
+                )
                 cell["source"] = _reinstate_magics(
-                    next(pycells),
-                    code_cell_number,
-                    notebook_info.trailing_semicolons,
-                    notebook_info.temporary_lines,
+                    source,
+                    notebook_info.temporary_lines.get(code_cell_number, {}),
                 )
 
         new_cells.append(cell)
