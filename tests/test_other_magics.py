@@ -18,7 +18,6 @@ if TYPE_CHECKING:
         (
             "--nbqa-ignore-cells=%%custommagic",
             [
-                "cell_2:3:1: E402 module level import not at top of file",
                 "cell_2:3:1: F401 'glob' imported but unused",
             ],
         ),
@@ -43,7 +42,6 @@ def test_cli(magic: str, expected: List[str], capsys: "CaptureFixture") -> None:
         (
             "ignore_cells=%%%%custommagic",
             [
-                "cell_2:3:1: E402 module level import not at top of file",
                 "cell_2:3:1: F401 'glob' imported but unused",
             ],
         ),
@@ -81,7 +79,6 @@ def test_ini(magic: str, expected: str, capsys: "CaptureFixture") -> None:
         (
             'flake8=["%%custommagic"]',
             [
-                "cell_2:3:1: E402 module level import not at top of file",
                 "cell_2:3:1: F401 'glob' imported but unused",
             ],
         ),

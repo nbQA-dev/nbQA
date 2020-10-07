@@ -11,6 +11,7 @@ from collections import defaultdict
 from itertools import takewhile
 from typing import TYPE_CHECKING, DefaultDict, Dict, Iterator, List, Optional, Tuple
 
+from nbqa.handle_magics import get_magic_replacement, is_ipython_magic
 from nbqa.notebook_info import NotebookInfo
 
 if TYPE_CHECKING:
@@ -18,7 +19,6 @@ if TYPE_CHECKING:
 
 CODE_SEPARATOR = "# %%"
 MAGIC = ["%%script", "%%bash"]
-IGNORE_LINE_REPLACEMENT = "pass  # nbqa"
 
 
 def _is_src_code_indentation_valid(source: str) -> bool:
@@ -48,8 +48,8 @@ def _is_src_code_indentation_valid(source: str) -> bool:
     return valid
 
 
-def _handle_line_magic_indentation(
-    source: List[str], line_magic: str
+def _handle_magic_indentation(
+    source: List[str], line_magic: str, replacement_line: str
 ) -> Tuple[str, str]:
     """
     Handle the indentation of line magics. Remove unnecessary indentation.
@@ -60,32 +60,32 @@ def _handle_line_magic_indentation(
         Source code of the notebook cell
     line_magic : str
         Line magic present in the notebook cell
-
+    replacement : str
+        Replacement python code for the ipython magic
     Returns
     -------
     Tuple[str, str]
         Tuple of replacement line and the original line magic statement.
     """
     leading_space = "".join(takewhile(lambda c: c == " ", line_magic))
-    token = secrets.token_hex(3)
 
     # preserve the leading spaces and check if the syntax is valid
-    line_tokenised = f"{leading_space}{IGNORE_LINE_REPLACEMENT}{token}"
+    replacement = f"{leading_space}{replacement_line}"
 
     if leading_space and not _is_src_code_indentation_valid(
-        "".join(source + [line_tokenised])
+        "".join(source + [replacement])
     ):
         # Remove the line magic indentation assuming these leading spaces
         # lead the source to have invalid indentation
         # Currently we don't check if the original source
         # code itself had IndentationError
-        line_tokenised = line_tokenised.lstrip()
+        replacement = replacement_line
         line_magic = line_magic.lstrip()
 
     if line_magic.endswith("\n"):
-        line_tokenised += "\n"
+        replacement += "\n"
 
-    return line_tokenised, line_magic
+    return replacement, line_magic
 
 
 def _replace_line_magics(source: List[str]) -> Iterator[Tuple[str, Optional[str]]]:
@@ -103,8 +103,10 @@ def _replace_line_magics(source: List[str]) -> Iterator[Tuple[str, Optional[str]
         Lines from cell, with line magics replaced with python code
     """
     for line_no, line in enumerate(source):
-        if line.lstrip().startswith(("!", "%", "?")) or line.rstrip().endswith("?"):
-            yield _handle_line_magic_indentation(source[:line_no], line)
+        trimmed_line: str = line.strip()
+        if is_ipython_magic(trimmed_line):
+            replacement_line = get_magic_replacement(trimmed_line, secrets.token_hex(3))
+            yield _handle_magic_indentation(source[:line_no], line, replacement_line)
         else:
             yield line, None
 
