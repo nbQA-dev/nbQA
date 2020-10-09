@@ -60,7 +60,7 @@ def _handle_magic_indentation(
     line_magic : str
         Line magic present in the notebook cell
     magic_replacement : MagicSubstitution
-        Replacement python code for the ipython magic
+        Object containing information on ipython magic replacement.
     Returns
     -------
     str
@@ -87,7 +87,7 @@ def _handle_magic_indentation(
 
 
 def _replace_magics(
-    source: List[str], temporary_lines: List[MagicSubstitution]
+    source: List[str], magic_substitutions: List[MagicSubstitution]
 ) -> Iterator[str]:
     """
     Replace IPython line magics with valid python code.
@@ -96,19 +96,21 @@ def _replace_magics(
     ----------
     source
         Source from notebook cell.
+    magic_substitutions
+        List to store all the ipython magics substitutions
 
     Yields
     ------
     str
-        Lines from cell, with line magics replaced with python code
+        Line from cell, with line magics replaced with python code
     """
     for line_no, line in enumerate(source):
         trimmed_line: str = line.strip()
         if MagicHandler.is_ipython_magic(trimmed_line):
             magic_handler = MagicHandler.get_magic_handler(trimmed_line)
             magic_substitution = magic_handler.replace_magic(trimmed_line)
+            magic_substitutions.append(magic_substitution)
             line = _handle_magic_indentation(source[:line_no], line, magic_substitution)
-            temporary_lines.append(magic_substitution)
 
         yield line
 
@@ -128,7 +130,7 @@ def _parse_cell(
     cell_number
         Number identifying the notebook cell.
     temporary_lines
-        Mapping from placeholder python code to the original statement(line magic).
+        Mapping to store the cell number to all the ipython magics replaced in those cells.
 
     Returns
     -------

@@ -5,6 +5,8 @@ from typing import Pattern, Tuple
 
 
 class MagicSubstitution:
+    """Store original ipython magic along with the replaced python code."""
+
     replacement_line: str
     _original_source: str
     _substitution_pattern: Pattern[str]
@@ -12,19 +14,64 @@ class MagicSubstitution:
     def __init__(
         self, replacement_line: str, original_source: str, pattern: Pattern[str]
     ) -> None:
+        """
+        Initialize MagicSubstitution instance.
+
+        Parameters
+        ----------
+        replacement_line : str
+            Python code replacing the ipython magic
+        original_source : str
+            IPython magic present in the notebook cell
+        pattern : Pattern[str]
+            Regex pattern to restore the magic with python code
+        """
         self.replacement_line = replacement_line
         self._original_source = original_source
         self._substitution_pattern = pattern
 
     def restore_magic(self, source: str) -> str:
+        """
+        Replace the original magic in the source.
+
+        Parameters
+        ----------
+        source : str
+            Source code of the notebook cell
+
+        Returns
+        -------
+        str
+            Source of the notebook cell with original ipython magic restored.
+        """
         return re.sub(self._substitution_pattern, self._original_source, source)
 
     def indent_magic_replacement(self, spaces: str) -> str:
+        """
+        Indent the magic replacement code with the input leading spaces.
+
+        Parameters
+        ----------
+        spaces : str
+            Spaces to indent the replacement code.
+
+        Returns
+        -------
+        str
+            Indented replacement code
+        """
         return f"{spaces}{self.replacement_line}"
 
 
 class MagicHandler:
-    # Magic replacement templates
+    """Base class of different types of magic handlers."""
+
+    # Here token is placed at the beginning and at the end so that
+    # the start and end of the code can be identified even if the code
+    # is split across multiple lines.
+    # `{token}` is not used as `String` because with different formatters (e.g: yapf)
+    # we would run in to formatting issues like single quotes formatted
+    # to double quotes or vice versa. `{token}` is used as hexadecimal number.
     _MAGIC_TEMPLATE: str = "type({token})  # {magic:10.10} {token}"
     _MAGIC_REGEX_TEMPLATE: str = r"type\({token}\).*{token}"
 
@@ -71,10 +118,33 @@ class MagicHandler:
 
     @staticmethod
     def _get_unique_token() -> str:
+        """
+        Return randomly generated token of hexadecimal characters.
+
+        Returns
+        -------
+        str
+            Token to uniquely identify the ipython magic replacement code.
+        """
         return f"0x{int(secrets.token_hex(4), base=16):X}"
 
     @staticmethod
     def _get_regex_pattern(pattern_template: str, token: str) -> Pattern[str]:
+        """
+        Return the compiled regex pattern.
+
+        Parameters
+        ----------
+        pattern_template : str
+            Regex pattern for the magic replacement template
+        token : str
+            Token to uniquely identify the magic replacement
+
+        Returns
+        -------
+        Pattern[str]
+            Compiled regex pattern
+        """
         return re.compile(pattern_template.format(token=token), re.RegexFlag.DOTALL)
 
     @staticmethod
@@ -96,6 +166,14 @@ class MagicHandler:
 
     @staticmethod
     def get_magic_handler(ipython_magic: str) -> "MagicHandler":
+        """
+        Return MagicHandler based on the type of ipython magic.
+
+        Returns
+        -------
+        MagicHandler
+            An instance of MagicHandler or some subclass of MagicHandler.
+        """
         magic_handler: MagicHandler
         if ipython_magic[0] == "!":
             magic_handler = ShellCommandHandler()
@@ -113,14 +191,16 @@ class MagicHandler:
 
 
 class HelpMagicHandler(MagicHandler):
-    pass
+    """Handle ipython magic starting or ending with ?."""
 
 
 class ShellCommandHandler(MagicHandler):
-    pass
+    """Handle ipython magic containing !."""
 
 
 class CellMagicHandler(MagicHandler):
+    """Handle ipython magic starting with %%."""
+
     # We use a comment for replacing cell magic, since we don't want
     # cell magic statements to be formatted
     # For instance a cell magic placed above a function will be
@@ -131,4 +211,4 @@ class CellMagicHandler(MagicHandler):
 
 
 class LineMagicHandler(MagicHandler):
-    pass
+    """Handle ipython line magic starting with %."""

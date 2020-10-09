@@ -59,7 +59,7 @@ def _reinstate_magics(
     source
         Portion of Python file between cell separators.
     temporary_lines
-        Mapping from temporary lines to original lines.
+        Mapping from temporary magic substitutions to original ipython magics
 
     Returns
     -------
