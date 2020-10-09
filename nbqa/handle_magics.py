@@ -1,6 +1,7 @@
 """Detect ipython magics and provide python code replacements for those magics."""
 import re
 import secrets
+from abc import ABC
 from typing import Pattern, Tuple
 
 
@@ -63,7 +64,7 @@ class MagicSubstitution:
         return f"{spaces}{self.replacement_line}"
 
 
-class MagicHandler:
+class MagicHandler(ABC):
     """Base class of different types of magic handlers."""
 
     # Here token is placed at the beginning and at the end so that
@@ -184,8 +185,6 @@ class MagicHandler:
                 magic_handler = CellMagicHandler()
             else:
                 magic_handler = LineMagicHandler()
-        else:
-            magic_handler = MagicHandler()
 
         return magic_handler
 
