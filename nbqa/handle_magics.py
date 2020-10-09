@@ -1,121 +1,134 @@
 """Detect ipython magics and provide python code replacements for those magics."""
+import re
 import secrets
-from typing import Callable, Mapping
-
-# Magic replacement templates
-_DEFAULT_TEMPLATE: str = 'type(""" {magic} """)  # {token}'
-
-# We use a comment for replacing cell magic, since we don't want
-# cell magic statements to be formatted
-# For instance a cell magic placed above a function will be
-# formatted to be separated by two blank lines from the function
-# It would look odd to have a cell magic followed by blank lines.
-_CELL_MAGIC_TEMPLATE: str = "# CELL_MAGIC {magic} {token}"
+from typing import Pattern, Tuple
 
 
-def is_ipython_magic(source: str) -> bool:
-    """
-    Return True if the source contains ipython magic.
+class MagicSubstitution:
+    replacement_line: str
+    _original_source: str
+    _substitution_pattern: Pattern[str]
 
-    Parameters
-    ----------
-    source : str
-        Source code present in the notebook cell.
+    def __init__(
+        self, replacement_line: str, original_source: str, pattern: Pattern[str]
+    ) -> None:
+        self.replacement_line = replacement_line
+        self._original_source = original_source
+        self._substitution_pattern = pattern
 
-    Returns
-    -------
-    bool
-        True if the source contains ipython magic
-    """
-    return source.startswith(("!", "%", "?")) or source.endswith("?")
+    def restore_magic(self, source: str) -> str:
+        return re.sub(self._substitution_pattern, self._original_source, source)
 
-
-def _get_default_replacement(token: str, magic: str) -> str:
-    """
-    Return python code to be replace the input ipython magic.
-
-    Parameters
-    ----------
-    token : str
-        Token to uniquely identify the replacement python code
-    magic : str
-        IPython magic statement
-
-    Returns
-    -------
-    str
-        Python code to replace the ipython magic
-    """
-    return _DEFAULT_TEMPLATE.format(magic=magic, token=token)
+    def indent_magic_replacement(self, spaces: str) -> str:
+        return f"{spaces}{self.replacement_line}"
 
 
-def _get_cell_or_line_magic_replacement(token: str, magic: str) -> str:
-    """
-    Return python code the replaces the input ipython magic.
+class MagicHandler:
+    # Magic replacement templates
+    _MAGIC_TEMPLATE: str = "type({token})  # {magic:10.10} {token}"
+    _MAGIC_REGEX_TEMPLATE: str = r"type\({token}\).*{token}"
 
-    Parameters
-    ----------
-    token : str
-        Token to uniquely identity the replacement python code
-    magic : str
-        IPython cell or line magic present in the notebook cell
+    def replace_magic(self, ipython_magic: str) -> MagicSubstitution:
+        """
+        Return python code to replace the ipython magic.
 
-    Returns
-    -------
-    str
-        Python code replacing the ipython magic
-    """
-    if magic.startswith("%%"):
-        return _get_cell_magic_replacement(token, magic)
+        Parameters
+        ----------
+        ipython_magic : str
+            IPython magic statement present in the notebook cell
 
-    return _get_default_replacement(token, magic)
+        Returns
+        -------
+        str
+            Python code to be substituted for the ipython magic
+        """
+        token: str = MagicHandler._get_unique_token()
+        replacement_line, pattern = self._get_magic_replacement(token, ipython_magic)
+        return MagicSubstitution(replacement_line, ipython_magic, pattern)
+
+    def _get_magic_replacement(
+        self, token: str, magic: str
+    ) -> Tuple[str, Pattern[str]]:
+        """
+        Return python code to be replace the input ipython magic.
+
+        Parameters
+        ----------
+        token : str
+            Token to uniquely identify the replacement python code
+        magic : str
+            IPython magic statement
+
+        Returns
+        -------
+        str
+            Python code to replace the ipython magic
+        """
+        return (
+            self._MAGIC_TEMPLATE.format(magic=magic, token=token),
+            MagicHandler._get_regex_pattern(self._MAGIC_REGEX_TEMPLATE, token),
+        )
+
+    @staticmethod
+    def _get_unique_token() -> str:
+        return f"0x{int(secrets.token_hex(4), base=16):X}"
+
+    @staticmethod
+    def _get_regex_pattern(pattern_template: str, token: str) -> Pattern[str]:
+        return re.compile(pattern_template.format(token=token), re.RegexFlag.DOTALL)
+
+    @staticmethod
+    def is_ipython_magic(source: str) -> bool:
+        """
+        Return True if the source contains ipython magic.
+
+        Parameters
+        ----------
+        source : str
+            Source code present in the notebook cell.
+
+        Returns
+        -------
+        bool
+            True if the source contains ipython magic
+        """
+        return source.startswith(("!", "%", "?")) or source.endswith("?")
+
+    @staticmethod
+    def get_magic_handler(ipython_magic: str) -> "MagicHandler":
+        magic_handler: MagicHandler
+        if ipython_magic[0] == "!":
+            magic_handler = ShellCommandHandler()
+        elif ipython_magic[0] == "?" or ipython_magic[-1] == "?":
+            magic_handler = HelpMagicHandler()
+        elif ipython_magic[0] == "%":
+            if len(ipython_magic) > 1 and ipython_magic[1] == "%":
+                magic_handler = CellMagicHandler()
+            else:
+                magic_handler = LineMagicHandler()
+        else:
+            magic_handler = MagicHandler()
+
+        return magic_handler
 
 
-def _get_cell_magic_replacement(token: str, magic: str) -> str:
-    """
-    Return python code to replace the input ipython cell magic.
-
-    Parameters
-    ----------
-    token : str
-        Token to uniquely identify the replacement python code
-    magic : str
-        IPython magic present in the notebook cell
-
-    Returns
-    -------
-    str
-        Python code replacing the cell magic
-    """
-    return _CELL_MAGIC_TEMPLATE.format(magic=magic, token=token)
+class HelpMagicHandler(MagicHandler):
+    pass
 
 
-_MAGIC_HANDLERS: Mapping[str, Callable[..., str]] = {
-    "!": _get_default_replacement,
-    "?": _get_default_replacement,
-    "%": _get_cell_or_line_magic_replacement,
-}
+class ShellCommandHandler(MagicHandler):
+    pass
 
 
-def get_magic_replacement(ipython_magic: str) -> str:
-    """
-    Return python code to replace the ipython magic.
+class CellMagicHandler(MagicHandler):
+    # We use a comment for replacing cell magic, since we don't want
+    # cell magic statements to be formatted
+    # For instance a cell magic placed above a function will be
+    # formatted to be separated by two blank lines from the function
+    # It would look odd to have a cell magic followed by blank lines.
+    _MAGIC_TEMPLATE: str = "# CELL_MAGIC {magic:10.10} {token}"
+    _MAGIC_REGEX_TEMPLATE: str = r"#\s*CELL_MAGIC.*{token}"
 
-    Parameters
-    ----------
-    ipython_magic : str
-        IPython magic statement present in the notebook cell
 
-    Returns
-    -------
-    str
-        Python code to be substituted for the ipython magic
-    """
-    token: str = secrets.token_hex(3)
-    replacement_line: str = _MAGIC_HANDLERS.get(
-        ipython_magic[0],
-        # This is to handle magic like str.split??
-        _MAGIC_HANDLERS.get(ipython_magic[-1], _get_default_replacement),
-    )(token, ipython_magic)
-
-    return replacement_line
+class LineMagicHandler(MagicHandler):
+    pass
