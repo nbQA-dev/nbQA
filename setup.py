@@ -25,6 +25,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
     description="Run any Python code quality tool on a Jupyter Notebook!",
     entry_points={"console_scripts": ["nbqa=nbqa.__main__:main"]},
