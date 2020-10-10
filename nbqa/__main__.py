@@ -155,13 +155,13 @@ def _replace_temp_python_file_references_in_out_err(
     # I couldn't reproduce this locally, but during CI, on the Windows job, I found
     # that VSSADM~1 was changing into VssAdministrator.
     temp_python_file_pattern = "{abs_path}|{rel_path}|{resolved_path}".format(
-        abs_path=str(temp_python_file),
-        rel_path=str(temp_python_file.relative_to(tmpdirname)),
-        resolved_path=str(temp_python_file.resolve()),
+        abs_path=re.escape(str(temp_python_file)),
+        rel_path=re.escape(str(temp_python_file.relative_to(tmpdirname))),
+        resolved_path=re.escape(str(temp_python_file.resolve())),
     )
 
-    out = re.sub(rf"{temp_python_file_pattern}", str(notebook), out)
-    err = re.sub(rf"{temp_python_file_pattern}", str(notebook), err)
+    out = re.sub(temp_python_file_pattern, str(notebook), out)
+    err = re.sub(temp_python_file_pattern, str(notebook), err)
     return out, err
 
 
