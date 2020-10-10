@@ -1,7 +1,6 @@
 """Check that :code:`black` works as intended."""
 
 import os
-import re
 from typing import TYPE_CHECKING
 
 import pytest
@@ -48,8 +47,8 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
     # This is to ensure no additional warnings get generated apart
     # from the expected ones. This will also help to update the test when the
     # notebooks used for testing are modified later.
-    assert len(re.findall(rf"{str(notebook1)}:cell_", out)) == 4
-    assert len(re.findall(rf"{str(notebook2)}:cell_", out)) == 1
+    assert out.count(rf"{str(notebook1)}:cell_") == 4
+    assert out.count(rf"{str(notebook2)}:cell_") == 1
 
     assert all(warning in out for warning in notebook1_expected_warnings)
     assert all(warning in out for warning in notebook2_expected_warnings)
