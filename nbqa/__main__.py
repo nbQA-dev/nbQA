@@ -154,14 +154,20 @@ def _replace_temp_python_file_references_in_out_err(
     # is a symlink as well as no normalize the path.
     # I couldn't reproduce this locally, but during CI, on the Windows job, I found
     # that VSSADM~1 was changing into VssAdministrator.
-    temp_python_file_pattern = "{abs_path}|{rel_path}|{resolved_path}".format(
-        abs_path=re.escape(str(temp_python_file)),
-        rel_path=re.escape(str(temp_python_file.relative_to(tmpdirname))),
-        resolved_path=re.escape(str(temp_python_file.resolve())),
+    paths = (
+        str(path)
+        for path in [
+            temp_python_file,
+            temp_python_file.resolve(),
+            temp_python_file.relative_to(tmpdirname),
+        ]
     )
 
-    out = re.sub(temp_python_file_pattern, str(notebook), out)
-    err = re.sub(temp_python_file_pattern, str(notebook), err)
+    notebook_path = str(notebook)
+    for path in paths:
+        out = out.replace(path, notebook_path)
+        err = err.replace(path, notebook_path)
+
     return out, err
 
 
