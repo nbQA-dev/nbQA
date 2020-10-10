@@ -79,45 +79,6 @@ def _temp_python_file_for_notebook(
     return temp_python_file
 
 
-def _replace_path_out_err(
-    out: str, err: str, temp_python_file: Path, notebook: Path
-) -> Tuple[str, str]:
-    """
-    Replace references to temporary Python file with notebook's path.
-
-    Parameters
-    ----------
-    out
-        Captured stdout from third-party tool.
-    err
-        Captured stderr from third-party tool.
-    temp_python_file
-        Temporary Python file where notebook was converted to.
-    notebook
-        Original Jupyter notebook.
-
-    Returns
-    -------
-    out
-        Stdout with temporary Python file replaced with notebook.
-    err
-        Stderr with temporary Python file replaced with notebook.
-    """
-    out = out.replace(str(temp_python_file), str(notebook))
-    err = err.replace(str(temp_python_file), str(notebook))
-
-    # This next part is necessary to handle cases when `resolve` changes the path.
-    # I couldn't reproduce this locally, but during CI, on the Windows job, I found
-    # that VSSADM~1 was changing into VssAdministrator.
-    out = out.replace(str(temp_python_file.resolve()), str(notebook))
-    err = err.replace(str(temp_python_file.resolve()), str(notebook))
-
-    out = out.replace(str(notebook.with_suffix(".py")), str(notebook))
-    err = err.replace(str(notebook.with_suffix(".py")), str(notebook))
-
-    return out, err
-
-
 def _map_python_line_to_nb_lines(
     out: str, notebook: Path, cell_mapping: Mapping[int, str]
 ) -> str:
@@ -157,17 +118,19 @@ def _map_python_line_to_nb_lines(
 
 
 def _replace_temp_python_file_references_in_out_err(
+    tmpdirname: str,
     temp_python_file: Path,
     notebook: Path,
     out: str,
     err: str,
-    cell_mapping: Mapping[int, str],
 ) -> Tuple[str, str]:
     """
     Replace references to temporary Python file with references to notebook.
 
     Parameters
     ----------
+    tmpdirname
+        Temporary directory used for converting notebooks to python files
     temp_python_file
         Temporary Python file where notebook was converted to.
     notebook
@@ -176,8 +139,6 @@ def _replace_temp_python_file_references_in_out_err(
         Captured stdout from third-party tool.
     err
         Captured stderr from third-party tool.
-    cell_mapping
-        Mapping from Python lines to Jupyter notebook cells.
 
     Returns
     -------
@@ -186,8 +147,21 @@ def _replace_temp_python_file_references_in_out_err(
     err
         Stderr with temporary directory replaced by current working directory.
     """
-    out, err = _replace_path_out_err(out, err, temp_python_file, notebook)
-    out = _map_python_line_to_nb_lines(out, notebook, cell_mapping)
+    # 1. Relative path is used because some tools like pylint always report only
+    # the relative path of the file(relative to project root),
+    # though absolute path was passed as the input.
+    # 2. This `resolve()` part is necessary to handle cases when the path used
+    # is a symlink as well as no normalize the path.
+    # I couldn't reproduce this locally, but during CI, on the Windows job, I found
+    # that VSSADM~1 was changing into VssAdministrator.
+    temp_python_file_pattern = r"{abs_path}|{rel_path}|{resolved_path}".format(
+        abs_path=str(temp_python_file),
+        rel_path=str(temp_python_file.relative_to(tmpdirname)),
+        resolved_path=str(temp_python_file.resolve()),
+    )
+
+    out = re.sub(temp_python_file_pattern, str(notebook), out)
+    err = re.sub(temp_python_file_pattern, str(notebook), err)
     return out, err
 
 
@@ -465,12 +439,12 @@ def _run_on_one_root_dir(
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(
-                temp_python_file,
-                notebook,
-                out,
-                err,
-                nb_info_mapping[notebook].cell_mappings,
+                tmpdirname, temp_python_file, notebook, out, err
             )
+            out = _map_python_line_to_nb_lines(
+                out, notebook, nb_info_mapping[notebook].cell_mappings
+            )
+
             if mutated:
                 if not configs.nbqa_mutate:
                     raise SystemExit(
