@@ -74,7 +74,7 @@ class MagicHandler(ABC):
     # we would run in to formatting issues like single quotes formatted
     # to double quotes or vice versa. `{token}` is used as hexadecimal number.
     _MAGIC_TEMPLATE: str = "type({token})  # {magic:10.10} {token}"
-    _MAGIC_REGEX_TEMPLATE: str = r"type\({token}\).*{token}"
+    _MAGIC_REGEX_TEMPLATE: str = r"type\s*\(\s*{token}\s*\).*{token}"
 
     def replace_magic(self, ipython_magic: str) -> MagicSubstitution:
         """
