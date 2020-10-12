@@ -144,15 +144,14 @@ def test_black_multiple_files(tmp_test_data: "Path") -> None:
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data"))
 
-    with open("setup.cfg", "w") as handle:
-        handle.write(
-            dedent(
-                """\
+    Path("setup.cfg").write_text(
+        dedent(
+            """\
             [nbqa.mutate]
             black=1
             """
-            )
         )
+    )
     with pytest.raises(SystemExit):
         main(["black", path])
     Path("setup.cfg").unlink()
