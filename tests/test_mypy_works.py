@@ -34,11 +34,7 @@ def test_mypy_works(capsys: "CaptureFixture") -> None:
         {path_2}:cell_3:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
         {path_1}:cell_2:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
         {path_0}:cell_2:19: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
-<<<<<<< HEAD
-        Found 3 errors in 3 files (checked 12 source files)
-=======
-        Found 3 errors in 3 files (checked 13 source files)
->>>>>>> origin/master
+        Found 3 errors in 3 files (checked 14 source files)
         """  # noqa
     )
     expected_err = ""
