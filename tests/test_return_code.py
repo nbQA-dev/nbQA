@@ -5,6 +5,9 @@ import subprocess
 
 DIRTY_NOTEBOOK = os.path.join("tests", "data", "notebook_for_testing.ipynb")
 CLEAN_NOTEBOOK = os.path.join("tests", "data", "clean_notebook.ipynb")
+CLEAN_NOTEBOOK_TRAILING_SEMICOLON = os.path.join(
+    "tests", "data", "clean_notebook_with_trailing_semicolon.ipynb"
+)
 
 
 def test_flake8_return_code() -> None:
@@ -37,6 +40,13 @@ def test_black_return_code() -> None:
     assert result == expected
 
     output = subprocess.run(["nbqa", "black", "--check", CLEAN_NOTEBOOK])
+    result = output.returncode
+    expected = 0
+    assert result == expected
+
+    output = subprocess.run(
+        ["nbqa", "black", "--check", CLEAN_NOTEBOOK_TRAILING_SEMICOLON]
+    )
     result = output.returncode
     expected = 0
     assert result == expected

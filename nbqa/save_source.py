@@ -6,6 +6,7 @@ Markdown cells, output, and metadata are ignored.
 
 import ast
 import json
+import re
 from collections import defaultdict
 from itertools import takewhile
 from typing import TYPE_CHECKING, DefaultDict, Dict, Iterator, List
@@ -212,7 +213,6 @@ def main(
                 continue
 
             parsed_cell = _parse_cell(cell["source"], cell_number, temporary_lines)
-            result.append(parsed_cell)
             split_parsed_cell = parsed_cell.splitlines()
             cell_mapping.update(
                 {
@@ -222,6 +222,7 @@ def main(
             )
             if parsed_cell.rstrip().endswith(";"):
                 trailing_semicolons.add(cell_number)
+            result.append(re.sub(r";(\s*)", "\\1", parsed_cell))
             line_number += len(split_parsed_cell)
 
     with open(str(temp_python_file), "w") as handle:
