@@ -347,6 +347,7 @@ def _run_command(
         cwd=tmpdirname,
         env=env,
     )
+
     mutated = _get_mtimes(arg) != before
 
     output_code = output.returncode
