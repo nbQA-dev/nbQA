@@ -5,8 +5,9 @@ The converted file will have had the third-party tool run against it by now.
 """
 
 import json
-from typing import TYPE_CHECKING, Iterator, List, Mapping, Set
+from typing import TYPE_CHECKING, Iterator, List, Set
 
+from nbqa.handle_magics import MagicSubstitution
 from nbqa.notebook_info import NotebookInfo
 from nbqa.save_source import CODE_SEPARATOR
 
@@ -48,7 +49,7 @@ def _restore_semicolon(
 
 def _reinstate_magics(
     source: str,
-    temporary_lines: Mapping[str, str],
+    temporary_lines: List[MagicSubstitution],
 ) -> List[str]:
     """
     Put (preprocessed) line magics back in.
@@ -58,15 +59,15 @@ def _reinstate_magics(
     source
         Portion of Python file between cell separators.
     temporary_lines
-        Mapping from temporary lines to original lines.
+        Mapping from temporary magic substitutions to original ipython magics
 
     Returns
     -------
     List[str]
         New source that can be saved into Jupyter Notebook.
     """
-    for key, val in temporary_lines.items():
-        source = source.replace(key, val)
+    for magic_substitution in temporary_lines:
+        source = magic_substitution.restore_magic(source)
     # we take [1:] because the first cell is just '\n'
     return "\n{}".format(source.strip("\n")).splitlines(True)[1:]
 
@@ -102,7 +103,7 @@ def main(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> 
                 )
                 cell["source"] = _reinstate_magics(
                     source,
-                    notebook_info.temporary_lines.get(code_cell_number, {}),
+                    notebook_info.temporary_lines.get(code_cell_number, []),
                 )
 
         new_cells.append(cell)

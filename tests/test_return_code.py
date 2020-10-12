@@ -20,6 +20,15 @@ def test_flake8_return_code() -> None:
     assert result == expected
 
 
+def test_pylint_return_code() -> None:
+    """Check pylint returns 0 if it passes, 1 otherwise."""
+    output = subprocess.run(["nbqa", "pylint", DIRTY_NOTEBOOK])
+    assert output.returncode == 1
+
+    output = subprocess.run(["nbqa", "pylint", CLEAN_NOTEBOOK, "--disable=C0114"])
+    assert output.returncode == 0
+
+
 def test_black_return_code() -> None:
     """Check black returns 0 if it passes, 1 otherwise."""
     output = subprocess.run(["nbqa", "black", DIRTY_NOTEBOOK, "--check"])

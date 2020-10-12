@@ -1,5 +1,8 @@
 """Store information about the code cells for processing."""
-from typing import Dict, Mapping, Set
+
+from typing import List, Mapping, Set
+
+from nbqa.handle_magics import MagicSubstitution
 
 
 class NotebookInfo:
@@ -13,21 +16,21 @@ class NotebookInfo:
     trailing_semicolons
         Cell numbers where there were originally trailing semicolons.
     temporary_lines
-        Mapping from temporary lines to original lines.
+        Mapping from cell number to all the magics substituted in those cell.
     code_cells_to_ignore
         List of code cell to ignore when modifying the source notebook.
     """
 
     _cell_mappings: Mapping[int, str] = {}
     _trailing_semicolons: Set[int] = set()
-    _temporary_lines: Mapping[int, Dict[str, str]] = {}
+    _temporary_lines: Mapping[int, List[MagicSubstitution]] = {}
     _code_cells_to_ignore: Set[int] = set()
 
     def __init__(
         self,
         cell_mappings: Mapping[int, str],
         trailing_semicolons: Set[int],
-        temporary_lines: Mapping[int, Dict[str, str]],
+        temporary_lines: Mapping[int, List[MagicSubstitution]],
         code_cells_to_ignore: Set[int],
     ) -> None:
         """
@@ -39,8 +42,8 @@ class NotebookInfo:
             Mapping from Python line numbers to Jupyter notebooks cells.
         trailing_semicolons : Set[int]
             Cell numbers where there were originally trailing semicolons.
-        temporary_lines : Mapping[int, Dict[str, str]]
-            Mapping from temporary lines to original lines.
+        temporary_lines : Mapping[int, List[MagicSubstitution]]
+            Mapping from cell number to all the magics substituted in those cell.
         code_cells_to_ignore : Set[int]
             List of cell numbers to ignore when modifying the source notebook.
         """
@@ -60,8 +63,8 @@ class NotebookInfo:
         return self._trailing_semicolons
 
     @property
-    def temporary_lines(self) -> Mapping[int, Dict[str, str]]:
-        """Return mapping from temporary lines to original lines."""
+    def temporary_lines(self) -> Mapping[int, List[MagicSubstitution]]:
+        """Return mapping from cell number to all the magics substituted."""
         return self._temporary_lines
 
     @property

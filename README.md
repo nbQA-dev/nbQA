@@ -85,6 +85,13 @@ $ nbqa pyupgrade my_notebook.ipynb --py36-plus --nbqa-mutate
 Rewriting my_notebook.ipynb
 ```
 
+Perform static code analysis with [pylint](https://www.pylint.org/):
+
+```bash
+$ nbqa pylint my_notebook.ipynb --disable=C0114
+my_notebook.ipynb:cell_1:5:0: W0611: Unused import nbqa (unused-import)
+```
+
 ## 🔧 Configuration
 
 You can configure `nbqa` either at the command line, or by using a `pyproject.toml` file - see
