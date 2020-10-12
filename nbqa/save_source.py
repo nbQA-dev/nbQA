@@ -219,6 +219,7 @@ def main(
             parsed_cell = _parse_cell(
                 cell["source"], cell_number, temporary_lines, command
             )
+            result.append(parsed_cell)
             cell_mapping.update(
                 {
                     j + line_number + 1: f"cell_{cell_number}:{j}"
