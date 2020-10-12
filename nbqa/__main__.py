@@ -442,6 +442,7 @@ def _run_on_one_root_dir(
             configs.nbqa_addopts,
             _get_arg(root_dir, tmpdirname, nb_to_py_mapping, project_root),
         )
+
         for notebook, temp_python_file in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(
                 tmpdirname, temp_python_file, notebook, out, err
