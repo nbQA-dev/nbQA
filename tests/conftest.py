@@ -1,6 +1,7 @@
 """Define some fixtures that can be re-used between tests."""
 
 import shutil
+from distutils.dir_util import copy_tree
 from pathlib import Path
 from typing import TYPE_CHECKING, Iterator
 
@@ -69,6 +70,28 @@ def tmp_notebook_for_testing(tmpdir: "LocalPath") -> Iterator[Path]:
 
 
 @pytest.fixture
+def tmp_notebook_with_multiline(tmpdir: "LocalPath") -> Iterator[Path]:
+    """
+    Make temporary copy of test notebook before it's operated on, then revert it.
+
+    Parameters
+    ----------
+    tmpdir
+        Pytest fixture, gives us a temporary directory.
+
+    Yields
+    ------
+    Path
+        Temporary copy of test notebook.
+    """
+    filename = Path("tests/data") / "clean_notebook_with_multiline.ipynb"
+    temp_file = Path(tmpdir) / "tmp.ipynb"
+    shutil.copy(str(filename), str(temp_file))
+    yield filename
+    shutil.copy(str(temp_file), str(filename))
+
+
+@pytest.fixture
 def tmp_notebook_starting_with_md(tmpdir: "LocalPath") -> Iterator[Path]:
     """
     Make temporary copy of test notebook before it's operated on, then revert it.
@@ -88,6 +111,28 @@ def tmp_notebook_starting_with_md(tmpdir: "LocalPath") -> Iterator[Path]:
     shutil.copy(str(filename), str(temp_file))
     yield filename
     shutil.copy(str(temp_file), str(filename))
+
+
+@pytest.fixture
+def tmp_test_data(tmpdir: "LocalPath") -> Iterator[Path]:
+    """
+    Make temporary copy of test data before it's operated on, then revert it.
+
+    Parameters
+    ----------
+    tmpdir
+        Pytest fixture, gives us a temporary directory.
+
+    Yields
+    ------
+    Path
+        Temporary copy of test data.
+    """
+    dirname = Path("tests/data")
+    temp_dir = Path(tmpdir)
+    copy_tree(str(dirname), str(temp_dir / dirname))
+    yield dirname
+    copy_tree(str(temp_dir / dirname), str(dirname))
 
 
 @pytest.fixture
