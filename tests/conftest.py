@@ -1,6 +1,7 @@
 """Define some fixtures that can be re-used between tests."""
 
 import shutil
+from distutils.dir_util import copy_tree
 from pathlib import Path
 from typing import TYPE_CHECKING, Iterator
 
@@ -107,9 +108,9 @@ def tmp_test_data(tmpdir: "LocalPath") -> Iterator[Path]:
     """
     dirname = Path("tests/data")
     temp_dir = Path(tmpdir)
-    shutil.copytree(str(dirname), str(temp_dir / dirname))
+    copy_tree(str(dirname), str(temp_dir / dirname))
     yield dirname
-    shutil.copytree(str(temp_dir / dirname), str(dirname), dirs_exist_ok=True)
+    copy_tree(str(temp_dir / dirname), str(dirname))
 
 
 @pytest.fixture
