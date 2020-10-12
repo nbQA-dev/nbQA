@@ -5,6 +5,9 @@ import subprocess
 
 DIRTY_NOTEBOOK = os.path.join("tests", "data", "notebook_for_testing.ipynb")
 CLEAN_NOTEBOOK = os.path.join("tests", "data", "clean_notebook.ipynb")
+NOTEBOOK_WITH_CELL_AFTER_DEF = os.path.join(
+    "tests", "data", "notebook_with_cell_after_def.ipynb"
+)
 CLEAN_NOTEBOOK_TRAILING_SEMICOLON = os.path.join(
     "tests", "data", "clean_notebook_with_trailing_semicolon.ipynb"
 )
@@ -40,6 +43,11 @@ def test_black_return_code() -> None:
     assert result == expected
 
     output = subprocess.run(["nbqa", "black", "--check", CLEAN_NOTEBOOK])
+    result = output.returncode
+    expected = 0
+    assert result == expected
+
+    output = subprocess.run(["nbqa", "black", "--check", NOTEBOOK_WITH_CELL_AFTER_DEF])
     result = output.returncode
     expected = 0
     assert result == expected

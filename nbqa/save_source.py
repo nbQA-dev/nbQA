@@ -19,6 +19,8 @@ if TYPE_CHECKING:
 
 CODE_SEPARATOR = "# %%"
 MAGIC = ["%%script", "%%bash"]
+NEWLINES = defaultdict(lambda: "\n\n")
+NEWLINES["isort"] = "\n"
 
 
 def _is_src_code_indentation_valid(source: str) -> bool:
@@ -120,6 +122,7 @@ def _parse_cell(
     source: List[str],
     cell_number: int,
     temporary_lines: Dict[int, List[MagicSubstitution]],
+    command: str,
 ) -> str:
     """
     Parse cell, replacing line magics with python code as placeholder.
@@ -132,6 +135,8 @@ def _parse_cell(
         Number identifying the notebook cell.
     temporary_lines
         Mapping to store the cell number to all the ipython magics replaced in those cells.
+    command
+        The third-party tool being run.
 
     Returns
     -------
@@ -139,7 +144,7 @@ def _parse_cell(
         Parsed cell.
     """
     substituted_magics: List[MagicSubstitution] = []
-    parsed_cell = f"\n{CODE_SEPARATOR}\n"
+    parsed_cell = f"{NEWLINES[command]}{CODE_SEPARATOR}\n"
 
     for parsed_line in _replace_magics(source, substituted_magics):
         parsed_cell += parsed_line
@@ -172,9 +177,7 @@ def _should_ignore_code_cell(source: List[str], ignore_cells: List[str]) -> bool
 
 
 def main(
-    notebook: "Path",
-    temp_python_file: "Path",
-    ignore_cells: List[str],
+    notebook: "Path", temp_python_file: "Path", ignore_cells: List[str], command: str
 ) -> NotebookInfo:
     """
     Extract code cells from notebook and save them in temporary Python file.
@@ -187,6 +190,8 @@ def main(
         Temporary Python file to save converted notebook in.
     ignore_cells
         Extra cells which nbqa should ignore.
+    command
+        The third-party tool being run.
 
     Returns
     -------
@@ -212,21 +217,22 @@ def main(
                 code_cells_to_ignore.add(cell_number)
                 continue
 
-            parsed_cell = _parse_cell(cell["source"], cell_number, temporary_lines)
-            split_parsed_cell = parsed_cell.splitlines()
+            parsed_cell = _parse_cell(
+                cell["source"], cell_number, temporary_lines, command
+            )
             cell_mapping.update(
                 {
                     j + line_number + 1: f"cell_{cell_number}:{j}"
-                    for j in range(len(split_parsed_cell))
+                    for j in range(len(parsed_cell.splitlines()))
                 }
             )
             if parsed_cell.rstrip().endswith(";"):
                 trailing_semicolons.add(cell_number)
             result.append(re.sub(r";(\s*)$", "\\1", parsed_cell))
-            line_number += len(split_parsed_cell)
+            line_number += len(parsed_cell.splitlines())
 
     with open(str(temp_python_file), "w") as handle:
-        handle.write("".join(result)[len("\n") :])
+        handle.write("".join(result).lstrip("\n"))
 
     return NotebookInfo(
         cell_mapping, trailing_semicolons, temporary_lines, code_cells_to_ignore

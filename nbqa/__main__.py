@@ -427,7 +427,10 @@ def _run_on_one_root_dir(
         for notebook, temp_python_file in nb_to_py_mapping.items():
             try:
                 nb_info_mapping[notebook] = save_source.main(
-                    notebook, temp_python_file, configs.nbqa_ignore_cells
+                    notebook,
+                    temp_python_file,
+                    configs.nbqa_ignore_cells,
+                    cli_args.command,
                 )
             except Exception as exc:
                 raise RuntimeError(
