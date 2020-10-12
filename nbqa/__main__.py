@@ -265,10 +265,10 @@ def _get_arg(
     >>> root_dir = "root_dir"
     >>> tmpdirname = "tmpdir"
     >>> nb_to_py_mapping = {
-    ...     Path('my_notebook.ipynb'): Path('tmpdir').joinpath('my_notebook   .py')
+    ...     Path('my_notebook.ipynb'): Path('tmpdir').joinpath('my_notebook.py')
     ... }
     >>> _get_arg(root_dir, tmpdirname, nb_to_py_mapping).as_posix()
-    'tmpdir/my_notebook   .py'
+    'tmpdir/my_notebook.py'
     """
     if Path(root_dir).is_dir():
         arg = Path(tmpdirname) / Path(root_dir).resolve().relative_to(project_root)
@@ -294,7 +294,7 @@ def _get_mtimes(arg: Path) -> Set[float]:
     """
     if not arg.is_dir():
         return {os.path.getmtime(str(arg))}
-    return {os.path.getmtime(str(i)) for i in arg.rglob("*   .py")}
+    return {os.path.getmtime(str(i)) for i in arg.rglob("*.py")}
 
 
 def _run_command(
