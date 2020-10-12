@@ -128,3 +128,58 @@ def test_black_works_with_trailing_semicolons(
     assert out == expected_out
     for i in (0, 2):  # haven't figured out how to test the emojis part
         assert err.splitlines()[i] == expected_err.splitlines()[i]
+
+
+def test_black_works_with_multiline(
+    tmp_notebook_with_multiline: "Path", capsys: "CaptureFixture"
+) -> None:
+    """
+    Check black works. Should only reformat code cells.
+
+    Parameters
+    ----------
+    tmp_notebook_with_multiline
+        Temporary copy of :code:`clean_notebook_with_multiline.ipynb`.
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    # check diff
+    with open(tmp_notebook_with_multiline) as handle:
+        before = handle.readlines()
+    path = os.path.abspath(
+        os.path.join("tests", "data", "clean_notebook_with_multiline.ipynb")
+    )
+
+    with open("setup.cfg", "w") as handle:
+        handle.write(
+            dedent(
+                """\
+            [nbqa.mutate]
+            black=1
+            """
+            )
+        )
+    with pytest.raises(SystemExit):
+        main(["black", path])
+    Path("setup.cfg").unlink()
+    with open(tmp_notebook_with_multiline) as handle:
+        after = handle.readlines()
+
+    diff = difflib.unified_diff(before, after)
+    result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
+    expected = (
+        '-    "assert 1 + 1 == 2;  assert 1 + 1 == 2;"\n'
+        '+    "assert 1 + 1 == 2\\n",\n'
+        '+    "assert 1 + 1 == 2;"\n'
+    )
+    assert result == expected
+
+    # check out and err
+    out, err = capsys.readouterr()
+    expected_out = ""
+    expected_err = os.linesep.join(
+        [f"reformatted {path}", "All done!   ", "1 file reformatted."]
+    )
+    assert out == expected_out
+    for i in (0, 2):  # haven't figured out how to test the emojis part
+        assert err.splitlines()[i] == expected_err.splitlines()[i]

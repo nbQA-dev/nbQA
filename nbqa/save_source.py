@@ -222,7 +222,7 @@ def main(
             )
             if parsed_cell.rstrip().endswith(";"):
                 trailing_semicolons.add(cell_number)
-            result.append(re.sub(r";(\s*)", "\\1", parsed_cell))
+            result.append(re.sub(r";(\s*)$", "\\1", parsed_cell))
             line_number += len(split_parsed_cell)
 
     with open(str(temp_python_file), "w") as handle:
