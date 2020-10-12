@@ -91,6 +91,28 @@ def tmp_notebook_starting_with_md(tmpdir: "LocalPath") -> Iterator[Path]:
 
 
 @pytest.fixture
+def tmp_test_data(tmpdir: "LocalPath") -> Iterator[Path]:
+    """
+    Make temporary copy of test data before it's operated on, then revert it.
+
+    Parameters
+    ----------
+    tmpdir
+        Pytest fixture, gives us a temporary directory.
+
+    Yields
+    ------
+    Path
+        Temporary copy of test data.
+    """
+    dirname = Path("tests/data")
+    temp_dir = Path(tmpdir)
+    shutil.copytree(str(dirname), str(temp_dir / dirname))
+    yield dirname
+    shutil.copytree(str(temp_dir / dirname), str(dirname), dirs_exist_ok=True)
+
+
+@pytest.fixture
 def tmp_notebook_with_trailing_semicolon(tmpdir: "LocalPath") -> Iterator[Path]:
     """
     Make temporary copy of test notebook before it's operated on, then revert it.

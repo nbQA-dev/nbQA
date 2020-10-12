@@ -128,3 +128,36 @@ def test_black_works_with_trailing_semicolons(
     assert out == expected_out
     for i in (0, 2):  # haven't figured out how to test the emojis part
         assert err.splitlines()[i] == expected_err.splitlines()[i]
+
+
+def test_black_multiple_files(tmp_test_data: "Path") -> None:
+    """
+    Check black works when running on a directory. Should reformat notebooks.
+
+    Parameters
+    ----------
+    tmp_test_data
+        Temporary copy of test data.
+    """
+    # check diff
+    with open(str(tmp_test_data / "notebook_for_testing.ipynb")) as handle:
+        before = handle.readlines()
+    path = os.path.abspath(os.path.join("tests", "data"))
+
+    with open("setup.cfg", "w") as handle:
+        handle.write(
+            dedent(
+                """\
+            [nbqa.mutate]
+            black=1
+            """
+            )
+        )
+    with pytest.raises(SystemExit):
+        main(["black", path])
+    Path("setup.cfg").unlink()
+    with open(str(tmp_test_data / "notebook_for_testing.ipynb")) as handle:
+        after = handle.readlines()
+
+    diff = difflib.unified_diff(before, after)
+    assert "".join(diff) != ""
