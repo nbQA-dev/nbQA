@@ -2,6 +2,13 @@
 Changelog
 =========
 
+0.3.0 (2020-10-12)
+------------------
+
+Added support for `pylint` (thanks Girish Pasupathy!).
+Fixed a false-positive in `black` when cells ended with trailing semicolons.
+Fixed some false-positives in `flake8` regarding expected numbers of newlines.
+
 0.2.3 (2020-10-06)
 ------------------
 
@@ -14,7 +21,7 @@ notebooks.
 0.2.2 (2020-10-01)
 ------------------
 
-Optimised handling cell-magics and improved support for indented in-line magics (thanks Girish Pasupathy !).
+Optimised handling cell-magics and improved support for indented in-line magics (thanks Girish Pasupathy!).
 
 0.2.1 (2020-09-27)
 ------------------
