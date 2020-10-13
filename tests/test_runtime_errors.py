@@ -12,6 +12,27 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
 
 
+def test_missing_command() -> None:
+    """Check useful error is raised if :code:`nbqa` is run with an invalid command."""
+    command = "some-fictional-command"
+    msg = (
+        f"Command `{command}` not found. "
+        "Please make sure you have it installed before running nbqa on it."
+    )
+    with pytest.raises(ValueError, match=msg):
+        main([command, "tests", "--some-flag"])
+
+
+def test_missing_root_dir() -> None:
+    """Check useful error message is raised if :code:`nbqa` is called without root_dir."""
+    msg = (
+        "Please specify both a command and a notebook/directory, e.g.\n"
+        "nbqa flake8 my_notebook.ipynb"
+    )
+    with pytest.raises(ValueError, match=msg):
+        main(["flake8", "--ignore=E203"])
+
+
 @pytest.mark.usefixtures("tmp_remove_comments")
 def test_unable_to_reconstruct_message() -> None:
     """Check error message shows if we're unable to reconstruct notebook."""
