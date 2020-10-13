@@ -89,7 +89,7 @@ Perform static code analysis with [pylint](https://www.pylint.org/):
 
 ```bash
 $ nbqa pylint my_notebook.ipynb --disable=C0114
-my_notebook.ipynb:cell_1:5:0: W0611: Unused import nbqa (unused-import)
+my_notebook.ipynb:cell_1:5:0: W0611: Unused import datetime (unused-import)
 ```
 
 ## 🔧 Configuration
