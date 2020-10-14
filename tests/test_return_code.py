@@ -5,7 +5,8 @@ from functools import partial
 from pathlib import Path
 from typing import List
 
-TEST_DATA_DIR = Path("tests/data")
+TESTS_DIR = Path("tests")
+TEST_DATA_DIR = TESTS_DIR / "data"
 DIRTY_NOTEBOOK = TEST_DATA_DIR / "notebook_for_testing.ipynb"
 CLEAN_NOTEBOOK = TEST_DATA_DIR / "clean_notebook.ipynb"
 
@@ -16,9 +17,10 @@ PASSED = 0
 FAILED = 1
 
 
-def _run_nbqa_with(command: str, notebooks: List[str], *args: str) -> int:
+def _run_nbqa_with(command: str, notebooks: List[Path], *args: str) -> int:
     """Run nbqa with the QA tool specified by command parameter."""
-    output = subprocess.run(["nbqa", command, *notebooks, *args])
+    notebook_paths = map(str, notebooks)
+    output = subprocess.run(["nbqa", command, *notebook_paths, *args])
     return output.returncode
 
 
@@ -50,4 +52,4 @@ def test_black_return_code() -> None:
     assert black_runner(clean_notebooks, "--check") == PASSED
 
     # This is to test if the tool ran on all the notebooks in a given directory
-    assert black_runner(["tests"], "--check") == FAILED
+    assert black_runner([TESTS_DIR], "--check") == FAILED
