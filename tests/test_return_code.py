@@ -1,12 +1,13 @@
 """Check that return code from third-party tool is preserved."""
 
-import os
 import subprocess
 from functools import partial
+from pathlib import Path
 from typing import List
 
-DIRTY_NOTEBOOK = os.path.join("tests", "data", "notebook_for_testing.ipynb")
-CLEAN_NOTEBOOK = os.path.join("tests", "data", "clean_notebook.ipynb")
+TEST_DATA_DIR = Path("tests/data")
+DIRTY_NOTEBOOK = TEST_DATA_DIR / "notebook_for_testing.ipynb"
+CLEAN_NOTEBOOK = TEST_DATA_DIR / "clean_notebook.ipynb"
 
 # Interpret the below constants in the same context as that of pre-commit tool
 # Success indicates the QA tool reported no issues.
@@ -43,8 +44,8 @@ def test_black_return_code() -> None:
 
     clean_notebooks = [
         CLEAN_NOTEBOOK,
-        os.path.join("tests", "data", "notebook_with_cell_after_def.ipynb"),
-        os.path.join("tests", "data", "clean_notebook_with_trailing_semicolon.ipynb"),
+        TEST_DATA_DIR / "notebook_with_cell_after_def.ipynb",
+        TEST_DATA_DIR / "clean_notebook_with_trailing_semicolon.ipynb",
     ]
     assert black_runner(clean_notebooks, "--check") == PASSED
 

@@ -16,8 +16,7 @@ if TYPE_CHECKING:
 
 def _create_ignore_cell_config(config_file_path: Path, config: str) -> None:
     """Create configuration file for nbqa."""
-    with open(str(config_file_path), "w") as handle:
-        handle.write(config)
+    config_file_path.write_text(config)
 
 
 def _copy_notebook(src_nb: Path, target_dir: Path) -> Path:
