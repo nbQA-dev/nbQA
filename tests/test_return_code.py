@@ -1,70 +1,55 @@
 """Check that return code from third-party tool is preserved."""
 
-import os
 import subprocess
+from functools import partial
+from pathlib import Path
+from typing import List
 
-DIRTY_NOTEBOOK = os.path.join("tests", "data", "notebook_for_testing.ipynb")
-CLEAN_NOTEBOOK = os.path.join("tests", "data", "clean_notebook.ipynb")
-NOTEBOOK_WITH_CELL_AFTER_DEF = os.path.join(
-    "tests", "data", "notebook_with_cell_after_def.ipynb"
-)
-CLEAN_NOTEBOOK_TRAILING_SEMICOLON = os.path.join(
-    "tests", "data", "clean_notebook_with_trailing_semicolon.ipynb"
-)
+TESTS_DIR = Path("tests")
+TEST_DATA_DIR = TESTS_DIR / "data"
+DIRTY_NOTEBOOK = TEST_DATA_DIR / "notebook_for_testing.ipynb"
+CLEAN_NOTEBOOK = TEST_DATA_DIR / "clean_notebook.ipynb"
+
+# Interpret the below constants in the same context as that of pre-commit tool
+# Success indicates the QA tool reported no issues.
+PASSED = 0
+# Failure indicates the QA tool reported some issues.
+FAILED = 1
+
+
+def _run_nbqa_with(command: str, notebooks: List[Path], *args: str) -> int:
+    """Run nbqa with the QA tool specified by command parameter."""
+    notebook_paths = map(str, notebooks)
+    output = subprocess.run(["nbqa", command, *notebook_paths, *args])
+    return output.returncode
 
 
 def test_flake8_return_code() -> None:
     """Check flake8 returns 0 if it passes, 1 otherwise."""
-    output = subprocess.run(["nbqa", "flake8", DIRTY_NOTEBOOK])
-    result = output.returncode
-    expected = 1
-    assert result == expected
-
-    output = subprocess.run(["nbqa", "flake8", CLEAN_NOTEBOOK])
-    result = output.returncode
-    expected = 0
-    assert result == expected
+    flake8_runner = partial(_run_nbqa_with, "flake8")
+    assert flake8_runner([DIRTY_NOTEBOOK]) == FAILED
+    assert flake8_runner([CLEAN_NOTEBOOK]) == PASSED
 
 
 def test_pylint_return_code() -> None:
     """Check pylint returns 0 if it passes, 1 otherwise."""
-    output = subprocess.run(["nbqa", "pylint", DIRTY_NOTEBOOK])
-    assert output.returncode == 1
-
-    output = subprocess.run(["nbqa", "pylint", CLEAN_NOTEBOOK, "--disable=C0114"])
-    assert output.returncode == 0
+    pylint_runner = partial(_run_nbqa_with, "pylint")
+    assert pylint_runner([DIRTY_NOTEBOOK]) == FAILED
+    assert pylint_runner([CLEAN_NOTEBOOK], "--disable=C0114") == PASSED
 
 
 def test_black_return_code() -> None:
     """Check black returns 0 if it passes, 1 otherwise."""
-    output = subprocess.run(["nbqa", "black", DIRTY_NOTEBOOK, "--check"])
-    result = output.returncode
-    expected = 1
-    assert result == expected
+    black_runner = partial(_run_nbqa_with, "black")
 
-    output = subprocess.run(["nbqa", "black", "--check", CLEAN_NOTEBOOK])
-    result = output.returncode
-    expected = 0
-    assert result == expected
+    assert black_runner([DIRTY_NOTEBOOK], "--check") == FAILED
 
-    output = subprocess.run(["nbqa", "black", "--check", NOTEBOOK_WITH_CELL_AFTER_DEF])
-    result = output.returncode
-    expected = 0
-    assert result == expected
+    clean_notebooks = [
+        CLEAN_NOTEBOOK,
+        TEST_DATA_DIR / "notebook_with_cell_after_def.ipynb",
+        TEST_DATA_DIR / "clean_notebook_with_trailing_semicolon.ipynb",
+    ]
+    assert black_runner(clean_notebooks, "--check") == PASSED
 
-    output = subprocess.run(
-        ["nbqa", "black", "--check", CLEAN_NOTEBOOK_TRAILING_SEMICOLON]
-    )
-    result = output.returncode
-    expected = 0
-    assert result == expected
-
-    output = subprocess.run(["nbqa", "black", "--check", "tests"])
-    result = output.returncode
-    expected = 1
-    assert result == expected
-
-    output = subprocess.run(["nbqa", "black", CLEAN_NOTEBOOK, "--check", "-l", "1"])
-    result = output.returncode
-    expected = 1
-    assert result == expected
+    # This is to test if the tool ran on all the notebooks in a given directory
+    assert black_runner([TESTS_DIR], "--check") == FAILED
