@@ -17,7 +17,7 @@ jobs:
           path: |
              ~/.cache/pip
              ~\AppData\Local\pip\Cache
-          key: ${{ runner.os }}-${{ hashFiles('**lockfiles') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
       # This is required since pylint is used in pre-commit as a local hook
       - name: Install dependencies
         run: |

@@ -24,7 +24,7 @@ jobs:
           path: |
              ~/.cache/pip
              ~\AppData\Local\pip\Cache
-          key: ${{ runner.os }}-${{ hashFiles('**lockfiles') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
       - name: install-tox
         run: python -m pip install --upgrade tox virtualenv setuptools pip
       - name: install-reqs
