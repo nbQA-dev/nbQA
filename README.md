@@ -23,7 +23,7 @@ Documentation is hosted [here](https://nbqa.readthedocs.io/en/latest/).
 Install `nbqa` with [pip](https://pip.pypa.io):
 
 ```bash
-pip install -U nbqa
+python -m pip install -U nbqa
 ```
 
 ## 🚀 Examples
