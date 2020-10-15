@@ -21,14 +21,12 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-             ~/.cache/pre-commit
-          key: pre-commit-autoupdate
-          path: |
-             ~/.cache/pip
-             /opt/hostedtoolcache/Python/
-             ~\AppData\Local\pip\Cache
-             c:\hostedtoolcache\windows\python\
-          key: ${{ runner.os }}-build-${{ env.cache-name }}
+            ~/.cache/pre-commit
+            ~/.cache/pip
+            /opt/hostedtoolcache/Python/
+            ~\AppData\Local\pip\Cache
+            c:\hostedtoolcache\windows\python\
+          key: pre-commit-autoupdate-${{ runner.os }}-build-${{ env.cache-name }}
       - name: Update pre-commit config packages
         uses: technote-space/create-pr-action@v2
         with:

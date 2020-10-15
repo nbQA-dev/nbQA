@@ -15,10 +15,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-             ~/.cache/pip
-             /opt/hostedtoolcache/Python/
-             ~\AppData\Local\pip\Cache
-             c:\hostedtoolcache\windows\python\
+            ~/.cache/pip
+            /opt/hostedtoolcache/Python/
+            ~\AppData\Local\pip\Cache
+            c:\hostedtoolcache\windows\python\
           key: ${{ runner.os }}-build-${{ env.cache-name }}
       # This is required since pylint is used in pre-commit as a local hook
       - name: Install dependencies
