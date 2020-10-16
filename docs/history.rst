@@ -2,6 +2,13 @@
 Changelog
 =========
 
+0.3.1 (2020-10-16)
+------------------
+
+Fixed bug whereby `nbqa` was using the system (or virtual environment) Python, rather than
+the Python used to install `nbqa`. This was causing issues when running `nbqa` outside of a
+virtual environment.
+
 0.3.0 (2020-10-12)
 ------------------
 
