@@ -78,6 +78,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "m3h0w",
+      "name": "Michał Gacka",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/25684390?v=4",
+      "profile": "https://gacka.space/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
