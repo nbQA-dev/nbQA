@@ -341,7 +341,7 @@ def _run_command(
     before = _get_mtimes(arg)
 
     output = subprocess.run(
-        ["python", "-m", command, str(arg), *cmd_args],
+        [sys.executable, "-m", command, str(arg), *cmd_args],
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         cwd=tmpdirname,
@@ -358,7 +358,9 @@ def _run_command(
     if "No module named" in err:
         raise ValueError(
             f"Command `{command}` not found. "
-            "Please make sure you have it installed before running nbqa on it."
+            "Please make sure you have it installed in the same environment as nbqa.\n"
+            "See e.g. https://realpython.com/python-virtual-environments-a-primer/ for how to "
+            "set up a virtual environment in Python."
         )
 
     return out, err, output_code, mutated
