@@ -341,7 +341,7 @@ def _run_command(
     before = _get_mtimes(arg)
 
     output = subprocess.run(
-        ["python", "-m", command, str(arg), *cmd_args],
+        [sys.executable, "-m", command, str(arg), *cmd_args],
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         cwd=tmpdirname,
