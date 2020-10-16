@@ -31,7 +31,7 @@ python -m pip install -U nbqa
 Reformat your notebook with
 [black](https://black.readthedocs.io/en/stable/):
 
-```bash
+```console
 $ nbqa black my_notebook.ipynb --nbqa-mutate
 reformatted my_notebook.ipynb
 All done! ✨ 🍰 ✨
@@ -40,14 +40,14 @@ All done! ✨ 🍰 ✨
 
 Sort your imports with [isort](https://timothycrosley.github.io/isort/):
 
-```bash
+```console
 $ nbqa isort my_notebook.ipynb --treat-comment-as-code '# %%' --nbqa-mutate
 Fixing my_notebook.ipynb
 ```
 
 Check your type annotations with [mypy](http://mypy-lang.org/):
 
-```bash
+```console
 $ nbqa mypy my_notebook.ipynb --ignore-missing-imports
 my_notebook.ipynb:cell_10:5: error: Argument "num1" to "add" has incompatible type "str"; expected "int"
 ```
@@ -55,7 +55,7 @@ my_notebook.ipynb:cell_10:5: error: Argument "num1" to "add" has incompatible ty
 Run your docstring tests with
 [doctest](https://docs.python.org/3/library/doctest.html):
 
-```bash
+```console
 $ nbqa doctest my_notebook.ipynb
 **********************************************************************
 File "my_notebook.ipynb", cell_2:11, in my_notebook.add
@@ -73,21 +73,21 @@ Got:
 
 Check for style guide enforcement with [flake8](https://flake8.pycqa.org/en/latest/):
 
-```bash
+```console
 $ nbqa flake8 my_notebook.ipynb --extend-ignore=E203,E302,E305,E703
 my_notebook.ipynb:cell_3:1:1: F401 'import pandas as pd' imported but unused
 ```
 
 Upgrade your syntax with [pyupgrade](https://github.com/asottile/pyupgrade):
 
-```bash
+```console
 $ nbqa pyupgrade my_notebook.ipynb --py36-plus --nbqa-mutate
 Rewriting my_notebook.ipynb
 ```
 
 Perform static code analysis with [pylint](https://www.pylint.org/):
 
-```bash
+```console
 $ nbqa pylint my_notebook.ipynb --disable=C0114
 my_notebook.ipynb:cell_1:5:0: W0611: Unused import datetime (unused-import)
 ```
