@@ -18,17 +18,11 @@ repos:
     hooks:
       - id: prettier
         exclude: README.md
-  - repo: local
+  - repo: https://github.com/PyCQA/pylint
+    rev: pylint-2.6.0
     hooks:
       - id: pylint
-        name: pylint
-        entry: pylint
-        language: system
-        types: [python]
-        require_serial: true
-        exclude: "docs"
-        args:
-          - "--rcfile=pyproject.toml"
+        exclude: ^docs/conf.py$
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.4
     hooks:
