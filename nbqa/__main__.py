@@ -359,7 +359,7 @@ def _run_command(
         raise ValueError(
             f"Command `{command}` not found. "
             "Please make sure you have it installed in the same environment as nbqa.\n"
-            "See https://realpython.com/python-virtual-environments-a-primer/ for how to "
+            "See e.g. https://realpython.com/python-virtual-environments-a-primer/ for how to "
             "set up a virtual environment in Python."
         )
 
