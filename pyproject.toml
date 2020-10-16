@@ -25,4 +25,5 @@ disable = [
   "C0330", # to work well with `black`
   "R0801", # Unfortunately I do need some duplication, e.g. with imports
   "W1510", # I need to run subprocess.run without check because it's OK if it fails
+  "E0401", # Unable to import '_pytest.capture' (this is just for typing anyway)
 ]
