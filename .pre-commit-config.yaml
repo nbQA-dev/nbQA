@@ -23,6 +23,8 @@ repos:
     hooks:
       - id: pylint
         exclude: ^docs/conf.py$
+        args:
+          - "--rcfile=pyproject.toml"
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.4
     hooks:
