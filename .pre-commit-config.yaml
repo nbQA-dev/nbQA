@@ -57,11 +57,6 @@ repos:
     hooks:
       - id: codespell
         files: ".py|.rst|.md"
-  - repo: https://github.com/codespell-project/codespell
-    rev: v1.17.1
-    hooks:
-      - id: codespell
-        files: ".py|.rst|.md"
   - repo: https://github.com/terrencepreilly/darglint
     rev: v1.5.5
     hooks:
