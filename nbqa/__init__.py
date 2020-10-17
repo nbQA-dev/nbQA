@@ -1,5 +1,3 @@
-"""Attributes used by in docs / packaging."""
+"""Attributes used by docs / packaging."""
 
-__author__ = """Marco Gorelli"""
-__email__ = "m.e.gorelli@gmail.com"
-__version__ = "0.3.1"
+__version__ = "0.3.2"
