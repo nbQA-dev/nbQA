@@ -87,7 +87,7 @@ class MagicHandler(ABC):
 
         Returns
         -------
-        str
+        MagicSubstitution
             Python code to be substituted for the ipython magic
         """
         token: str = MagicHandler._get_unique_token()

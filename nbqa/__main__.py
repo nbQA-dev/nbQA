@@ -95,7 +95,7 @@ def _map_python_line_to_nb_lines(
 
     Returns
     -------
-    out
+    str
         Stdout with references to temporary Python file's lines replaced with references
         to notebook's cells and lines.
     """
@@ -310,8 +310,8 @@ def _run_command(
         Temporary directory where converted notebooks will be stored.
     cmd_args
         Flags to pass to third-party tool (e.g. :code:`--verbose`).
-    project_root
-        Root of repository, where .git / .hg / .nbqa.ini file is.
+    arg
+        Notebook, or directory of notebooks, third-party tool is being run on.
 
     Returns
     -------
@@ -368,7 +368,7 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
 
     Parameters
     ----------
-    args
+    cli_args
         Commandline arguments passed to nbqa
     project_root
         Root of repository, where .git / .hg / .nbqa.ini file is.
@@ -410,6 +410,14 @@ def _run_on_one_root_dir(
     -------
     int
         Output code from third-party tool.
+
+    Raises
+    ------
+    RuntimeError
+        If unable to parse or reconstruct notebook.
+    SystemExit
+        If third-party tool would've reformatted notebook but ``--nbqa-mutate``
+        wasn't passed.
     """
     with tempfile.TemporaryDirectory() as tmpdirname:
 

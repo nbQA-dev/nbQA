@@ -58,7 +58,7 @@ def test_isort_initial_md(
     Parameters
     ----------
     tmp_notebook_starting_with_md
-        Temporary copy of :code:`notebook_for_testing.ipynb`.
+        Temporary copy of :code:`notebook_starting_with_md.ipynb`.
     capsys
         Pytest fixture to capture stdout and stderr.
     """
@@ -99,8 +99,8 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
 
     Parameters
     ----------
-    tmp_notebook_starting_with_md
-        Temporary copy of :code:`notebook_for_testing.ipynb`.
+    notebook
+        Notebook to run ``nbqa isort`` on.
     capsys
         Pytest fixture to capture stdout and stderr.
     """
@@ -134,10 +134,8 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: "Path") 
 
     Parameters
     ----------
-    tmp_notebook_starting_with_md
-        Temporary copy of :code:`notebook_for_testing.ipynb`.
-    capsys
-        Pytest fixture to capture stdout and stderr.
+    tmp_notebook_with_trailing_semicolon
+        Temporary copy of :code:`notebook_with_trailing_semicolon.ipynb`.
     """
     # check diff
     with open(tmp_notebook_with_trailing_semicolon) as handle:
