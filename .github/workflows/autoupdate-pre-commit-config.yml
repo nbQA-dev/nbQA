@@ -17,10 +17,13 @@ jobs:
     steps:
       - name: Set up Python
         uses: actions/setup-python@v2
-      - uses: actions/cache@v2
+      - name: Cache multiple paths
+        uses: actions/cache@v2
         with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-autoupdate
+          path: |
+            ~/.cache/pre-commit
+            ~/.cache/pip
+          key: pre-commit-autoupdate-${{ runner.os }}-build
       - name: Update pre-commit config packages
         uses: technote-space/create-pr-action@v2
         with:

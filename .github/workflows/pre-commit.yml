@@ -11,9 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
-      # This is required since pylint is used in pre-commit as a local hook
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
+        with:
+          python-version: "3.8"
       - uses: pre-commit/action@v2.0.0
