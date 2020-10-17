@@ -34,12 +34,12 @@ def test_pyupgrade(tmp_notebook_for_testing: "Path", capsys: "CaptureFixture") -
     Path("setup.cfg").write_text(
         dedent(
             """\
-                [nbqa.mutate]
-                pyupgrade = 1
+            [nbqa.mutate]
+            pyupgrade = 1
 
-                [nbqa.addopts]
-                pyupgrade = '--py36-plus'
-                """
+            [nbqa.addopts]
+            pyupgrade = '--py36-plus'
+            """
         )
     )
     with pytest.raises(SystemExit):

@@ -59,11 +59,11 @@ def test_configs_work_in_setupcfg(capsys: "CaptureFixture") -> None:
     Path(".flake8").write_text(
         dedent(
             """\
-        [flake8]
-        ignore=F401
-        select=E303
-        quiet=1
-        """
+            [flake8]
+            ignore=F401
+            select=E303
+            quiet=1
+            """
         )
     )
 
