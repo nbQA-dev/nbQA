@@ -15,6 +15,15 @@
   require_serial: true
   types: [jupyter]
   additional_dependencies: [black]
+- id: nbqa-mypy
+  name: nbqa-mypy
+  description: "Run 'black' on a Jupyter Notebook"
+  entry: nbqa mypy
+  language: python
+  language_version: python3
+  require_serial: true
+  types: [jupyter]
+  additional_dependencies: [mypy]
 - id: nbqa-isort
   name: nbqa-isort
   description: "Run 'isort' on a Jupyter Notebook"
