@@ -43,11 +43,12 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
         All Jupyter Notebooks found in directory.
     """
     if not Path(root_dir).is_dir():
-        return (i for i in (Path(root_dir),))
-    notebooks = (
-        i for i in Path(root_dir).rglob("*.ipynb") if ".ipynb_checkpoints" not in str(i)
+        return iter((Path(root_dir),))
+    return (
+        i
+        for i in Path(root_dir).rglob("*.ipynb")
+        if ".ipynb_checkpoints" not in str(i)
     )
-    return notebooks
 
 
 def _temp_python_file_for_notebook(
@@ -213,10 +214,7 @@ def _preserve_config_files(
     project_root
         Root of repository, where .git / .hg / .nbqa.ini file is.
     """
-    if nbqa_config is not None:
-        config_files = [nbqa_config]
-    else:
-        config_files = CONFIG_FILES
+    config_files = [nbqa_config] if nbqa_config is not None else CONFIG_FILES
     for config_file in config_files:
         config_file_path = project_root / config_file
         if config_file_path.exists():
