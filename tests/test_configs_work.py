@@ -18,8 +18,6 @@ def test_configs_work(capsys: "CaptureFixture") -> None:
 
     Parameters
     ----------
-    tmp_notebook_for_testing
-        Temporary copy of :code:`notebook_for_testing.ipynb`.
     capsys
         Pytest fixture to capture stdout and stderr.
     """
@@ -43,8 +41,6 @@ def test_configs_work_in_setupcfg(capsys: "CaptureFixture") -> None:
 
     Parameters
     ----------
-    tmp_notebook_for_testing
-        Temporary copy of :code:`notebook_for_testing.ipynb`.
     capsys
         Pytest fixture to capture stdout and stderr.
     """
