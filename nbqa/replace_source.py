@@ -88,8 +88,7 @@ def main(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> 
     with open(notebook) as handle:
         notebook_json = json.load(handle)
 
-    with open(str(python_file)) as handle:
-        pyfile = handle.read()
+    pyfile = python_file.read_text()
 
     pycells: Iterator[str] = iter(pyfile[len(CODE_SEPARATOR) :].split(CODE_SEPARATOR))
     code_cell_number = 0

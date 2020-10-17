@@ -33,15 +33,14 @@ def test_black_works(
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
 
-    with open("setup.cfg", "w") as handle:
-        handle.write(
-            dedent(
-                """\
+    Path("setup.cfg").write_text(
+        dedent(
+            """\
             [nbqa.mutate]
             black=1
             """
-            )
         )
+    )
     with pytest.raises(SystemExit):
         main(["black", path])
     Path("setup.cfg").unlink()
@@ -89,15 +88,14 @@ def test_black_works_with_trailing_semicolons(
         os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
     )
 
-    with open("setup.cfg", "w") as handle:
-        handle.write(
-            dedent(
-                """\
+    Path("setup.cfg").write_text(
+        dedent(
+            """\
             [nbqa.mutate]
             black=1
             """
-            )
         )
+    )
     with pytest.raises(SystemExit):
         main(["black", path, "--line-length=10"])
     Path("setup.cfg").unlink()
@@ -150,15 +148,14 @@ def test_black_works_with_multiline(
         os.path.join("tests", "data", "clean_notebook_with_multiline.ipynb")
     )
 
-    with open("setup.cfg", "w") as handle:
-        handle.write(
-            dedent(
-                """\
+    Path("setup.cfg").write_text(
+        dedent(
+            """\
             [nbqa.mutate]
             black=1
             """
-            )
         )
+    )
     with pytest.raises(SystemExit):
         main(["black", path])
     Path("setup.cfg").unlink()

@@ -23,11 +23,9 @@ def test_pyproject_toml_works(
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    filename: str = str(temporarily_delete_pyprojecttoml)
-    with open(filename, "w") as handle:
-        handle.write(
-            dedent(
-                """
+    temporarily_delete_pyprojecttoml.write_text(
+        dedent(
+            """
             [tool.nbqa.addopts]
             flake8 = [
                 "--ignore=F401",
@@ -35,13 +33,13 @@ def test_pyproject_toml_works(
                 "--quiet"
             ]
             """
-            )
         )
+    )
 
     with pytest.raises(SystemExit):
         main(["flake8", "tests", "--ignore", "E302"])
 
-    Path(filename).unlink()
+    temporarily_delete_pyprojecttoml.unlink()
 
     # check out and err
     out, _ = capsys.readouterr()

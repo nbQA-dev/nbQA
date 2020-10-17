@@ -21,17 +21,16 @@ def test_nbqa_ini_works(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with open("setup.cfg", "w") as handle:
-        handle.write(
-            dedent(
-                """\
+    Path("setup.cfg").write_text(
+        dedent(
+            """\
             [nbqa.addopts]
             flake8 = --ignore=F401 \
                       --select=E303 \
                       --quiet
             """
-            )
         )
+    )
 
     with pytest.raises(SystemExit):
         main(["flake8", "tests", "--ignore", "E302"])
