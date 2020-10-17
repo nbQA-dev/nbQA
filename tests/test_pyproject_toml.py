@@ -20,6 +20,8 @@ def test_pyproject_toml_works(
 
     Parameters
     ----------
+    tmp_pyprojecttoml
+        Temporary pyproject.toml file.
     capsys
         Pytest fixture to capture stdout and stderr.
     """
