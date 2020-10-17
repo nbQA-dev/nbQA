@@ -68,3 +68,4 @@
   language_version: python3
   require_serial: true
   types: [jupyter]
+  additional_dependencies: [doctest]
