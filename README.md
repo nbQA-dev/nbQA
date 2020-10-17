@@ -20,7 +20,7 @@ Documentation is hosted [here](https://nbqa.readthedocs.io/en/latest/).
 
 ## 🎉 Installation
 
-Install `nbqa` with [pip](https://pip.pypa.io):
+Install `nbqa` in your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/) with [pip](https://pip.pypa.io):
 
 ```bash
 python -m pip install -U nbqa
