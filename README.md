@@ -98,11 +98,9 @@ You can configure `nbqa` either at the command line, or by using a `pyproject.to
 [configuration](https://nbqa.readthedocs.io/en/latest/configuration.html)
 for details and examples.
 
-## 👷 Usage as pre-commit hook
+## 👷 Pre-commit
 
-You can easily use `nbqa` as a [pre-commit](https://pre-commit.com/) hook by passing your desired
-code quality tool in the `args` and `additional_dependencies` sections - see
-[usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html) for examples.
+See [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html) for examples.
 
 ## 💬 Testimonials
 

@@ -6,3 +6,65 @@
   language_version: python3
   require_serial: true
   types: [jupyter]
+- id: nbqa-black
+  name: nbqa-black
+  description: "Run 'black' on a Jupyter Notebook"
+  entry: nbqa black
+  language: python
+  language_version: python3
+  require_serial: true
+  types: [jupyter]
+  additional_dependencies: [black]
+- id: nbqa-mypy
+  name: nbqa-mypy
+  description: "Run 'black' on a Jupyter Notebook"
+  entry: nbqa mypy
+  language: python
+  language_version: python3
+  require_serial: true
+  types: [jupyter]
+  additional_dependencies: [mypy]
+- id: nbqa-isort
+  name: nbqa-isort
+  description: "Run 'isort' on a Jupyter Notebook"
+  entry: nbqa isort
+  language: python
+  language_version: python3
+  require_serial: true
+  types: [jupyter]
+  additional_dependencies: [isort]
+- id: nbqa-pyupgrade
+  name: nbqa-pyupgrade
+  description: "Run 'pyupgrade' on a Jupyter Notebook"
+  entry: nbqa pyupgrade
+  language: python
+  language_version: python3
+  require_serial: true
+  types: [jupyter]
+  additional_dependencies: [pyupgrade]
+- id: nbqa-flake8
+  name: nbqa-flake8
+  description: "Run 'flake8' on a Jupyter Notebook"
+  entry: nbqa flake8
+  language: python
+  language_version: python3
+  require_serial: true
+  types: [jupyter]
+  additional_dependencies: [flake8]
+- id: nbqa-pylint
+  name: nbqa-pylint
+  description: "Run 'pylint' on a Jupyter Notebook"
+  entry: nbqa pylint
+  language: python
+  language_version: python3
+  require_serial: true
+  types: [jupyter]
+  additional_dependencies: [pylint]
+- id: nbqa-doctest
+  name: nbqa-doctest
+  description: "Run 'doctest' on a Jupyter Notebook"
+  entry: nbqa doctest
+  language: python
+  language_version: python3
+  require_serial: true
+  types: [jupyter]
