@@ -5,13 +5,12 @@ This is just so we can check what happens when running nbqa on a tool which caus
 """
 
 import argparse
+from pathlib import Path
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("path")
     args, _ = parser.parse_known_args()
-    with open(args.path) as handle:
-        file_ = handle.read()
+    file_ = Path(args.path).read_text()
     file_ = file_.replace("#", "")
-    with open(args.path, "w") as handle:
-        handle.write(file_)
+    Path(args.path).write_text(file_)

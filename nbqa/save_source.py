@@ -198,8 +198,7 @@ def main(
     NotebookInfo
 
     """
-    with open(notebook) as handle:
-        cells = json.load(handle)["cells"]
+    cells = json.loads(notebook.read_text())["cells"]
 
     result = []
     cell_mapping = {}
