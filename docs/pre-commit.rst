@@ -30,5 +30,5 @@ If you have your own custom tool (e.g. ``customtool``) for which we currently do
 If there are additional Python code quality tools you would like us to make a hook for, please :ref:`open a pull request<contributing>`
 or let us know in the `issue tracker <https://github.com/nbQA-dev/nbQA/issues>`_!
 
-See :ref:`configuration<configuration>` for how to further configure how ``nbqa`` should run each tool. Also, see the `pre-commit documentation<https://pre-commit.com/>`_
+See :ref:`configuration<configuration>` for how to further configure how ``nbqa`` should run each tool. Also, see the `pre-commit documentation <https://pre-commit.com/>`_
 for how to further configure these hooks.
