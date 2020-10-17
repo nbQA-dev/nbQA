@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 def test_pyproject_toml_works(
-    temporarily_delete_pyprojecttoml: Path, capsys: "CaptureFixture"
+    tmp_pyprojecttoml: Path, capsys: "CaptureFixture"
 ) -> None:
     """
     Check if config is picked up from pyproject.toml works.
@@ -23,7 +23,7 @@ def test_pyproject_toml_works(
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    temporarily_delete_pyprojecttoml.write_text(
+    tmp_pyprojecttoml.write_text(
         dedent(
             """
             [tool.nbqa.addopts]
@@ -39,7 +39,7 @@ def test_pyproject_toml_works(
     with pytest.raises(SystemExit):
         main(["flake8", "tests", "--ignore", "E302"])
 
-    temporarily_delete_pyprojecttoml.unlink()
+    tmp_pyprojecttoml.unlink()
 
     # check out and err
     out, _ = capsys.readouterr()

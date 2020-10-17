@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture
-def temporarily_delete_pyprojecttoml(tmpdir: "LocalPath") -> Iterator[Path]:
+def tmp_pyprojecttoml(tmpdir: "LocalPath") -> Iterator[Path]:
     """
     Temporarily delete pyproject.toml so it can be recreated during tests.
 
@@ -30,7 +30,7 @@ def temporarily_delete_pyprojecttoml(tmpdir: "LocalPath") -> Iterator[Path]:
 
 
 @pytest.fixture(autouse=True)
-def temporarily_delete_setupcfg(tmpdir: "LocalPath") -> Iterator[None]:
+def tmp_setupcfg(tmpdir: "LocalPath") -> Iterator[None]:
     """
     Temporarily delete setup.cfg so it can be recreated during tests.
 
