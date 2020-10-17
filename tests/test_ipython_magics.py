@@ -153,9 +153,8 @@ def _validate_indented_magics(actual: str, test_nb_path: Path) -> bool:
     ]
     result: bool = True
 
-    with open(str(test_nb_path)) as handle:
-        actual_cells = json.load(handle)["cells"]
-        actual_cell_source = (cell["source"] for cell in actual_cells)
+    actual_cells = json.loads(test_nb_path.read_text())["cells"]
+    actual_cell_source = (cell["source"] for cell in actual_cells)
 
     for actual_src, expected_src in zip(actual_cell_source, expected_cell_source):
         result = result and (actual_src == expected_src)

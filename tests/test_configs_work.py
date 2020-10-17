@@ -21,8 +21,16 @@ def test_configs_work(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with open(".flake8", "w") as handle:
-        handle.write("[flake8]\nignore=F401\nselect=E303\nquiet=1\n")
+    Path(".flake8").write_text(
+        dedent(
+            """\
+            [flake8]
+            ignore=F401
+            select=E303
+            quiet=1
+            """
+        )
+    )
 
     with pytest.raises(SystemExit):
         main(["flake8", "tests", "--ignore", "E302", "--nbqa-config", ".flake8"])
@@ -44,27 +52,25 @@ def test_configs_work_in_setupcfg(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with open(".flake8", "w") as handle:
-        handle.write(
-            dedent(
-                """\
+    Path(".flake8").write_text(
+        dedent(
+            """\
             [flake8]
             ignore=F401
             select=E303
             quiet=1
             """
-            )
         )
+    )
 
-    with open("setup.cfg", "w") as handle:
-        handle.write(
-            dedent(
-                """\
+    Path("setup.cfg").write_text(
+        dedent(
+            """\
             [nbqa.config]
             flake8=.flake8
             """
-            )
         )
+    )
 
     with pytest.raises(SystemExit):
         main(["flake8", "tests", "--ignore", "E302"])

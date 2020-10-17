@@ -104,15 +104,14 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with open("setup.cfg", "w") as handle:
-        handle.write(
-            dedent(
-                """\
+    Path("setup.cfg").write_text(
+        dedent(
+            """\
             [nbqa.isort]
             addopts = --treat-comment-as-code "# %%%%"
             """
-            )
         )
+    )
 
     path = os.path.abspath(os.path.join("tests", "data", notebook))
     with pytest.raises(SystemExit):

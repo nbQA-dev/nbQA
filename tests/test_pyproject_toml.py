@@ -13,21 +13,21 @@ if TYPE_CHECKING:
 
 
 def test_pyproject_toml_works(
-    temporarily_delete_pyprojecttoml: Path, capsys: "CaptureFixture"
+    tmp_pyprojecttoml: Path, capsys: "CaptureFixture"
 ) -> None:
     """
     Check if config is picked up from pyproject.toml works.
 
     Parameters
     ----------
+    tmp_pyprojecttoml
+        Temporary pyproject.toml file.
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    filename: str = str(temporarily_delete_pyprojecttoml)
-    with open(filename, "w") as handle:
-        handle.write(
-            dedent(
-                """
+    tmp_pyprojecttoml.write_text(
+        dedent(
+            """
             [tool.nbqa.addopts]
             flake8 = [
                 "--ignore=F401",
@@ -35,13 +35,13 @@ def test_pyproject_toml_works(
                 "--quiet"
             ]
             """
-            )
         )
+    )
 
     with pytest.raises(SystemExit):
         main(["flake8", "tests", "--ignore", "E302"])
 
-    Path(filename).unlink()
+    tmp_pyprojecttoml.unlink()
 
     # check out and err
     out, _ = capsys.readouterr()

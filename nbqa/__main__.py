@@ -462,15 +462,14 @@ def _run_on_one_root_dir(
 
             if mutated:
                 if not configs.nbqa_mutate:
-                    raise SystemExit(
-                        dedent(
-                            f"""\
-                    💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
+                    msg = dedent(
+                        f"""\
+                        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
 
-                        {" ".join([str(cli_args), "--nbqa-mutate"])}
-                    """
-                        )
+                            {" ".join([str(cli_args), "--nbqa-mutate"])}
+                        """
                     )
+                    raise SystemExit(msg)
 
                 try:
                     replace_source.main(

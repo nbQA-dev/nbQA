@@ -198,8 +198,7 @@ def main(
     NotebookInfo
 
     """
-    with open(notebook) as handle:
-        cells = json.load(handle)["cells"]
+    cells = json.loads(notebook.read_text())["cells"]
 
     result = []
     cell_mapping = {}
@@ -231,8 +230,7 @@ def main(
             result.append(re.sub(r";(\s*)$", "\\1", parsed_cell))
             line_number += len(parsed_cell.splitlines())
 
-    with open(str(temp_python_file), "w") as handle:
-        handle.write("".join(result).lstrip("\n"))
+    temp_python_file.write_text("".join(result).lstrip("\n"))
 
     return NotebookInfo(
         cell_mapping, trailing_semicolons, temporary_lines, code_cells_to_ignore

@@ -85,11 +85,9 @@ def main(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> 
     notebook_info
         Information about notebook cells used for processing
     """
-    with open(notebook) as handle:
-        notebook_json = json.load(handle)
+    notebook_json = json.loads(notebook.read_text())
 
-    with open(str(python_file)) as handle:
-        pyfile = handle.read()
+    pyfile = python_file.read_text()
 
     pycells: Iterator[str] = iter(pyfile[len(CODE_SEPARATOR) :].split(CODE_SEPARATOR))
     code_cell_number = 0
@@ -109,6 +107,4 @@ def main(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> 
         new_cells.append(cell)
 
     notebook_json.update({"cells": new_cells})
-    with open(notebook, "w") as handle:
-        json.dump(notebook_json, handle, indent=1, ensure_ascii=False)
-        handle.write("\n")
+    notebook.write_text(f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n")
