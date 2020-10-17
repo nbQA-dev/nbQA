@@ -66,4 +66,3 @@ repos:
     rev: v1.5.5
     hooks:
       - id: darglint
-        args: [-s=numpy]
