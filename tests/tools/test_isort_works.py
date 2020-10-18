@@ -14,9 +14,7 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-def test_isort_works(
-    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture"
-) -> None:
+def test_isort_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> None:
     """
     Check isort works.
 
@@ -50,7 +48,7 @@ def test_isort_works(
 
 
 def test_isort_initial_md(
-    tmp_notebook_starting_with_md: "Path", capsys: "CaptureFixture"
+    tmp_notebook_starting_with_md: Path, capsys: "CaptureFixture"
 ) -> None:
     """
     Check isort works when a notebook starts with a markdown cell.
@@ -127,7 +125,7 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
     assert err == expected_err
 
 
-def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: "Path") -> None:
+def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: Path) -> None:
     """
     Check isort works when a notebook starts with a markdown cell.
 

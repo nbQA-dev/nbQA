@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-def test_pyupgrade(tmp_notebook_for_testing: "Path", capsys: "CaptureFixture") -> None:
+def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> None:
     """
     Check pyupgrade works. Should only reformat code cells.
 
