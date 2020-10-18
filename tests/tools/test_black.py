@@ -15,9 +15,7 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-def test_black_works(
-    tmp_notebook_for_testing: "Path", capsys: "CaptureFixture"
-) -> None:
+def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> None:
     """
     Check black works. Should only reformat code cells.
 
@@ -69,7 +67,7 @@ def test_black_works(
 
 
 def test_black_works_with_trailing_semicolons(
-    tmp_notebook_with_trailing_semicolon: "Path", capsys: "CaptureFixture"
+    tmp_notebook_with_trailing_semicolon: Path, capsys: "CaptureFixture"
 ) -> None:
     """
     Check black works. Should only reformat code cells.
@@ -129,7 +127,7 @@ def test_black_works_with_trailing_semicolons(
 
 
 def test_black_works_with_multiline(
-    tmp_notebook_with_multiline: "Path", capsys: "CaptureFixture"
+    tmp_notebook_with_multiline: Path, capsys: "CaptureFixture"
 ) -> None:
     """
     Check black works. Should only reformat code cells.
@@ -182,7 +180,7 @@ def test_black_works_with_multiline(
         assert err.splitlines()[i] == expected_err.splitlines()[i]
 
 
-def test_black_multiple_files(tmp_test_data: "Path") -> None:
+def test_black_multiple_files(tmp_test_data: Path) -> None:
     """
     Check black works when running on a directory. Should reformat notebooks.
 
