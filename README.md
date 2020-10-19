@@ -8,7 +8,7 @@
 [![image](https://img.shields.io/pypi/pyversions/nbqa.svg)](https://pypi.org/project/nbqa/)
 [![image](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![image](https://img.shields.io/pypi/dm/nbqa.svg?label=pypi%20downloads&logo=PyPI&logoColor=white)](https://pypistats.org/packages/nbqa)
-[![image](https://badges.gitter.im/Join%20Chat.svg)(https://gitter.im/nbQA/nbQA)
+[![image](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/nbQA/nbQA)
 
 <p align="center">
     <a href="#readme">
