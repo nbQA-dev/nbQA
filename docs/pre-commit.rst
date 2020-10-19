@@ -1,6 +1,6 @@
-========================
-Usage as pre-commit hook
-========================
+==========
+Pre-commit
+==========
 
 You can easily use ``nbqa`` as a `pre-commit <https://pre-commit.com/>`_ hook.
 
