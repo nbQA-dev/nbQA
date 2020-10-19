@@ -17,7 +17,6 @@
 </p>
 
 A tool (and pre-commit hook) to run any standard Python code-quality tool on a Jupyter notebook.
-Documentation is hosted [here](https://nbqa.readthedocs.io/en/latest/).
 
 ## 🎉 Installation
 
