@@ -12,7 +12,6 @@ nbQA
    tutorial
    configuration
    pre-commit
-   authors
    history
 
 
