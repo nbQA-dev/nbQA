@@ -16,8 +16,7 @@
     </a>
 </p>
 
-Adapter to run any standard code-quality tool on a Jupyter notebook.
-Documentation is hosted [here](https://nbqa.readthedocs.io/en/latest/).
+A tool (and pre-commit hook) to run any standard Python code-quality tool on a Jupyter notebook.
 
 ## 🎉 Installation
 
@@ -29,7 +28,7 @@ python -m pip install -U nbqa
 
 ## 🚀 Examples
 
-Reformat your notebook with
+Reformat your notebooks with
 [black](https://black.readthedocs.io/en/stable/):
 
 ```console
