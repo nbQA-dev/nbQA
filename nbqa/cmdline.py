@@ -19,6 +19,8 @@ class CLIArgs:
         The notebooks or directories to run third-party tool on.
     nbqa_mutate
         Whether to allow 3rd party tools to modify notebooks.
+    nbqa_find
+        Check if nqba is able to find the 3rd party tool in its PATH
     nbqa_config
         Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
     nbqa_ignore_cells
@@ -31,6 +33,7 @@ class CLIArgs:
     root_dirs: List[str]
     nbqa_addopts: List[str]
     nbqa_mutate: bool
+    nbqa_find: bool
     nbqa_ignore_cells: Optional[str]
     nbqa_config: Optional[str]
 
@@ -49,6 +52,7 @@ class CLIArgs:
         self.root_dirs = args.root_dirs
         self.nbqa_addopts = cmd_args
         self.nbqa_mutate = args.nbqa_mutate or False
+        self.nbqa_find = args.nbqa_find or False
         self.nbqa_config = args.nbqa_config or None
         self.nbqa_ignore_cells = args.nbqa_ignore_cells or None
 
@@ -58,6 +62,8 @@ class CLIArgs:
         args.extend(self.root_dirs)
         if self.nbqa_mutate:
             args.append("--nbqa-mutate")
+        if self.nbqa_find:
+            args.append("--nbqa-find")
         if self.nbqa_config:
             args.append(f"--nbqa-config={self.nbqa_config}")
         if self.nbqa_ignore_cells:
@@ -121,15 +127,30 @@ class CLIArgs:
             ),
         )
         parser.add_argument(
+            "--nbqa-find",
+            action="store_true",
+            help="""
+            Use this flag to check if `nbqa` is able to find the third party tool in
+            its PATH. When this flag is present, nbqa does not run the tool on the
+            notebook(s).
+            """,
+        )
+        parser.add_argument(
             "--version", action="version", version=f"nbqa {__version__}"
         )
         try:
             args, cmd_args = parser.parse_known_args(raw_args)
         except SystemExit as exception:
             if exception.code != 0:
-                msg = (
-                    "Please specify both a command and a notebook/directory, e.g.\n"
-                    "nbqa flake8 my_notebook.ipynb"
+                msg = dedent(
+                    """\
+                    Please specify both a command and a notebook/directory.
+                    e.g nbqa flake8 my_notebook.ipynb
+
+                    To know all the options supported by nbqa, use `nbqa --help`. To
+                    read in detail about the various configuration options supported by
+                    nbqa, refer https://nbqa.readthedocs.io/en/latest/configuration.html
+                    """
                 )
                 raise ValueError(msg) from exception
             sys.exit(0)  # pragma: nocover

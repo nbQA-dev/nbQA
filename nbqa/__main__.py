@@ -15,6 +15,7 @@ from nbqa.cmdline import CLIArgs
 from nbqa.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
+from nbqa.troubleshoot import find_command
 
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
 
@@ -353,10 +354,17 @@ def _run_command(
 
     if "No module named" in err:
         raise ValueError(
-            f"Command `{command}` not found. "
-            "Please make sure you have it installed in the same environment as nbqa.\n"
-            "See e.g. https://realpython.com/python-virtual-environments-a-primer/ for how to "
-            "set up a virtual environment in Python."
+            dedent(
+                f"""\
+            Command `{command}` not found.
+
+            Please make sure you have it installed in the same environment as nbqa.
+            See e.g. https://realpython.com/python-virtual-environments-a-primer/ for
+            how to set up a virtual environment in Python.
+
+            To check if nbqa is able to find {command}, use `nbqa {command} --nbqa-find .`
+            """
+            )
         )
 
     return out, err, output_code, mutated
@@ -502,10 +510,15 @@ def main(raw_args: Optional[List[str]] = None) -> None:
     project_root: Path = find_project_root(tuple(cli_args.root_dirs))
     configs: Configs = _get_configs(cli_args, project_root)
 
-    output_codes = [
-        _run_on_one_root_dir(i, cli_args, configs, project_root)
-        for i in cli_args.root_dirs
-    ]
+    output_codes: List[int]
+
+    if cli_args.nbqa_find:
+        output_codes = [find_command(cli_args.command)]
+    else:
+        output_codes = [
+            _run_on_one_root_dir(i, cli_args, configs, project_root)
+            for i in cli_args.root_dirs
+        ]
 
     sys.exit(int(any(output_codes)))
 
