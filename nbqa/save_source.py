@@ -18,7 +18,22 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 CODE_SEPARATOR = "# %%"
-MAGIC = ["%%script", "%%bash"]
+MAGIC = [
+    "%%bash",
+    "%%cython",
+    "%%html",
+    "%%javascript",
+    "%%js",
+    "%%latex",
+    "%%markdown",
+    "%%perl",
+    "%%python2",
+    "%%ruby",
+    "%%script",
+    "%%sh",
+    "%%svg",
+    "%%writefile",
+]
 NEWLINES = defaultdict(lambda: "\n\n")
 NEWLINES["isort"] = "\n"
 
