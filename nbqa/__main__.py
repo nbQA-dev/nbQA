@@ -15,7 +15,6 @@ from nbqa.cmdline import CLIArgs
 from nbqa.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
-from nbqa.troubleshoot import find_command
 
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
 
@@ -353,21 +352,43 @@ def _run_command(
     err = output.stderr.decode()
 
     if "No module named" in err:
-        raise ValueError(
-            dedent(
-                f"""\
-            Command `{command}` not found.
-
-            Please make sure you have it installed in the same environment as nbqa.
-            See e.g. https://realpython.com/python-virtual-environments-a-primer/ for
-            how to set up a virtual environment in Python.
-
-            To check if nbqa is able to find {command}, use `nbqa {command} --nbqa-find .`
-            """
-            )
-        )
+        raise ValueError(_get_command_not_found_msg(command))
 
     return out, err, output_code, mutated
+
+
+def _get_command_not_found_msg(command: str) -> str:
+    """Return the message to display when the command is not found by nbqa.
+
+    Parameters
+    ----------
+    command : str
+        Command passed to nbqa to find.
+
+    Returns
+    -------
+    str
+        Message to display to stdout.
+    """
+    template = dedent(
+        """\
+    Command `{command}` not found by nbqa.
+
+    Please make sure you have it installed in the same python environment as nbqa. See
+    e.g. https://realpython.com/python-virtual-environments-a-primer/ for how to set up
+    a virtual environment in Python.
+
+    Python executable: {python}
+    nbqa location: {nbqa_loc}
+
+    You could also fix this by running `{python} -m pip install {command}` so that nbqa
+    can find {command}.
+    """
+    )
+    python_executable = sys.executable
+    nbqa_loc = str(Path(sys.modules["nbqa"].__file__).parent)
+
+    return template.format(command=command, python=python_executable, nbqa_loc=nbqa_loc)
 
 
 def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
@@ -510,15 +531,10 @@ def main(raw_args: Optional[List[str]] = None) -> None:
     project_root: Path = find_project_root(tuple(cli_args.root_dirs))
     configs: Configs = _get_configs(cli_args, project_root)
 
-    output_codes: List[int]
-
-    if cli_args.nbqa_find:
-        output_codes = [find_command(cli_args.command)]
-    else:
-        output_codes = [
-            _run_on_one_root_dir(i, cli_args, configs, project_root)
-            for i in cli_args.root_dirs
-        ]
+    output_codes = [
+        _run_on_one_root_dir(i, cli_args, configs, project_root)
+        for i in cli_args.root_dirs
+    ]
 
     sys.exit(int(any(output_codes)))
 

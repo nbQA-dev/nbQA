@@ -14,7 +14,6 @@ def test_cli_command_str() -> None:
         "nbqa",
         "flake8",
         path,
-        "--nbqa-find",
         "--nbqa-mutate",
         "--nbqa-config=setup.cfg",
         "--ignore=F401",

@@ -19,8 +19,6 @@ class CLIArgs:
         The notebooks or directories to run third-party tool on.
     nbqa_mutate
         Whether to allow 3rd party tools to modify notebooks.
-    nbqa_find
-        Check if nqba is able to find the 3rd party tool in its PATH
     nbqa_config
         Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
     nbqa_ignore_cells
@@ -33,7 +31,6 @@ class CLIArgs:
     root_dirs: List[str]
     nbqa_addopts: List[str]
     nbqa_mutate: bool
-    nbqa_find: bool
     nbqa_ignore_cells: Optional[str]
     nbqa_config: Optional[str]
 
@@ -52,7 +49,6 @@ class CLIArgs:
         self.root_dirs = args.root_dirs
         self.nbqa_addopts = cmd_args
         self.nbqa_mutate = args.nbqa_mutate or False
-        self.nbqa_find = args.nbqa_find or False
         self.nbqa_config = args.nbqa_config or None
         self.nbqa_ignore_cells = args.nbqa_ignore_cells or None
 
@@ -62,8 +58,6 @@ class CLIArgs:
         args.extend(self.root_dirs)
         if self.nbqa_mutate:
             args.append("--nbqa-mutate")
-        if self.nbqa_find:
-            args.append("--nbqa-find")
         if self.nbqa_config:
             args.append(f"--nbqa-config={self.nbqa_config}")
         if self.nbqa_ignore_cells:
@@ -125,15 +119,6 @@ class CLIArgs:
                 by placing commas between them.
                 """
             ),
-        )
-        parser.add_argument(
-            "--nbqa-find",
-            action="store_true",
-            help="""
-            Use this flag to check if `nbqa` is able to find the third party tool in
-            its PATH. When this flag is present, nbqa does not run the tool on the
-            notebook(s).
-            """,
         )
         parser.add_argument(
             "--version", action="version", version=f"nbqa {__version__}"
