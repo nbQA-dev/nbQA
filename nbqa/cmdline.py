@@ -134,7 +134,7 @@ class CLIArgs:
 
                     To know all the options supported by nbqa, use `nbqa --help`. To
                     read in detail about the various configuration options supported by
-                    nbqa, refer https://nbqa.readthedocs.io/en/latest/configuration.html
+                    nbqa, refer to https://nbqa.readthedocs.io/en/latest/configuration.html
                     """
                 )
                 raise ValueError(msg) from exception

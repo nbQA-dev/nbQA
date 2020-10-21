@@ -372,15 +372,15 @@ def _get_command_not_found_msg(command: str) -> str:
     """
     template = dedent(
         """\
-    Command `{command}` not found by nbqa.
+        Command `{command}` not found by nbqa.
 
-    Please make sure you have it installed in the same python environment as nbqa. See
-    e.g. https://realpython.com/python-virtual-environments-a-primer/ for how to set up
-    a virtual environment in Python.
+        Please make sure you have it installed in the same Python environment as nbqa. See
+        e.g. https://realpython.com/python-virtual-environments-a-primer/ for how to set up
+        a virtual environment in Python.
 
-    Since nbqa is installed at {nbqa_loc} and uses the python executable found at
-    {python}, you could fix this issue by running `{python} -m pip install {command}`.
-    """
+        Since nbqa is installed at {nbqa_loc} and uses the Python executable found at
+        {python}, you could fix this issue by running `{python} -m pip install {command}`.
+        """
     )
     python_executable = sys.executable
     nbqa_loc = str(Path(sys.modules["nbqa"].__file__).parent)
