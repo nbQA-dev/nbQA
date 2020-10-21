@@ -26,12 +26,6 @@ Install `nbqa` in your [virtual environment](https://realpython.com/python-virtu
 python -m pip install -U nbqa
 ```
 
-If you want to install `nbqa` together with all tools it supports, you can do so by running:
-
-```bash
-python -m pip install -U nbqa[toolchain]
-```
-
 ## 🚀 Examples
 
 Reformat your notebooks with
