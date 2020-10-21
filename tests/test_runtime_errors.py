@@ -18,18 +18,15 @@ def test_missing_command() -> None:
     command = "some-fictional-command"
     msg = dedent(
         f"""\
-        Command `{command}` not found by nbqa.
+    Command `{command}` not found by nbqa.
 
-        Please make sure you have it installed in the same python environment as nbqa. See
-        e.g. https://realpython.com/python-virtual-environments-a-primer/ for how to set up
-        a virtual environment in Python.
+    Please make sure you have it installed in the same python environment as nbqa. See
+    e.g. https://realpython.com/python-virtual-environments-a-primer/ for how to set up
+    a virtual environment in Python.
 
-        Python executable: .*
-        nbqa location: .*
-
-        You could also fix this by running `.*` so that nbqa
-        can find {command}.
-        """
+    Since nbqa is installed at .* and uses the python executable found at
+    .*, you could fix this issue by running `.* -m pip install {command}`.
+    """
     )
     with pytest.raises(ModuleNotFoundError, match=msg):
         main([command, "tests", "--some-flag"])
