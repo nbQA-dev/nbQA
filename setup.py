@@ -13,6 +13,10 @@ setup_requirements = []
 
 test_requirements = []
 
+extra_requirements = {
+    "toolchain": ["black", "mypy", "isort", "pyupgrade", "flake8", "pylint"]
+}
+
 setup(
     author="Marco Gorelli, Girish Pasupathy",
     python_requires=">=3.6",
@@ -40,6 +44,7 @@ setup(
     setup_requires=setup_requirements,
     test_suite="tests",
     tests_require=test_requirements,
+    extras_require=extra_requirements,
     url="https://github.com/nbQA-dev/nbQA",
     version="0.3.2",
     zip_safe=False,
