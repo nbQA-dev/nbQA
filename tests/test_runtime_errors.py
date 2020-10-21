@@ -31,7 +31,7 @@ def test_missing_command() -> None:
         can find {command}.
         """
     )
-    with pytest.raises(ValueError, match=msg):
+    with pytest.raises(ModuleNotFoundError, match=msg):
         main([command, "tests", "--some-flag"])
 
 

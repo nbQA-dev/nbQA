@@ -352,7 +352,7 @@ def _run_command(
     err = output.stderr.decode()
 
     if "No module named" in err:
-        raise ValueError(_get_command_not_found_msg(command))
+        raise ModuleNotFoundError(_get_command_not_found_msg(command))
 
     return out, err, output_code, mutated
 
