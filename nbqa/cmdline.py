@@ -127,9 +127,15 @@ class CLIArgs:
             args, cmd_args = parser.parse_known_args(raw_args)
         except SystemExit as exception:
             if exception.code != 0:
-                msg = (
-                    "Please specify both a command and a notebook/directory, e.g.\n"
-                    "nbqa flake8 my_notebook.ipynb"
+                msg = dedent(
+                    """\
+                    Please specify both a command and a notebook/directory.
+                    e.g nbqa flake8 my_notebook.ipynb
+
+                    To know all the options supported by nbqa, use `nbqa --help`. To
+                    read in detail about the various configuration options supported by
+                    nbqa, refer to https://nbqa.readthedocs.io/en/latest/configuration.html
+                    """
                 )
                 raise ValueError(msg) from exception
             sys.exit(0)  # pragma: nocover

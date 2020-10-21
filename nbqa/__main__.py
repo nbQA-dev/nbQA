@@ -352,14 +352,40 @@ def _run_command(
     err = output.stderr.decode()
 
     if "No module named" in err:
-        raise ValueError(
-            f"Command `{command}` not found. "
-            "Please make sure you have it installed in the same environment as nbqa.\n"
-            "See e.g. https://realpython.com/python-virtual-environments-a-primer/ for how to "
-            "set up a virtual environment in Python."
-        )
+        raise ModuleNotFoundError(_get_command_not_found_msg(command))
 
     return out, err, output_code, mutated
+
+
+def _get_command_not_found_msg(command: str) -> str:
+    """Return the message to display when the command is not found by nbqa.
+
+    Parameters
+    ----------
+    command : str
+        Command passed to nbqa to find.
+
+    Returns
+    -------
+    str
+        Message to display to stdout.
+    """
+    template = dedent(
+        """\
+        Command `{command}` not found by nbqa.
+
+        Please make sure you have it installed in the same Python environment as nbqa. See
+        e.g. https://realpython.com/python-virtual-environments-a-primer/ for how to set up
+        a virtual environment in Python.
+
+        Since nbqa is installed at {nbqa_loc} and uses the Python executable found at
+        {python}, you could fix this issue by running `{python} -m pip install {command}`.
+        """
+    )
+    python_executable = sys.executable
+    nbqa_loc = str(Path(sys.modules["nbqa"].__file__).parent)
+
+    return template.format(command=command, python=python_executable, nbqa_loc=nbqa_loc)
 
 
 def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
