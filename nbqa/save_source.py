@@ -27,6 +27,7 @@ MAGIC = [
     "%%latex",
     "%%markdown",
     "%%perl",
+    "%%python2",
     "%%ruby",
     "%%script",
     "%%sh",
