@@ -2,6 +2,14 @@
 Changelog
 =========
 
+0.3.3 (2020-10-21)
+------------------
+
+More precise error diagnostics if code-quality tool isn't found (thanks Girish Pasupathy!).
+You can now install all supported code-quality tools with ``python -m pip install -U nbqa[toolchain]`` (thanks Sebastian Weigand!).
+We handle a greater array of cell magics by default.
+We removed ``nbqa-doctest`` pre-commit hook, as this one's best run from the command line (thanks Sebastian Weigand!).
+
 0.3.2 (2020-10-17)
 ------------------
 
