@@ -14,6 +14,9 @@ GOOD_EXAMPLE_NOTEBOOK = os.path.join("tests", "data", "notebook_for_testing.ipyn
 WRONG_EXAMPLE_NOTEBOOK = os.path.join(
     "tests", "data", "notebook_for_testing_copy.ipynb"
 )
+INVALID_IMPORT_NOTEBOOK = os.path.join(
+    "tests", "data", "invalid_import_in_doctest.ipynb"
+)
 
 
 def test_doctest_works(capsys: "CaptureFixture") -> None:
@@ -59,3 +62,19 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
 
     assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
     assert err == ""
+
+
+def test_doctest_invalid_import(capsys: "CaptureFixture") -> None:
+    """
+    Check that correct error is reported if notebook contains unimportable imports.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    with pytest.raises(SystemExit):
+        main(["doctest", INVALID_IMPORT_NOTEBOOK])
+
+    _, err = capsys.readouterr()
+    assert "ModuleNotFoundError: No module named 'thisdoesnotexist'" in err
