@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.3.4 (2020-10-23)
+------------------
+
+Fixed bug whereby nbqa was giving the wrong error message when running ``nbqa doctest`` and
+the notebook contained a library which couldn't be imported.
+
 0.3.3 (2020-10-21)
 ------------------
 
