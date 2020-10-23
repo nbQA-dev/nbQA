@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from importlib import import_module
 from pathlib import Path
 from textwrap import dedent
 from typing import Dict, Iterator, List, Mapping, Match, Optional, Set, Tuple
@@ -351,9 +352,6 @@ def _run_command(
     out = output.stdout.decode()
     err = output.stderr.decode()
 
-    if "No module named" in err:
-        raise ModuleNotFoundError(_get_command_not_found_msg(command))
-
     return out, err, output_code, mutated
 
 
@@ -514,6 +512,26 @@ def _run_on_one_root_dir(
     return output_code
 
 
+def _check_command_is_installed(command: str) -> None:
+    """
+    Check whether third-party tool is installed.
+
+    Parameters
+    ----------
+    command
+        Third-party tool being run on notebook(s).
+
+    Raises
+    ------
+    ModuleNotFoundError
+        If third-party tool isn't installed.
+    """
+    try:
+        import_module(command)
+    except ImportError as exc:
+        raise ModuleNotFoundError(_get_command_not_found_msg(command)) from exc
+
+
 def main(raw_args: Optional[List[str]] = None) -> None:
     """
     Run third-party tool (e.g. :code:`mypy`) against notebook or directory.
@@ -527,6 +545,8 @@ def main(raw_args: Optional[List[str]] = None) -> None:
     cli_args: CLIArgs = CLIArgs.parse_args(raw_args)
     project_root: Path = find_project_root(tuple(cli_args.root_dirs))
     configs: Configs = _get_configs(cli_args, project_root)
+
+    _check_command_is_installed(cli_args.command)
 
     output_codes = [
         _run_on_one_root_dir(i, cli_args, configs, project_root)
