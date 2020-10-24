@@ -5,8 +5,9 @@
 		src="https://github.com/nbQA-dev/nbQA/raw/master/assets/logo.png">
 </h1>
 
-
-# nbQA
+<h3 align="center">
+	nbQA
+</h3>
 
 [![image](https://github.com/nbQA-dev/nbQA/workflows/tox/badge.svg)](https://github.com/nbQA-dev/nbQA/actions?workflow=tox)
 [![image](https://codecov.io/gh/nbQA-dev/nbQA/branch/master/graph/badge.svg)](https://codecov.io/gh/nbQA-dev/nbQA)
