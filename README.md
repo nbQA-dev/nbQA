@@ -1,4 +1,10 @@
-<img src="https://github.com/nbQA-dev/nbQA/raw/master/assets/logo.png" alt="logo" width="400"/>
+<h1 align="center">
+	<img
+		width="400"
+		alt="nbQA"
+		src="https://github.com/nbQA-dev/nbQA/raw/master/assets/logo.png">
+</h1>
+
 
 # nbQA
 
