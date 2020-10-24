@@ -3,7 +3,6 @@
 import difflib
 import os
 from pathlib import Path
-from textwrap import dedent
 from typing import TYPE_CHECKING
 
 import pytest
@@ -93,8 +92,6 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
     """
     Check isort works when a notebook has imports in different cells.
 
-    We will pass --treat-comment-as-code '# %%'.
-
     Parameters
     ----------
     notebook
@@ -102,20 +99,9 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    Path("setup.cfg").write_text(
-        dedent(
-            """\
-            [nbqa.isort]
-            addopts = --treat-comment-as-code "# %%%%"
-            """
-        )
-    )
-
     path = os.path.abspath(os.path.join("tests", "data", notebook))
     with pytest.raises(SystemExit):
-        main(["isort", path, "--nbqa-mutate"])
-
-    Path("setup.cfg").unlink()
+        main(["isort", path])
 
     # check out and err
     out, err = capsys.readouterr()
@@ -155,3 +141,39 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: Path) ->
         '+    "    pass;"\n'
     )
     assert result == expected
+
+
+# def test_old_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> None:
+#     """
+#     Check isort works when a notebook has imports in different cells.
+
+#     We will not pass --treat-comment-as-code '# %%' as this is an old version of isort.
+
+#     Parameters
+#     ----------
+#     notebook
+#         Notebook to run ``nbqa isort`` on.
+#     capsys
+#         Pytest fixture to capture stdout and stderr.
+#     """
+#     Path("setup.cfg").write_text(
+#         dedent(
+#             """\
+#             [nbqa.isort]
+#             addopts = --treat-comment-as-code "# %%%%"
+#             """
+#         )
+#     )
+
+#     path = os.path.abspath(os.path.join("tests", "data", notebook))
+#     with pytest.raises(SystemExit):
+#         main(["isort", path, "--nbqa-mutate"])
+
+#     Path("setup.cfg").unlink()
+
+#     # check out and err
+#     out, err = capsys.readouterr()
+#     expected_out = ""
+#     expected_err = ""
+#     assert out == expected_out
+#     assert err == expected_err

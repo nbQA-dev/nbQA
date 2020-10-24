@@ -1,7 +1,11 @@
 """Module responsible for storing and handling nbqa configuration."""
 
+from collections import defaultdict
+from importlib import import_module
 from shlex import split
 from typing import Any, Callable, ClassVar, Dict, List, NamedTuple, Optional
+
+from pkg_resources import parse_version
 
 from nbqa.cmdline import CLIArgs
 
@@ -16,6 +20,16 @@ class _ConfigSections(NamedTuple):  # pylint: disable=R0903
 
 
 CONFIG_SECTIONS = _ConfigSections()
+
+DEFAULT_CONFIGS = defaultdict(lambda: [])
+
+try:
+    isort_module = import_module("isort")
+    version = parse_version(isort_module.__version__)  # type: ignore
+    if version >= parse_version("5.3.0"):
+        DEFAULT_CONFIGS["isort"] = ["--treat-comment-as-code", "# %%"]
+except ImportError:
+    pass
 
 
 class Configs:
@@ -111,7 +125,10 @@ class Configs:
         """
         config: Configs = Configs()
 
-        config.set_config(CONFIG_SECTIONS.ADDOPTS, cli_args.nbqa_addopts)
+        config.set_config(
+            CONFIG_SECTIONS.ADDOPTS,
+            cli_args.nbqa_addopts + DEFAULT_CONFIGS[cli_args.command],
+        )
         config.set_config(CONFIG_SECTIONS.CONFIG, cli_args.nbqa_config)
         config.set_config(CONFIG_SECTIONS.IGNORE_CELLS, cli_args.nbqa_ignore_cells)
         config.set_config(CONFIG_SECTIONS.MUTATE, cli_args.nbqa_mutate)
