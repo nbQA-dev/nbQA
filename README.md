@@ -106,7 +106,7 @@ for details)
    pyupgrade = ["--py36-plus"]
    ```
 
-2. Put this in your `.pre-commit-config.yaml` file
+2. Put this in your `.pre-commit-config.yaml` file (see [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html))
 
    ```yaml
    - repo: https://github.com/nbQA-dev/nbQA
@@ -116,8 +116,6 @@ for details)
        - id: nbqa-pyupgrade
        - id: nbqa-isort
    ```
-
-See [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html) for how to set up your own custom hook!
 
 ## 🥳 Used by
 
