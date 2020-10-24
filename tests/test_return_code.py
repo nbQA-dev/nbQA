@@ -15,6 +15,8 @@ CLEAN_NOTEBOOK = TEST_DATA_DIR / "clean_notebook.ipynb"
 PASSED = 0
 # Failure indicates the QA tool reported some issues.
 FAILED = 1
+# pylint exits with 20 instead of 1
+PYLINT_FAILED = 20
 
 
 def _run_nbqa_with(command: str, notebooks: List[Path], *args: str) -> int:
@@ -34,7 +36,7 @@ def test_flake8_return_code() -> None:
 def test_pylint_return_code() -> None:
     """Check pylint returns 0 if it passes, 1 otherwise."""
     pylint_runner = partial(_run_nbqa_with, "pylint")
-    assert pylint_runner([DIRTY_NOTEBOOK]) == FAILED
+    assert pylint_runner([DIRTY_NOTEBOOK]) == PYLINT_FAILED
     assert pylint_runner([CLEAN_NOTEBOOK], "--disable=C0114") == PASSED
 
 

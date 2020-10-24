@@ -29,7 +29,7 @@ BASE_ERROR_MESSAGE = dedent(
 )
 
 
-def _get_notebooks(root_dir: List[str]) -> Iterator[Path]:
+def _get_notebooks(root_dir: str) -> Iterator[Path]:
     """
     Get generator with all notebooks in directory.
 
@@ -49,8 +49,22 @@ def _get_notebooks(root_dir: List[str]) -> Iterator[Path]:
         i for i in Path(root_dir).rglob("*.ipynb") if ".ipynb_checkpoints" not in str(i)
     )
 
-def _get_all_notebooks(root_dir):
-    return (j for i in root_dir for j in _get_notebooks(i))
+
+def _get_all_notebooks(root_dirs: List[str]) -> Iterator[Path]:
+    """
+    Get generator with all notebooks passed in via the command-line.
+
+    Parameters
+    ----------
+    root_dirs
+        All the notebooks/directories passed in via the command-line.
+
+    Returns
+    -------
+    Iterator
+        All Jupyter Notebooks found in all passed directories/notebooks.
+    """
+    return (j for i in root_dirs for j in _get_notebooks(i))
 
 
 def _temp_python_file_for_notebook(
@@ -271,14 +285,38 @@ def _get_arg(
     'tmpdir/my_notebook.py'
     """
     if Path(root_dir).is_dir():
-        arg = [Path(tmpdirname) / Path(root_dir).resolve().relative_to(project_root)]
+        arg = Path(tmpdirname) / Path(root_dir).resolve().relative_to(project_root)
     else:
-        arg = list(nb_to_py_mapping.values())
+        arg = nb_to_py_mapping[Path(root_dir)]
     return arg
 
-def _get_all_args(root_dirs, tmpdirname, nb_to_py_mapping, project_root):
-    breakpoint()
-    return ' '.join(_get_arg(i, tmpdirname, nb_to_py_mapping, project_root) for i in root_dirs)
+
+def _get_all_args(
+    root_dirs: List[str],
+    tmpdirname: str,
+    nb_to_py_mapping: Dict[Path, Path],
+    project_root: Path,
+) -> Iterator[Path]:
+    """
+    Get all arguments to run command against.
+
+    Parameters
+    ----------
+    root_dirs
+        All notebooks or directories third-party tool is being run against.
+    tmpdirname
+        Temporary directory where converted notebooks are stored.
+    nb_to_py_mapping
+        Mapping between notebooks and Python files corresponding to converted notebooks.
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
+
+    Returns
+    -------
+    Path
+        All notebooks or directories to run third-party tool against.
+    """
+    return (_get_arg(i, tmpdirname, nb_to_py_mapping, project_root) for i in root_dirs)
 
 
 def _get_mtimes(arg: Path) -> Set[float]:
@@ -304,7 +342,7 @@ def _run_command(
     command: str,
     tmpdirname: str,
     cmd_args: List[str],
-    arg: Path,
+    args: Iterator[Path],
 ) -> Tuple[str, str, int, bool]:
     """
     Run third-party tool against given file or directory.
@@ -317,8 +355,8 @@ def _run_command(
         Temporary directory where converted notebooks will be stored.
     cmd_args
         Flags to pass to third-party tool (e.g. :code:`--verbose`).
-    arg
-        Notebook, or directory of notebooks, third-party tool is being run on.
+    args
+        Notebooks, or directories of notebooks, third-party tool is being run on.
 
     Returns
     -------
@@ -340,18 +378,17 @@ def _run_command(
     env[
         "PYTHONPATH"
     ] = f"{env.get('PYTHONPATH', '').rstrip(os.pathsep)}{os.pathsep}{os.getcwd()}"
-
-    before = [_get_mtimes(i) for i in arg]
+    before = [_get_mtimes(i) for i in args]
 
     output = subprocess.run(
-        [sys.executable, "-m", command, ' '.join(str(i) for i in arg), *cmd_args],
+        [sys.executable, "-m", command, *(str(i) for i in args), *cmd_args],
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         cwd=tmpdirname,
         env=env,
     )
 
-    mutated = [_get_mtimes(i) for i in arg] != before
+    mutated = [_get_mtimes(i) for i in args] != before
 
     output_code = output.returncode
 
@@ -427,8 +464,6 @@ def _run_on_one_root_dir(
 
     Parameters
     ----------
-    root_dir
-        Directory on which nbqa should be run
     cli_args
         Commanline arguments passed to nbqa.
     configs
@@ -479,7 +514,9 @@ def _run_on_one_root_dir(
             cli_args.command,
             tmpdirname,
             configs.nbqa_addopts,
-            nb_to_py_mapping.values(),
+            _get_all_args(
+                cli_args.root_dirs, tmpdirname, nb_to_py_mapping, project_root
+            ),
         )
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
