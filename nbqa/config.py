@@ -140,6 +140,7 @@ class Configs:
             Configuration passed via command line arguments.
         """
         config: Configs = Configs()
+
         config.set_config(
             CONFIG_SECTIONS.ADDOPTS,
             cli_args.nbqa_addopts + get_default_configs()[cli_args.command],
