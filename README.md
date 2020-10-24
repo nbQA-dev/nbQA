@@ -128,7 +128,7 @@ See [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.
 
 ## 💬 Testimonials
 
-**Michael Kennedy & Brian Okken** [hosts of the Python Bytes podcast](https://pythonbytes.fm/)
+**Michael Kennedy & Brian Okken**, [hosts of the Python Bytes podcast](https://pythonbytes.fm/)
 > This is really cool. I think it brings so much of the code formatting and code analysis, clean up to notebooks, which I think had been really lacking
 
 **Alex Andorra**,
