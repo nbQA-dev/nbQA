@@ -25,7 +25,7 @@ CONFIG_SECTIONS = _ConfigSections()
 
 try:
     ISORT_MODULE: Optional[ModuleType] = import_module("isort")
-except ImportError:
+except ImportError:  # pragma: nocover (this case is tested in test_isort_works.py)
     ISORT_MODULE = None
 
 

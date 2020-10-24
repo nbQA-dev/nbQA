@@ -145,7 +145,7 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: Path) ->
 
 
 def test_old_isort_separated_imports(
-    capsys: "CaptureFixture", monkeypatch: "MonkeyPatch"
+    tmp_test_data: Path, capsys: "CaptureFixture", monkeypatch: "MonkeyPatch"
 ) -> None:
     """
     Check isort works when a notebook has imports in different cells.
@@ -154,22 +154,35 @@ def test_old_isort_separated_imports(
 
     Parameters
     ----------
+    tmp_test_data
+        Temporary copy of test data.
     capsys
         Pytest fixture to capture stdout and stderr.
     monkeypatch
         Pytest fixture, we use it to override isort's version.
     """
-    notebook = "notebook_with_separated_imports_other.ipynb"
+    notebook = tmp_test_data / "notebook_with_separated_imports_other.ipynb"
 
-    path = os.path.abspath(os.path.join("tests", "data", notebook))
+    with open(notebook) as handle:
+        before = handle.readlines()
     with pytest.raises(SystemExit):
-        main(["isort", path, "--check-only"])
-    out, _ = capsys.readouterr()
-    assert out == ""
+        main(["isort", str(notebook), "--nbqa-mutate"])
+    with open(notebook) as handle:
+        after = handle.readlines()
+    assert before == after
 
     monkeypatch.setattr("nbqa.config.ISORT_MODULE.__version__", "4.3.21")
-    path = os.path.abspath(os.path.join("tests", "data", notebook))
+    with open(notebook) as handle:
+        before = handle.readlines()
     with pytest.raises(SystemExit):
-        main(["isort", path, "--check-only"])
-    out, _ = capsys.readouterr()
-    assert "Imports are incorrectly sorted" in out
+        main(["isort", str(notebook), "--nbqa-mutate"])
+    with open(notebook) as handle:
+        after = handle.readlines()
+    assert before != after
+
+    # Check nbqa still works if there is no isort installed.
+    monkeypatch.setattr("nbqa.config.ISORT_MODULE", None)
+    with pytest.raises(SystemExit):
+        main(["black", str(notebook)])
+    _, err = capsys.readouterr()
+    assert "1 file left unchanged" in err
