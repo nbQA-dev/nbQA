@@ -40,7 +40,7 @@
   - [🚀 Examples](#-examples)
     - [Command-line](#command-line)
     - [Pre-commit](#pre-commit)
-  - [Used by](#used-by)
+  - [🥳 Used by](#-used-by)
   - [💬 Testimonials](#-testimonials)
   - [👥 Contributing](#-contributing)
 
@@ -119,7 +119,9 @@ for details)
 
 See [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html) for how to set up your own custom hook!
 
-## Used by
+## 🥳 Used by
+
+Take some inspiration from their config files 😉
 
 - **PyMC3**: [pyproject.toml](https://github.com/pymc-devs/pymc3/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/pymc-devs/pymc3/blob/master/.pre-commit-config.yaml)
 - **pandas-profiling** [.pre-commit-config.yaml](https://github.com/pandas-profiling/pandas-profiling/blob/develop/.pre-commit-config.yaml)
