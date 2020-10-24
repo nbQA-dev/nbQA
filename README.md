@@ -41,7 +41,6 @@
     - [Pre-commit](#pre-commit)
   - [🎉 Installation](#-installation)
   - [🔧 Configuration](#-configuration)
-  - [👷 Pre-commit](#-pre-commit)
   - [💬 Testimonials](#-testimonials)
   - [👥 Contributing](#-contributing)
 
@@ -108,6 +107,8 @@ Here's an example of how to set up some pre-commit hooks:
        - id: nbqa-isort
    ```
 
+See [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html) for how to set up your own custom hook!
+
 ## 🎉 Installation
 
 Install `nbqa` in your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/) with [pip](https://pip.pypa.io):
@@ -121,10 +122,6 @@ python -m pip install -U nbqa
 You can configure `nbqa` either at the command line, or by using a `pyproject.toml` file - see
 [configuration](https://nbqa.readthedocs.io/en/latest/configuration.html)
 for details and examples.
-
-## 👷 Pre-commit
-
-See [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html) for examples.
 
 ## 💬 Testimonials
 
