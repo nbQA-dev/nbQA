@@ -33,15 +33,21 @@
     </a>
 </p>
 
-## 🎉 Installation
+# Table of contents
 
-Install `nbqa` in your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/) with [pip](https://pip.pypa.io):
-
-```bash
-python -m pip install -U nbqa
-```
+- [Table of contents](#table-of-contents)
+  - [🚀 Examples](#-examples)
+    - [Command-line](#command-line)
+    - [Pre-commit](#pre-commit)
+  - [🎉 Installation](#-installation)
+  - [🔧 Configuration](#-configuration)
+  - [👷 Pre-commit](#-pre-commit)
+  - [💬 Testimonials](#-testimonials)
+  - [👥 Contributing](#-contributing)
 
 ## 🚀 Examples
+
+### Command-line
 
 Reformat your notebooks with
 [black](https://black.readthedocs.io/en/stable/):
@@ -105,6 +111,46 @@ Perform static code analysis with [pylint](https://www.pylint.org/):
 ```console
 $ nbqa pylint my_notebook.ipynb --disable=C0114
 my_notebook.ipynb:cell_1:5:0: W0611: Unused import datetime (unused-import)
+```
+
+### Pre-commit
+
+Here's an example of how to set up some pre-commit hooks:
+
+1. Put this in your `pyproject.toml` file
+
+   ```toml
+   [tool.nbqa.config]
+   isort = "setup.cfg"
+   black = "pyproject.toml"
+
+   [tool.nbqa.mutate]
+   isort = 1
+   black = 1
+   pyupgrade = 1
+
+   [tool.nbqa.addopts]
+   isort = ["--treat-comment-as-code", "# %%"]
+   pyupgrade = ["--py36-plus"]
+   ```
+
+2. Put this in your `.pre-commit-config.yaml` file
+
+   ```yaml
+   - repo: https://github.com/nbQA-dev/nbQA
+     rev: 0.3.4
+     hooks:
+       - id: nbqa-black
+       - id: nbqa-pyupgrade
+       - id: nbqa-isort
+   ```
+
+## 🎉 Installation
+
+Install `nbqa` in your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/) with [pip](https://pip.pypa.io):
+
+```bash
+python -m pip install -U nbqa
 ```
 
 ## 🔧 Configuration
