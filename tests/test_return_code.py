@@ -34,7 +34,7 @@ def test_flake8_return_code() -> None:
 
 
 def test_pylint_return_code() -> None:
-    """Check pylint returns 0 if it passes, 1 otherwise."""
+    """Check pylint returns 0 if it passes, 20 otherwise."""
     pylint_runner = partial(_run_nbqa_with, "pylint")
     assert pylint_runner([DIRTY_NOTEBOOK]) == PYLINT_FAILED
     assert pylint_runner([CLEAN_NOTEBOOK], "--disable=C0114") == PASSED
