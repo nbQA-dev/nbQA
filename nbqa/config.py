@@ -3,7 +3,8 @@
 from collections import defaultdict
 from importlib import import_module
 from shlex import split
-from typing import Any, Callable, ClassVar, Dict, List, NamedTuple, Optional
+from types import ModuleType
+from typing import Any, Callable, ClassVar, Dict, List, Mapping, NamedTuple, Optional
 
 from pkg_resources import parse_version
 
@@ -21,15 +22,30 @@ class _ConfigSections(NamedTuple):  # pylint: disable=R0903
 
 CONFIG_SECTIONS = _ConfigSections()
 
-DEFAULT_CONFIGS = defaultdict(lambda: [])
 
 try:
-    isort_module = import_module("isort")
-    version = parse_version(isort_module.__version__)  # type: ignore
-    if version >= parse_version("5.3.0"):
-        DEFAULT_CONFIGS["isort"] = ["--treat-comment-as-code", "# %%"]
+    ISORT_MODULE: Optional[ModuleType] = import_module("isort")
 except ImportError:
-    pass
+    ISORT_MODULE = None
+
+
+def get_default_configs() -> Mapping[str, List[str]]:
+    """
+    Get default CLI args (if any) to call command with.
+
+    In the case of isort, we use ``--treat-comment-as-code '# %%'``.
+
+    Returns
+    -------
+    Mapping
+        Default configs for each code quality tool.
+    """
+    default_configs = defaultdict(lambda: [])
+    if ISORT_MODULE is not None:
+        version = parse_version(ISORT_MODULE.__version__)  # type: ignore
+        if version >= parse_version("5.3.0"):
+            default_configs["isort"] = ["--treat-comment-as-code", "# %%"]
+    return default_configs
 
 
 class Configs:
@@ -124,10 +140,9 @@ class Configs:
             Configuration passed via command line arguments.
         """
         config: Configs = Configs()
-
         config.set_config(
             CONFIG_SECTIONS.ADDOPTS,
-            cli_args.nbqa_addopts + DEFAULT_CONFIGS[cli_args.command],
+            cli_args.nbqa_addopts + get_default_configs()[cli_args.command],
         )
         config.set_config(CONFIG_SECTIONS.CONFIG, cli_args.nbqa_config)
         config.set_config(CONFIG_SECTIONS.IGNORE_CELLS, cli_args.nbqa_ignore_cells)

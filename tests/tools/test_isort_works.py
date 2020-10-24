@@ -11,6 +11,7 @@ from nbqa.__main__ import main
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
+    from _pytest.monkeypatch import MonkeyPatch
 
 
 def test_isort_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> None:
@@ -143,37 +144,32 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: Path) ->
     assert result == expected
 
 
-# def test_old_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> None:
-#     """
-#     Check isort works when a notebook has imports in different cells.
+def test_old_isort_separated_imports(
+    capsys: "CaptureFixture", monkeypatch: "MonkeyPatch"
+) -> None:
+    """
+    Check isort works when a notebook has imports in different cells.
 
-#     We will not pass --treat-comment-as-code '# %%' as this is an old version of isort.
+    We will not pass --treat-comment-as-code '# %%' in old version of isort.
 
-#     Parameters
-#     ----------
-#     notebook
-#         Notebook to run ``nbqa isort`` on.
-#     capsys
-#         Pytest fixture to capture stdout and stderr.
-#     """
-#     Path("setup.cfg").write_text(
-#         dedent(
-#             """\
-#             [nbqa.isort]
-#             addopts = --treat-comment-as-code "# %%%%"
-#             """
-#         )
-#     )
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    monkeypatch
+        Pytest fixture, we use it to override isort's version.
+    """
+    notebook = "notebook_with_separated_imports_other.ipynb"
 
-#     path = os.path.abspath(os.path.join("tests", "data", notebook))
-#     with pytest.raises(SystemExit):
-#         main(["isort", path, "--nbqa-mutate"])
+    path = os.path.abspath(os.path.join("tests", "data", notebook))
+    with pytest.raises(SystemExit):
+        main(["isort", path, "--check-only"])
+    out, _ = capsys.readouterr()
+    assert out == ""
 
-#     Path("setup.cfg").unlink()
-
-#     # check out and err
-#     out, err = capsys.readouterr()
-#     expected_out = ""
-#     expected_err = ""
-#     assert out == expected_out
-#     assert err == expected_err
+    monkeypatch.setattr("nbqa.config.ISORT_MODULE.__version__", "4.3.21")
+    path = os.path.abspath(os.path.join("tests", "data", notebook))
+    with pytest.raises(SystemExit):
+        main(["isort", path, "--check-only"])
+    out, _ = capsys.readouterr()
+    assert "Imports are incorrectly sorted" in out
