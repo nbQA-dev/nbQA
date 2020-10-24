@@ -40,7 +40,7 @@
   - [🚀 Examples](#-examples)
     - [Command-line](#command-line)
     - [Pre-commit](#pre-commit)
-  - [🔧 Configuration](#-configuration)
+  - [Used by](#used-by)
   - [💬 Testimonials](#-testimonials)
   - [👥 Contributing](#-contributing)
 
@@ -87,7 +87,9 @@ See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html)
 
 Here's an example of how to set up some pre-commit hooks:
 
-1. Put this in your `pyproject.toml` file
+1. Put this in your `pyproject.toml` file (see
+[configuration](https://nbqa.readthedocs.io/en/latest/configuration.html)
+for details)
 
    ```toml
    [tool.nbqa.config]
@@ -117,13 +119,17 @@ Here's an example of how to set up some pre-commit hooks:
 
 See [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html) for how to set up your own custom hook!
 
-## 🔧 Configuration
+## Used by
 
-You can configure `nbqa` either at the command line, or by using a `pyproject.toml` file - see
-[configuration](https://nbqa.readthedocs.io/en/latest/configuration.html)
-for details and examples.
+**PyMC3**: [pyproject.toml](https://github.com/pymc-devs/pymc3/blob/master/pyproject.toml), [.pre-commit-config.yaml](https://github.com/pymc-devs/pymc3/blob/master/.pre-commit-config.yaml)
+**pandas-profiling** [.pre-commit-config.yaml](https://github.com/pandas-profiling/pandas-profiling/blob/develop/.pre-commit-config.yaml)
+**alibi** [.pre-commit-config.yaml](https://github.com/SeldonIO/alibi/blob/master/.pre-commit-config.yaml)
+**NLP Profiler**: [pyproject.toml](https://github.com/neomatrix369/nlp_profiler/blob/master/pyproject.toml), [.pre-commit-config.yaml](https://github.com/neomatrix369/nlp_profiler/blob/master/.pre-commit-config.yaml)
 
 ## 💬 Testimonials
+
+**Michael Kennedy & Brian Okken** [hosts of the Python Bytes podcast](https://pythonbytes.fm/)
+> This is really cool. I think it brings so much of the code formatting and code analysis, clean up to notebooks, which I think had been really lacking
 
 **Alex Andorra**,
 [Data Scientist, ArviZ & PyMC Dev, Host of 'Learning Bayesian Statistics' Podcast 🎙️](https://learnbayesstats.anvil.app/):
