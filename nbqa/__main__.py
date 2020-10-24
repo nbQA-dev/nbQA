@@ -296,7 +296,7 @@ def _get_all_args(
     tmpdirname: str,
     nb_to_py_mapping: Dict[Path, Path],
     project_root: Path,
-) -> Iterator[Path]:
+) -> List[Path]:
     """
     Get all arguments to run command against.
 
@@ -313,10 +313,10 @@ def _get_all_args(
 
     Returns
     -------
-    Path
+    List[Path]
         All notebooks or directories to run third-party tool against.
     """
-    return (_get_arg(i, tmpdirname, nb_to_py_mapping, project_root) for i in root_dirs)
+    return [_get_arg(i, tmpdirname, nb_to_py_mapping, project_root) for i in root_dirs]
 
 
 def _get_mtimes(arg: Path) -> Set[float]:
@@ -342,7 +342,7 @@ def _run_command(
     command: str,
     tmpdirname: str,
     cmd_args: List[str],
-    args: Iterator[Path],
+    args: List[Path],
 ) -> Tuple[str, str, int, bool]:
     """
     Run third-party tool against given file or directory.
