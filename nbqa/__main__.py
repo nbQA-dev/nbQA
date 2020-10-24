@@ -29,7 +29,7 @@ BASE_ERROR_MESSAGE = dedent(
 )
 
 
-def _get_notebooks(root_dir: str) -> Iterator[Path]:
+def _get_notebooks(root_dir: List[str]) -> Iterator[Path]:
     """
     Get generator with all notebooks in directory.
 
@@ -48,6 +48,9 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
     return (
         i for i in Path(root_dir).rglob("*.ipynb") if ".ipynb_checkpoints" not in str(i)
     )
+
+def _get_all_notebooks(root_dir):
+    return (j for i in root_dir for j in _get_notebooks(i))
 
 
 def _temp_python_file_for_notebook(
@@ -268,11 +271,14 @@ def _get_arg(
     'tmpdir/my_notebook.py'
     """
     if Path(root_dir).is_dir():
-        arg = Path(tmpdirname) / Path(root_dir).resolve().relative_to(project_root)
+        arg = [Path(tmpdirname) / Path(root_dir).resolve().relative_to(project_root)]
     else:
-        assert len(nb_to_py_mapping) == 1
-        arg = next(iter(nb_to_py_mapping.values()))
+        arg = list(nb_to_py_mapping.values())
     return arg
+
+def _get_all_args(root_dirs, tmpdirname, nb_to_py_mapping, project_root):
+    breakpoint()
+    return ' '.join(_get_arg(i, tmpdirname, nb_to_py_mapping, project_root) for i in root_dirs)
 
 
 def _get_mtimes(arg: Path) -> Set[float]:
@@ -335,17 +341,17 @@ def _run_command(
         "PYTHONPATH"
     ] = f"{env.get('PYTHONPATH', '').rstrip(os.pathsep)}{os.pathsep}{os.getcwd()}"
 
-    before = _get_mtimes(arg)
+    before = [_get_mtimes(i) for i in arg]
 
     output = subprocess.run(
-        [sys.executable, "-m", command, str(arg), *cmd_args],
+        [sys.executable, "-m", command, ' '.join(str(i) for i in arg), *cmd_args],
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         cwd=tmpdirname,
         env=env,
     )
 
-    mutated = _get_mtimes(arg) != before
+    mutated = [_get_mtimes(i) for i in arg] != before
 
     output_code = output.returncode
 
@@ -414,7 +420,7 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
 
 
 def _run_on_one_root_dir(
-    root_dir: str, cli_args: CLIArgs, configs: Configs, project_root: Path
+    cli_args: CLIArgs, configs: Configs, project_root: Path
 ) -> int:
     """
     Run third-party tool on a single notebook or directory.
@@ -447,7 +453,7 @@ def _run_on_one_root_dir(
 
         nb_to_py_mapping = {
             notebook: _temp_python_file_for_notebook(notebook, tmpdirname, project_root)
-            for notebook in _get_notebooks(root_dir)
+            for notebook in _get_all_notebooks(cli_args.root_dirs)
         }
 
         _preserve_config_files(configs.nbqa_config, tmpdirname, project_root)
@@ -473,7 +479,7 @@ def _run_on_one_root_dir(
             cli_args.command,
             tmpdirname,
             configs.nbqa_addopts,
-            _get_arg(root_dir, tmpdirname, nb_to_py_mapping, project_root),
+            nb_to_py_mapping.values(),
         )
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
@@ -548,12 +554,9 @@ def main(raw_args: Optional[List[str]] = None) -> None:
 
     _check_command_is_installed(cli_args.command)
 
-    output_codes = [
-        _run_on_one_root_dir(i, cli_args, configs, project_root)
-        for i in cli_args.root_dirs
-    ]
+    output_code = _run_on_one_root_dir(cli_args, configs, project_root)
 
-    sys.exit(int(any(output_codes)))
+    sys.exit(output_code)
 
 
 if __name__ == "__main__":
