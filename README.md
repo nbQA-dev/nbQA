@@ -50,7 +50,7 @@ In your [virtual environment](https://realpython.com/python-virtual-environments
 
 - `python -m pip install -U nbqa` (standard installation)
 - `python -m pip install -U nbqa[toolchain]` (install supported code quality tools as well)
-- `conda install -c conda-forge nbqa`
+- `conda install -c conda-forge nbqa` (if you use conda)
 
 ## 🚀 Examples
 
