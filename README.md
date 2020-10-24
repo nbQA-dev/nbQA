@@ -73,7 +73,7 @@ $ nbqa pyupgrade my_notebook.ipynb --py36-plus --nbqa-mutate
 Rewriting my_notebook.ipynb
 ```
 
-See [examples](https://nbqa.readthedocs.io/en/latest/examples.html) for examples involving [pylint](https://www.pylint.org/), [flake8](https://flake8.pycqa.org/en/latest/),
+See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html) for examples involving [pylint](https://www.pylint.org/), [flake8](https://flake8.pycqa.org/en/latest/),
 [doctest](https://docs.python.org/3/library/doctest.html), and [mypy](http://mypy-lang.org/).
 
 ### Pre-commit
