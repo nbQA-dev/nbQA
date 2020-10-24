@@ -46,11 +46,11 @@
 
 ## 🎉 Installation
 
-Install `nbqa` in your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/) with [pip](https://pip.pypa.io):
+In your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/), run one of the following:
 
-```bash
-python -m pip install -U nbqa
-```
+- `python -m pip install -U nbqa` (standard installation)
+- `python -m pip install -U nbqa[toolchain]` (install supported code quality tools as well)
+- `conda install -c conda-forge nbqa`
 
 ## 🚀 Examples
 
