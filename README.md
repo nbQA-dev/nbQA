@@ -36,13 +36,21 @@
 # Table of contents
 
 - [Table of contents](#table-of-contents)
+  - [🎉 Installation](#-installation)
   - [🚀 Examples](#-examples)
     - [Command-line](#command-line)
     - [Pre-commit](#pre-commit)
-  - [🎉 Installation](#-installation)
   - [🔧 Configuration](#-configuration)
   - [💬 Testimonials](#-testimonials)
   - [👥 Contributing](#-contributing)
+
+## 🎉 Installation
+
+Install `nbqa` in your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/) with [pip](https://pip.pypa.io):
+
+```bash
+python -m pip install -U nbqa
+```
 
 ## 🚀 Examples
 
@@ -108,14 +116,6 @@ Here's an example of how to set up some pre-commit hooks:
    ```
 
 See [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html) for how to set up your own custom hook!
-
-## 🎉 Installation
-
-Install `nbqa` in your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/) with [pip](https://pip.pypa.io):
-
-```bash
-python -m pip install -U nbqa
-```
 
 ## 🔧 Configuration
 
