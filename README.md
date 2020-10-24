@@ -40,17 +40,17 @@
   - [🚀 Examples](#-examples)
     - [Command-line](#command-line)
     - [Pre-commit](#pre-commit)
-  - [🔧 Configuration](#-configuration)
+  - [🥳 Used by](#-used-by)
   - [💬 Testimonials](#-testimonials)
   - [👥 Contributing](#-contributing)
 
 ## 🎉 Installation
 
-Install `nbqa` in your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/) with [pip](https://pip.pypa.io):
+In your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/), run one of the following:
 
-```bash
-python -m pip install -U nbqa
-```
+- `python -m pip install -U nbqa` (minimal installation)
+- `python -m pip install -U nbqa[toolchain]` (install supported code quality tools as well)
+- `conda install -c conda-forge nbqa` (if you use conda)
 
 ## 🚀 Examples
 
@@ -87,7 +87,9 @@ See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html)
 
 Here's an example of how to set up some pre-commit hooks:
 
-1. Put this in your `pyproject.toml` file
+1. Put this in your `pyproject.toml` file (see
+[configuration](https://nbqa.readthedocs.io/en/latest/configuration.html)
+for details)
 
    ```toml
    [tool.nbqa.config]
@@ -104,7 +106,7 @@ Here's an example of how to set up some pre-commit hooks:
    pyupgrade = ["--py36-plus"]
    ```
 
-2. Put this in your `.pre-commit-config.yaml` file
+2. Put this in your `.pre-commit-config.yaml` file (see [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html))
 
    ```yaml
    - repo: https://github.com/nbQA-dev/nbQA
@@ -115,15 +117,19 @@ Here's an example of how to set up some pre-commit hooks:
        - id: nbqa-isort
    ```
 
-See [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html) for how to set up your own custom hook!
+## 🥳 Used by
 
-## 🔧 Configuration
+Take some inspiration from their config files 😉
 
-You can configure `nbqa` either at the command line, or by using a `pyproject.toml` file - see
-[configuration](https://nbqa.readthedocs.io/en/latest/configuration.html)
-for details and examples.
+- **PyMC3**: [pyproject.toml](https://github.com/pymc-devs/pymc3/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/pymc-devs/pymc3/blob/master/.pre-commit-config.yaml)
+- **pandas-profiling** [.pre-commit-config.yaml](https://github.com/pandas-profiling/pandas-profiling/blob/develop/.pre-commit-config.yaml)
+- **alibi** [.pre-commit-config.yaml](https://github.com/SeldonIO/alibi/blob/master/.pre-commit-config.yaml)
+- **NLP Profiler**: [pyproject.toml](https://github.com/neomatrix369/nlp_profiler/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/neomatrix369/nlp_profiler/blob/master/.pre-commit-config.yaml)
 
 ## 💬 Testimonials
+
+**Michael Kennedy & Brian Okken**, [hosts of the Python Bytes podcast](https://pythonbytes.fm/)
+> This is really cool. I think it brings so much of the code formatting and code analysis, clean up to notebooks, which I think had been really lacking
 
 **Alex Andorra**,
 [Data Scientist, ArviZ & PyMC Dev, Host of 'Learning Bayesian Statistics' Podcast 🎙️](https://learnbayesstats.anvil.app/):
