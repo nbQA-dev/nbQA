@@ -141,9 +141,10 @@ class Configs:
         """
         config: Configs = Configs()
 
+        addopts = cli_args.nbqa_addopts + get_default_configs()[cli_args.command]
         config.set_config(
             CONFIG_SECTIONS.ADDOPTS,
-            cli_args.nbqa_addopts + get_default_configs()[cli_args.command],
+            addopts,
         )
         config.set_config(CONFIG_SECTIONS.CONFIG, cli_args.nbqa_config)
         config.set_config(CONFIG_SECTIONS.IGNORE_CELLS, cli_args.nbqa_ignore_cells)
