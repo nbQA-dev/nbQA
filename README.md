@@ -6,7 +6,7 @@
 </h1>
 
 <h3 align="center">
-	A tool (and pre-commit hook) to run any standard Python code-quality tool on a Jupyter notebook.
+	Run any standard Python code quality tool on a Jupyter Notebook
 </h3>
 
 [![image](https://github.com/nbQA-dev/nbQA/workflows/tox/badge.svg)](https://github.com/nbQA-dev/nbQA/actions?workflow=tox)
