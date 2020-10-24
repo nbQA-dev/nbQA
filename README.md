@@ -1,22 +1,37 @@
-<img src="https://github.com/nbQA-dev/nbQA/raw/master/assets/logo.png" alt="logo" width="400"/>
+<h1 align="center">
+	<img
+		width="400"
+		alt="nbQA"
+		src="https://github.com/nbQA-dev/nbQA/raw/master/assets/logo.png">
+</h1>
 
-# nbQA
+<h3 align="center">
+	Run any standard Python code quality tool on a Jupyter Notebook
+</h3>
 
-[![image](https://github.com/nbQA-dev/nbQA/workflows/tox/badge.svg)](https://github.com/nbQA-dev/nbQA/actions?workflow=tox)
-[![image](https://codecov.io/gh/nbQA-dev/nbQA/branch/master/graph/badge.svg)](https://codecov.io/gh/nbQA-dev/nbQA)
-[![image](https://readthedocs.org/projects/nbqa/badge/?version=latest)](https://nbqa.readthedocs.io/en/latest/)
-[![image](https://img.shields.io/pypi/pyversions/nbqa.svg)](https://pypi.org/project/nbqa/)
-[![image](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-[![image](https://img.shields.io/pypi/dm/nbqa.svg?label=pypi%20downloads&logo=PyPI&logoColor=white)](https://pypistats.org/packages/nbqa)
-[![image](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/nbQA/nbQA)
+<p align="center">
+	<a href="https://github.com/nbQA-dev/nbQA/actions?workflow=tox"><img
+		alt="tox"
+		src="https://github.com/nbQA-dev/nbQA/workflows/tox/badge.svg"></a>
+	<a href="https://codecov.io/gh/nbQA-dev/nbQA"><img
+		alt="codecov"
+		src="https://codecov.io/gh/nbQA-dev/nbQA/branch/master/graph/badge.svg"></a>
+	<a href="https://pypi.org/project/nbqa/"><img
+		alt="versions"
+		src="https://img.shields.io/pypi/pyversions/nbqa.svg"></a>
+	<a href="https://github.com/pre-commit/pre-commit"><img
+		alt="pre-commit"
+		src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white"></a>
+	<a href="https://gitter.im/nbQA/nbQA"><img
+		alt="chat"
+		src="https://badges.gitter.im/Join%20Chat.svg"></a>
+</p>
 
 <p align="center">
     <a href="#readme">
         <img alt="demo" src="https://raw.githubusercontent.com/nbQA-dev/nbQA-demo/master/demo.gif">
     </a>
 </p>
-
-A tool (and pre-commit hook) to run any standard Python code-quality tool on a Jupyter notebook.
 
 ## 🎉 Installation
 
