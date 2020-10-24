@@ -121,10 +121,10 @@ See [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.
 
 ## Used by
 
-- **PyMC3**: [pyproject.toml](https://github.com/pymc-devs/pymc3/blob/master/pyproject.toml), [.pre-commit-config.yaml](https://github.com/pymc-devs/pymc3/blob/master/.pre-commit-config.yaml)
+- **PyMC3**: [pyproject.toml](https://github.com/pymc-devs/pymc3/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/pymc-devs/pymc3/blob/master/.pre-commit-config.yaml)
 - **pandas-profiling** [.pre-commit-config.yaml](https://github.com/pandas-profiling/pandas-profiling/blob/develop/.pre-commit-config.yaml)
 - **alibi** [.pre-commit-config.yaml](https://github.com/SeldonIO/alibi/blob/master/.pre-commit-config.yaml)
-- **NLP Profiler**: [pyproject.toml](https://github.com/neomatrix369/nlp_profiler/blob/master/pyproject.toml), [.pre-commit-config.yaml](https://github.com/neomatrix369/nlp_profiler/blob/master/.pre-commit-config.yaml)
+- **NLP Profiler**: [pyproject.toml](https://github.com/neomatrix369/nlp_profiler/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/neomatrix369/nlp_profiler/blob/master/.pre-commit-config.yaml)
 
 ## 💬 Testimonials
 
