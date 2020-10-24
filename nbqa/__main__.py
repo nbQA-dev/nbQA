@@ -378,6 +378,7 @@ def _run_command(
     env[
         "PYTHONPATH"
     ] = f"{env.get('PYTHONPATH', '').rstrip(os.pathsep)}{os.pathsep}{os.getcwd()}"
+
     before = [_get_mtimes(i) for i in args]
 
     output = subprocess.run(
