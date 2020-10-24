@@ -33,6 +33,17 @@
     </a>
 </p>
 
+# Table of contents
+
+- [Table of contents](#table-of-contents)
+  - [🎉 Installation](#-installation)
+  - [🚀 Examples](#-examples)
+    - [Command-line](#command-line)
+    - [Pre-commit](#pre-commit)
+  - [🔧 Configuration](#-configuration)
+  - [💬 Testimonials](#-testimonials)
+  - [👥 Contributing](#-contributing)
+
 ## 🎉 Installation
 
 Install `nbqa` in your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/) with [pip](https://pip.pypa.io):
@@ -42,6 +53,8 @@ python -m pip install -U nbqa
 ```
 
 ## 🚀 Examples
+
+### Command-line
 
 Reformat your notebooks with
 [black](https://black.readthedocs.io/en/stable/):
@@ -60,39 +73,6 @@ $ nbqa isort my_notebook.ipynb --treat-comment-as-code '# %%' --nbqa-mutate
 Fixing my_notebook.ipynb
 ```
 
-Check your type annotations with [mypy](http://mypy-lang.org/):
-
-```console
-$ nbqa mypy my_notebook.ipynb --ignore-missing-imports
-my_notebook.ipynb:cell_10:5: error: Argument "num1" to "add" has incompatible type "str"; expected "int"
-```
-
-Run your docstring tests with
-[doctest](https://docs.python.org/3/library/doctest.html):
-
-```console
-$ nbqa doctest my_notebook.ipynb
-**********************************************************************
-File "my_notebook.ipynb", cell_2:11, in my_notebook.add
-Failed example:
-    add(2, 2)
-Expected:
-    4
-Got:
-    5
-**********************************************************************
-1 items had failures:
-1 of   2 in my_notebook.hello
-***Test Failed*** 1 failures.
-```
-
-Check for style guide enforcement with [flake8](https://flake8.pycqa.org/en/latest/):
-
-```console
-$ nbqa flake8 my_notebook.ipynb --extend-ignore=E203,E302,E305,E703
-my_notebook.ipynb:cell_3:1:1: F401 'import pandas as pd' imported but unused
-```
-
 Upgrade your syntax with [pyupgrade](https://github.com/asottile/pyupgrade):
 
 ```console
@@ -100,22 +80,48 @@ $ nbqa pyupgrade my_notebook.ipynb --py36-plus --nbqa-mutate
 Rewriting my_notebook.ipynb
 ```
 
-Perform static code analysis with [pylint](https://www.pylint.org/):
+See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html) for examples involving [pylint](https://www.pylint.org/), [flake8](https://flake8.pycqa.org/en/latest/),
+[doctest](https://docs.python.org/3/library/doctest.html), and [mypy](http://mypy-lang.org/).
 
-```console
-$ nbqa pylint my_notebook.ipynb --disable=C0114
-my_notebook.ipynb:cell_1:5:0: W0611: Unused import datetime (unused-import)
-```
+### Pre-commit
+
+Here's an example of how to set up some pre-commit hooks:
+
+1. Put this in your `pyproject.toml` file
+
+   ```toml
+   [tool.nbqa.config]
+   isort = "setup.cfg"
+   black = "pyproject.toml"
+
+   [tool.nbqa.mutate]
+   isort = 1
+   black = 1
+   pyupgrade = 1
+
+   [tool.nbqa.addopts]
+   isort = ["--treat-comment-as-code", "# %%"]
+   pyupgrade = ["--py36-plus"]
+   ```
+
+2. Put this in your `.pre-commit-config.yaml` file
+
+   ```yaml
+   - repo: https://github.com/nbQA-dev/nbQA
+     rev: 0.3.4
+     hooks:
+       - id: nbqa-black
+       - id: nbqa-pyupgrade
+       - id: nbqa-isort
+   ```
+
+See [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html) for how to set up your own custom hook!
 
 ## 🔧 Configuration
 
 You can configure `nbqa` either at the command line, or by using a `pyproject.toml` file - see
 [configuration](https://nbqa.readthedocs.io/en/latest/configuration.html)
 for details and examples.
-
-## 👷 Pre-commit
-
-See [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html) for examples.
 
 ## 💬 Testimonials
 

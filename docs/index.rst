@@ -10,6 +10,7 @@ nbQA
 
    readme
    tutorial
+   examples
    configuration
    pre-commit
    history
