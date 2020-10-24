@@ -6,7 +6,7 @@
 </h1>
 
 <h3 align="center">
-	nbQA
+	A tool (and pre-commit hook) to run any standard Python code-quality tool on a Jupyter notebook.
 </h3>
 
 [![image](https://github.com/nbQA-dev/nbQA/workflows/tox/badge.svg)](https://github.com/nbQA-dev/nbQA/actions?workflow=tox)
@@ -22,8 +22,6 @@
         <img alt="demo" src="https://raw.githubusercontent.com/nbQA-dev/nbQA-demo/master/demo.gif">
     </a>
 </p>
-
-A tool (and pre-commit hook) to run any standard Python code-quality tool on a Jupyter notebook.
 
 ## 🎉 Installation
 
