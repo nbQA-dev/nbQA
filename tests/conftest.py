@@ -47,7 +47,7 @@ def tmp_setupcfg(tmpdir: "LocalPath") -> Iterator[None]:
     shutil.copy(str(temp_file), str(filename))
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def tmp_notebook_for_testing(tmpdir: "LocalPath") -> Iterator[Path]:
     """
     Make temporary copy of test notebook before it's operated on, then revert it.
