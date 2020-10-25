@@ -1,5 +1,5 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
-
+from collections import defaultdict
 import os
 import re
 import shutil
@@ -17,7 +17,7 @@ from nbqa.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 
-CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
+CONFIG_FILES = defaultdict(lambda: ["setup.cfg", "tox.ini", "pyproject.toml"])
 
 BASE_ERROR_MESSAGE = dedent(
     """
