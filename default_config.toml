@@ -1,8 +1,0 @@
-[addopts]
-isort=["--treat-comment-as-code", "# %%"]
-
-[ignore_cells]
-
-[mutate]
-
-[config]
