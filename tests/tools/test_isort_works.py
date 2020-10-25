@@ -144,45 +144,45 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: Path) ->
     assert result == expected
 
 
-def test_old_isort_separated_imports(
-    tmp_test_data: Path, capsys: "CaptureFixture", monkeypatch: "MonkeyPatch"
-) -> None:
-    """
-    Check isort works when a notebook has imports in different cells.
+# def test_old_isort_separated_imports(
+#     tmp_test_data: Path, capsys: "CaptureFixture", monkeypatch: "MonkeyPatch"
+# ) -> None:
+#     """
+#     Check isort works when a notebook has imports in different cells.
 
-    We will not pass --treat-comment-as-code '# %%' in old version of isort.
+#     This test would fail if we didn't pass --treat-comment-as-code '# %%'.
 
-    Parameters
-    ----------
-    tmp_test_data
-        Temporary copy of test data.
-    capsys
-        Pytest fixture to capture stdout and stderr.
-    monkeypatch
-        Pytest fixture, we use it to override isort's version.
-    """
-    notebook = tmp_test_data / "notebook_with_separated_imports_other.ipynb"
+#     Parameters
+#     ----------
+#     tmp_test_data
+#         Temporary copy of test data.
+#     capsys
+#         Pytest fixture to capture stdout and stderr.
+#     monkeypatch
+#         Pytest fixture, we use it to override isort's version.
+#     """
+#     notebook = tmp_test_data / "notebook_with_separated_imports_other.ipynb"
 
-    with open(notebook) as handle:
-        before = handle.readlines()
-    with pytest.raises(SystemExit):
-        main(["isort", str(notebook), "--nbqa-mutate"])
-    with open(notebook) as handle:
-        after = handle.readlines()
-    assert before == after
+#     with open(notebook) as handle:
+#         before = handle.readlines()
+#     with pytest.raises(SystemExit):
+#         main(["isort", str(notebook), "--nbqa-mutate"])
+#     with open(notebook) as handle:
+#         after = handle.readlines()
+#     assert before == after
 
-    monkeypatch.setattr("nbqa.config.ISORT_MODULE.__version__", "4.3.21")
-    with open(notebook) as handle:
-        before = handle.readlines()
-    with pytest.raises(SystemExit):
-        main(["isort", str(notebook), "--nbqa-mutate"])
-    with open(notebook) as handle:
-        after = handle.readlines()
-    assert before != after
+    # monkeypatch.setattr("nbqa.config.ISORT_MODULE.__version__", "4.3.21")
+    # with open(notebook) as handle:
+    #     before = handle.readlines()
+    # with pytest.raises(SystemExit):
+    #     main(["isort", str(notebook), "--nbqa-mutate"])
+    # with open(notebook) as handle:
+    #     after = handle.readlines()
+    # assert before != after
 
-    # Check nbqa still works if there is no isort installed.
-    monkeypatch.setattr("nbqa.config.ISORT_MODULE", None)
-    with pytest.raises(SystemExit):
-        main(["black", str(notebook)])
-    _, err = capsys.readouterr()
-    assert "1 file left unchanged" in err
+    # # Check nbqa still works if there is no isort installed.
+    # monkeypatch.setattr("nbqa.config.ISORT_MODULE", None)
+    # with pytest.raises(SystemExit):
+    #     main(["black", str(notebook)])
+    # _, err = capsys.readouterr()
+    # assert "1 file left unchanged" in err

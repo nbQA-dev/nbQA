@@ -3,6 +3,7 @@
 from configparser import ConfigParser
 from pathlib import Path
 from typing import Callable, List, Optional, Tuple
+import toml
 
 from nbqa.cmdline import CLIArgs
 from nbqa.config import CONFIG_SECTIONS, Configs
@@ -96,6 +97,13 @@ _CONFIG_FILE_HANDLERS: List[Tuple[str, Optional[_ConfigHandler]]] = [
     (".nbqa.ini", _parse_nbqa_ini_config),
 ]
 
+DEFAULT_CONFIG = {
+    'addopts': {'isort': ['--treat-comment-as-code', '# %%']},
+    'ignore_cells': {},
+    'mutate': {},
+    'config': {}
+}
+
 
 def parse_config_from_file(cli_args: CLIArgs, project_root: Path) -> Optional[Configs]:
     """
@@ -113,16 +121,20 @@ def parse_config_from_file(cli_args: CLIArgs, project_root: Path) -> Optional[Co
     Optional[Configs]
         Configuration read from the file(if any)
     """
-    config: Optional[Configs] = None
-
     for config_file, config_handler in _CONFIG_FILE_HANDLERS:
         file_path: Path = project_root / config_file
 
         if file_path.is_file() and config_handler is not None:
             config = config_handler(cli_args.command, file_path)
 
-        # we found the config. skip other files
-        if config is not None:
-            break
+            # we found the config. skip other files
+            if config is not None:
+                break
+    else:
+        config = Configs()
 
+    for section in CONFIG_SECTIONS:
+        if not getattr(config, section, None):
+            config.set_config(section, DEFAULT_CONFIG[section].get(cli_args.command))
+    breakpoint()
     return config

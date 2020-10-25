@@ -1,12 +1,7 @@
 """Module responsible for storing and handling nbqa configuration."""
 
-from collections import defaultdict
-from importlib import import_module
 from shlex import split
-from types import ModuleType
-from typing import Any, Callable, ClassVar, Dict, List, Mapping, NamedTuple, Optional
-
-from pkg_resources import parse_version
+from typing import Any, Callable, ClassVar, Dict, List, NamedTuple, Optional
 
 from nbqa.cmdline import CLIArgs
 
@@ -21,31 +16,6 @@ class _ConfigSections(NamedTuple):  # pylint: disable=R0903
 
 
 CONFIG_SECTIONS = _ConfigSections()
-
-
-try:
-    ISORT_MODULE: Optional[ModuleType] = import_module("isort")
-except ImportError:  # pragma: nocover (this case is tested in test_isort_works.py)
-    ISORT_MODULE = None
-
-
-def get_default_configs() -> Mapping[str, List[str]]:
-    """
-    Get default CLI args (if any) to call command with.
-
-    In the case of isort, we use ``--treat-comment-as-code '# %%'``.
-
-    Returns
-    -------
-    Mapping
-        Default configs for each code quality tool.
-    """
-    default_configs = defaultdict(lambda: [])
-    if ISORT_MODULE is not None:
-        version = parse_version(ISORT_MODULE.__version__)  # type: ignore
-        if version >= parse_version("5.3.0"):
-            default_configs["isort"] = ["--treat-comment-as-code", "# %%"]
-    return default_configs
 
 
 class Configs:
@@ -141,8 +111,7 @@ class Configs:
         """
         config: Configs = Configs()
 
-        addopts = cli_args.nbqa_addopts + get_default_configs()[cli_args.command]
-        config.set_config(CONFIG_SECTIONS.ADDOPTS, addopts)
+        config.set_config(CONFIG_SECTIONS.ADDOPTS, cli_args.nbqa_addopts)
         config.set_config(CONFIG_SECTIONS.CONFIG, cli_args.nbqa_config)
         config.set_config(CONFIG_SECTIONS.IGNORE_CELLS, cli_args.nbqa_ignore_cells)
         config.set_config(CONFIG_SECTIONS.MUTATE, cli_args.nbqa_mutate)

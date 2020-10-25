@@ -7,6 +7,8 @@ import subprocess
 import sys
 import tempfile
 from importlib import import_module
+from importlib_metadata import version, PackageNotFoundError
+from pkg_resources import parse_version
 from pathlib import Path
 from textwrap import dedent
 from typing import Dict, Iterator, List, Mapping, Match, Optional, Set, Tuple
@@ -18,7 +20,6 @@ from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
-
 BASE_ERROR_MESSAGE = dedent(
     """
 
@@ -27,6 +28,7 @@ BASE_ERROR_MESSAGE = dedent(
     Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏
     """
 )
+MIN_VERSIONS = {'isort': '5.3.0'}
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
@@ -409,7 +411,7 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
 
     if file_config is not None:
         cli_config = cli_config.merge(file_config)
-
+        
     return cli_config
 
 
@@ -527,9 +529,17 @@ def _check_command_is_installed(command: str) -> None:
         If third-party tool isn't installed.
     """
     try:
-        import_module(command)
-    except ImportError as exc:
-        raise ModuleNotFoundError(_get_command_not_found_msg(command)) from exc
+        command_version = version(command)
+    except PackageNotFoundError:
+        try:
+            import_module(command)
+        except ImportError as exc:
+            raise ModuleNotFoundError(_get_command_not_found_msg(command)) from exc
+    else:
+        if command in MIN_VERSIONS:
+            min_version = MIN_VERSIONS[command]
+            if parse_version(command_version) < parse_version(min_version):
+                raise ModuleNotFoundError(_get_command_not_found_msg(f"{command}>={min_version}"))
 
 
 def main(raw_args: Optional[List[str]] = None) -> None:
