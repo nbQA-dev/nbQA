@@ -93,11 +93,15 @@ class Configs:
         Configs
             Merged configuration object
         """
-        self._addopts.extend(other.nbqa_addopts)
-        self._config = self._config or other.nbqa_config
-        self._ignore_cells = self._ignore_cells or other.nbqa_ignore_cells
-        self._mutate = self._mutate or other.nbqa_mutate
-        return self
+        config: Configs = Configs()
+
+        config.set_config(CONFIG_SECTIONS.ADDOPTS, self._addopts + other.nbqa_addopts)
+        config.set_config(CONFIG_SECTIONS.CONFIG, self._config or other.nbqa_config)
+        config.set_config(
+            CONFIG_SECTIONS.IGNORE_CELLS, self._ignore_cells or other.nbqa_ignore_cells
+        )
+        config.set_config(CONFIG_SECTIONS.MUTATE, self._mutate or other.nbqa_mutate)
+        return config
 
     @staticmethod
     def parse_from_cli_args(cli_args: CLIArgs) -> "Configs":
