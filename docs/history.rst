@@ -2,6 +2,11 @@
 Changelog
 =========
 
+0.3.5 (2020-10-25)
+------------------
+
+Optimised how nbqa passes files so that pre-commit hooks run faster.
+
 0.3.4 (2020-10-23)
 ------------------
 

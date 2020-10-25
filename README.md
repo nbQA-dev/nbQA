@@ -110,7 +110,7 @@ for details)
 
    ```yaml
    - repo: https://github.com/nbQA-dev/nbQA
-     rev: 0.3.4
+     rev: 0.3.5
      hooks:
        - id: nbqa-black
        - id: nbqa-pyupgrade
