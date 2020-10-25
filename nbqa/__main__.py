@@ -7,11 +7,12 @@ import subprocess
 import sys
 import tempfile
 from importlib import import_module
-from importlib_metadata import version, PackageNotFoundError
-from pkg_resources import parse_version
 from pathlib import Path
 from textwrap import dedent
 from typing import Dict, Iterator, List, Mapping, Match, Optional, Set, Tuple
+
+from importlib_metadata import PackageNotFoundError, version
+from pkg_resources import parse_version
 
 from nbqa import config_parser, replace_source, save_source
 from nbqa.cmdline import CLIArgs
@@ -28,7 +29,7 @@ BASE_ERROR_MESSAGE = dedent(
     Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏
     """
 )
-MIN_VERSIONS = {'isort': '5.3.0'}
+MIN_VERSIONS = {"isort": "5.3.0"}
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
@@ -408,10 +409,16 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     file_config: Optional[Configs] = config_parser.parse_config_from_file(
         cli_args, project_root
     )
+    if (
+        cli_args.command == "isort"
+        and file_config is not None
+        and not file_config.nbqa_addopts
+    ):
+        file_config.nbqa_addopts = ["--treat-comment-as-code", "# %%"]
 
     if file_config is not None:
         cli_config = cli_config.merge(file_config)
-        
+
     return cli_config
 
 
@@ -539,7 +546,9 @@ def _check_command_is_installed(command: str) -> None:
         if command in MIN_VERSIONS:
             min_version = MIN_VERSIONS[command]
             if parse_version(command_version) < parse_version(min_version):
-                raise ModuleNotFoundError(_get_command_not_found_msg(f"{command}>={min_version}"))
+                raise ModuleNotFoundError(
+                    _get_command_not_found_msg(f"{command}>={min_version}")
+                )
 
 
 def main(raw_args: Optional[List[str]] = None) -> None:
