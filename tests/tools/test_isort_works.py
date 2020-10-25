@@ -175,9 +175,9 @@ def test_old_isort_separated_imports(tmp_test_data: Path) -> None:
     assert before == after
 
 
-def test_old_isort(monkeypatch):
-    monkeypatch.setattr("nbqa.__main__.version", lambda _: "4.3.21")
-    with pytest.raises(ModuleNotFoundError) as excinfo:
-        main(["isort", "tests/data/notebook_for_testing.ipynb"])
+# def test_old_isort(monkeypatch):
+#     monkeypatch.setattr("nbqa.__main__.version", lambda _: "4.3.21")
+#     with pytest.raises(ModuleNotFoundError) as excinfo:
+#         main(["isort", "tests/data/notebook_for_testing.ipynb"])
 
-    assert "Command `isort>=5.3.0` not found by nbqa" in str(excinfo.value)
+#     assert "Command `isort>=5.3.0` not found by nbqa" in str(excinfo.value)

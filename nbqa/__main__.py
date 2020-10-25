@@ -414,7 +414,7 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
         and file_config is not None
         and not file_config.nbqa_addopts
     ):
-        file_config.nbqa_addopts = ["--treat-comment-as-code", "# %%"]
+        file_config.set_config('addopts', ["--treat-comment-as-code", "# %%"])
 
     if file_config is not None:
         cli_config = cli_config.merge(file_config)

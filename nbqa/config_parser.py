@@ -132,8 +132,8 @@ def parse_config_from_file(cli_args: CLIArgs, project_root: Path) -> Optional[Co
     else:
         config = Configs()
 
-    # for section in CONFIG_SECTIONS:
-    #     default = DEFAULT_CONFIG[section].get(cli_args.command, None)
-    #     if not getattr(config, section, None):
-    #         config.set_config(section, default)
+    for section in CONFIG_SECTIONS:
+        default = DEFAULT_CONFIG[section].get(cli_args.command, None)
+        if not getattr(config, section, None):
+            config.set_config(section, default)
     return config
