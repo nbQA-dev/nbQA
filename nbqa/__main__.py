@@ -296,7 +296,7 @@ def _get_all_args(
     tmpdirname: str,
     nb_to_py_mapping: Dict[Path, Path],
     project_root: Path,
-) -> Tuple[Path, ...]:
+) -> List[Path]:
     """
     Get all arguments to run command against.
 
@@ -316,9 +316,7 @@ def _get_all_args(
     List[Path]
         All notebooks or directories to run third-party tool against.
     """
-    return tuple(
-        _get_arg(i, tmpdirname, nb_to_py_mapping, project_root) for i in root_dirs
-    )
+    return [_get_arg(i, tmpdirname, nb_to_py_mapping, project_root) for i in root_dirs]
 
 
 def _get_mtimes(arg: Path) -> Set[float]:
@@ -344,7 +342,7 @@ def _run_command(
     command: str,
     tmpdirname: str,
     cmd_args: List[str],
-    args: Tuple[Path, ...],
+    args: List[Path],
 ) -> Tuple[str, str, int, bool]:
     """
     Run third-party tool against given file or directory.
@@ -381,7 +379,7 @@ def _run_command(
         "PYTHONPATH"
     ] = f"{env.get('PYTHONPATH', '').rstrip(os.pathsep)}{os.pathsep}{os.getcwd()}"
 
-    before = tuple(_get_mtimes(i) for i in args)
+    before = [_get_mtimes(i) for i in args]
 
     output = subprocess.run(
         [sys.executable, "-m", command, *(str(i) for i in args), *cmd_args],
@@ -391,7 +389,7 @@ def _run_command(
         env=env,
     )
 
-    mutated = tuple(_get_mtimes(i) for i in args) != before
+    mutated = [_get_mtimes(i) for i in args] != before
 
     output_code = output.returncode
 
