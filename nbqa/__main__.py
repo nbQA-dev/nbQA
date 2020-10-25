@@ -409,12 +409,6 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     file_config: Optional[Configs] = config_parser.parse_config_from_file(
         cli_args, project_root
     )
-    if (
-        cli_args.command == "isort"
-        and file_config is not None
-        and not file_config.nbqa_addopts
-    ):
-        file_config.set_config('addopts', ["--treat-comment-as-code", "# %%"])
 
     if file_config is not None:
         cli_config = cli_config.merge(file_config)
