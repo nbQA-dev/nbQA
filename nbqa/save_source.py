@@ -11,7 +11,7 @@ from collections import defaultdict
 from itertools import takewhile
 from typing import TYPE_CHECKING, DefaultDict, Dict, Iterator, List
 
-from nbqa.handle_magics import MagicHandler, MagicSubstitution
+from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
 
 if TYPE_CHECKING:
@@ -66,7 +66,7 @@ def _is_src_code_indentation_valid(source: str) -> bool:
 
 
 def _handle_magic_indentation(
-    source: List[str], line_magic: str, magic_replacement: MagicSubstitution
+    source: List[str], line_magic: str, magic_replacement: str
 ) -> str:
     """
     Handle the indentation of line magics. Remove unnecessary indentation.
@@ -77,8 +77,8 @@ def _handle_magic_indentation(
         Source code of the notebook cell
     line_magic : str
         Line magic present in the notebook cell
-    magic_replacement : MagicSubstitution
-        Object containing information on ipython magic replacement.
+    magic_replacement : str
+        Python code replacing ipython magic
     Returns
     -------
     str
@@ -87,7 +87,9 @@ def _handle_magic_indentation(
     leading_space = "".join(takewhile(lambda c: c == " ", line_magic))
 
     # preserve the leading spaces and check if the syntax is valid
-    replacement = magic_replacement.indent_magic_replacement(leading_space)
+    replacement = f"{leading_space}{magic_replacement}".replace(
+        "\n", f"\n{leading_space}"
+    )
 
     if leading_space and not _is_src_code_indentation_valid(
         "".join(source + [replacement])
@@ -96,7 +98,7 @@ def _handle_magic_indentation(
         # lead the source to have invalid indentation
         # Currently we don't check if the original source
         # code itself had IndentationError
-        replacement = magic_replacement.replacement_line
+        replacement = magic_replacement
 
     if line_magic.endswith("\n"):
         replacement += "\n"
@@ -105,7 +107,7 @@ def _handle_magic_indentation(
 
 
 def _replace_magics(
-    source: List[str], magic_substitutions: List[MagicSubstitution]
+    source: List[str], magic_substitutions: List[MagicHandler]
 ) -> Iterator[str]:
     """
     Replace IPython line magics with valid python code.
@@ -126,9 +128,10 @@ def _replace_magics(
         trimmed_line: str = line.strip()
         if MagicHandler.is_ipython_magic(trimmed_line):
             magic_handler = MagicHandler.get_magic_handler(trimmed_line)
-            magic_substitution = magic_handler.replace_magic(trimmed_line)
-            magic_substitutions.append(magic_substitution)
-            line = _handle_magic_indentation(source[:line_no], line, magic_substitution)
+            magic_substitutions.append(magic_handler)
+            line = _handle_magic_indentation(
+                source[:line_no], line, magic_handler.replace_magic()
+            )
 
         yield line
 
@@ -136,7 +139,7 @@ def _replace_magics(
 def _parse_cell(
     source: List[str],
     cell_number: int,
-    temporary_lines: Dict[int, List[MagicSubstitution]],
+    temporary_lines: Dict[int, List[MagicHandler]],
     command: str,
 ) -> str:
     """
@@ -158,7 +161,7 @@ def _parse_cell(
     str
         Parsed cell.
     """
-    substituted_magics: List[MagicSubstitution] = []
+    substituted_magics: List[MagicHandler] = []
     parsed_cell = f"{NEWLINES[command]}{CODE_SEPARATOR}\n"
 
     for parsed_line in _replace_magics(source, substituted_magics):
@@ -220,7 +223,7 @@ def main(
     line_number = 0
     cell_number = 0
     trailing_semicolons = set()
-    temporary_lines: DefaultDict[int, List[MagicSubstitution]] = defaultdict(list)
+    temporary_lines: DefaultDict[int, List[MagicHandler]] = defaultdict(list)
     code_cells_to_ignore = set()
 
     for cell in cells:

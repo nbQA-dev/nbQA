@@ -7,7 +7,7 @@ The converted file will have had the third-party tool run against it by now.
 import json
 from typing import TYPE_CHECKING, Iterator, List, Set
 
-from nbqa.handle_magics import MagicSubstitution
+from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
 from nbqa.save_source import CODE_SEPARATOR
 
@@ -49,7 +49,7 @@ def _restore_semicolon(
 
 def _reinstate_magics(
     source: str,
-    temporary_lines: List[MagicSubstitution],
+    temporary_lines: List[MagicHandler],
 ) -> List[str]:
     """
     Put (preprocessed) line magics back in.
