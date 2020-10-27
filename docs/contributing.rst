@@ -102,6 +102,12 @@ Before you submit a pull request, check that it meets these guidelines:
    feature to the list in README.md.
 3. The pull request should work for Python 3.6, 3.7, 3.8, and 3.9.
 
+Add yourself as a contributor
+-----------------------------
+
+To add yourself to the table of contributors, please follow the `bot usage
+instructions <https://allcontributors.org/docs/en/bot/usage>`_.
+
 Tips
 ----
 
