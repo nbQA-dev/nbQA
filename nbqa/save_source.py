@@ -251,7 +251,6 @@ def main(
             line_number += len(parsed_cell.splitlines())
 
     temp_python_file.write_text("".join(result).lstrip("\n"))
-    print(temp_python_file.read_text())
 
     return NotebookInfo(
         cell_mapping, trailing_semicolons, temporary_lines, code_cells_to_ignore
