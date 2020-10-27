@@ -412,7 +412,7 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
 
     if file_config is not None:
         cli_config = cli_config.merge(file_config)
-
+    cli_config = cli_config.merge_defaults(cli_args.command)
     return cli_config
 
 

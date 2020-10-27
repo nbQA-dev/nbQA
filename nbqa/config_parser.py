@@ -2,7 +2,7 @@
 
 from configparser import ConfigParser
 from pathlib import Path
-from typing import Callable, List, Mapping, Optional, Tuple
+from typing import Callable, List, Optional, Tuple
 
 from nbqa.cmdline import CLIArgs
 from nbqa.config import CONFIG_SECTIONS, Configs
@@ -96,13 +96,6 @@ _CONFIG_FILE_HANDLERS: List[Tuple[str, Optional[_ConfigHandler]]] = [
     (".nbqa.ini", _parse_nbqa_ini_config),
 ]
 
-DEFAULT_CONFIG: Mapping[str, Mapping] = {
-    "addopts": {"isort": ["--treat-comment-as-code", "# %%"]},
-    "ignore_cells": {},
-    "mutate": {},
-    "config": {},
-}
-
 
 def parse_config_from_file(cli_args: CLIArgs, project_root: Path) -> Optional[Configs]:
     """
@@ -131,10 +124,5 @@ def parse_config_from_file(cli_args: CLIArgs, project_root: Path) -> Optional[Co
                 break
     else:
         config = Configs()
-
-    for section in CONFIG_SECTIONS:
-        default = DEFAULT_CONFIG[section].get(cli_args.command, None)
-        if not getattr(config, section, None):
-            config.set_config(section, default)
 
     return config

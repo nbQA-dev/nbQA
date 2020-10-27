@@ -179,6 +179,14 @@ def test_old_isort_separated_imports(tmp_test_data: Path) -> None:
         after = handle.readlines()
     assert before == after
 
+    # check that adding extra command-line arguments doesn't interfere with
+    # --treat-comment-as-code
+    with pytest.raises(SystemExit):
+        main(["isort", str(notebook), "--profile=black", "--nbqa-mutate"])
+    with open(notebook) as handle:
+        after = handle.readlines()
+    assert before == after
+
 
 def test_old_isort(monkeypatch: "MonkeyPatch") -> None:
     """
