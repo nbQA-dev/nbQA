@@ -111,7 +111,7 @@ instructions <https://allcontributors.org/docs/en/bot/usage>`_.
 Example of comment::
 
     @all-contributors please add @<username> for documentation
-    
+
 .. note::
 
     It's considered a good practice to always prefix usernames with ``@``
