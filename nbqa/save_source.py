@@ -87,6 +87,8 @@ def _handle_magic_indentation(
     leading_space = "".join(takewhile(lambda c: c == " ", line_magic))
 
     # preserve the leading spaces and check if the syntax is valid
+    # Add the spaces to every line of the magic replacement to be consistent
+    # with the indentation.
     replacement = f"{leading_space}{magic_replacement}".replace(
         "\n", f"\n{leading_space}"
     )
@@ -249,6 +251,7 @@ def main(
             line_number += len(parsed_cell.splitlines())
 
     temp_python_file.write_text("".join(result).lstrip("\n"))
+    print(temp_python_file.read_text())
 
     return NotebookInfo(
         cell_mapping, trailing_semicolons, temporary_lines, code_cells_to_ignore

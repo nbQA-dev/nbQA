@@ -5,6 +5,7 @@ import re
 import secrets
 from abc import ABC
 from ast import AST
+from textwrap import dedent
 from typing import Optional, Pattern
 
 
@@ -23,8 +24,15 @@ class MagicHandler(ABC):
     _ipython_magic: str
 
     def __init__(self, ipython_magic: str) -> None:
-        self._token: str = MagicHandler._get_unique_token()
+        """Initialize this instance.
+
+        Parameters
+        ----------
+        ipython_magic : str
+            Ipython magic statement present in the notebook cell
+        """
         self._ipython_magic = ipython_magic
+        self._token: str = MagicHandler._get_unique_token()
 
     def replace_magic(self) -> str:
         """
@@ -38,10 +46,22 @@ class MagicHandler(ABC):
         return self._MAGIC_TEMPLATE.format(magic=self._ipython_magic, token=self._token)
 
     def restore_magic(self, cell_source: str) -> str:
+        """Return the cell source with the ipython magic restored.
+
+        Parameters
+        ----------
+        cell_source : str
+            Source code of the notebook cell
+
+        Returns
+        -------
+        str
+            Cell source with ipython magic restored.
+        """
         pattern = MagicHandler._get_regex_pattern(
             self._MAGIC_REGEX_TEMPLATE, self._token
         )
-        return re.sub(pattern, self._ipython_magic, cell_source)
+        return pattern.sub(self._ipython_magic, cell_source)
 
     @staticmethod
     def _get_unique_token() -> str:
@@ -136,17 +156,93 @@ class CellMagicHandler(MagicHandler):
 
 
 class LineMagicHandler(MagicHandler):
-    """Handle ipython line magic starting with %."""
+    """Handle ipython line magic starting with %.
 
-    _MAGIC_TEMPLATE_WITH_CODE: str = r"if int({token}):\n    {code}  # {token}"
+    Description
+    -----------
+    When ipython magic like `%time` that can contain python code, if we ignore the
+    code and replace the line magic with the template `type(hex_token)...`, we will
+    get into a scenario of unused imports.
+
+    For example, consider the following snippet.
+
+    ```Python
+    import os
+
+    if True
+        %time os.system("ls -l")
+    ```
+
+    In the above snippet, if we replace the `%time` line magic with `type(token)  #`
+    statement, then flake8 or pylint would complain `unused import os`. Also tools
+    like autoflake would remove those statements from the notebook which is undesirable.
+
+    To handle this issue, we transform the above snippet to a temporary python code that
+    looks like the snippet below
+
+    ```Python
+    import os
+
+    if True
+        if int(hex_token):
+            os.system("ls -l")  # hex_token
+    ```
+
+    Before transforming the line magic to the above form, first the line magic is
+    checked if it contains any python code with a callable. Otherwise the usual
+    template is used. For instance line magics like `%load_ext` won't contain any
+    python code. So such line magics will be replaced with `type(hex_token)` template.
+
+    Now till this change the linters are happy. But there will be a problem with code
+    formatters like black. Consider the below snippet
+
+    ```Python
+    %time func(arg1,arg2)
+    ```
+
+    This line magic will be transformed and after black formatting the code will look as
+
+    ```Python
+    if int(hex_token):
+        func(arg1, arg2)  # hex_token
+    ```
+
+    Note `func(arg1, arg2)` got formatted. If we don't replace this newly formatted
+    code back to original notebook cell source, every time black will reformat this
+    notebook and we might have failures from tools like pre-commit.
+
+    To avoid this issue, we need to extract only the formatted source `func(arg1, arg2)`
+    and add it to `%time`, and then restore this new statement back to the cell source.
+    This logic is done in the method `_restore_magic_with_modified_code`.
+    """
+
+    _MAGIC_TEMPLATE_WITH_CODE: str = dedent(
+        """
+        if int({token}):
+            {code}  # {token}
+        """
+    ).strip()
     _MAGIC_WITH_CODE_REGEX_TEMPLATE: str = r"if\s+int\(\s*{token}\s*\).*{token}"
     _EXTRACT_CODE_REGEX_TEMPLATE: str = (
         r"if\s+int\(\s*{token}\s*\):\s+(.*)\s+#\s+{token}"
     )
+
     _contains_code: bool = False
 
     @staticmethod
     def _get_syntax_tree(stmt: str) -> Optional[AST]:
+        """Return the input statement parsed as AST.
+
+        Parameters
+        ----------
+        stmt : str
+            String to be parsed by `ast.parse`
+
+        Returns
+        -------
+        Optional[AST]
+            Return AST if the statement is a valid python code else None
+        """
         syntax_tree: Optional[AST] = None
         with contextlib.suppress(SyntaxError):
             syntax_tree = ast.parse(stmt)
@@ -178,8 +274,8 @@ class LineMagicHandler(MagicHandler):
         str
             Python code to replace the ipython magic
         """
-        # strip %line_magic_name from the line magic statement
-        code: str = re.sub(r"%\w+", "", self._ipython_magic)
+        # strip %line_magic from the line magic statement
+        code: str = re.sub(r"%\w+", "", self._ipython_magic).strip()
         syntax_tree = self._get_syntax_tree(code)
         if syntax_tree and self._contains_callable(syntax_tree):
             self._contains_code = True
@@ -188,32 +284,64 @@ class LineMagicHandler(MagicHandler):
         return super().replace_magic()
 
     def restore_magic(self, cell_source: str) -> str:
+        """Return the cell source with the ipython magic restored.
+
+        Parameters
+        ----------
+        cell_source : str
+            Source code of the notebook cell
+
+        Returns
+        -------
+        str
+            Cell source with ipython magic restored.
+        """
         if self._contains_code:
             pattern = MagicHandler._get_regex_pattern(
                 self._MAGIC_WITH_CODE_REGEX_TEMPLATE, self._token
             )
-            return re.sub(
-                pattern, self._extract_code(pattern, cell_source), cell_source
-            )
+            return self._restore_magic_with_modified_code(pattern, cell_source)
 
         return super().restore_magic(cell_source)
 
-    def _extract_code(
+    def _restore_magic_with_modified_code(
         self, replacement_code_pattern: Pattern[str], cell_source: str
     ) -> str:
-        match_obj = replacement_code_pattern.search(cell_source)
-        if match_obj:
-            replaced_line = match_obj.group()
-            # from the replaced line extract the python source code
+        """Return cell source code with ipython magic statement restored.
+
+        Parameters
+        ----------
+        replacement_code_pattern : Pattern[str]
+            Regex pattern to find the python code replacing the ipython magic
+        cell_source : str
+            Source code of the notebook cell
+
+        Returns
+        -------
+        str
+            Cell source with ipython magic restored
+        """
+        ipython_magic = self._ipython_magic
+        with contextlib.suppress(AssertionError):
+            # Get the code used for replacing the ipython magic statement
+            match_obj = replacement_code_pattern.search(cell_source)
+            assert match_obj is not None
+            replacement_code = match_obj.group()
+
+            # from the replaced code extract the python source code
+            # that was also present in the original ipython magic
             extract_code_pattern = MagicHandler._get_regex_pattern(
                 self._EXTRACT_CODE_REGEX_TEMPLATE, self._token
             )
-            match_obj = extract_code_pattern.search(replaced_line)
-            if match_obj:
-                extracted_code = match_obj.group(1)
-                match_obj = re.match(r"%\w+", self._ipython_magic)
-                if match_obj:
-                    return f"{match_obj.group()} {extracted_code}".strip()
+            match_obj = extract_code_pattern.search(replacement_code)
+            assert match_obj is not None
+            extracted_code = match_obj.group(1)
 
-        # if not return the original source
-        return self._ipython_magic
+            # combine %line_magic and the `code` to be the new ipython magic statement.
+            # This is done so that formatters like black won't reformat the notebook
+            # every time they are run on the notebook.
+            match_obj = re.match(r"%\w+", self._ipython_magic)
+            assert match_obj is not None
+            ipython_magic = f"{match_obj.group()} {extracted_code}".strip()
+
+        return replacement_code_pattern.sub(ipython_magic, cell_source)
