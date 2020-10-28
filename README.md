@@ -132,7 +132,7 @@ Take some inspiration from their config files 😉
 
 > This is really cool. I think it brings so much of the code formatting and code analysis, clean up to notebooks, which I think had been really lacking
 
-**Nikita Sobolev**, [CTO at wemake.services](https://sobolevn.me/)
+**Nikita Sobolev**, [CTO at wemake.services](https://sobolevn.me/):
 
 > It is amazing!
 
