@@ -224,12 +224,12 @@ def test_successive_runs_using_black(tmpdir: "LocalPath") -> None:
     copyfile(src_notebook, test_notebook)
 
     def run_black(
-        test_notebook: str, mod_time_compare_op: Callable[[int, int], bool]
+        test_notebook: str, mod_time_compare_op: Callable[[float, float], bool]
     ) -> bool:
         """Run black using nbqa and validate the output."""
-        mod_time_before: int = int(os.path.getmtime(test_notebook))
+        mod_time_before: float = os.path.getmtime(test_notebook)
         output = subprocess.run(["nbqa", "black", test_notebook, "--nbqa-mutate"])
-        mod_time_after: int = int(os.path.getmtime(test_notebook))
+        mod_time_after: float = os.path.getmtime(test_notebook)
         return output.returncode == 0 and mod_time_compare_op(
             mod_time_after, mod_time_before
         )
