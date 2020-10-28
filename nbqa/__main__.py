@@ -11,7 +11,6 @@ from pathlib import Path
 from textwrap import dedent
 from typing import Dict, Iterator, List, Mapping, Match, Optional, Set, Tuple
 
-from importlib_metadata import PackageNotFoundError, version
 from pkg_resources import parse_version
 
 from nbqa import config_parser, replace_source, save_source
@@ -19,6 +18,7 @@ from nbqa.cmdline import CLIArgs
 from nbqa.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
+from nbqa.optional import metadata
 
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
 BASE_ERROR_MESSAGE = dedent(
@@ -530,8 +530,8 @@ def _check_command_is_installed(command: str) -> None:
         If third-party tool isn't installed.
     """
     try:
-        command_version = version(command)
-    except PackageNotFoundError:
+        command_version = metadata.version(command)  # type: ignore
+    except metadata.PackageNotFoundError:  # type: ignore
         try:
             import_module(command)
         except ImportError as exc:

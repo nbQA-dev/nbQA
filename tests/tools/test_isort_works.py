@@ -197,7 +197,7 @@ def test_old_isort(monkeypatch: "MonkeyPatch") -> None:
     monkeypatch
         Pytest fixture, we use it to override isort's version.
     """
-    monkeypatch.setattr("nbqa.__main__.version", lambda _: "4.3.21")
+    monkeypatch.setattr("nbqa.__main__.metadata.version", lambda _: "4.3.21")
     with pytest.raises(ModuleNotFoundError) as excinfo:
         main(["isort", "tests/data/notebook_for_testing.ipynb"])
 
