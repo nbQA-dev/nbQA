@@ -24,3 +24,10 @@ Will be transformed in:
 
     plt.plot()
     # some comment
+
+You can overcome this limitation by moving the comment to the previous line:
+
+.. code:: python
+
+    # some comment
+    plt.plot();
