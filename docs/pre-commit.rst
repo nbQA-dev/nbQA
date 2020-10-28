@@ -47,7 +47,7 @@ Temporarily disable hooks
 
 Although not recommended, it is still possible to temporarily **disable all checks**
 using ``git commit --no-verify``, or **just specific ones** using the ``SKIP``
-environment variable. For example:
+environment variable. For example, on a Unix-like operating system:
 
 .. code:: bash
 
