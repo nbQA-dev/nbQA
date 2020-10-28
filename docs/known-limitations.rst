@@ -39,7 +39,7 @@ flake8 (and other linters)
 Line magics
 ~~~~~~~~~~~
 
-If you import a module and then _only_ use it in a line magic, then you may get an "unused import"
+If you import a module and then *only* use it in a line magic, then you may get an "unused import"
 warning from ``flake8``.
 
 Example:
