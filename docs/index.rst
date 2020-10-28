@@ -13,6 +13,7 @@ nbQA
    examples
    configuration
    pre-commit
+   known-limitations
    history
 
 
