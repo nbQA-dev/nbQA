@@ -16,15 +16,21 @@
 	<a href="https://codecov.io/gh/nbQA-dev/nbQA"><img
 		alt="codecov"
 		src="https://codecov.io/gh/nbQA-dev/nbQA/branch/master/graph/badge.svg"></a>
+	<a href="https://results.pre-commit.ci/latest/github/nbQA-dev/nbQA/master"><img
+		alt="pre-commit"
+		src="https://results.pre-commit.ci/badge/github/nbQA-dev/nbQA/master.svg"></a>
+</p>
+
+<p align="center">
 	<a href="https://pypi.org/project/nbqa/"><img
 		alt="versions"
 		src="https://img.shields.io/pypi/pyversions/nbqa.svg"></a>
-	<a href="https://github.com/pre-commit/pre-commit"><img
-		alt="pre-commit"
-		src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white"></a>
 	<a href="https://gitter.im/nbQA/nbQA"><img
 		alt="chat"
 		src="https://badges.gitter.im/Join%20Chat.svg"></a>
+	<a href="https://nbqa.readthedocs.io/en/latest/)"><img
+		alt="docs"
+		src="https://readthedocs.org/projects/nbqa/badge/?version=latest"></a>
 </p>
 
 <p align="center">
