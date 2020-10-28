@@ -137,9 +137,9 @@ Take some inspiration from their config files 😉
 > It is amazing!
 
 **Alex Andorra**,
-[Data Scientist, ArviZ & PyMC Dev, Host of 'Learning Bayesian Statistics' Podcast 🎙️](https://learnbayesstats.anvil.app/):
+[Data Scientist, ArviZ & PyMC Dev, Host of 'Learning Bayesian Statistics' Podcast](https://learnbayesstats.anvil.app/):
 
-> well done on `nbqa` @MarcoGorelli ! Will be super useful in CI 😉
+> well done on `nbqa` @MarcoGorelli ! Will be super useful in CI
 
 **Girish Pasupathy**,
 [Software engineer and now core-contributor](https://github.com/girip11):
