@@ -18,7 +18,7 @@ Example:
     plt.plot();  # some comment
 
 
-Will be transformed in:
+Will be transformed to:
 
 .. code:: python
 
