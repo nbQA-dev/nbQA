@@ -16,15 +16,21 @@
 	<a href="https://codecov.io/gh/nbQA-dev/nbQA"><img
 		alt="codecov"
 		src="https://codecov.io/gh/nbQA-dev/nbQA/branch/master/graph/badge.svg"></a>
+	<a href="https://results.pre-commit.ci/latest/github/nbQA-dev/nbQA/master"><img
+		alt="pre-commit"
+		src="https://results.pre-commit.ci/badge/github/nbQA-dev/nbQA/master.svg"></a>
+</p>
+
+<p align="center">
 	<a href="https://pypi.org/project/nbqa/"><img
 		alt="versions"
 		src="https://img.shields.io/pypi/pyversions/nbqa.svg"></a>
-	<a href="https://github.com/pre-commit/pre-commit"><img
-		alt="pre-commit"
-		src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white"></a>
 	<a href="https://gitter.im/nbQA/nbQA"><img
 		alt="chat"
 		src="https://badges.gitter.im/Join%20Chat.svg"></a>
+	<a href="https://nbqa.readthedocs.io/en/latest/)"><img
+		alt="docs"
+		src="https://readthedocs.org/projects/nbqa/badge/?version=latest"></a>
 </p>
 
 <p align="center">
@@ -128,13 +134,18 @@ Take some inspiration from their config files 😉
 
 ## 💬 Testimonials
 
-**Michael Kennedy & Brian Okken**, [hosts of the Python Bytes podcast](https://pythonbytes.fm/)
+**Michael Kennedy & Brian Okken**, [hosts of the Python Bytes podcast](https://pythonbytes.fm/):
+
 > This is really cool. I think it brings so much of the code formatting and code analysis, clean up to notebooks, which I think had been really lacking
 
-**Alex Andorra**,
-[Data Scientist, ArviZ & PyMC Dev, Host of 'Learning Bayesian Statistics' Podcast 🎙️](https://learnbayesstats.anvil.app/):
+**Nikita Sobolev**, [CTO at wemake.services](https://sobolevn.me/):
 
-> well done on `nbqa` @MarcoGorelli ! Will be super useful in CI 😉
+> It is amazing!
+
+**Alex Andorra**,
+[Data Scientist, ArviZ & PyMC Dev, Host of 'Learning Bayesian Statistics' Podcast](https://learnbayesstats.anvil.app/):
+
+> well done on `nbqa` @MarcoGorelli ! Will be super useful in CI
 
 **Girish Pasupathy**,
 [Software engineer and now core-contributor](https://github.com/girip11):
