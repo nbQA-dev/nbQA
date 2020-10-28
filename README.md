@@ -128,8 +128,13 @@ Take some inspiration from their config files 😉
 
 ## 💬 Testimonials
 
-**Michael Kennedy & Brian Okken**, [hosts of the Python Bytes podcast](https://pythonbytes.fm/)
+**Michael Kennedy & Brian Okken**, [hosts of the Python Bytes podcast](https://pythonbytes.fm/):
+
 > This is really cool. I think it brings so much of the code formatting and code analysis, clean up to notebooks, which I think had been really lacking
+
+**Nikita Sobolev**, [CTO at wemake.services](https://sobolevn.me/)
+
+> It is amazing!
 
 **Alex Andorra**,
 [Data Scientist, ArviZ & PyMC Dev, Host of 'Learning Bayesian Statistics' Podcast 🎙️](https://learnbayesstats.anvil.app/):
