@@ -9,6 +9,7 @@ import json
 import re
 from collections import defaultdict
 from itertools import takewhile
+from textwrap import indent
 from typing import TYPE_CHECKING, DefaultDict, Dict, Iterator, List
 
 from nbqa.handle_magics import MagicHandler
@@ -87,15 +88,17 @@ def _handle_magic_indentation(
     leading_space = "".join(takewhile(lambda c: c == " ", line_magic))
 
     # preserve the leading spaces and check if the syntax is valid
-    # Add the spaces to every line of the magic replacement to be consistent
-    # with the indentation.
-    replacement = f"{leading_space}{magic_replacement}".replace(
-        "\n", f"\n{leading_space}"
-    )
+    replacement = indent(magic_replacement, leading_space)
+    cell_source = "".join(source + [replacement])
 
-    if leading_space and not _is_src_code_indentation_valid(
-        "".join(source + [replacement])
-    ):
+    # If the cell contains multiple line magics `ast.parse` will raise
+    # `SyntaxError`. Since we are interested in only checking the indentation
+    # of the current line magic, previous line magics should be replaced with
+    # some valid python token.
+    # `%time print("hello")` will become `magic; print("hello")`
+    cell_source = re.sub(r"%\w+", "magic;", cell_source)
+
+    if leading_space and not _is_src_code_indentation_valid(cell_source):
         # Remove the line magic indentation assuming these leading spaces
         # lead the source to have invalid indentation
         # Currently we don't check if the original source
@@ -106,6 +109,58 @@ def _handle_magic_indentation(
         replacement += "\n"
 
     return replacement
+
+
+def _extract_ipython_magic(source: List[str]) -> str:
+    r"""Extract the ipython magic from the notebook cell source.
+
+    To extract ipython magic, we use `nbconvert.get_lines` because it can extract
+    the ipython magic statement that can span multiple lines.
+
+    ```Python
+    # example of ipython magic spanning multiple lines
+    %time result_pymc3 = eval_lda(\
+    transform_pymc3, beta_pymc3, docs_te.toarray(), np.arange(100)\
+    )
+    ```
+
+    `nbconvert.filters.get_lines` has the capability to parse such line magics and
+    return the result as a single line with trailing backslash removed. `get_lines`
+    would return `%time result_pymc3 = eval_lda(        transform_pymc3, beta_pymc3,
+     docs_te.toarray(), np.arange(100)    )`
+
+    If the magic was spanning multiple lines, then we need to remove all trailing
+    backslashes introduced by previous runs of nbqa. Also we do need to preserve the
+    newline characters, otherwise tools like black will format the code again. Linters
+    like flake8, pylint will complain about line length. After we extract the code, we
+    should have string like below
+
+    ```Python
+    %time result_pymc3 =eval_lda(
+        transform_pymc3, beta_pymc3, docs_te.toarray(), np.arange(100)
+    )`
+    ```
+
+    Parameters
+    ----------
+    source : List[str]
+        Source code of the notebook cell starting with line magic
+
+    Returns
+    -------
+    str
+        IPython line magic statement
+    """
+    if len(source) > 1 and re.match(r"\s*%\w+", source[0]) is not None:
+        # Here we look for line magics spanning across multiple lines.
+        ipython_magic = source[0]
+        next_line_no = 1
+        while next_line_no < len(source) and ipython_magic.endswith("\\\n"):
+            ipython_magic += source[next_line_no]
+            next_line_no += 1
+        return re.sub("\\\n", "\n", ipython_magic)
+
+    return source[0]
 
 
 def _replace_magics(
@@ -127,12 +182,13 @@ def _replace_magics(
         Line from cell, with line magics replaced with python code
     """
     for line_no, line in enumerate(source):
-        trimmed_line: str = line.strip()
-        if MagicHandler.is_ipython_magic(trimmed_line):
-            magic_handler = MagicHandler.get_magic_handler(trimmed_line)
+        if MagicHandler.is_ipython_magic(line):
+            # always pass the source starting from the current line
+            ipython_magic = _extract_ipython_magic(source[line_no:])
+            magic_handler = MagicHandler.get_magic_handler(ipython_magic)
             magic_substitutions.append(magic_handler)
             line = _handle_magic_indentation(
-                source[:line_no], line, magic_handler.replace_magic()
+                source[:line_no], ipython_magic, magic_handler.replace_magic()
             )
 
         yield line

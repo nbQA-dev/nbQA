@@ -109,7 +109,7 @@ class MagicHandler(ABC):
         bool
             True if the source contains ipython magic
         """
-        return source.startswith(("!", "%", "?")) or source.endswith("?")
+        return source.strip().startswith(("!", "%", "?")) or source.endswith("?")
 
     @staticmethod
     def get_magic_handler(ipython_magic: str) -> "MagicHandler":
@@ -121,6 +121,7 @@ class MagicHandler(ABC):
         MagicHandler
             An instance of MagicHandler or some subclass of MagicHandler.
         """
+        ipython_magic = ipython_magic.strip()
         magic_handler: MagicHandler
         if ipython_magic[0] == "!":
             magic_handler = ShellCommandHandler(ipython_magic)
@@ -169,7 +170,7 @@ class LineMagicHandler(MagicHandler):
     ```Python
     import os
 
-    if True
+    if True:
         %time os.system("ls -l")
     ```
 
@@ -183,7 +184,7 @@ class LineMagicHandler(MagicHandler):
     ```Python
     import os
 
-    if True
+    if True:
         if int(hex_token):
             os.system("ls -l")  # hex_token
     ```
@@ -274,8 +275,9 @@ class LineMagicHandler(MagicHandler):
         str
             Python code to replace the ipython magic
         """
-        # strip %line_magic from the line magic statement
-        code: str = re.sub(r"%\w+", "", self._ipython_magic).strip()
+        # Remove %line_magic from the line magic statement
+        # Remove leading indentation and remove leading and trailing spaces
+        code: str = dedent(re.sub(r"%\w+", " " * 4, self._ipython_magic)).strip()
         syntax_tree = self._get_syntax_tree(code)
         if syntax_tree and self._contains_callable(syntax_tree):
             self._contains_code = True
@@ -335,9 +337,16 @@ class LineMagicHandler(MagicHandler):
             )
             match_obj = extract_code_pattern.search(replacement_code)
             assert match_obj is not None
-            extracted_code = match_obj.group(1)
+            # This is needed because if formatters like black format the code
+            # to span across multiple lines, then we need to add \ to end of each line
+            # so that line magic parses all those lines as part of one python statement.
+            # %time np.random.randn(\
+            # 100\
+            # )
+            extracted_code = re.sub("\n", "\\\n", match_obj.group(1))
 
-            # combine %line_magic and the `code` to be the new ipython magic statement.
+            # combine %line_magic and the extracted code to be the new
+            # ipython magic statement.
             # This is done so that formatters like black won't reformat the notebook
             # every time they are run on the notebook.
             match_obj = re.match(r"%\w+", self._ipython_magic)
