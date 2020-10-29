@@ -66,8 +66,8 @@ class CLIArgs:
 
         return " ".join(args)
 
-    @classmethod
-    def parse_args(cls, raw_args: Optional[List[str]]) -> "CLIArgs":
+    @staticmethod
+    def parse_args(raw_args: Optional[List[str]]) -> "CLIArgs":
         """
         Parse command-line arguments.
 
