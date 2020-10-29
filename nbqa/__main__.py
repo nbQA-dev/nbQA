@@ -104,7 +104,14 @@ def _temp_python_file_for_notebook(
     Path
         Temporary Python file whose location mirrors that of the notebook, but
         inside the temporary directory.
+
+    Raises
+    ------
+    FileNotFoundError
+        If notebook doesn't exist.
     """
+    if not notebook.exists():
+        raise FileNotFoundError(f"No such file or directory: {str(notebook)}")
     relative_notebook_path = (
         notebook.resolve().relative_to(project_root).with_suffix(".py")
     )
@@ -605,21 +612,20 @@ def _check_command_is_installed(command: str) -> None:
                 )
 
 
-def main(raw_args: Optional[List[str]] = None) -> None:
+def main(argv: Optional[List[str]] = None) -> None:
     """
     Run third-party tool (e.g. :code:`mypy`) against notebook or directory.
 
     Parameters
     ----------
-    raw_args
+    argv
         Command-line arguments (if calling this function directly), defaults to
         :code:`None` if calling via command-line.
     """
-    cli_args: CLIArgs = CLIArgs.parse_args(raw_args)
+    cli_args: CLIArgs = CLIArgs.parse_args(argv)
+    _check_command_is_installed(cli_args.command)
     project_root: Path = find_project_root(tuple(cli_args.root_dirs))
     configs: Configs = _get_configs(cli_args, project_root)
-
-    _check_command_is_installed(cli_args.command)
 
     output_code = _run_on_one_root_dir(cli_args, configs, project_root)
 
