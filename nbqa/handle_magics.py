@@ -5,7 +5,7 @@ import re
 import secrets
 from abc import ABC
 from ast import AST
-from textwrap import dedent
+from textwrap import dedent, indent
 from typing import Optional, Pattern
 
 
@@ -220,7 +220,7 @@ class LineMagicHandler(MagicHandler):
     _MAGIC_TEMPLATE_WITH_CODE: str = dedent(
         """
         if int({token}):
-            {code}  # {token}
+        {code}  # {token}
         """
     ).strip()
     _MAGIC_WITH_CODE_REGEX_TEMPLATE: str = r"if\s+int\(\s*{token}\s*\).*{token}"
@@ -281,7 +281,9 @@ class LineMagicHandler(MagicHandler):
         syntax_tree = self._get_syntax_tree(code)
         if syntax_tree and self._contains_callable(syntax_tree):
             self._contains_code = True
-            return self._MAGIC_TEMPLATE_WITH_CODE.format(code=code, token=self._token)
+            return self._MAGIC_TEMPLATE_WITH_CODE.format(
+                code=indent(code, " " * 4), token=self._token
+            )
 
         return super().replace_magic()
 
