@@ -1,0 +1,35 @@
+name: docs
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  docs:
+    name: "Running: ${{ matrix.tox-env-name }}"
+    strategy:
+      matrix:
+        tox-env-name: ["docs", "docs-links"]
+
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7 # Same as RTD
+      - name: Cache multiple paths
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: docs
+      - name: install-tox
+        run: python -m pip install --upgrade tox virtualenv setuptools pip
+      - name: run ${{ matrix.tox-env-name }}
+        run: tox -e ${{ matrix.tox-env-name }}
+      - name: Upload docs artifact
+        if: ${{ matrix.tox-env-name }} == "docs"
+        uses: actions/upload-artifact@v2
+        with:
+          name: nbqa-docs
+          path: docs/_build/html
