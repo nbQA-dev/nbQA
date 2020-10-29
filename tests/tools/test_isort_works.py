@@ -171,21 +171,16 @@ def test_old_isort_separated_imports(tmp_test_data: Path) -> None:
     """
     notebook = tmp_test_data / "notebook_with_separated_imports_other.ipynb"
 
-    with open(notebook) as handle:
-        before = handle.readlines()
+    before_mtime = os.path.getmtime(str(notebook))
     with pytest.raises(SystemExit):
         main(["isort", str(notebook), "--nbqa-mutate"])
-    with open(notebook) as handle:
-        after = handle.readlines()
-    assert before == after
+    assert os.path.getmtime(str(notebook)) == before_mtime
 
     # check that adding extra command-line arguments doesn't interfere with
     # --treat-comment-as-code
     with pytest.raises(SystemExit):
         main(["isort", str(notebook), "--profile=black", "--nbqa-mutate"])
-    with open(notebook) as handle:
-        after = handle.readlines()
-    assert before == after
+    assert os.path.getmtime(str(notebook)) == before_mtime
 
 
 def test_old_isort(monkeypatch: "MonkeyPatch") -> None:
