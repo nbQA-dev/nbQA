@@ -11,14 +11,16 @@ from pathlib import Path
 from textwrap import dedent
 from typing import Dict, Iterator, List, Mapping, Match, Optional, Set, Tuple
 
+from pkg_resources import parse_version
+
 from nbqa import config_parser, replace_source, save_source
 from nbqa.cmdline import CLIArgs
 from nbqa.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
+from nbqa.optional import metadata
 
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
-
 BASE_ERROR_MESSAGE = dedent(
     """
 
@@ -27,6 +29,21 @@ BASE_ERROR_MESSAGE = dedent(
     Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏
     """
 )
+MIN_VERSIONS = {"isort": "5.3.0"}
+
+
+class UnsupportedPackageVersionError(Exception):
+    """Raise if installed module is older than minimum required version."""
+
+    def __init__(self, command: str, current_version: str, min_version: str) -> None:
+        """Initialise with command, current version, and minimum version."""
+        self.msg = dedent(
+            f"""\
+            nbqa only works with {command} >= {min_version}, while
+            you have {current_version} installed.
+            """
+        )
+        super().__init__(self.msg)
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
@@ -454,7 +471,7 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     if file_config is not None:
         cli_config = cli_config.merge(file_config)
 
-    return cli_config
+    return cli_config.merge(Configs.get_default_config(cli_args.command))
 
 
 def _run_on_one_root_dir(
@@ -569,11 +586,23 @@ def _check_command_is_installed(command: str) -> None:
     ------
     ModuleNotFoundError
         If third-party tool isn't installed.
+    UnsupportedPackageVersionError
+        If third-party tool is of an unsupported version.
     """
     try:
-        import_module(command)
-    except ImportError as exc:
-        raise ModuleNotFoundError(_get_command_not_found_msg(command)) from exc
+        command_version = metadata.version(command)  # type: ignore
+    except metadata.PackageNotFoundError:  # type: ignore
+        try:
+            import_module(command)
+        except ImportError as exc:
+            raise ModuleNotFoundError(_get_command_not_found_msg(command)) from exc
+    else:
+        if command in MIN_VERSIONS:
+            min_version = MIN_VERSIONS[command]
+            if parse_version(command_version) < parse_version(min_version):
+                raise UnsupportedPackageVersionError(
+                    command, command_version, min_version
+                )
 
 
 def main(raw_args: Optional[List[str]] = None) -> None:

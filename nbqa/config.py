@@ -1,7 +1,7 @@
 """Module responsible for storing and handling nbqa configuration."""
 
 from shlex import split
-from typing import Any, Callable, ClassVar, Dict, List, NamedTuple, Optional
+from typing import Any, Callable, ClassVar, Dict, List, Mapping, NamedTuple, Optional
 
 from nbqa.cmdline import CLIArgs
 
@@ -16,6 +16,14 @@ class _ConfigSections(NamedTuple):  # pylint: disable=R0903
 
 
 CONFIG_SECTIONS = _ConfigSections()
+
+
+DEFAULT_CONFIG: Mapping[str, Mapping] = {
+    "addopts": {"isort": ["--treat-comment-as-code", "# %%"]},
+    "ignore_cells": {},
+    "mutate": {},
+    "config": {},
+}
 
 
 class Configs:
@@ -121,3 +129,22 @@ class Configs:
         config.set_config(CONFIG_SECTIONS.MUTATE, cli_args.nbqa_mutate)
 
         return config
+
+    @staticmethod
+    def get_default_config(command: str) -> "Configs":
+        """Merge defaults."""
+        defaults: Configs = Configs()
+        defaults.set_config(
+            CONFIG_SECTIONS.ADDOPTS, DEFAULT_CONFIG["addopts"].get(command)
+        )
+        defaults.set_config(
+            CONFIG_SECTIONS.CONFIG, DEFAULT_CONFIG["config"].get(command)
+        )
+        defaults.set_config(
+            CONFIG_SECTIONS.IGNORE_CELLS, DEFAULT_CONFIG["ignore_cells"].get(command)
+        )
+        defaults.set_config(
+            CONFIG_SECTIONS.MUTATE, DEFAULT_CONFIG["mutate"].get(command)
+        )
+
+        return defaults
