@@ -412,8 +412,8 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
 
     if file_config is not None:
         cli_config = cli_config.merge(file_config)
-    cli_config = cli_config.merge_defaults(cli_args.command)
-    return cli_config
+
+    return cli_config.merge(Configs.get_default_config(cli_args.command))
 
 
 def _run_on_one_root_dir(

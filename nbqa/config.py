@@ -130,7 +130,8 @@ class Configs:
 
         return config
 
-    def merge_defaults(self, command: str) -> "Configs":
+    @staticmethod
+    def get_default_config(command: str) -> "Configs":
         """Merge defaults."""
         defaults: Configs = Configs()
         defaults.set_config(
@@ -146,4 +147,4 @@ class Configs:
             CONFIG_SECTIONS.MUTATE, DEFAULT_CONFIG["mutate"].get(command)
         )
 
-        return self.merge(defaults)
+        return defaults

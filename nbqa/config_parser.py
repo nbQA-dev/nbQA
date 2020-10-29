@@ -122,7 +122,5 @@ def parse_config_from_file(cli_args: CLIArgs, project_root: Path) -> Optional[Co
             # we found the config. skip other files
             if config is not None:
                 break
-    else:
-        config = Configs()
 
     return config
