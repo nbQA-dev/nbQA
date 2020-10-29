@@ -7,7 +7,7 @@ from setuptools import find_packages, setup
 
 readme = Path("README.md").read_text(encoding="utf8")
 
-requirements = ["toml"]
+requirements = ["toml", "importlib_metadata; python_version < '3.8'"]
 
 setup_requirements = []
 
