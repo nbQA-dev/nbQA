@@ -109,6 +109,26 @@
         "tool",
         "bug"
       ]
+    },
+    {
+      "login": "caioariede",
+      "name": "Caio Ariede",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/55533?v=4",
+      "profile": "http://caioariede.github.io/",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "sobolevn",
+      "name": "Nikita Sobolev",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/4660275?v=4",
+      "profile": "https://sobolevn.me",
+      "contributions": [
+        "ideas",
+        "bug",
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,

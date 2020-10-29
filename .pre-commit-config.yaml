@@ -3,7 +3,7 @@ default_language_version:
   python: python3
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+    rev: v3.3.0
     hooks:
       - id: end-of-file-fixer
       - id: requirements-txt-fixer
@@ -17,16 +17,16 @@ repos:
     rev: 20.8b1
     hooks:
       - id: black
-  - repo: https://github.com/prettier/prettier
-    rev: 2.1.2
+  - repo: https://github.com/prettier/pre-commit
+    rev: v2.1.2
     hooks:
       - id: prettier
-        exclude: README.md
+        exclude: ^README\.md$
   - repo: https://github.com/PyCQA/pylint
     rev: pylint-2.6.0
     hooks:
       - id: pylint
-        exclude: ^docs/conf.py$
+        exclude: ^docs/conf\.py$
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.4
     hooks:
@@ -39,29 +39,35 @@ repos:
     rev: 5.1.1
     hooks:
       - id: pydocstyle
-        exclude: "docs"
+        exclude: ^docs/
   - repo: https://github.com/econchick/interrogate
     rev: 1.3.1
     hooks:
       - id: interrogate
         args: [-v, --fail-under=100]
-        exclude: (docs|__init__.py)
+        exclude: ^docs/|__init__\.py$
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v0.790
     hooks:
       - id: mypy
-        exclude: "docs"
+        exclude: ^docs/
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.7.2
+    rev: v2.7.3
     hooks:
       - id: pyupgrade
-        args: ["--py36-plus"]
+        args: [--py36-plus]
   - repo: https://github.com/codespell-project/codespell
     rev: v1.17.1
     hooks:
       - id: codespell
-        files: ".py|.rst|.md"
+        files: \.(py|rst|md)$
   - repo: https://github.com/terrencepreilly/darglint
     rev: v1.5.5
     hooks:
       - id: darglint
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.7.0
+    hooks:
+      - id: rst-backticks
+      - id: rst-directive-colons
+      - id: rst-inline-touching-normal
