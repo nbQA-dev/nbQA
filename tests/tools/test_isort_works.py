@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from nbqa.__main__ import main
+from nbqa.__main__ import UnsupportedPackageVersionError, main
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -198,7 +198,13 @@ def test_old_isort(monkeypatch: "MonkeyPatch") -> None:
         Pytest fixture, we use it to override isort's version.
     """
     monkeypatch.setattr("nbqa.__main__.metadata.version", lambda _: "4.3.21")
-    with pytest.raises(ModuleNotFoundError) as excinfo:
+    with pytest.raises(UnsupportedPackageVersionError) as excinfo:
         main(["isort", "tests/data/notebook_for_testing.ipynb"])
 
-    assert "Command `isort>=5.3.0` not found by nbqa" in str(excinfo.value)
+    msg = dedent(
+        """\
+        nbqa only works with isort >= 5.3.0, while
+        you have 4.3.21 installed.
+        """
+    )
+    assert msg == str(excinfo.value)

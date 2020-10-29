@@ -32,6 +32,20 @@ BASE_ERROR_MESSAGE = dedent(
 MIN_VERSIONS = {"isort": "5.3.0"}
 
 
+class UnsupportedPackageVersionError(Exception):
+    """Raise if installed module is older than minimum required version."""
+
+    def __init__(self, command: str, current_version: str, min_version: str) -> None:
+        """Initialise with command, current version, and minimum version."""
+        self.msg = dedent(
+            f"""\
+            nbqa only works with {command} >= {min_version}, while
+            you have {current_version} installed.
+            """
+        )
+        super().__init__(self.msg)
+
+
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
     """
     Get generator with all notebooks in directory.
@@ -572,6 +586,8 @@ def _check_command_is_installed(command: str) -> None:
     ------
     ModuleNotFoundError
         If third-party tool isn't installed.
+    UnsupportedPackageVersionError
+        If third-party tool is of an unsupported version.
     """
     try:
         command_version = metadata.version(command)  # type: ignore
@@ -584,8 +600,8 @@ def _check_command_is_installed(command: str) -> None:
         if command in MIN_VERSIONS:
             min_version = MIN_VERSIONS[command]
             if parse_version(command_version) < parse_version(min_version):
-                raise ModuleNotFoundError(
-                    _get_command_not_found_msg(f"{command}>={min_version}")
+                raise UnsupportedPackageVersionError(
+                    command, command_version, min_version
                 )
 
 
