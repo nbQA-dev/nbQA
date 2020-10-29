@@ -67,13 +67,13 @@ class CLIArgs:
         return " ".join(args)
 
     @staticmethod
-    def parse_args(raw_args: Optional[List[str]]) -> "CLIArgs":
+    def parse_args(argv: Optional[List[str]]) -> "CLIArgs":
         """
         Parse command-line arguments.
 
         Parameters
         ----------
-        raw_args
+        argv
             Passed via command-line.
         Returns
         -------
@@ -124,7 +124,7 @@ class CLIArgs:
             "--version", action="version", version=f"nbqa {__version__}"
         )
         try:
-            args, cmd_args = parser.parse_known_args(raw_args)
+            args, cmd_args = parser.parse_known_args(argv)
         except SystemExit as exception:
             if exception.code != 0:
                 msg = dedent(
