@@ -117,12 +117,12 @@ def _extract_ipython_magic(magic: str, cell_source: Iterator[Tuple[int, str]]) -
     To extract ipython magic, we use `nbconvert.get_lines` because it can extract
     the ipython magic statement that can span multiple lines.
 
-    ```Python
-    # example of ipython magic spanning multiple lines
-    %time result_pymc3 = eval_lda(\
-    transform_pymc3, beta_pymc3, docs_te.toarray(), np.arange(100)\
-    )
-    ```
+    .. code:: python
+
+        # example of ipython magic spanning multiple lines
+        %time result_pymc3 = eval_lda(\
+        transform_pymc3, beta_pymc3, docs_te.toarray(), np.arange(100)\
+        )
 
     `nbconvert.filters.get_lines` has the capability to parse such line magics and
     return the result as a single line with trailing backslash removed. `get_lines`
@@ -135,11 +135,11 @@ def _extract_ipython_magic(magic: str, cell_source: Iterator[Tuple[int, str]]) -
     like flake8, pylint will complain about line length. After we extract the code, we
     should have string like below
 
-    ```Python
-    %time result_pymc3 =eval_lda(
-        transform_pymc3, beta_pymc3, docs_te.toarray(), np.arange(100)
-    )`
-    ```
+    .. code:: python
+
+        %time result_pymc3 =eval_lda(
+            transform_pymc3, beta_pymc3, docs_te.toarray(), np.arange(100)
+        )
 
     Parameters
     ----------

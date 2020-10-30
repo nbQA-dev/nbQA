@@ -157,22 +157,20 @@ class CellMagicHandler(MagicHandler):
 
 
 class LineMagicHandler(MagicHandler):
-    """Handle ipython line magic starting with %.
+    """Handle ipython line magic starting with `%`.
 
-    Description
-    -----------
     When ipython magic like `%time` that can contain python code, if we ignore the
     code and replace the line magic with the template `type(hex_token)...`, we will
     get into a scenario of unused imports.
 
     For example, consider the following snippet.
 
-    ```Python
-    import os
+    .. code:: python
 
-    if True:
-        %time os.system("ls -l")
-    ```
+        import os
+
+        if True:
+            %time os.system("ls -l")
 
     In the above snippet, if we replace the `%time` line magic with `type(token)  #`
     statement, then flake8 or pylint would complain `unused import os`. Also tools
@@ -181,13 +179,13 @@ class LineMagicHandler(MagicHandler):
     To handle this issue, we transform the above snippet to a temporary python code that
     looks like the snippet below
 
-    ```Python
-    import os
+    .. code:: python
 
-    if True:
-        if int(hex_token):
-            os.system("ls -l")  # hex_token
-    ```
+        import os
+
+        if True:
+            if int(hex_token):
+                os.system("ls -l")  # hex_token
 
     Before transforming the line magic to the above form, first the line magic is
     checked if it contains any python code with a callable. Otherwise the usual
@@ -197,16 +195,16 @@ class LineMagicHandler(MagicHandler):
     Now till this change the linters are happy. But there will be a problem with code
     formatters like black. Consider the below snippet
 
-    ```Python
-    %time func(arg1,arg2)
-    ```
+    .. code:: python
+
+        %time func(arg1,arg2)
 
     This line magic will be transformed and after black formatting the code will look as
 
-    ```Python
-    if int(hex_token):
-        func(arg1, arg2)  # hex_token
-    ```
+    .. code:: python
+
+        if int(hex_token):
+            func(arg1, arg2)  # hex_token
 
     Note `func(arg1, arg2)` got formatted. If we don't replace this newly formatted
     code back to original notebook cell source, every time black will reformat this
