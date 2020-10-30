@@ -28,7 +28,7 @@
 	<a href="https://gitter.im/nbQA/nbQA"><img
 		alt="chat"
 		src="https://badges.gitter.im/Join%20Chat.svg"></a>
-	<a href="https://nbqa.readthedocs.io/en/latest/)"><img
+	<a href="https://nbqa.readthedocs.io/en/latest/"><img
 		alt="docs"
 		src="https://readthedocs.org/projects/nbqa/badge/?version=latest"></a>
 </p>
