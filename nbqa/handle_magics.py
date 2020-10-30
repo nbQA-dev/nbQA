@@ -356,6 +356,16 @@ class LineMagicHandler(MagicHandler):
             # every time they are run on the notebook.
             match_obj = re.match(r"%\w+", self._ipython_magic)
             assert match_obj is not None
-            ipython_magic = f"{match_obj.group()} {extracted_code}".strip()
+            line_magic = match_obj.group()
+            # Code is indented by 2 more spaces, so that code like below
+            # %time np.random.randn(\
+            #         1000\
+            #     )
+            # will look aesthetically better like below
+            # %time np.random.randn(\
+            #           1000\
+            #       )
+            indented_code = indent(extracted_code, prefix=" " * 2).strip()
+            ipython_magic = f"{line_magic} {indented_code}".strip()
 
         return replacement_code_pattern.sub(ipython_magic, cell_source)
