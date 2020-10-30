@@ -75,7 +75,7 @@ All done! ✨ 🍰 ✨
 Sort your imports with [isort](https://timothycrosley.github.io/isort/):
 
 ```console
-$ nbqa isort my_notebook.ipynb --treat-comment-as-code '# %%' --nbqa-mutate
+$ nbqa isort my_notebook.ipynb --nbqa-mutate
 Fixing my_notebook.ipynb
 ```
 
@@ -108,7 +108,6 @@ for details)
    pyupgrade = 1
 
    [tool.nbqa.addopts]
-   isort = ["--treat-comment-as-code", "# %%"]
    pyupgrade = ["--py36-plus"]
    ```
 
@@ -116,7 +115,7 @@ for details)
 
    ```yaml
    - repo: https://github.com/nbQA-dev/nbQA
-     rev: 0.3.5
+     rev: 0.3.6
      hooks:
        - id: nbqa-black
        - id: nbqa-pyupgrade

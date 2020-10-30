@@ -2,6 +2,13 @@
 Changelog
 =========
 
+0.3.6 (2020-10-25)
+------------------
+
+Improved error reporting if file is not found.
+We now pass ``--treat-comment-as-code '# %%'`` by default when running ``isort``.
+Fixed bug whereby tools referencing line 0 we resulting in a ``KeyError``.
+
 0.3.5 (2020-10-25)
 ------------------
 
