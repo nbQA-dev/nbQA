@@ -150,9 +150,9 @@ def _map_python_line_to_nb_lines(
     out = re.sub(pattern, substitution, out, flags=re.MULTILINE)
 
     # doctest pattern
-    pattern = rf'(?<={notebook.name}", line )\d+'
-    if re.search(pattern, out) is not None:
-        out = re.sub(pattern, substitution, out)
+    pattern = rf'(?<=^File "{re.escape(str(notebook))}", line )\d+'
+    if re.search(pattern, out, flags=re.MULTILINE) is not None:
+        out = re.sub(pattern, substitution, out, flags=re.MULTILINE)
         out = out.replace(f'{notebook.name}", line ', f'{notebook.name}", ')
 
     return out
