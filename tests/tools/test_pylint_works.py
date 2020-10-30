@@ -36,8 +36,18 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
         f"{str(notebook1)}:cell_1:5:0: W0611: Unused import nbqa (unused-import)",
         f'{str(notebook1)}:cell_4:1:0: C0413: Import "from random import randint"'
         + " should be placed at the top of the module (wrong-import-position)",
+        f'{str(notebook1)}:cell_5:1:0: C0413: Import "import pprint"'
+        + " should be placed at the top of the module (wrong-import-position)",
+        f'{str(notebook1)}:cell_5:2:0: C0413: Import "import sys"'
+        + " should be placed at the top of the module (wrong-import-position)",
         f"{str(notebook1)}:cell_4:1:0: C0411: standard import"
         + ' "from random import randint"'
+        + ' should be placed before "import nbqa" (wrong-import-order)',
+        f"{str(notebook1)}:cell_5:1:0: C0411: standard import"
+        + ' "import pprint"'
+        + ' should be placed before "import nbqa" (wrong-import-order)',
+        f"{str(notebook1)}:cell_5:2:0: C0411: standard import"
+        + ' "import sys"'
         + ' should be placed before "import nbqa" (wrong-import-order)',
     ]
 

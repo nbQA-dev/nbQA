@@ -159,7 +159,9 @@ def _extract_ipython_magic(magic: str, cell_source: Iterator[Tuple[int, str]]) -
         while magic.endswith("\\\n"):
             try:
                 magic += next(cell_source)[1]
-            except StopIteration:
+            except StopIteration:  # pragma: nocover
+                # This scenario is a syntax error where a line magic
+                # ends with a backslash and does not have a next line.
                 break
 
     return magic
