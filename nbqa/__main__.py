@@ -141,7 +141,7 @@ def _map_python_line_to_nb_lines(
         Stdout with references to temporary Python file's lines replaced with references
         to notebook's cells and lines.
     """
-    pattern = rf"(?<=^{str(notebook)}:)\d+"
+    pattern = rf"(?<=^{re.escape(str(notebook))}:)\d+"
 
     def substitution(match: Match[str]) -> str:
         """Replace Python line with corresponding Jupyter notebook cell."""
