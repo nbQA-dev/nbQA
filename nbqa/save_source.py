@@ -111,9 +111,7 @@ def _handle_magic_indentation(
     return replacement
 
 
-def _extract_ipython_magic(
-    source: List[str], source_itr: Iterator[Tuple[int, str]]
-) -> str:
+def _extract_ipython_magic(magic: str, cell_source: Iterator[Tuple[int, str]]) -> str:
     r"""Extract the ipython magic from the notebook cell source.
 
     To extract ipython magic, we use `nbconvert.get_lines` because it can extract
@@ -145,10 +143,10 @@ def _extract_ipython_magic(
 
     Parameters
     ----------
-    source : List[str]
-        Source code of the notebook cell starting with line magic
+    magic : str
+        First line of the ipython magic
 
-    source_itr: Iterator[Tuple[int, str]]
+    cell_source: Iterator[Tuple[int, str]]
         Iterator to the notebook cell source
 
     Returns
@@ -156,16 +154,15 @@ def _extract_ipython_magic(
     str
         IPython line magic statement
     """
-    if len(source) > 1 and re.match(r"\s*%\w+", source[0]) is not None:
+    if re.match(r"\s*%\w+", magic) is not None:
         # Here we look for line magics spanning across multiple lines.
-        ipython_magic = source[0]
-        next_line_no = 1
-        while next_line_no < len(source) and ipython_magic.endswith("\\\n"):
-            ipython_magic += next(source_itr)[1]
-            next_line_no += 1
-        return re.sub(r"\\\n", "\n", ipython_magic)
+        while magic.endswith("\\\n"):
+            try:
+                magic += next(cell_source)[1]
+            except StopIteration:
+                break
 
-    return source[0]
+    return magic
 
 
 def _replace_magics(
@@ -190,7 +187,7 @@ def _replace_magics(
     for line_no, line in source_itr:
         if MagicHandler.is_ipython_magic(line):
             # always pass the source starting from the current line
-            ipython_magic = _extract_ipython_magic(source[line_no:], source_itr)
+            ipython_magic = _extract_ipython_magic(line, source_itr)
             magic_handler = MagicHandler.get_magic_handler(ipython_magic)
             magic_substitutions.append(magic_handler)
             line = _handle_magic_indentation(

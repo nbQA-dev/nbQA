@@ -121,7 +121,7 @@ class MagicHandler(ABC):
         MagicHandler
             An instance of MagicHandler or some subclass of MagicHandler.
         """
-        ipython_magic = ipython_magic.strip()
+        ipython_magic = dedent(ipython_magic).strip()
         magic_handler: MagicHandler
         if ipython_magic[0] == "!":
             magic_handler = ShellCommandHandler(ipython_magic)
@@ -220,13 +220,14 @@ class LineMagicHandler(MagicHandler):
     _MAGIC_TEMPLATE_WITH_CODE: str = dedent(
         """
         if int({token}):
-        {code}  # {token}
+        {indented_code}  # {token}
         """
     ).strip()
     _MAGIC_WITH_CODE_REGEX_TEMPLATE: str = r"if\s+int\(\s*{token}\s*\).*{token}"
     _EXTRACT_CODE_REGEX_TEMPLATE: str = (
         r"if\s+int\(\s*{token}\s*\):\s+(.*)\s+#\s+{token}"
     )
+    _LEADING_SPACES: str = " " * 4
 
     _contains_code: bool = False
 
@@ -277,12 +278,16 @@ class LineMagicHandler(MagicHandler):
         """
         # Remove %line_magic from the line magic statement
         # Remove leading indentation and remove leading and trailing spaces
-        code: str = dedent(re.sub(r"%\w+", " " * 4, self._ipython_magic)).strip()
+        code: str = dedent(
+            re.sub(r"%\w+", lambda m: " " * len(m.group()), self._ipython_magic)
+        ).strip()
         syntax_tree = self._get_syntax_tree(code)
         if syntax_tree and self._contains_callable(syntax_tree):
             self._contains_code = True
+            # remove the trailing backslashes if any from the code
+            code = re.sub(r"\\\n", "\n", code)
             return self._MAGIC_TEMPLATE_WITH_CODE.format(
-                code=indent(code, " " * 4), token=self._token
+                indented_code=indent(code, self._LEADING_SPACES), token=self._token
             )
 
         return super().replace_magic()
@@ -340,7 +345,7 @@ class LineMagicHandler(MagicHandler):
             match_obj = extract_code_pattern.search(replacement_code)
             assert match_obj is not None
             # This is needed because if formatters like black format the code
-            # to span across multiple lines, then we need to add \ to end of each line
+            # to span across multiple lines, then we need to add `\` to end of each line
             # so that line magic parses all those lines as part of one python statement.
             # %time np.random.randn(\
             # 100\
