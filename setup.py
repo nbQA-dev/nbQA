@@ -46,6 +46,6 @@ setup(
     tests_require=test_requirements,
     extras_require=extra_requirements,
     url="https://github.com/nbQA-dev/nbQA",
-    version="0.3.5",
+    version="0.3.6",
     zip_safe=False,
 )

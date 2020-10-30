@@ -11,7 +11,7 @@ Here's an example of what you could include in your ``.pre-commit-config.yaml`` 
 
     repos:
     - repo: https://github.com/nbQA-dev/nbQA
-      rev: 0.3.5
+      rev: 0.3.6
       hooks:
         - id: nbqa-black
         - id: nbqa-isort
@@ -25,7 +25,7 @@ Custom hooks
 If you have your own custom tool (e.g. ``customtool``) for which we currently don't have a built-in hook, you can define your own one with: ::
 
     - repo: https://github.com/nbQA-dev/nbQA
-      rev: 0.3.5
+      rev: 0.3.6
       hooks:
         - id: nbqa
           args: [customtool]
