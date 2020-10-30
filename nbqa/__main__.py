@@ -141,13 +141,13 @@ def _map_python_line_to_nb_lines(
         Stdout with references to temporary Python file's lines replaced with references
         to notebook's cells and lines.
     """
-    pattern = rf"(?<={notebook.name}:)\d+"
+    pattern = rf"(?<=^{str(notebook)}:)\d+"
 
     def substitution(match: Match[str]) -> str:
         """Replace Python line with corresponding Jupyter notebook cell."""
         return str(cell_mapping[int(match.group())])
 
-    out = re.sub(pattern, substitution, out)
+    out = re.sub(pattern, substitution, out, flags=re.MULTILINE)
 
     # doctest pattern
     pattern = rf'(?<={notebook.name}", line )\d+'
