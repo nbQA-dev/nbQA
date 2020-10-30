@@ -216,7 +216,7 @@ def main(
     cells = json.loads(notebook.read_text())["cells"]
 
     result = []
-    cell_mapping = {}
+    cell_mapping = {0: "cell_0:0"}
     line_number = 0
     cell_number = 0
     trailing_semicolons = set()
