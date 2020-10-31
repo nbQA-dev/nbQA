@@ -443,7 +443,7 @@ def _get_command_not_found_msg(command: str) -> str:
     """
     python = sys.executable
     nbqa_loc = str(Path(sys.modules["nbqa"].__file__).parent)
-    msg = dedent(
+    return dedent(
         f"""\
         {RED}Command `{command}` not found by nbqa.{RESET}
 
@@ -455,7 +455,6 @@ def _get_command_not_found_msg(command: str) -> str:
         {python}, you could fix this issue by running `{python} -m pip install {command}`.
         """
     )
-    return msg
 
 
 def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
