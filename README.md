@@ -2,7 +2,7 @@
 	<img
 		width="400"
 		alt="nbQA"
-		src="https://github.com/nbQA-dev/nbQA/raw/master/docs/assets/logo.png">
+		src="https://github.com/nbQA-dev/nbQA/raw/master/assets/logo.png">
 </h1>
 
 <h3 align="center">
