@@ -554,13 +554,16 @@ def _run_on_one_root_dir(
 
             if mutated:
                 if not configs.nbqa_mutate:
+                    # pylint: disable=C0301
                     msg = dedent(
                         f"""\
-                        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:
+                        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:
 
-                            {" ".join([str(cli_args), "--nbqa-mutate"])}
+                            nbqa {cli_args.command} notebook.ipynb --nbqa-mutate
+
                         """
                     )
+                    # pylint: enable=C0301
                     raise SystemExit(msg)
 
                 try:
