@@ -101,14 +101,12 @@ def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     path = Path("tests") / "data/notebook_for_testing.ipynb"
-    # pylint: disable=C0301
     expected_err = dedent(
-        r"""\
-        \x1b\[1;31m😭 KeyError(.*) while parsing output from applying print_6174 to tests.data.notebook_for_testing\.ipynb 😭
+        rf"""\
+        \x1b\[1;31m😭 KeyError(.*) while parsing output from applying print_6174 to {str(path)} 😭
         Please report a bug at https://github\.com/nbQA\-dev/nbQA/issues 🙏\x1b\[0m
-        """  # noqa: E501  pylint: disable=C0301
+        """
     )
-    # pylint: enable=C0301
     with pytest.raises(SystemExit):
         main(["print_6174", str(path), "--nbqa-mutate"])
     out, err = capsys.readouterr()
