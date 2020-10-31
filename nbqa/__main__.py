@@ -23,7 +23,6 @@ from nbqa.optional import metadata
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
 BASE_ERROR_MESSAGE = dedent(
     f"""\
-
     {RED}😭 {{}} 😭
     Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏{RESET}
     """
