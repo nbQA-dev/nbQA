@@ -1,13 +1,15 @@
 """Check that users are encouraged to report bugs if reconstructing notebook fails."""
 
 import os
+import re
 from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
 import pytest
 
-from nbqa.__main__ import main
+from nbqa.__main__ import VIRTUAL_ENVIRONMENTS_URL, main
+from nbqa.cmdline import CONFIGURATION_URL, RED, RESET
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -17,12 +19,13 @@ if TYPE_CHECKING:
 def test_missing_command() -> None:
     """Check useful error is raised if :code:`nbqa` is run with an invalid command."""
     command = "some-fictional-command"
+
     msg = dedent(
         f"""\
-        Command `{command}` not found by nbqa.
+        {re.escape(RED)}Command `{command}` not found by nbqa.{re.escape(RESET)}
 
         Please make sure you have it installed in the same Python environment as nbqa. See
-        e.g. https://realpython.com/python-virtual-environments-a-primer/ for how to set up
+        e.g. {re.escape(VIRTUAL_ENVIRONMENTS_URL)} for how to set up
         a virtual environment in Python.
 
         Since nbqa is installed at .* and uses the Python executable found at
@@ -36,13 +39,15 @@ def test_missing_command() -> None:
 def test_missing_root_dir() -> None:
     """Check useful error message is raised if :code:`nbqa` is called without root_dir."""
     msg = dedent(
-        """\
-        Please specify both a command and a notebook/directory.
-        e.g nbqa flake8 my_notebook.ipynb
+        f"""\
+        {re.escape(RED)}Please specify both a command and a notebook/directory\
+        {re.escape(RESET)}, e.g.:
+
+            nbqa flake8 my_notebook.ipynb
 
         To know all the options supported by nbqa, use `nbqa --help`. To
         read in detail about the various configuration options supported by
-        nbqa, refer to https://nbqa.readthedocs.io/en/latest/configuration.html
+        nbqa, refer to {re.escape(CONFIGURATION_URL)}
         """
     )
     with pytest.raises(ValueError, match=msg):
@@ -98,7 +103,7 @@ def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     path = Path("tests") / "data/notebook_for_testing.ipynb"
-    message = f"Error parsing output from applying print_6174 to {path}"
+    message = f"KeyError(6174) while parsing output from applying print_6174 to {path}"
     with pytest.raises(SystemExit):
         main(["print_6174", str(path), "--nbqa-mutate"])
     out, err = capsys.readouterr()

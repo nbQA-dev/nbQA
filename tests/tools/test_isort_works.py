@@ -199,7 +199,6 @@ def test_old_isort(monkeypatch: "MonkeyPatch") -> None:
     msg = dedent(
         """\
         nbqa only works with isort >= 5.3.0, while
-        you have 4.3.21 installed.
-        """
+        you have 4.3.21 installed."""
     )
-    assert msg == str(excinfo.value)
+    assert msg in str(excinfo.value)

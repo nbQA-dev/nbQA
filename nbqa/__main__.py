@@ -14,7 +14,7 @@ from typing import Dict, Iterator, List, Mapping, Match, Optional, Set, Tuple
 from pkg_resources import parse_version
 
 from nbqa import config_parser, replace_source, save_source
-from nbqa.cmdline import CLIArgs
+from nbqa.cmdline import RED, RESET, CLIArgs
 from nbqa.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
@@ -22,14 +22,17 @@ from nbqa.optional import metadata
 
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
 BASE_ERROR_MESSAGE = dedent(
-    """\
-    \x1b[1;31m
-    😭 {} 😭
+    f"""\
+    {RED}
+    😭 {{}} 😭
     Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏
-    \x1b[0m
+    {RESET}
     """
 )
 MIN_VERSIONS = {"isort": "5.3.0"}
+VIRTUAL_ENVIRONMENTS_URL = (
+    "https://realpython.com/python-virtual-environments-a-primer/"
+)
 
 
 class UnsupportedPackageVersionError(Exception):
@@ -39,8 +42,8 @@ class UnsupportedPackageVersionError(Exception):
         """Initialise with command, current version, and minimum version."""
         self.msg = dedent(
             f"""\
-            \x1b[1;31mnbqa only works with {command} >= {min_version}, while
-            you have {current_version} installed.\x1b[0m
+            {RED}nbqa only works with {command} >= {min_version}, while
+            you have {current_version} installed.{RESET}
             """
         )
         super().__init__(self.msg)
@@ -112,7 +115,7 @@ def _temp_python_file_for_notebook(
     """
     if not notebook.exists():
         raise FileNotFoundError(
-            f"\x1b[1;31mNo such file or directory: {str(notebook)}\x1b[0m"
+            f"{RED}No such file or directory: {str(notebook)}{RESET}"
         )
     relative_notebook_path = (
         notebook.resolve().relative_to(project_root).with_suffix(".py")
@@ -438,22 +441,21 @@ def _get_command_not_found_msg(command: str) -> str:
     str
         Message to display to stdout.
     """
-    template = dedent(
-        """\
-        \x1b[1;31mCommand `{command}` not found by nbqa.\x1b[0m
+    python = sys.executable
+    nbqa_loc = str(Path(sys.modules["nbqa"].__file__).parent)
+    msg = dedent(
+        f"""\
+        {RED}Command `{command}` not found by nbqa.{RESET}
 
         Please make sure you have it installed in the same Python environment as nbqa. See
-        e.g. https://realpython.com/python-virtual-environments-a-primer/ for how to set up
+        e.g. {VIRTUAL_ENVIRONMENTS_URL} for how to set up
         a virtual environment in Python.
 
         Since nbqa is installed at {nbqa_loc} and uses the Python executable found at
         {python}, you could fix this issue by running `{python} -m pip install {command}`.
         """
     )
-    python_executable = sys.executable
-    nbqa_loc = str(Path(sys.modules["nbqa"].__file__).parent)
-
-    return template.format(command=command, python=python_executable, nbqa_loc=nbqa_loc)
+    return msg
 
 
 def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
@@ -557,7 +559,7 @@ def _run_on_one_root_dir(
             except Exception as exc:  # pylint: disable=W0703
                 msg = (
                     f"{repr(exc)} while parsing output "
-                    "from applying {cli_args.command} to {str(notebook)}"
+                    f"from applying {cli_args.command} to {str(notebook)}"
                 )
                 sys.stderr.write(BASE_ERROR_MESSAGE.format(msg))
 
@@ -565,8 +567,8 @@ def _run_on_one_root_dir(
                 if not configs.nbqa_mutate:
                     msg = dedent(
                         f"""\
-                        \x1b[1;31m💥 Mutation detected, will not reformat! \
-                        Please use the `--nbqa-mutate` flag:\x1b[0m
+                        {RED}💥 Mutation detected, will not reformat! \
+                        Please use the `--nbqa-mutate` flag:{RESET}
 
                             {" ".join([str(cli_args), "--nbqa-mutate"])}
                         """
