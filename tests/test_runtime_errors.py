@@ -1,15 +1,13 @@
 """Check that users are encouraged to report bugs if reconstructing notebook fails."""
 
 import os
-import re
 from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
 import pytest
 
-from nbqa.__main__ import VIRTUAL_ENVIRONMENTS_URL, main
-from nbqa.cmdline import CONFIGURATION_URL, RED, RESET
+from nbqa.__main__ import main
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -18,36 +16,35 @@ if TYPE_CHECKING:
 
 def test_missing_command() -> None:
     """Check useful error is raised if :code:`nbqa` is run with an invalid command."""
-    command = "some-fictional-command"
-
+    # pylint: disable=C0301
     msg = dedent(
-        f"""\
-        {re.escape(RED)}Command `{command}` not found by nbqa.{re.escape(RESET)}
+        """\
+        \x1b\\[1;31mCommand `some-fictional-command` not found by nbqa.\x1b\\[0m
 
         Please make sure you have it installed in the same Python environment as nbqa. See
-        e.g. {re.escape(VIRTUAL_ENVIRONMENTS_URL)} for how to set up
+        e.g. https://realpython\\.com/python\\-virtual\\-environments\\-a\\-primer/ for how to set up
         a virtual environment in Python.
 
         Since nbqa is installed at .* and uses the Python executable found at
-        .*, you could fix this issue by running `.* -m pip install {command}`.
+        .*, you could fix this issue by running `.* -m pip install some-fictional-command`.
         """
     )
+    # pylint: disable=C0301
     with pytest.raises(ModuleNotFoundError, match=msg):
-        main([command, "tests", "--some-flag"])
+        main(["some-fictional-command", "tests", "--some-flag"])
 
 
 def test_missing_root_dir() -> None:
     """Check useful error message is raised if :code:`nbqa` is called without root_dir."""
     msg = dedent(
-        f"""\
-        {re.escape(RED)}Please specify both a command and a notebook/directory\
-        {re.escape(RESET)}, e.g.:
+        """\
+        \x1b\\[1;31mPlease specify both a command and a notebook/directory\x1b\\[0m, e.g.:
 
             nbqa flake8 my_notebook.ipynb
 
         To know all the options supported by nbqa, use `nbqa --help`. To
         read in detail about the various configuration options supported by
-        nbqa, refer to {re.escape(CONFIGURATION_URL)}
+        nbqa, refer to https://nbqa\\.readthedocs\\.io/en/latest/configuration\\.html
         """
     )
     with pytest.raises(ValueError, match=msg):
