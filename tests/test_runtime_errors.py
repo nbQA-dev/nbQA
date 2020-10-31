@@ -109,9 +109,9 @@ def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
         """  # noqa: E501
     )
     # pylint: enable=C0301
+    expected_out = f"{str(path)}:6174:0 some silly warning{os.linesep}"
     with pytest.raises(SystemExit):
         main(["print_6174", str(path), "--nbqa-mutate"])
     out, err = capsys.readouterr()
-    expected_out = f"{str(path)}:6174:0 some silly warning{os.linesep}"
     re.match(expected_err, err)
-    assert expected_out in out
+    assert expected_out == out
