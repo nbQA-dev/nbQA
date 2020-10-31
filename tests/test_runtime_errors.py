@@ -100,7 +100,7 @@ def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     path = Path("tests") / "data/notebook_for_testing.ipynb"
-    message = f"KeyError(6174) while parsing output from applying print_6174 to {path}"
+    message = f"while parsing output from applying print_6174 to {path}"
     with pytest.raises(SystemExit):
         main(["print_6174", str(path), "--nbqa-mutate"])
     out, err = capsys.readouterr()
