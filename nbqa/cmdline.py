@@ -129,8 +129,9 @@ class CLIArgs:
             if exception.code != 0:
                 msg = dedent(
                     """\
-                    Please specify both a command and a notebook/directory.
-                    e.g nbqa flake8 my_notebook.ipynb
+                    \x1b[1;31mPlease specify both a command and a notebook/directory\x1b[0m, e.g.:
+
+                        nbqa flake8 my_notebook.ipynb
 
                     To know all the options supported by nbqa, use `nbqa --help`. To
                     read in detail about the various configuration options supported by

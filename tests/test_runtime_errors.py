@@ -10,6 +10,7 @@ import pytest
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:
+    from _pytest.capture import CaptureFixture
     from _pytest.monkeypatch import MonkeyPatch
 
 
@@ -87,18 +88,20 @@ def test_unable_to_parse() -> None:
 
 
 @pytest.mark.usefixtures("tmp_print_6174")
-def test_unable_to_parse_output(monkeypatch: "MonkeyPatch") -> None:
+def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
     """
-    Same as ``test_unable_to_reconstruct_message`` but we check ``PYTHONPATH`` updates correctly.
+    Check user is encouraged to report bug if we're unable to parse tool's output.
 
     Parameters
     ----------
-    monkeypatch
-        Pytest fixture, we use it to override ``PYTHONPATH``.
+    capsys
+        Pytest fixture to capture stdout and stderr.
     """
-    path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
+    path = Path("tests") / "data/notebook_for_testing.ipynb"
     message = f"Error parsing output from applying print_6174 to {path}"
-    monkeypatch.setenv("PYTHONPATH", os.path.join(os.getcwd(), "tests"))
-    with pytest.raises(RuntimeError) as excinfo:
-        main(["print_6174", path, "--nbqa-mutate"])
-    assert message in str(excinfo.value)
+    with pytest.raises(SystemExit):
+        main(["print_6174", str(path), "--nbqa-mutate"])
+    out, err = capsys.readouterr()
+    expected_out = f"{str(path)}:6174:0 some silly warning{os.linesep}"
+    assert message in err
+    assert expected_out in out
