@@ -18,7 +18,6 @@ def test_allow_mutation() -> None:
         💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:
 
             nbqa black notebook.ipynb --nbqa-mutate
-
         """
     )
 
