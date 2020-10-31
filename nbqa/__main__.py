@@ -40,11 +40,9 @@ class UnsupportedPackageVersionError(Exception):
 
     def __init__(self, command: str, current_version: str, min_version: str) -> None:
         """Initialise with command, current version, and minimum version."""
-        self.msg = dedent(
-            f"""\
-            {RED}nbqa only works with {command} >= {min_version}, while
-            you have {current_version} installed.{RESET}
-            """
+        self.msg = (
+            f"{RED}nbqa only works with {command} >= {min_version}, "
+            f"while you have {current_version} installed.{RESET}"
         )
         super().__init__(self.msg)
 
