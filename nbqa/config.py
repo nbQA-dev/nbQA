@@ -22,7 +22,7 @@ CONFIG_SECTIONS = _ConfigSections()
 
 
 DEFAULT_CONFIG: Mapping[str, Mapping] = toml.load(
-    resource_filename("nbqa", "default_config.toml")
+    resource_filename("nbqa.config_files", "default_config.toml")
 )
 
 
