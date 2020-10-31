@@ -26,7 +26,7 @@ repos:
     rev: pylint-2.6.0
     hooks:
       - id: pylint
-        exclude: ^docs/conf\.py$
+        files: ^nbqa/
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.4
     hooks:
@@ -39,18 +39,18 @@ repos:
     rev: 5.1.1
     hooks:
       - id: pydocstyle
-        exclude: ^docs/
+        files: ^nbqa/
   - repo: https://github.com/econchick/interrogate
     rev: 1.3.1
     hooks:
       - id: interrogate
         args: [-v, --fail-under=100]
-        exclude: ^docs/|__init__\.py$
+        files: ^nbqa/
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v0.790
     hooks:
       - id: mypy
-        exclude: ^docs/
+        files: ^nbqa/
   - repo: https://github.com/asottile/pyupgrade
     rev: v2.7.3
     hooks:
@@ -71,3 +71,7 @@ repos:
       - id: rst-backticks
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
+  - repo: https://github.com/asottile/setup-cfg-fmt
+    rev: v1.15.1
+    hooks:
+      - id: setup-cfg-fmt

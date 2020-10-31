@@ -3,6 +3,9 @@
 from shlex import split
 from typing import Any, Callable, ClassVar, Dict, List, Mapping, NamedTuple, Optional
 
+import toml
+from pkg_resources import resource_filename
+
 from nbqa.cmdline import CLIArgs
 
 
@@ -18,12 +21,9 @@ class _ConfigSections(NamedTuple):  # pylint: disable=R0903
 CONFIG_SECTIONS = _ConfigSections()
 
 
-DEFAULT_CONFIG: Mapping[str, Mapping] = {
-    "addopts": {"isort": ["--treat-comment-as-code", "# %%"]},
-    "ignore_cells": {},
-    "mutate": {},
-    "config": {},
-}
+DEFAULT_CONFIG: Mapping[str, Mapping] = toml.load(
+    resource_filename("nbqa.config", "default_config.toml")
+)
 
 
 class Configs:
