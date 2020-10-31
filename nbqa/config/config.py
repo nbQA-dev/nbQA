@@ -1,7 +1,10 @@
 """Module responsible for storing and handling nbqa configuration."""
 
 from shlex import split
-from typing import Any, Callable, ClassVar, Dict, List, NamedTuple, Optional
+from typing import Any, Callable, ClassVar, Dict, List, Mapping, NamedTuple, Optional
+
+import toml
+from pkg_resources import resource_filename
 
 from nbqa.cmdline import CLIArgs
 
@@ -16,6 +19,11 @@ class _ConfigSections(NamedTuple):  # pylint: disable=R0903
 
 
 CONFIG_SECTIONS = _ConfigSections()
+
+
+DEFAULT_CONFIG: Mapping[str, Mapping] = toml.load(
+    resource_filename("nbqa.config", "default_config.toml")
+)
 
 
 class Configs:
@@ -93,11 +101,15 @@ class Configs:
         Configs
             Merged configuration object
         """
-        self._addopts.extend(other.nbqa_addopts)
-        self._config = self._config or other.nbqa_config
-        self._ignore_cells = self._ignore_cells or other.nbqa_ignore_cells
-        self._mutate = self._mutate or other.nbqa_mutate
-        return self
+        config: Configs = Configs()
+
+        config.set_config(CONFIG_SECTIONS.ADDOPTS, self._addopts + other.nbqa_addopts)
+        config.set_config(CONFIG_SECTIONS.CONFIG, self._config or other.nbqa_config)
+        config.set_config(
+            CONFIG_SECTIONS.IGNORE_CELLS, self._ignore_cells or other.nbqa_ignore_cells
+        )
+        config.set_config(CONFIG_SECTIONS.MUTATE, self._mutate or other.nbqa_mutate)
+        return config
 
     @staticmethod
     def parse_from_cli_args(cli_args: CLIArgs) -> "Configs":
@@ -117,3 +129,22 @@ class Configs:
         config.set_config(CONFIG_SECTIONS.MUTATE, cli_args.nbqa_mutate)
 
         return config
+
+    @staticmethod
+    def get_default_config(command: str) -> "Configs":
+        """Merge defaults."""
+        defaults: Configs = Configs()
+        defaults.set_config(
+            CONFIG_SECTIONS.ADDOPTS, DEFAULT_CONFIG["addopts"].get(command)
+        )
+        defaults.set_config(
+            CONFIG_SECTIONS.CONFIG, DEFAULT_CONFIG["config"].get(command)
+        )
+        defaults.set_config(
+            CONFIG_SECTIONS.IGNORE_CELLS, DEFAULT_CONFIG["ignore_cells"].get(command)
+        )
+        defaults.set_config(
+            CONFIG_SECTIONS.MUTATE, DEFAULT_CONFIG["mutate"].get(command)
+        )
+
+        return defaults

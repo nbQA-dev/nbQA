@@ -16,15 +16,21 @@
 	<a href="https://codecov.io/gh/nbQA-dev/nbQA"><img
 		alt="codecov"
 		src="https://codecov.io/gh/nbQA-dev/nbQA/branch/master/graph/badge.svg"></a>
+	<a href="https://results.pre-commit.ci/latest/github/nbQA-dev/nbQA/master"><img
+		alt="pre-commit"
+		src="https://results.pre-commit.ci/badge/github/nbQA-dev/nbQA/master.svg"></a>
+</p>
+
+<p align="center">
 	<a href="https://pypi.org/project/nbqa/"><img
 		alt="versions"
 		src="https://img.shields.io/pypi/pyversions/nbqa.svg"></a>
-	<a href="https://github.com/pre-commit/pre-commit"><img
-		alt="pre-commit"
-		src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white"></a>
 	<a href="https://gitter.im/nbQA/nbQA"><img
 		alt="chat"
 		src="https://badges.gitter.im/Join%20Chat.svg"></a>
+	<a href="https://nbqa.readthedocs.io/en/latest/"><img
+		alt="docs"
+		src="https://readthedocs.org/projects/nbqa/badge/?version=latest"></a>
 </p>
 
 <p align="center">
@@ -69,7 +75,7 @@ All done! ✨ 🍰 ✨
 Sort your imports with [isort](https://timothycrosley.github.io/isort/):
 
 ```console
-$ nbqa isort my_notebook.ipynb --treat-comment-as-code '# %%' --nbqa-mutate
+$ nbqa isort my_notebook.ipynb --nbqa-mutate
 Fixing my_notebook.ipynb
 ```
 
@@ -102,7 +108,6 @@ for details)
    pyupgrade = 1
 
    [tool.nbqa.addopts]
-   isort = ["--treat-comment-as-code", "# %%"]
    pyupgrade = ["--py36-plus"]
    ```
 
@@ -110,7 +115,7 @@ for details)
 
    ```yaml
    - repo: https://github.com/nbQA-dev/nbQA
-     rev: 0.3.4
+     rev: 0.3.6
      hooks:
        - id: nbqa-black
        - id: nbqa-pyupgrade
@@ -125,16 +130,22 @@ Take some inspiration from their config files 😉
 - **pandas-profiling** [.pre-commit-config.yaml](https://github.com/pandas-profiling/pandas-profiling/blob/develop/.pre-commit-config.yaml)
 - **alibi** [.pre-commit-config.yaml](https://github.com/SeldonIO/alibi/blob/master/.pre-commit-config.yaml)
 - **NLP Profiler**: [pyproject.toml](https://github.com/neomatrix369/nlp_profiler/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/neomatrix369/nlp_profiler/blob/master/.pre-commit-config.yaml)
+- **LiuAlgoTrader**: [pyproject.toml](https://github.com/amor71/LiuAlgoTrader/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/amor71/LiuAlgoTrader/blob/master/.pre-commit-config.yaml)
 
 ## 💬 Testimonials
 
-**Michael Kennedy & Brian Okken**, [hosts of the Python Bytes podcast](https://pythonbytes.fm/)
+**Michael Kennedy & Brian Okken**, [hosts of the Python Bytes podcast](https://pythonbytes.fm/):
+
 > This is really cool. I think it brings so much of the code formatting and code analysis, clean up to notebooks, which I think had been really lacking
 
-**Alex Andorra**,
-[Data Scientist, ArviZ & PyMC Dev, Host of 'Learning Bayesian Statistics' Podcast 🎙️](https://learnbayesstats.anvil.app/):
+**Nikita Sobolev**, [CTO at wemake.services](https://sobolevn.me/):
 
-> well done on `nbqa` @MarcoGorelli ! Will be super useful in CI 😉
+> It is amazing!
+
+**Alex Andorra**,
+[Data Scientist, ArviZ & PyMC Dev, Host of 'Learning Bayesian Statistics' Podcast](https://learnbayesstats.anvil.app/):
+
+> well done on `nbqa` @MarcoGorelli ! Will be super useful in CI
 
 **Girish Pasupathy**,
 [Software engineer and now core-contributor](https://github.com/girip11):
@@ -166,7 +177,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://gacka.space/"><img src="https://avatars1.githubusercontent.com/u/25684390?v=4" width="100px;" alt=""/><br /><sub><b>Michał Gacka</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Am3h0w" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/HappyFacade"><img src="https://avatars0.githubusercontent.com/u/54226355?v=4" width="100px;" alt=""/><br /><sub><b>Happy</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/commits?author=HappyFacade" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/ntaylor-nanigans"><img src="https://avatars0.githubusercontent.com/u/44039328?v=4" width="100px;" alt=""/><br /><sub><b>Nat Taylor</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Antaylor-nanigans" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/ntaylor-nanigans"><img src="https://avatars0.githubusercontent.com/u/44039328?v=4" width="100px;" alt=""/><br /><sub><b>Nat Taylor</b></sub></a><br /><a href="#ideas-ntaylor-nanigans" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/nbQA-dev/nbQA/commits?author=ntaylor-nanigans" title="Code">💻</a> <a href="#tool-ntaylor-nanigans" title="Tools">🔧</a> <a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Antaylor-nanigans" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="http://caioariede.github.io/"><img src="https://avatars0.githubusercontent.com/u/55533?v=4" width="100px;" alt=""/><br /><sub><b>Caio Ariede</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/commits?author=caioariede" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://sobolevn.me"><img src="https://avatars1.githubusercontent.com/u/4660275?v=4" width="100px;" alt=""/><br /><sub><b>Nikita Sobolev</b></sub></a><br /><a href="#ideas-sobolevn" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Asobolevn" title="Bug reports">🐛</a> <a href="https://github.com/nbQA-dev/nbQA/commits?author=sobolevn" title="Documentation">📖</a></td>
   </tr>
 </table>
 

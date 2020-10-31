@@ -59,9 +59,9 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `nbqa` for local development.
+Ready to contribute? Here's how to set up ``nbqa`` for local development.
 
-1. Fork the `nbqa` repo on GitHub.
+1. Fork the ``nbqa`` repo on GitHub.
 2. Clone your fork locally::
 
     $ git clone git@github.com:your_name_here/nbqa.git nbqa-dev
@@ -101,6 +101,20 @@ Before you submit a pull request, check that it meets these guidelines:
    your new functionality into a function with a docstring, and add the
    feature to the list in README.md.
 3. The pull request should work for Python 3.6, 3.7, 3.8, and 3.9.
+
+Add yourself as a contributor
+-----------------------------
+
+To add yourself to the table of contributors, please follow the `bot usage
+instructions <https://allcontributors.org/docs/en/bot/usage>`_.
+
+Example of comment::
+
+    @all-contributors please add @<username> for documentation
+
+.. note::
+
+    It's considered a good practice to always prefix usernames with ``@``
 
 Tips
 ----

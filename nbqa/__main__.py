@@ -1,24 +1,52 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
-from collections import defaultdict
+
 import os
 import re
 import shutil
 import subprocess
 import sys
 import tempfile
+from collections import defaultdict
 from importlib import import_module
 from pathlib import Path
 from textwrap import dedent
-from typing import Dict, Iterator, List, Mapping, Match, Optional, Set, Tuple
+from typing import (
+    DefaultDict,
+    Dict,
+    Iterator,
+    List,
+    Mapping,
+    Match,
+    Optional,
+    Set,
+    Tuple,
+)
+
+from pkg_resources import parse_version
 
 from nbqa import config_parser, replace_source, save_source
 from nbqa.cmdline import CLIArgs
-from nbqa.config import Configs
+from nbqa.config.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
+from nbqa.optional import metadata
 
-CONFIG_FILES = defaultdict(lambda: ["setup.cfg", "tox.ini", "pyproject.toml"])
-
+CONFIG_FILES: DefaultDict[str, List[str]] = defaultdict(
+    lambda: ["setup.cfg", "tox.ini", "pyproject.toml"]
+)
+CONFIG_FILES["black"] = ["pyproject.toml"]
+CONFIG_FILES["flake8"] = ["setup.cfg", "tox.ini", ".flake8"]
+CONFIG_FILES["pyupgrade"] = []
+CONFIG_FILES["mypy"] = ["mypy.ini", ".mypy.ini", "setup.cfg"]
+CONFIG_FILES["doctest"] = []
+CONFIG_FILES["isort"] = [
+    ".isort.cfg",
+    "pyproject.toml",
+    "setup.cfg",
+    "tox.ini",
+    ".editorconfig",
+]
+CONFIG_FILES["pylint"] = ["pylintrc", ".pylintrc", "pyproject.toml", "setup.cfg"]
 BASE_ERROR_MESSAGE = dedent(
     """
 
@@ -27,6 +55,21 @@ BASE_ERROR_MESSAGE = dedent(
     Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏
     """
 )
+MIN_VERSIONS = {"isort": "5.3.0"}
+
+
+class UnsupportedPackageVersionError(Exception):
+    """Raise if installed module is older than minimum required version."""
+
+    def __init__(self, command: str, current_version: str, min_version: str) -> None:
+        """Initialise with command, current version, and minimum version."""
+        self.msg = dedent(
+            f"""\
+            nbqa only works with {command} >= {min_version}, while
+            you have {current_version} installed.
+            """
+        )
+        super().__init__(self.msg)
 
 
 def _get_notebooks(root_dir: str) -> Iterator[Path]:
@@ -50,6 +93,23 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
     )
 
 
+def _get_all_notebooks(root_dirs: List[str]) -> Iterator[Path]:
+    """
+    Get generator with all notebooks passed in via the command-line.
+
+    Parameters
+    ----------
+    root_dirs
+        All the notebooks/directories passed in via the command-line.
+
+    Returns
+    -------
+    Iterator
+        All Jupyter Notebooks found in all passed directories/notebooks.
+    """
+    return (j for i in root_dirs for j in _get_notebooks(i))
+
+
 def _temp_python_file_for_notebook(
     notebook: Path, tmpdir: str, project_root: Path
 ) -> Path:
@@ -70,7 +130,14 @@ def _temp_python_file_for_notebook(
     Path
         Temporary Python file whose location mirrors that of the notebook, but
         inside the temporary directory.
+
+    Raises
+    ------
+    FileNotFoundError
+        If notebook doesn't exist.
     """
+    if not notebook.exists():
+        raise FileNotFoundError(f"No such file or directory: {str(notebook)}")
     relative_notebook_path = (
         notebook.resolve().relative_to(project_root).with_suffix(".py")
     )
@@ -100,18 +167,18 @@ def _map_python_line_to_nb_lines(
         Stdout with references to temporary Python file's lines replaced with references
         to notebook's cells and lines.
     """
-    pattern = rf"(?<={notebook.name}:)\d+"
+    pattern = rf"(?<=^{re.escape(str(notebook))}:)\d+"
 
     def substitution(match: Match[str]) -> str:
         """Replace Python line with corresponding Jupyter notebook cell."""
         return str(cell_mapping[int(match.group())])
 
-    out = re.sub(pattern, substitution, out)
+    out = re.sub(pattern, substitution, out, flags=re.MULTILINE)
 
     # doctest pattern
-    pattern = rf'(?<={notebook.name}", line )\d+'
-    if re.search(pattern, out) is not None:
-        out = re.sub(pattern, substitution, out)
+    pattern = rf'(?<=^File "{re.escape(str(notebook))}", line )\d+'
+    if re.search(pattern, out, flags=re.MULTILINE) is not None:
+        out = re.sub(pattern, substitution, out, flags=re.MULTILINE)
         out = out.replace(f'{notebook.name}", line ', f'{notebook.name}", ')
 
     return out
@@ -199,13 +266,15 @@ def _create_blank_init_files(
 
 
 def _preserve_config_files(
-    nbqa_config: Optional[str], tmpdirname: str, project_root: Path
+    command: str, nbqa_config: Optional[str], tmpdirname: str, project_root: Path
 ) -> None:
     """
     Copy local config file to temporary directory.
 
     Parameters
     ----------
+    command
+        Code quality tool being run.
     nbqa_config
         Config file for third-party tool (e.g. mypy).
     tmpdirname
@@ -213,7 +282,7 @@ def _preserve_config_files(
     project_root
         Root of repository, where .git / .hg / .nbqa.ini file is.
     """
-    config_files = [nbqa_config] if nbqa_config is not None else CONFIG_FILES
+    config_files = [nbqa_config] if nbqa_config is not None else CONFIG_FILES[command]
     for config_file in config_files:
         config_file_path = project_root / config_file
         if config_file_path.exists():
@@ -270,9 +339,36 @@ def _get_arg(
     if Path(root_dir).is_dir():
         arg = Path(tmpdirname) / Path(root_dir).resolve().relative_to(project_root)
     else:
-        assert len(nb_to_py_mapping) == 1
-        arg = next(iter(nb_to_py_mapping.values()))
+        arg = nb_to_py_mapping[Path(root_dir)]
     return arg
+
+
+def _get_all_args(
+    root_dirs: List[str],
+    tmpdirname: str,
+    nb_to_py_mapping: Dict[Path, Path],
+    project_root: Path,
+) -> List[Path]:
+    """
+    Get all arguments to run command against.
+
+    Parameters
+    ----------
+    root_dirs
+        All notebooks or directories third-party tool is being run against.
+    tmpdirname
+        Temporary directory where converted notebooks are stored.
+    nb_to_py_mapping
+        Mapping between notebooks and Python files corresponding to converted notebooks.
+    project_root
+        Root of repository, where .git / .hg / .nbqa.ini file is.
+
+    Returns
+    -------
+    List[Path]
+        All notebooks or directories to run third-party tool against.
+    """
+    return [_get_arg(i, tmpdirname, nb_to_py_mapping, project_root) for i in root_dirs]
 
 
 def _get_mtimes(arg: Path) -> Set[float]:
@@ -298,7 +394,7 @@ def _run_command(
     command: str,
     tmpdirname: str,
     cmd_args: List[str],
-    arg: Path,
+    args: List[Path],
 ) -> Tuple[str, str, int, bool]:
     """
     Run third-party tool against given file or directory.
@@ -311,8 +407,8 @@ def _run_command(
         Temporary directory where converted notebooks will be stored.
     cmd_args
         Flags to pass to third-party tool (e.g. :code:`--verbose`).
-    arg
-        Notebook, or directory of notebooks, third-party tool is being run on.
+    args
+        Notebooks, or directories of notebooks, third-party tool is being run on.
 
     Returns
     -------
@@ -335,17 +431,17 @@ def _run_command(
         "PYTHONPATH"
     ] = f"{env.get('PYTHONPATH', '').rstrip(os.pathsep)}{os.pathsep}{os.getcwd()}"
 
-    before = _get_mtimes(arg)
+    before = [_get_mtimes(i) for i in args]
 
     output = subprocess.run(
-        [sys.executable, "-m", command, str(arg), *cmd_args],
+        [sys.executable, "-m", command, *(str(i) for i in args), *cmd_args],
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         cwd=tmpdirname,
         env=env,
     )
 
-    mutated = _get_mtimes(arg) != before
+    mutated = [_get_mtimes(i) for i in args] != before
 
     output_code = output.returncode
 
@@ -410,19 +506,17 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     if file_config is not None:
         cli_config = cli_config.merge(file_config)
 
-    return cli_config
+    return cli_config.merge(Configs.get_default_config(cli_args.command))
 
 
 def _run_on_one_root_dir(
-    root_dir: str, cli_args: CLIArgs, configs: Configs, project_root: Path
+    cli_args: CLIArgs, configs: Configs, project_root: Path
 ) -> int:
     """
     Run third-party tool on a single notebook or directory.
 
     Parameters
     ----------
-    root_dir
-        Directory on which nbqa should be run
     cli_args
         Commanline arguments passed to nbqa.
     configs
@@ -447,10 +541,12 @@ def _run_on_one_root_dir(
 
         nb_to_py_mapping = {
             notebook: _temp_python_file_for_notebook(notebook, tmpdirname, project_root)
-            for notebook in _get_notebooks(root_dir)
+            for notebook in _get_all_notebooks(cli_args.root_dirs)
         }
 
-        _preserve_config_files(configs.nbqa_config, tmpdirname, project_root)
+        _preserve_config_files(
+            cli_args.command, configs.nbqa_config, tmpdirname, project_root
+        )
 
         nb_info_mapping: Dict[Path, NotebookInfo] = {}
 
@@ -473,7 +569,9 @@ def _run_on_one_root_dir(
             cli_args.command,
             tmpdirname,
             configs.nbqa_addopts,
-            _get_arg(root_dir, tmpdirname, nb_to_py_mapping, project_root),
+            _get_all_args(
+                cli_args.root_dirs, tmpdirname, nb_to_py_mapping, project_root
+            ),
         )
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
@@ -525,35 +623,43 @@ def _check_command_is_installed(command: str) -> None:
     ------
     ModuleNotFoundError
         If third-party tool isn't installed.
+    UnsupportedPackageVersionError
+        If third-party tool is of an unsupported version.
     """
     try:
-        import_module(command)
-    except ImportError as exc:
-        raise ModuleNotFoundError(_get_command_not_found_msg(command)) from exc
+        command_version = metadata.version(command)  # type: ignore
+    except metadata.PackageNotFoundError:  # type: ignore
+        try:
+            import_module(command)
+        except ImportError as exc:
+            raise ModuleNotFoundError(_get_command_not_found_msg(command)) from exc
+    else:
+        if command in MIN_VERSIONS:
+            min_version = MIN_VERSIONS[command]
+            if parse_version(command_version) < parse_version(min_version):
+                raise UnsupportedPackageVersionError(
+                    command, command_version, min_version
+                )
 
 
-def main(raw_args: Optional[List[str]] = None) -> None:
+def main(argv: Optional[List[str]] = None) -> None:
     """
     Run third-party tool (e.g. :code:`mypy`) against notebook or directory.
 
     Parameters
     ----------
-    raw_args
+    argv
         Command-line arguments (if calling this function directly), defaults to
         :code:`None` if calling via command-line.
     """
-    cli_args: CLIArgs = CLIArgs.parse_args(raw_args)
+    cli_args: CLIArgs = CLIArgs.parse_args(argv)
+    _check_command_is_installed(cli_args.command)
     project_root: Path = find_project_root(tuple(cli_args.root_dirs))
     configs: Configs = _get_configs(cli_args, project_root)
 
-    _check_command_is_installed(cli_args.command)
+    output_code = _run_on_one_root_dir(cli_args, configs, project_root)
 
-    output_codes = [
-        _run_on_one_root_dir(i, cli_args, configs, project_root)
-        for i in cli_args.root_dirs
-    ]
-
-    sys.exit(int(any(output_codes)))
+    sys.exit(output_code)
 
 
 if __name__ == "__main__":

@@ -8,10 +8,11 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from nbqa.__main__ import main
+from nbqa.__main__ import UnsupportedPackageVersionError, main
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
+    from _pytest.monkeypatch import MonkeyPatch
 
 
 def test_isort_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> None:
@@ -155,3 +156,50 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: Path) ->
         '+    "    pass;"\n'
     )
     assert result == expected
+
+
+def test_old_isort_separated_imports(tmp_test_data: Path) -> None:
+    """
+    Check isort works when a notebook has imports in different cells.
+
+    This test would fail if we didn't pass --treat-comment-as-code '# %%'.
+
+    Parameters
+    ----------
+    tmp_test_data
+        Temporary copy of test data.
+    """
+    notebook = tmp_test_data / "notebook_with_separated_imports_other.ipynb"
+
+    before_mtime = os.path.getmtime(str(notebook))
+    with pytest.raises(SystemExit):
+        main(["isort", str(notebook), "--nbqa-mutate"])
+    assert os.path.getmtime(str(notebook)) == before_mtime
+
+    # check that adding extra command-line arguments doesn't interfere with
+    # --treat-comment-as-code
+    with pytest.raises(SystemExit):
+        main(["isort", str(notebook), "--profile=black", "--nbqa-mutate"])
+    assert os.path.getmtime(str(notebook)) == before_mtime
+
+
+def test_old_isort(monkeypatch: "MonkeyPatch") -> None:
+    """
+    Check that using an old version of isort will raise an error.
+
+    Parameters
+    ----------
+    monkeypatch
+        Pytest fixture, we use it to override isort's version.
+    """
+    monkeypatch.setattr("nbqa.__main__.metadata.version", lambda _: "4.3.21")
+    with pytest.raises(UnsupportedPackageVersionError) as excinfo:
+        main(["isort", "tests/data/notebook_for_testing.ipynb"])
+
+    msg = dedent(
+        """\
+        nbqa only works with isort >= 5.3.0, while
+        you have 4.3.21 installed.
+        """
+    )
+    assert msg == str(excinfo.value)

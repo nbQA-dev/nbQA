@@ -4,7 +4,7 @@ from typing import Any, Mapping, Optional
 
 import toml
 
-from nbqa.config import CONFIG_SECTIONS, Configs
+from nbqa.config.config import CONFIG_SECTIONS, Configs
 
 _ROOT_CONFIG_KEY: str = "tool"
 _NBQA_CONFIG_KEY: str = "nbqa"

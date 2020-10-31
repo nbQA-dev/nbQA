@@ -14,7 +14,7 @@ Sort your imports with `isort`_:
 
 .. code:: console
 
-   $ nbqa isort my_notebook.ipynb --treat-comment-as-code '# %%' --nbqa-mutate
+   $ nbqa isort my_notebook.ipynb --nbqa-mutate
    Fixing my_notebook.ipynb
 
 Check your type annotations with `mypy`_:
