@@ -1,6 +1,3 @@
-include LICENSE
-include README.md
-
 recursive-exclude tests *
 recursive-exclude docs *
 recursive-exclude * __pycache__
