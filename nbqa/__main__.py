@@ -548,9 +548,16 @@ def _run_on_one_root_dir(
             out, err = _replace_temp_python_file_references_in_out_err(
                 tmpdirname, temp_python_file, notebook, out, err
             )
-            out = _map_python_line_to_nb_lines(
-                out, notebook, nb_info_mapping[notebook].cell_mappings
-            )
+            try:
+                out = _map_python_line_to_nb_lines(
+                    out, notebook, nb_info_mapping[notebook].cell_mappings
+                )
+            except Exception as exc:
+                raise RuntimeError(
+                    BASE_ERROR_MESSAGE.format(
+                        f"Error parsing output from applying {cli_args.command} to {str(notebook)}"
+                    )
+                ) from exc
 
             if mutated:
                 if not configs.nbqa_mutate:

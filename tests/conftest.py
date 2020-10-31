@@ -186,3 +186,12 @@ def tmp_remove_comments() -> Iterator[None]:
     shutil.copy(str(Path("tests") / temp_file), str(temp_file))
     yield
     temp_file.unlink()
+
+
+@pytest.fixture
+def tmp_print_6174() -> Iterator[None]:
+    """Make temporary copy of ``tests/print_6174.py`` in root dir."""
+    temp_file = Path("print_6174.py")
+    shutil.copy(str(Path("tests") / temp_file), str(temp_file))
+    yield
+    temp_file.unlink()

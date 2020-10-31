@@ -84,3 +84,21 @@ def test_unable_to_parse() -> None:
         main(["flake8", str(path), "--nbqa-mutate"])
     path.unlink()
     assert message in str(excinfo.value)
+
+
+@pytest.mark.usefixtures("tmp_print_6174")
+def test_unable_to_parse_output(monkeypatch: "MonkeyPatch") -> None:
+    """
+    Same as ``test_unable_to_reconstruct_message`` but we check ``PYTHONPATH`` updates correctly.
+
+    Parameters
+    ----------
+    monkeypatch
+        Pytest fixture, we use it to override ``PYTHONPATH``.
+    """
+    path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
+    message = f"Error parsing output from applying print_6174 to {path}"
+    monkeypatch.setenv("PYTHONPATH", os.path.join(os.getcwd(), "tests"))
+    with pytest.raises(RuntimeError) as excinfo:
+        main(["print_6174", path, "--nbqa-mutate"])
+    assert message in str(excinfo.value)
