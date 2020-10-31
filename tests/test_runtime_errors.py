@@ -1,6 +1,7 @@
 """Check that users are encouraged to report bugs if reconstructing notebook fails."""
 
 import os
+import re
 from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
@@ -100,10 +101,14 @@ def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     path = Path("tests") / "data/notebook_for_testing.ipynb"
-    message = f"while parsing output from applying print_6174 to {path}"
+    expected_err = """
+
+\x1b\\[1;31m😭 KeyError(.*) while parsing output from applying print_6174 to tests.data.notebook_for_testing\\.ipynb 😭
+Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏\x1b\\[0m
+"""
     with pytest.raises(SystemExit):
         main(["print_6174", str(path), "--nbqa-mutate"])
     out, err = capsys.readouterr()
     expected_out = f"{str(path)}:6174:0 some silly warning{os.linesep}"
-    assert message in err
+    re.match(expected_err, err)
     assert expected_out in out
