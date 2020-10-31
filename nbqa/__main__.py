@@ -455,6 +455,7 @@ def _get_command_not_found_msg(command: str) -> str:
     )
     python_executable = sys.executable
     nbqa_loc = str(Path(sys.modules["nbqa"].__file__).parent)
+
     return template.format(python=python_executable, nbqa_loc=nbqa_loc)
 
 
@@ -565,14 +566,15 @@ def _run_on_one_root_dir(
 
             if mutated:
                 if not configs.nbqa_mutate:
+                    # pylint: disable=C0301
                     msg = dedent(
                         f"""\
-                        {RED}💥 Mutation detected, will not reformat! \
-                        Please use the `--nbqa-mutate` flag:{RESET}
+                        {RED}💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag:{RESET}
 
                             {" ".join([str(cli_args), "--nbqa-mutate"])}
                         """
                     )
+                    # pylint: enable=C0301
                     raise SystemExit(msg)
 
                 try:
