@@ -441,9 +441,7 @@ def _get_command_not_found_msg(command: str) -> str:
     str
         Message to display to stdout.
     """
-    python = sys.executable
-    nbqa_loc = str(Path(sys.modules["nbqa"].__file__).parent)
-    msg = dedent(
+    template = dedent(
         f"""\
         {RED}Command `{command}` not found by nbqa.{RESET}
 
@@ -451,11 +449,13 @@ def _get_command_not_found_msg(command: str) -> str:
         e.g. {VIRTUAL_ENVIRONMENTS_URL} for how to set up
         a virtual environment in Python.
 
-        Since nbqa is installed at {nbqa_loc} and uses the Python executable found at
-        {python}, you could fix this issue by running `{python} -m pip install {command}`.
+        Since nbqa is installed at {{nbqa_loc}} and uses the Python executable found at
+        {{python}}, you could fix this issue by running `{{python}} -m pip install {command}`.
         """
     )
-    return msg
+    python_executable = sys.executable
+    nbqa_loc = str(Path(sys.modules["nbqa"].__file__).parent)
+    return template.format(python=python_executable, nbqa_loc=nbqa_loc)
 
 
 def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
