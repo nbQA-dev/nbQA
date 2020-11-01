@@ -121,14 +121,16 @@ def _temp_python_file_for_notebook(
 
 
 def _map_python_line_to_nb_lines(
-    out: str, notebook: Path, cell_mapping: Mapping[int, str]
-) -> str:
+    out: str, err: str, notebook: Path, cell_mapping: Mapping[int, str]
+) -> Tuple[str, str]:
     """
     Make sure stdout and stderr make reference to Jupyter Notebook cells and lines.
 
     Parameters
     ----------
     out
+        Captured stdout from third-party tool.
+    err
         Captured stdout from third-party tool.
     notebook
         Original Jupyter notebook.
@@ -140,13 +142,17 @@ def _map_python_line_to_nb_lines(
     str
         Stdout with references to temporary Python file's lines replaced with references
         to notebook's cells and lines.
+    err
+        Stderr with references to temporary Python file's lines replaced with references
+        to notebook's cells and lines.
     """
-    pattern = rf"(?<=^{re.escape(str(notebook))}:)\d+"
 
     def substitution(match: Match[str]) -> str:
         """Replace Python line with corresponding Jupyter notebook cell."""
         return str(cell_mapping[int(match.group())])
 
+    # flake8, pylint, mypy
+    pattern = rf"(?<=^{re.escape(str(notebook))}:)\d+"
     out = re.sub(pattern, substitution, out, flags=re.MULTILINE)
 
     # doctest pattern
@@ -155,7 +161,13 @@ def _map_python_line_to_nb_lines(
         out = re.sub(pattern, substitution, out, flags=re.MULTILINE)
         out = out.replace(f'{notebook.name}", line ', f'{notebook.name}", ')
 
-    return out
+    # black
+    pattern = (
+        rf"(?<=^error: cannot format {re.escape(str(notebook))}: Cannot parse: )\d+"
+    )
+    err = re.sub(pattern, substitution, err, flags=re.MULTILINE)
+
+    return out, err
 
 
 def _replace_temp_python_file_references_in_out_err(
@@ -548,8 +560,8 @@ def _run_on_one_root_dir(
             out, err = _replace_temp_python_file_references_in_out_err(
                 tmpdirname, temp_python_file, notebook, out, err
             )
-            out = _map_python_line_to_nb_lines(
-                out, notebook, nb_info_mapping[notebook].cell_mappings
+            out, err = _map_python_line_to_nb_lines(
+                out, err, notebook, nb_info_mapping[notebook].cell_mappings
             )
 
             if mutated:
