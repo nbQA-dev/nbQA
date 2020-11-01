@@ -267,23 +267,20 @@ def _create_blank_init_files(
 
 
 def _preserve_config_files(
-    command: str, nbqa_config: Optional[str], tmpdirname: str, project_root: Path
+    config_files: List[str], tmpdirname: str, project_root: Path
 ) -> None:
     """
     Copy local config file to temporary directory.
 
     Parameters
     ----------
-    command
-        Code quality tool being run.
-    nbqa_config
-        Config file for third-party tool (e.g. mypy).
+    config_files
+        Config files for third-party tool (e.g. mypy).
     tmpdirname
         Temporary directory to store converted notebooks in.
     project_root
         Root of repository, where .git / .hg / .nbqa.ini file is.
     """
-    config_files = [nbqa_config] if nbqa_config is not None else CONFIG_FILES[command]
     for config_file in config_files:
         config_file_path = project_root / config_file
         if config_file_path.exists():
@@ -545,9 +542,12 @@ def _run_on_one_root_dir(
             for notebook in _get_all_notebooks(cli_args.root_dirs)
         }
 
-        _preserve_config_files(
-            cli_args.command, configs.nbqa_config, tmpdirname, project_root
+        config_files = (
+            [configs.nbqa_config]
+            if configs.nbqa_config
+            else CONFIG_FILES[cli_args.command]
         )
+        _preserve_config_files(config_files, tmpdirname, project_root)
 
         nb_info_mapping: Dict[Path, NotebookInfo] = {}
 
