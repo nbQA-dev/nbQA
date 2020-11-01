@@ -10,7 +10,7 @@ import re
 from collections import defaultdict
 from itertools import takewhile
 from textwrap import indent
-from typing import TYPE_CHECKING, DefaultDict, Dict, Iterator, List, Tuple
+from typing import TYPE_CHECKING, DefaultDict, Dict, Iterator, List, Mapping, Tuple
 
 from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
@@ -35,8 +35,9 @@ MAGIC = [
     "%%svg",
     "%%writefile",
 ]
-NEWLINES = defaultdict(lambda: "\n\n")
-NEWLINES["isort"] = "\n"
+NEWLINE = "\n"
+NEWLINES = defaultdict(lambda: NEWLINE * 2)
+NEWLINES["isort"] = NEWLINE
 
 
 def _is_src_code_indentation_valid(source: str) -> bool:
@@ -105,8 +106,8 @@ def _handle_magic_indentation(
         # code itself had IndentationError
         replacement = magic_replacement
 
-    if line_magic.endswith("\n"):
-        replacement += "\n"
+    if line_magic.endswith(NEWLINE):
+        replacement += NEWLINE
 
     return replacement
 
@@ -156,7 +157,7 @@ def _extract_ipython_magic(magic: str, cell_source: Iterator[Tuple[int, str]]) -
     """
     if re.match(r"\s*%\w+", magic) is not None:
         # Here we look for line magics spanning across multiple lines.
-        while magic.endswith("\\\n"):
+        while magic.endswith(f"\\{NEWLINE}"):
             try:
                 magic += next(cell_source)[1]
             except StopIteration:  # pragma: nocover
@@ -225,7 +226,7 @@ def _parse_cell(
         Parsed cell.
     """
     substituted_magics: List[MagicHandler] = []
-    parsed_cell = f"{NEWLINES[command]}{CODE_SEPARATOR}\n"
+    parsed_cell = f"{CODE_SEPARATOR}{NEWLINE}"
 
     for parsed_line in _replace_magics(source, substituted_magics):
         parsed_cell += parsed_line
@@ -233,8 +234,53 @@ def _parse_cell(
     if substituted_magics:
         temporary_lines[cell_number] = substituted_magics
 
-    parsed_cell = parsed_cell.rstrip("\n") + "\n"
-    return parsed_cell
+    if not parsed_cell.endswith(NEWLINE):
+        parsed_cell = f"{parsed_cell}{NEWLINE}"
+
+    return f"{parsed_cell}{NEWLINES[command]}"
+
+
+def _get_line_numbers_for_mapping(
+    cell_source: str, magic_substitutions: List[MagicHandler]
+) -> Mapping[int, int]:
+    """Get the line number mapping from python file to notebook cell.
+
+    Parameters
+    ----------
+    cell_source : str
+        Source code of the notebook cell
+    magic_substitutions : List[MagicHandler]
+        IPython magics substituted in the current notebook cell.
+
+    Returns
+    -------
+    Mapping[int, int]
+        Line number mapping from temporary python file to notebook cell
+    """
+    lines_in_cell = cell_source.splitlines()
+    line_mapping: Dict[int, int] = {}
+
+    if not magic_substitutions:
+        line_mapping.update({i: i for i in range(len(lines_in_cell))})
+    else:
+        ignore_previous_line = False
+        line_number = -1
+
+        for line_no, line in enumerate(lines_in_cell):
+            if ignore_previous_line:
+                line_mapping[line_no] = line_number
+                ignore_previous_line = False
+                continue
+
+            ignore_previous_line = any(
+                magic_handler.should_ignore_for_line_mapping(line)
+                for magic_handler in magic_substitutions
+            )
+
+            line_number += 1
+            line_mapping[line_no] = line_number
+
+    return line_mapping
 
 
 def _should_ignore_code_cell(source: List[str], ignore_cells: List[str]) -> bool:
@@ -300,10 +346,13 @@ def main(
             parsed_cell = _parse_cell(
                 cell["source"], cell_number, temporary_lines, command
             )
+
             cell_mapping.update(
                 {
-                    j + line_number + 1: f"cell_{cell_number}:{j}"
-                    for j in range(len(parsed_cell.splitlines()))
+                    py_line + line_number + 1: f"cell_{cell_number}:{cell_line}"
+                    for py_line, cell_line in _get_line_numbers_for_mapping(
+                        parsed_cell, temporary_lines[cell_number]
+                    ).items()
                 }
             )
             if parsed_cell.rstrip().endswith(";"):
@@ -311,7 +360,8 @@ def main(
             result.append(re.sub(r";(\s*)$", "\\1", parsed_cell))
             line_number += len(parsed_cell.splitlines())
 
-    temp_python_file.write_text("".join(result).lstrip("\n"))
+    result[-1] = result[-1].rstrip(NEWLINE)
+    temp_python_file.write_text("".join(result) + NEWLINE)
 
     return NotebookInfo(
         cell_mapping, trailing_semicolons, temporary_lines, code_cells_to_ignore

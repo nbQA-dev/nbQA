@@ -63,6 +63,21 @@ class MagicHandler(ABC):
         )
         return pattern.sub(self._ipython_magic, cell_source)
 
+    def should_ignore_for_line_mapping(self, _: str) -> bool:  # pylint: disable=R0201
+        """Return True if the line should be ignored from line mapping.
+
+        Parameters
+        ----------
+        _ : str
+            Line to check
+
+        Returns
+        -------
+        bool
+            True if the line should be ignored. False otherwise
+        """
+        return False
+
     @staticmethod
     def _get_unique_token() -> str:
         """
@@ -157,10 +172,10 @@ class CellMagicHandler(MagicHandler):
 
 
 class LineMagicHandler(MagicHandler):
-    """Handle ipython line magic starting with `%`.
+    """Handle ipython line magic starting with ``%``.
 
-    When ipython magic like `%time` that can contain python code, if we ignore the
-    code and replace the line magic with the template `type(hex_token)...`, we will
+    When ipython magic like ``%time`` that can contain python code, if we ignore the
+    code and replace the line magic with the template ``type(hex_token)...``, we will
     get into a scenario of unused imports.
 
     For example, consider the following snippet.
@@ -172,8 +187,8 @@ class LineMagicHandler(MagicHandler):
         if True:
             %time os.system("ls -l")
 
-    In the above snippet, if we replace the `%time` line magic with `type(token)  #`
-    statement, then flake8 or pylint would complain `unused import os`. Also tools
+    In the above snippet, if we replace the ``%time`` line magic with ``type(token)  #``
+    statement, then flake8 or pylint would complain ``unused import os``. Also tools
     like autoflake would remove those statements from the notebook which is undesirable.
 
     To handle this issue, we transform the above snippet to a temporary python code that
@@ -189,8 +204,8 @@ class LineMagicHandler(MagicHandler):
 
     Before transforming the line magic to the above form, first the line magic is
     checked if it contains any python code with a callable. Otherwise the usual
-    template is used. For instance line magics like `%load_ext` won't contain any
-    python code. So such line magics will be replaced with `type(hex_token)` template.
+    template is used. For instance line magics like ``%load_ext`` won't contain any
+    python code. So such line magics will be replaced with ``type(hex_token)`` template.
 
     Now till this change the linters are happy. But there will be a problem with code
     formatters like black. Consider the below snippet
@@ -206,13 +221,13 @@ class LineMagicHandler(MagicHandler):
         if int(hex_token):
             func(arg1, arg2)  # hex_token
 
-    Note `func(arg1, arg2)` got formatted. If we don't replace this newly formatted
+    Note ``func(arg1, arg2)`` got formatted. If we don't replace this newly formatted
     code back to original notebook cell source, every time black will reformat this
     notebook and we might have failures from tools like pre-commit.
 
-    To avoid this issue, we need to extract only the formatted source `func(arg1, arg2)`
-    and add it to `%time`, and then restore this new statement back to the cell source.
-    This logic is done in the method `_restore_magic_with_modified_code`.
+    To avoid this issue, we need to extract only the formatted source
+    ``func(arg1, arg2)`` and add it to ``%time``, and then restore this new statement
+    back to the cell source. This logic is done in the method ``_restore_magic_with_modified_code``.
     """
 
     _MAGIC_TEMPLATE_WITH_CODE: str = dedent(
@@ -369,3 +384,21 @@ class LineMagicHandler(MagicHandler):
             ipython_magic = f"{line_magic} {indented_code}".strip()
 
         return replacement_code_pattern.sub(ipython_magic, cell_source)
+
+    def should_ignore_for_line_mapping(self, line: str) -> bool:
+        """Return True if the line should be ignored from line mapping.
+
+        Parameters
+        ----------
+        line : str
+            Line to check
+
+        Returns
+        -------
+        bool
+            True if the line should be ignored. False otherwise
+        """
+        return (
+            re.fullmatch(rf"\s*if\s+int\(\s*{self._token}\s*\):\s*", line, re.DOTALL)
+            is not None
+        )
