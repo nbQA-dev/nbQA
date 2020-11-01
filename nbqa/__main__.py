@@ -6,10 +6,21 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections import defaultdict
 from importlib import import_module
 from pathlib import Path
 from textwrap import dedent
-from typing import Dict, Iterator, List, Mapping, Match, Optional, Set, Tuple
+from typing import (
+    DefaultDict,
+    Dict,
+    Iterator,
+    List,
+    Mapping,
+    Match,
+    Optional,
+    Set,
+    Tuple,
+)
 
 from pkg_resources import parse_version
 
@@ -20,7 +31,22 @@ from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
 
-CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
+CONFIG_FILES: DefaultDict[str, List[str]] = defaultdict(
+    lambda: ["setup.cfg", "tox.ini", "pyproject.toml"]
+)
+CONFIG_FILES["black"] = ["pyproject.toml"]
+CONFIG_FILES["flake8"] = ["setup.cfg", "tox.ini", ".flake8"]
+CONFIG_FILES["pyupgrade"] = []
+CONFIG_FILES["mypy"] = ["mypy.ini", ".mypy.ini", "setup.cfg"]
+CONFIG_FILES["doctest"] = []
+CONFIG_FILES["isort"] = [
+    ".isort.cfg",
+    "pyproject.toml",
+    "setup.cfg",
+    "tox.ini",
+    ".editorconfig",
+]
+CONFIG_FILES["pylint"] = ["pylintrc", ".pylintrc", "pyproject.toml", "setup.cfg"]
 BASE_ERROR_MESSAGE = dedent(
     f"""\
     {RED}😭 {{}} 😭
@@ -241,21 +267,20 @@ def _create_blank_init_files(
 
 
 def _preserve_config_files(
-    nbqa_config: Optional[str], tmpdirname: str, project_root: Path
+    config_files: List[str], tmpdirname: str, project_root: Path
 ) -> None:
     """
     Copy local config file to temporary directory.
 
     Parameters
     ----------
-    nbqa_config
-        Config file for third-party tool (e.g. mypy).
+    config_files
+        Config files for third-party tool (e.g. mypy).
     tmpdirname
         Temporary directory to store converted notebooks in.
     project_root
         Root of repository, where .git / .hg / .nbqa.ini file is.
     """
-    config_files = [nbqa_config] if nbqa_config is not None else CONFIG_FILES
     for config_file in config_files:
         config_file_path = project_root / config_file
         if config_file_path.exists():
@@ -517,7 +542,12 @@ def _run_on_one_root_dir(
             for notebook in _get_all_notebooks(cli_args.root_dirs)
         }
 
-        _preserve_config_files(configs.nbqa_config, tmpdirname, project_root)
+        config_files = (
+            [configs.nbqa_config]
+            if configs.nbqa_config
+            else CONFIG_FILES[cli_args.command]
+        )
+        _preserve_config_files(config_files, tmpdirname, project_root)
 
         nb_info_mapping: Dict[Path, NotebookInfo] = {}
 
