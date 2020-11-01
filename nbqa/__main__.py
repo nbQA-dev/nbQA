@@ -155,11 +155,11 @@ def _map_python_line_to_nb_lines(
     pattern = rf"(?<=^{re.escape(str(notebook))}:)\d+"
     out = re.sub(pattern, substitution, out, flags=re.MULTILINE)
 
-    # doctest pattern
+    # doctest
     pattern = rf'(?<=^File "{re.escape(str(notebook))}", line )\d+'
-    if re.search(pattern, out, flags=re.MULTILINE) is not None:
-        out = re.sub(pattern, substitution, out, flags=re.MULTILINE)
-        out = out.replace(f'{notebook.name}", line ', f'{notebook.name}", ')
+    out = re.sub(pattern, substitution, out, flags=re.MULTILINE).replace(
+        f'{notebook.name}", line ', f'{notebook.name}", '
+    )
 
     # black
     pattern = (
