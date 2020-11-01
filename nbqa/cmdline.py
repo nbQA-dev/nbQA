@@ -6,6 +6,10 @@ from typing import List, Optional
 
 from nbqa import __version__
 
+RED = "\x1b[1;31m"
+RESET = "\x1b[0m"
+CONFIGURATION_URL = "https://nbqa.readthedocs.io/en/latest/configuration.html"
+
 
 class CLIArgs:
     """
@@ -128,13 +132,14 @@ class CLIArgs:
         except SystemExit as exception:
             if exception.code != 0:
                 msg = dedent(
-                    """\
-                    Please specify both a command and a notebook/directory.
-                    e.g nbqa flake8 my_notebook.ipynb
+                    f"""\
+                    {RED}Please specify both a command and a notebook/directory{RESET}, e.g.:
+
+                        nbqa flake8 my_notebook.ipynb
 
                     To know all the options supported by nbqa, use `nbqa --help`. To
                     read in detail about the various configuration options supported by
-                    nbqa, refer to https://nbqa.readthedocs.io/en/latest/configuration.html
+                    nbqa, refer to {CONFIGURATION_URL}
                     """
                 )
                 raise ValueError(msg) from exception
