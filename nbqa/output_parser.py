@@ -56,8 +56,9 @@ def _extra_substitution(
         stderr with substitution applied.
     """
     if command == "doctest":
-        out = out.replace(f'{notebook.name}", line ', f'{notebook.name}", ')
-        err = err.replace(f'{notebook.name}", line ', f'{notebook.name}", ')
+        pattern = rf'(?<=^File "{re.escape(str(notebook))}",) line'
+        out = re.sub(pattern, "", out, flags=re.MULTILINE)
+        err = re.sub(pattern, "", err, flags=re.MULTILINE)
     return out, err
 
 
