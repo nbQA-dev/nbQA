@@ -59,7 +59,6 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
         ***Test Failed*** 1 failures.
         """
     )
-
     assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
     assert err == ""
 
