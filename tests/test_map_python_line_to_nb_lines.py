@@ -18,7 +18,7 @@ def test_map_python_line_to_nb_lines() -> None:
 
 
 def test_black_unparseable_output() -> None:
-    """Check that the output is correctly parsed if there is a warning about line 0."""
+    """Check that the output is correctly parsed if ``black`` fails to reformat."""
     out = ""
     err = dedent(
         """\
