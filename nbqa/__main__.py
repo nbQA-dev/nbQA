@@ -142,7 +142,7 @@ def _map_python_line_to_nb_lines(
     str
         Stdout with references to temporary Python file's lines replaced with references
         to notebook's cells and lines.
-    err
+    str
         Stderr with references to temporary Python file's lines replaced with references
         to notebook's cells and lines.
     """
