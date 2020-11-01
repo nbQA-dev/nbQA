@@ -14,7 +14,7 @@ from typing import Dict, Iterator, List, Mapping, Match, Optional, Set, Tuple
 from pkg_resources import parse_version
 
 from nbqa import config_parser, replace_source, save_source
-from nbqa.cmdline import CLIArgs
+from nbqa.cmdline import RED, RESET, CLIArgs
 from nbqa.config.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
@@ -22,14 +22,15 @@ from nbqa.optional import metadata
 
 CONFIG_FILES = ["setup.cfg", "tox.ini", "pyproject.toml"]
 BASE_ERROR_MESSAGE = dedent(
-    """
-
-    😭 {} 😭
-
-    Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏
+    f"""\
+    {RED}😭 {{}} 😭
+    Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏{RESET}
     """
 )
 MIN_VERSIONS = {"isort": "5.3.0"}
+VIRTUAL_ENVIRONMENTS_URL = (
+    "https://realpython.com/python-virtual-environments-a-primer/"
+)
 
 
 class UnsupportedPackageVersionError(Exception):
@@ -37,11 +38,9 @@ class UnsupportedPackageVersionError(Exception):
 
     def __init__(self, command: str, current_version: str, min_version: str) -> None:
         """Initialise with command, current version, and minimum version."""
-        self.msg = dedent(
-            f"""\
-            nbqa only works with {command} >= {min_version}, while
-            you have {current_version} installed.
-            """
+        self.msg = (
+            f"{RED}nbqa only works with {command} >= {min_version}, "
+            f"while you have {current_version} installed.{RESET}"
         )
         super().__init__(self.msg)
 
@@ -111,7 +110,9 @@ def _temp_python_file_for_notebook(
         If notebook doesn't exist.
     """
     if not notebook.exists():
-        raise FileNotFoundError(f"No such file or directory: {str(notebook)}")
+        raise FileNotFoundError(
+            f"{RED}No such file or directory: {str(notebook)}{RESET}"
+        )
     relative_notebook_path = (
         notebook.resolve().relative_to(project_root).with_suffix(".py")
     )
@@ -437,21 +438,21 @@ def _get_command_not_found_msg(command: str) -> str:
         Message to display to stdout.
     """
     template = dedent(
-        """\
-        Command `{command}` not found by nbqa.
+        f"""\
+        {RED}Command `{command}` not found by nbqa.{RESET}
 
         Please make sure you have it installed in the same Python environment as nbqa. See
-        e.g. https://realpython.com/python-virtual-environments-a-primer/ for how to set up
+        e.g. {VIRTUAL_ENVIRONMENTS_URL} for how to set up
         a virtual environment in Python.
 
-        Since nbqa is installed at {nbqa_loc} and uses the Python executable found at
-        {python}, you could fix this issue by running `{python} -m pip install {command}`.
+        Since nbqa is installed at {{nbqa_loc}} and uses the Python executable found at
+        {{python}}, you could fix this issue by running `{{python}} -m pip install {command}`.
         """
     )
     python_executable = sys.executable
     nbqa_loc = str(Path(sys.modules["nbqa"].__file__).parent)
 
-    return template.format(command=command, python=python_executable, nbqa_loc=nbqa_loc)
+    return template.format(python=python_executable, nbqa_loc=nbqa_loc)
 
 
 def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
@@ -548,16 +549,23 @@ def _run_on_one_root_dir(
             out, err = _replace_temp_python_file_references_in_out_err(
                 tmpdirname, temp_python_file, notebook, out, err
             )
-            out = _map_python_line_to_nb_lines(
-                out, notebook, nb_info_mapping[notebook].cell_mappings
-            )
+            try:
+                out = _map_python_line_to_nb_lines(
+                    out, notebook, nb_info_mapping[notebook].cell_mappings
+                )
+            except Exception as exc:  # pylint: disable=W0703
+                msg = (
+                    f"{repr(exc)} while parsing output "
+                    f"from applying {cli_args.command} to {str(notebook)}"
+                )
+                sys.stderr.write(BASE_ERROR_MESSAGE.format(msg))
 
             if mutated:
                 if not configs.nbqa_mutate:
                     # pylint: disable=C0301
                     msg = dedent(
                         f"""\
-                        💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:
+                        {RED}💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:{RESET}
 
                             nbqa {cli_args.command} notebook.ipynb --nbqa-mutate
                         """
