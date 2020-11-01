@@ -15,7 +15,7 @@ from pkg_resources import parse_version
 
 from nbqa import config_parser, replace_source, save_source
 from nbqa.cmdline import RED, RESET, CLIArgs
-from nbqa.config import Configs
+from nbqa.config.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
@@ -142,18 +142,18 @@ def _map_python_line_to_nb_lines(
         Stdout with references to temporary Python file's lines replaced with references
         to notebook's cells and lines.
     """
-    pattern = rf"(?<={notebook.name}:)\d+"
+    pattern = rf"(?<=^{re.escape(str(notebook))}:)\d+"
 
     def substitution(match: Match[str]) -> str:
         """Replace Python line with corresponding Jupyter notebook cell."""
         return str(cell_mapping[int(match.group())])
 
-    out = re.sub(pattern, substitution, out)
+    out = re.sub(pattern, substitution, out, flags=re.MULTILINE)
 
     # doctest pattern
-    pattern = rf'(?<={notebook.name}", line )\d+'
-    if re.search(pattern, out) is not None:
-        out = re.sub(pattern, substitution, out)
+    pattern = rf'(?<=^File "{re.escape(str(notebook))}", line )\d+'
+    if re.search(pattern, out, flags=re.MULTILINE) is not None:
+        out = re.sub(pattern, substitution, out, flags=re.MULTILINE)
         out = out.replace(f'{notebook.name}", line ', f'{notebook.name}", ')
 
     return out

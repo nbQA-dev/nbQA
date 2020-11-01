@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Callable, List, Optional, Tuple
 
 from nbqa.cmdline import CLIArgs
-from nbqa.config import CONFIG_SECTIONS, Configs
+from nbqa.config.config import CONFIG_SECTIONS, Configs
 from nbqa.toml_parser import parse_from_pyproject_toml
 
 
