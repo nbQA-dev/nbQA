@@ -1,6 +1,5 @@
 """Parses the command line arguments provided."""
 import argparse
-import sys
 from textwrap import dedent
 from typing import List, Optional
 
@@ -136,9 +135,5 @@ class CLIArgs:
         parser.add_argument(
             "--version", action="version", version=f"nbqa {__version__}"
         )
-        try:
-            args, cmd_args = parser.parse_known_args(argv)
-        except SystemExit as exception:
-            sys.exit(exception.code)  # pragma: nocover
-        else:
-            return CLIArgs(args, cmd_args)
+        args, cmd_args = parser.parse_known_args(argv)
+        return CLIArgs(args, cmd_args)
