@@ -1,7 +1,6 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
 
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -10,17 +9,7 @@ from collections import defaultdict
 from importlib import import_module
 from pathlib import Path
 from textwrap import dedent
-from typing import (
-    DefaultDict,
-    Dict,
-    Iterator,
-    List,
-    Mapping,
-    Match,
-    Optional,
-    Set,
-    Tuple,
-)
+from typing import DefaultDict, Dict, Iterator, List, Optional, Set, Tuple
 
 from pkg_resources import parse_version
 
@@ -30,6 +19,7 @@ from nbqa.config.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
+from nbqa.output_parser import map_python_line_to_nb_lines
 
 CONFIG_FILES: DefaultDict[str, List[str]] = defaultdict(
     lambda: ["setup.cfg", "tox.ini", "pyproject.toml"]
@@ -145,44 +135,6 @@ def _temp_python_file_for_notebook(
     temp_python_file = Path(tmpdir) / relative_notebook_path
     temp_python_file.parent.mkdir(parents=True, exist_ok=True)
     return temp_python_file
-
-
-def _map_python_line_to_nb_lines(
-    out: str, notebook: Path, cell_mapping: Mapping[int, str]
-) -> str:
-    """
-    Make sure stdout and stderr make reference to Jupyter Notebook cells and lines.
-
-    Parameters
-    ----------
-    out
-        Captured stdout from third-party tool.
-    notebook
-        Original Jupyter notebook.
-    cell_mapping
-        Mapping from Python file lines to Jupyter notebook cells.
-
-    Returns
-    -------
-    str
-        Stdout with references to temporary Python file's lines replaced with references
-        to notebook's cells and lines.
-    """
-    pattern = rf"(?<=^{re.escape(str(notebook))}:)\d+"
-
-    def substitution(match: Match[str]) -> str:
-        """Replace Python line with corresponding Jupyter notebook cell."""
-        return str(cell_mapping[int(match.group())])
-
-    out = re.sub(pattern, substitution, out, flags=re.MULTILINE)
-
-    # doctest pattern
-    pattern = rf'(?<=^File "{re.escape(str(notebook))}", line )\d+'
-    if re.search(pattern, out, flags=re.MULTILINE) is not None:
-        out = re.sub(pattern, substitution, out, flags=re.MULTILINE)
-        out = out.replace(f'{notebook.name}", line ', f'{notebook.name}", ')
-
-    return out
 
 
 def _replace_temp_python_file_references_in_out_err(
@@ -580,8 +532,12 @@ def _run_on_one_root_dir(
                 tmpdirname, temp_python_file, notebook, out, err
             )
             try:
-                out = _map_python_line_to_nb_lines(
-                    out, notebook, nb_info_mapping[notebook].cell_mappings
+                out, err = map_python_line_to_nb_lines(
+                    cli_args.command,
+                    out,
+                    err,
+                    notebook,
+                    nb_info_mapping[notebook].cell_mappings,
                 )
             except Exception as exc:  # pylint: disable=W0703
                 msg = (
