@@ -6,7 +6,6 @@ from typing import List, Optional
 
 from nbqa import __version__
 
-RED = "\x1b[1;31m"
 BOLD = "\033[1m"
 RESET = "\x1b[0m"
 CONFIGURATION_URL = "https://nbqa.readthedocs.io/en/latest/configuration.html"

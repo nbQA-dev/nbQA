@@ -25,7 +25,7 @@ from typing import (
 from pkg_resources import parse_version
 
 from nbqa import config_parser, replace_source, save_source
-from nbqa.cmdline import RED, RESET, CLIArgs
+from nbqa.cmdline import BOLD, RESET, CLIArgs
 from nbqa.config.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
@@ -49,7 +49,7 @@ CONFIG_FILES["isort"] = [
 CONFIG_FILES["pylint"] = ["pylintrc", ".pylintrc", "pyproject.toml", "setup.cfg"]
 BASE_ERROR_MESSAGE = dedent(
     f"""\
-    {RED}😭 {{}} 😭
+    {BOLD}😭 {{}} 😭
     Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏{RESET}
     """
 )
@@ -65,7 +65,7 @@ class UnsupportedPackageVersionError(Exception):
     def __init__(self, command: str, current_version: str, min_version: str) -> None:
         """Initialise with command, current version, and minimum version."""
         self.msg = (
-            f"{RED}nbqa only works with {command} >= {min_version}, "
+            f"{BOLD}nbqa only works with {command} >= {min_version}, "
             f"while you have {current_version} installed.{RESET}"
         )
         super().__init__(self.msg)
@@ -137,7 +137,7 @@ def _temp_python_file_for_notebook(
     """
     if not notebook.exists():
         raise FileNotFoundError(
-            f"{RED}No such file or directory: {str(notebook)}{RESET}"
+            f"{BOLD}No such file or directory: {str(notebook)}{RESET}"
         )
     relative_notebook_path = (
         notebook.resolve().relative_to(project_root).with_suffix(".py")
@@ -464,7 +464,7 @@ def _get_command_not_found_msg(command: str) -> str:
     """
     template = dedent(
         f"""\
-        {RED}Command `{command}` not found by nbqa.{RESET}
+        {BOLD}Command `{command}` not found by nbqa.{RESET}
 
         Please make sure you have it installed in the same Python environment as nbqa. See
         e.g. {VIRTUAL_ENVIRONMENTS_URL} for how to set up
@@ -595,7 +595,7 @@ def _run_on_one_root_dir(
                     # pylint: disable=C0301
                     msg = dedent(
                         f"""\
-                        {RED}💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:{RESET}
+                        {BOLD}💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:{RESET}
 
                             nbqa {cli_args.command} notebook.ipynb --nbqa-mutate
                         """
