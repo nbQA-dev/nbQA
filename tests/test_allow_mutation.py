@@ -13,7 +13,7 @@ def test_allow_mutation() -> None:
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     msg = dedent(
         """\
-        \x1b[1;31m💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:\x1b[0m
+        \x1b[1m💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:\x1b[0m
 
             nbqa black notebook.ipynb --nbqa-mutate
         """
