@@ -11,10 +11,10 @@ CONFIGURATION_URL = "https://nbqa.readthedocs.io/en/latest/configuration.html"
 DOCS_URL = "https://nbqa.readthedocs.io/en/latest/index.html"
 USAGE_MSG = dedent(
     f"""\
-    nbqa <code quality tool> <notebook or directory> <flags>
+    nbqa <code quality tool> <notebook or directory> <nbqa options> <code quality tool arguments>
 
     {BOLD}Please specify:{RESET}
-    - 1) a code quality tool
+    - 1) a code quality tool (e.g. `black`, `pyupgrade`, `flake`, ...)
     - 2) some notebooks (or, if supported by the tool, directories)
     - 3) (optional) extra flags
 
