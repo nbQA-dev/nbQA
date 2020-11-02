@@ -196,5 +196,5 @@ def test_old_isort(monkeypatch: "MonkeyPatch") -> None:
     with pytest.raises(UnsupportedPackageVersionError) as excinfo:
         main(["isort", "tests/data/notebook_for_testing.ipynb"])
 
-    msg = "\x1b[1;31mnbqa only works with isort >= 5.3.0, while you have 4.3.21 installed.\x1b[0m"
+    msg = "\x1b[1mnbqa only works with isort >= 5.3.0, while you have 4.3.21 installed.\x1b[0m"
     assert msg == str(excinfo.value)

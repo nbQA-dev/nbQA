@@ -20,7 +20,7 @@ def test_missing_command() -> None:
     # pylint: disable=C0301
     msg = dedent(
         """\
-        \x1b\\[1;31mCommand `some-fictional-command` not found by nbqa.\x1b\\[0m
+        \x1b\\[1mCommand `some-fictional-command` not found by nbqa.\x1b\\[0m
 
         Please make sure you have it installed in the same Python environment as nbqa. See
         e.g. https://realpython\\.com/python\\-virtual\\-environments\\-a\\-primer/ for how to set up
@@ -35,21 +35,33 @@ def test_missing_command() -> None:
         main(["some-fictional-command", "tests", "--some-flag"])
 
 
-def test_missing_root_dir() -> None:
+def test_missing_root_dir(capsys) -> None:
     """Check useful error message is raised if :code:`nbqa` is called without root_dir."""
     msg = dedent(
         """\
-        \x1b\\[1;31mPlease specify both a command and a notebook/directory\x1b\\[0m, e.g.:
+        usage: nbqa <code quality tool> <notebook or directory> <flags>
 
-            nbqa flake8 my_notebook.ipynb
+        \x1b[1mPlease specify:\x1b[0m
+        - 1) a code quality tool
+        - 2) some notebooks (or, if supported by the tool, directories)
+        - 3) (optional) extra flags
 
-        To know all the options supported by nbqa, use `nbqa --help`. To
-        read in detail about the various configuration options supported by
-        nbqa, refer to https://nbqa\\.readthedocs\\.io/en/latest/configuration\\.html
+        \x1b[1mExamples:\x1b[0m
+            nbqa black notebook.ipynb
+            nbqa black notebook.ipynb --line-length=96
+            nbqa black notebook_1.ipynb notebook_2.ipynb
+
+        If you want to let `nbqa` modify your notebook(s), also pass `--nbqa-mutate`:
+            nbqa black notebook.ipynb --nbqa-mutate
+
+        See https://nbqa.readthedocs.io/en/latest/index.html for more details on how to run `nbqa`.
+        pytest: error: the following arguments are required: root_dirs
         """
     )
-    with pytest.raises(ValueError, match=msg):
+    with pytest.raises(SystemExit):
         main(["flake8", "--ignore=E203"])
+    _, err = capsys.readouterr()
+    assert msg == err
 
 
 @pytest.mark.usefixtures("tmp_remove_comments")
@@ -104,7 +116,7 @@ def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
     # pylint: disable=C0301
     expected_err = dedent(
         r"""\
-        \x1b\[1;31m😭 KeyError(.*) while parsing output from applying print_6174 to tests.data.notebook_for_testing\.ipynb 😭
+        \x1b\[1m😭 KeyError(.*) while parsing output from applying print_6174 to tests.data.notebook_for_testing\.ipynb 😭
         Please report a bug at https://github\.com/nbQA\-dev/nbQA/issues 🙏\x1b\[0m
         """  # noqa: E501
     )
