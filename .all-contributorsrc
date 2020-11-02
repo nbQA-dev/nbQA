@@ -129,6 +129,15 @@
         "bug",
         "doc"
       ]
+    },
+    {
+      "login": "amor71",
+      "name": "Amichay Oren",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/48661380?v=4",
+      "profile": "https://www.linkedin.com/in/amichayoren/",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
