@@ -15,7 +15,7 @@ def _get_pattern(
     notebook: Path, command: str, cell_mapping: Mapping[int, str]
 ) -> List[Tuple[str, Union[str, partial[str]]]]:
     """
-    Get pattern with which code quality tool reports output.
+    Get pattern and substitutions with which to process code quality tool's output.
 
     Parameters
     ----------
@@ -23,11 +23,13 @@ def _get_pattern(
         Notebook command is being run on.
     command
         Code quality tool.
+    cell_mapping
+        Mapping from Python file lines to Jupyter notebook cells.
 
     Returns
     -------
-    str
-        Patter of reported output.
+    List
+        Patterns and substitutions for reported output.
     """
     standard_substitution = partial(_line_to_cell, cell_mapping=cell_mapping)
     if command == "black":
