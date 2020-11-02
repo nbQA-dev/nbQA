@@ -1,11 +1,19 @@
 """Parse output from code quality tools."""
 
 import re
+from functools import partial
 from pathlib import Path
-from typing import Mapping, Match, Tuple
+from typing import List, Mapping, Match, Tuple, Union
 
 
-def _get_pattern(notebook: Path, command: str) -> str:
+def _line_to_cell(match: Match[str], cell_mapping: Mapping[int, str]) -> str:
+    """Replace Python line with corresponding Jupyter notebook cell."""
+    return str(cell_mapping[int(match.group())])
+
+
+def _get_pattern(
+    notebook: Path, command: str, cell_mapping: Mapping[int, str]
+) -> List[Tuple[str, Union[str, partial[str]]]]:
     """
     Get pattern with which code quality tool reports output.
 
@@ -21,45 +29,24 @@ def _get_pattern(notebook: Path, command: str) -> str:
     str
         Patter of reported output.
     """
+    standard_substitution = partial(_line_to_cell, cell_mapping=cell_mapping)
     if command == "black":
-        return (
-            rf"(?<=^error: cannot format {re.escape(str(notebook))}: Cannot parse: )\d+"
-        )
+        return [
+            (
+                rf"(?<=^error: cannot format {re.escape(str(notebook))}: Cannot parse: )\d+",
+                standard_substitution,
+            )
+        ]
     if command == "doctest":
-        return rf'(?<=^File "{re.escape(str(notebook))}", line )\d+'
-    # This next one is the most common one and is used by flake, pylint, mypy, and more.
-    return rf"(?<=^{re.escape(str(notebook))}:)\d+"
-
-
-def _extra_substitution(
-    out: str, err: str, notebook: Path, command: str
-) -> Tuple[str, str]:
-    """
-    Make extra substitution as required by some tools.
-
-    Parameters
-    ----------
-    out
-        Captured stdout from third-party tool.
-    err
-        Captured stdout from third-party tool.
-    notebook
-        Original Jupyter notebook.
-    command:
-        Code quality tool.
-
-    Returns
-    -------
-    str
-        stdout with substitution applied.
-    str
-        stderr with substitution applied.
-    """
-    if command == "doctest":
-        pattern = rf'(?<=^File "{re.escape(str(notebook))}",) line'
-        out = re.sub(pattern, "", out, flags=re.MULTILINE)
-        err = re.sub(pattern, "", err, flags=re.MULTILINE)
-    return out, err
+        return [
+            (
+                rf'(?<=^File "{re.escape(str(notebook))}", line )\d+',
+                standard_substitution,
+            ),
+            (rf'(?<=^File "{re.escape(str(notebook))}",) line', ""),
+        ]
+    # This is the most common one and is used by flake, pylint, mypy, and more.
+    return [(rf"(?<=^{re.escape(str(notebook))}:)\d+", standard_substitution)]
 
 
 def map_python_line_to_nb_lines(
@@ -90,15 +77,9 @@ def map_python_line_to_nb_lines(
         Stderr with references to temporary Python file's lines replaced with references
         to notebook's cells and lines.
     """
-
-    def substitution(match: Match[str]) -> str:
-        """Replace Python line with corresponding Jupyter notebook cell."""
-        return str(cell_mapping[int(match.group())])
-
-    pattern = _get_pattern(notebook, command)
-    out = re.sub(pattern, substitution, out, flags=re.MULTILINE)
-    err = re.sub(pattern, substitution, err, flags=re.MULTILINE)
-
-    out, err = _extra_substitution(out, err, notebook, command)
+    patterns = _get_pattern(notebook, command, cell_mapping)
+    for pattern_, substitution_ in patterns:
+        out = re.sub(pattern_, substitution_, out, flags=re.MULTILINE)
+        err = re.sub(pattern_, substitution_, err, flags=re.MULTILINE)
 
     return out, err
