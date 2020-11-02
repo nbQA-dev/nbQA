@@ -9,6 +9,26 @@ BOLD = "\033[1m"
 RESET = "\x1b[0m"
 CONFIGURATION_URL = "https://nbqa.readthedocs.io/en/latest/configuration.html"
 DOCS_URL = "https://nbqa.readthedocs.io/en/latest/index.html"
+USAGE_MSG = dedent(
+    f"""\
+    nbqa <code quality tool> <notebook or directory> <flags>
+
+    {BOLD}Please specify:{RESET}
+    - 1) a code quality tool
+    - 2) some notebooks (or, if supported by the tool, directories)
+    - 3) (optional) extra flags
+
+    {BOLD}Examples:{RESET}
+        nbqa flake8 notebook.ipynb
+        nbqa black notebook.ipynb --line-length=96
+        nbqa pyupgrade notebook_1.ipynb notebook_2.ipynb
+
+    {BOLD}Mutation:{RESET} to let `nbqa` modify your notebook(s), also pass `--nbqa-mutate`, e.g.:
+        nbqa black notebook.ipynb --nbqa-mutate
+
+    See {DOCS_URL} for more details on how to run `nbqa`.
+    """
+)
 
 
 class CLIArgs:
@@ -86,26 +106,7 @@ class CLIArgs:
         """
         parser = argparse.ArgumentParser(
             description="Run any standard Python code-quality tool on a Jupyter notebook.",
-            usage=dedent(
-                f"""\
-                nbqa <code quality tool> <notebook or directory> <flags>
-
-                {BOLD}Please specify:{RESET}
-                - 1) a code quality tool
-                - 2) some notebooks (or, if supported by the tool, directories)
-                - 3) (optional) extra flags
-
-                {BOLD}Examples:{RESET}
-                    nbqa black notebook.ipynb
-                    nbqa black notebook.ipynb --line-length=96
-                    nbqa black notebook_1.ipynb notebook_2.ipynb
-
-                If you want to let `nbqa` modify your notebook(s), also pass `--nbqa-mutate`:
-                    nbqa black notebook.ipynb --nbqa-mutate
-
-                See {DOCS_URL} for more details on how to run `nbqa`.
-                """
-            ),
+            usage=USAGE_MSG,
         )
         parser.add_argument("command", help="Command to run, e.g. `flake8`.")
         parser.add_argument(
