@@ -55,7 +55,7 @@ def test_missing_root_dir(capsys) -> None:
             nbqa black notebook.ipynb --nbqa-mutate
 
         See https://nbqa.readthedocs.io/en/latest/index.html for more details on how to run `nbqa`.
-        pytest: error: the following arguments are required: root_dirs
+        __main__.py: error: the following arguments are required: root_dirs
         """
     )
     with pytest.raises(SystemExit):
