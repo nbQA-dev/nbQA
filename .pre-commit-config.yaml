@@ -10,7 +10,7 @@ repos:
       - id: trailing-whitespace
       - id: debug-statements
   - repo: https://github.com/pre-commit/pre-commit
-    rev: v2.7.1
+    rev: v2.8.2
     hooks:
       - id: validate_manifest
   - repo: https://github.com/python/black
@@ -18,7 +18,7 @@ repos:
     hooks:
       - id: black
   - repo: https://github.com/prettier/pre-commit
-    rev: v2.1.2
+    rev: 83c5da9dc412f5a2294d6c67ab349e9d30caca31
     hooks:
       - id: prettier
         exclude: ^README\.md$
