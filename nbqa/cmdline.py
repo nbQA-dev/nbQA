@@ -7,8 +7,10 @@ from typing import List, Optional
 from nbqa import __version__
 
 RED = "\x1b[1;31m"
+BOLD = "\033[1m"
 RESET = "\x1b[0m"
 CONFIGURATION_URL = "https://nbqa.readthedocs.io/en/latest/configuration.html"
+DOCS_URL = "https://nbqa.readthedocs.io/en/latest/index.html"
 
 
 class CLIArgs:
@@ -83,19 +85,27 @@ class CLIArgs:
         -------
         CLIArgs
             Object that holds all the parsed command line arguments.
-        Raises
-        ------
-        ValueError
-            If user doesn't specify both a command and a notebook/directory to run it
-            on (e.g. if the user runs :code:`nbqa flake8` instead of :code:`nbqa flake8 .`).
         """
         parser = argparse.ArgumentParser(
-            description="Adapter to run any code-quality tool on a Jupyter notebook.",
+            description="Run any standard Python code-quality tool on a Jupyter notebook.",
             usage=dedent(
-                """\
-                nbqa <command> <notebook or directory> <flags>
-                example:
-                    nbqa flake8 my_notebook.ipynb --ignore=E203\
+                f"""\
+                nbqa <code quality tool> <notebook or directory> <flags>
+
+                {BOLD}Please specify:{RESET}
+                - 1) a code quality tool
+                - 2) some notebooks (or, if supported by the tool, directories)
+                - 3) (optional) extra flags
+
+                {BOLD}Examples:{RESET}
+                    nbqa black notebook.ipynb
+                    nbqa black notebook.ipynb --line-length=96
+                    nbqa black notebook_1.ipynb notebook_2.ipynb
+
+                If you want to let `nbqa` modify your notebook(s), also pass `--nbqa-mutate`:
+                    nbqa black notebook.ipynb --nbqa-mutate
+
+                See {DOCS_URL} for more details on how to run `nbqa`.
                 """
             ),
         )
@@ -130,19 +140,6 @@ class CLIArgs:
         try:
             args, cmd_args = parser.parse_known_args(argv)
         except SystemExit as exception:
-            if exception.code != 0:
-                msg = dedent(
-                    f"""\
-                    {RED}Please specify both a command and a notebook/directory{RESET}, e.g.:
-
-                        nbqa flake8 my_notebook.ipynb
-
-                    To know all the options supported by nbqa, use `nbqa --help`. To
-                    read in detail about the various configuration options supported by
-                    nbqa, refer to {CONFIGURATION_URL}
-                    """
-                )
-                raise ValueError(msg) from exception
-            sys.exit(0)  # pragma: nocover
+            sys.exit(exception.code)  # pragma: nocover
         else:
             return CLIArgs(args, cmd_args)
