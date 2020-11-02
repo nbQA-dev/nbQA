@@ -51,7 +51,7 @@ def test_missing_root_dir(capsys) -> None:
             nbqa black notebook.ipynb --line-length=96
             nbqa pyupgrade notebook_1.ipynb notebook_2.ipynb
 
-        \x1b[1mMutation:\x1b[0m if you want to let `nbqa` modify your notebook(s), also pass `--nbqa-mutate`, e.g.:
+        \x1b[1mMutation:\x1b[0m to let `nbqa` modify your notebook(s), also pass `--nbqa-mutate`, e.g.:
             nbqa black notebook.ipynb --nbqa-mutate
 
         See https://nbqa.readthedocs.io/en/latest/index.html for more details on how to run `nbqa`.
