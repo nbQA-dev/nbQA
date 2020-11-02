@@ -39,10 +39,10 @@ def test_missing_root_dir(capsys) -> None:
     """Check useful error message is raised if :code:`nbqa` is called without root_dir."""
     msg = dedent(
         """\
-        usage: nbqa <code quality tool> <notebook or directory> <flags>
+        usage: nbqa <code quality tool> <notebook or directory> <nbqa options> <code quality tool arguments>
 
         \x1b[1mPlease specify:\x1b[0m
-        - 1) a code quality tool
+        - 1) a code quality tool (e.g. `black`, `pyupgrade`, `flake`, ...)
         - 2) some notebooks (or, if supported by the tool, directories)
         - 3) (optional) extra flags
 
