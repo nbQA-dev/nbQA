@@ -16,7 +16,8 @@ USAGE_MSG = dedent(
     {BOLD}Please specify:{RESET}
     - 1) a code quality tool (e.g. `black`, `pyupgrade`, `flake`, ...)
     - 2) some notebooks (or, if supported by the tool, directories)
-    - 3) (optional) extra flags
+    - 3) (optional) flags for nbqa (e.g. `--nbqa-mutate`)
+    - 4) (optional) flags for code quality tool (e.g. `--line-length` for `black`)
 
     {BOLD}Examples:{RESET}
         nbqa flake8 notebook.ipynb

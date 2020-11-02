@@ -44,7 +44,8 @@ def test_missing_root_dir(capsys) -> None:
         \x1b[1mPlease specify:\x1b[0m
         - 1) a code quality tool (e.g. `black`, `pyupgrade`, `flake`, ...)
         - 2) some notebooks (or, if supported by the tool, directories)
-        - 3) (optional) extra flags
+        - 3) (optional) flags for nbqa (e.g. `--nbqa-mutate`)
+        - 4) (optional) flags for code quality tool (e.g. `--line-length` for `black`)
 
         \x1b[1mExamples:\x1b[0m
             nbqa flake8 notebook.ipynb
