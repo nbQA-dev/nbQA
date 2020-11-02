@@ -32,6 +32,7 @@ def _get_pattern(
         Patterns and substitutions for reported output.
     """
     standard_substitution = partial(_line_to_cell, cell_mapping=cell_mapping)
+
     if command == "black":
         return [
             (
@@ -39,6 +40,7 @@ def _get_pattern(
                 standard_substitution,
             )
         ]
+
     if command == "doctest":
         return [
             (
@@ -47,6 +49,7 @@ def _get_pattern(
             ),
             (rf'(?<=^File "{re.escape(str(notebook))}",) line', ""),
         ]
+
     # This is the most common one and is used by flake, pylint, mypy, and more.
     return [(rf"(?<=^{re.escape(str(notebook))}:)\d+", standard_substitution)]
 
