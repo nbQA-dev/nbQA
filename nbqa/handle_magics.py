@@ -364,9 +364,10 @@ class LineMagicHandler(MagicHandler):
 
             # IPython magic is recreated from modified source so that formatters
             # like black won't reformat the notebook every time they are run.
-            ipython_magic = f"""
-            {self._extract_line_magic()} {self._indent_extracted_code(extracted_code)}
-            """.strip()
+            ipython_magic = (
+                f"{self._extract_line_magic()} "
+                f"{self._indent_extracted_code(extracted_code)}"
+            )
 
         return replacement_code_pattern.sub(ipython_magic, cell_source)
 
