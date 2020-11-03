@@ -357,7 +357,7 @@ class LineMagicHandler(MagicHandler):
         with contextlib.suppress(AssertionError):
             # Get the code used for replacing the ipython magic statement
             match_obj = replacement_code_pattern.search(cell_source)
-            if match_obj is None:
+            if match_obj is None:  # pragma: nocover
                 raise AssertionError("unable to extract the replaced python code")
 
             extracted_code = self._extract_code(match_obj.group())
@@ -408,7 +408,7 @@ class LineMagicHandler(MagicHandler):
             self._EXTRACT_CODE_REGEX_TEMPLATE, self._token
         )
         match_obj = extract_code_pattern.search(replacement_code)
-        if match_obj is None:
+        if match_obj is None:  # pragma: nocover
             raise AssertionError("Unable to extract code from the replaced python code")
         # This is needed because if formatters like black break the code in to many
         # lines, when the current statement exceeds the configured line length.
@@ -439,7 +439,7 @@ class LineMagicHandler(MagicHandler):
             Raised if unable to extract the line magic from the source.
         """
         match_obj = re.match(r"%\w+", self._ipython_magic)
-        if match_obj is None:
+        if match_obj is None:  # pragma: nocover
             raise AssertionError("Unable to extract the line magic")
         return match_obj.group()
 
