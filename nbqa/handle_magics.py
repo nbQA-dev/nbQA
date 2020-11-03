@@ -342,48 +342,138 @@ class LineMagicHandler(MagicHandler):
         -------
         str
             Cell source with ipython magic restored
+
+        Raises
+        ------
+        AssertionError
+            Raised when unable to extract the python code replacing ipython magic. This
+            error is handled with internally and not thrown to the caller.
         """
         ipython_magic = self._ipython_magic
+
+        # In case of any assertion failures, we should gracefully handle it
+        # by replacing the temporary python code with the original ipython magic
+        # Hence AssertionError is caught and ignored.
         with contextlib.suppress(AssertionError):
             # Get the code used for replacing the ipython magic statement
             match_obj = replacement_code_pattern.search(cell_source)
-            assert match_obj is not None
-            replacement_code = match_obj.group()
+            if match_obj is None:
+                raise AssertionError("unable to extract the replaced python code")
 
-            # from the replaced code extract the python source code
-            # that was also present in the original ipython magic
-            extract_code_pattern = MagicHandler._get_regex_pattern(
-                self._EXTRACT_CODE_REGEX_TEMPLATE, self._token
-            )
-            match_obj = extract_code_pattern.search(replacement_code)
-            assert match_obj is not None
-            # This is needed because if formatters like black format the code
-            # to span across multiple lines, then we need to add `\` to end of each line
-            # so that line magic parses all those lines as part of one python statement.
-            # %time np.random.randn(\
-            # 100\
-            # )
-            extracted_code = re.sub("\n", "\\\n", match_obj.group(1))
+            extracted_code = self._extract_code(match_obj.group())
 
-            # combine %line_magic and the extracted code to be the new
-            # ipython magic statement.
-            # This is done so that formatters like black won't reformat the notebook
-            # every time they are run on the notebook.
-            match_obj = re.match(r"%\w+", self._ipython_magic)
-            assert match_obj is not None
-            line_magic = match_obj.group()
-            # Code is indented by 2 more spaces, so that code like below
-            # %time np.random.randn(\
-            #         1000\
-            #     )
-            # will look aesthetically better like below
-            # %time np.random.randn(\
-            #           1000\
-            #       )
-            indented_code = indent(extracted_code, prefix=" " * 2).strip()
-            ipython_magic = f"{line_magic} {indented_code}".strip()
+            # IPython magic is recreated from modified source so that formatters
+            # like black won't reformat the notebook every time they are run.
+            ipython_magic = f"""
+            {self._extract_line_magic()} {self._indent_extracted_code(extracted_code)}
+            """.strip()
 
         return replacement_code_pattern.sub(ipython_magic, cell_source)
+
+    def _extract_code(self, replacement_code: str) -> str:
+        """Extract the python code that was present in original ipython magic.
+
+        Line magic like ``%time func(a, b)`` will get replaced in the temporary python
+        as file as
+
+        .. code:: python
+
+            if int(some_hex_token):
+                func(a, b)  # some_hex_token
+
+        This method extracts only ``func(a, b)`` from the above python code. This
+        extracted code will be written to the original notebook. This is done so that
+        changes made by formatters on those pieces of code are captured and thereby
+        preventing formatters like black reformatting the notebook every time they are
+        run on the notebook.
+
+        Parameters
+        ----------
+        replacement_code : str
+            Python code used for replacing the line magic
+
+        Returns
+        -------
+        str
+            Extracted python code
+
+        Raises
+        ------
+        AssertionError
+            Raised when unable to extract the python code
+        """
+        # from the replaced code extract the python source code
+        # that was also present in the original ipython magic
+        extract_code_pattern = MagicHandler._get_regex_pattern(
+            self._EXTRACT_CODE_REGEX_TEMPLATE, self._token
+        )
+        match_obj = extract_code_pattern.search(replacement_code)
+        if match_obj is None:
+            raise AssertionError("Unable to extract code from the replaced python code")
+        # This is needed because if formatters like black break the code in to many
+        # lines, when the current statement exceeds the configured line length.
+        # But ipython syntax requires multiline line magics to end with a backslash
+        # By adding `\` to end of each line, line magic spanning multiple lines is
+        # parsed as single line by jupyter/ipython.
+        # For example, black formatted code like below
+        # %time np.random.randn(
+        #           100
+        #       )
+        # will become
+        # %time np.random.randn(\
+        #           100\
+        #       )
+        return re.sub("\n", "\\\n", match_obj.group(1))
+
+    def _extract_line_magic(self) -> str:
+        """Extract only the line magic of the format ``%<magic_name>``.
+
+        Returns
+        -------
+        str
+            Returns the line magic from the original source code.
+
+        Raises
+        ------
+        AssertionError
+            Raised if unable to extract the line magic from the source.
+        """
+        match_obj = re.match(r"%\w+", self._ipython_magic)
+        if match_obj is None:
+            raise AssertionError("Unable to extract the line magic")
+        return match_obj.group()
+
+    @staticmethod
+    def _indent_extracted_code(extracted_code: str) -> str:
+        """Return the extracted code indented by 2 spaces.
+
+        Code is indented by exactly 2 spaces, so that code like below
+
+        .. code:: python
+
+            %time np.random.randn(\
+                    1000\
+                )
+
+        will look aesthetically better like below
+
+        .. code:: python
+
+            %time np.random.randn(\
+                    1000\
+                )
+
+        Parameters
+        ----------
+        extracted_code : str
+            Python code extracted from the modified source in temporary python file
+
+        Returns
+        -------
+        str
+            Indented python code
+        """
+        return indent(extracted_code, prefix=" " * 2).strip()
 
     def should_ignore_for_line_mapping(self, line: str) -> bool:
         """Return True if the line should be ignored from line mapping.
