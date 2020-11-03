@@ -58,12 +58,15 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     # check out and err
     out, err = capsys.readouterr()
     expected_out = ""
-    expected_err = os.linesep.join(
-        [f"reformatted {path}", "All done!   ", "1 file reformatted."]
+    expected_err = dedent(
+        f"""\
+        reformatted {path}
+        All done! ✨ 🍰 ✨
+        1 file reformatted.
+        """
     )
     assert out == expected_out
-    for i in (0, 2):  # haven't figured out how to test the emojis part
-        assert err.splitlines()[i] == expected_err.splitlines()[i]
+    assert err == expected_err
 
 
 def test_black_works_with_trailing_semicolons(
