@@ -60,7 +60,7 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     expected_out = ""
     expected_err = (
         f"reformatted {path}{os.linesep}"
-        f"All done! ✨ 🍰 ✨{os.linesep}"
+        "All done! \u2728 \U0001f370 \u2728" + f"{os.linesep}"
         f"1 file reformatted.{os.linesep}"
     )
     assert out == expected_out
