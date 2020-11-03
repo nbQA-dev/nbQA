@@ -58,12 +58,10 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     # check out and err
     out, err = capsys.readouterr()
     expected_out = ""
-    expected_err = dedent(
-        f"""\
-        reformatted {path}
-        All done! ✨ 🍰 ✨
-        1 file reformatted.
-        """
+    expected_err = (
+        f"reformatted {path}{os.linesep}"
+        f"All done! ✨ 🍰 ✨{os.linesep}"
+        f"1 file reformatted.{os.linesep}"
     )
     assert out == expected_out
     assert err == expected_err
