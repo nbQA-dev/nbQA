@@ -2,7 +2,6 @@
 
 import difflib
 import os
-import re
 from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
@@ -14,6 +13,9 @@ from nbqa.__main__ import main
 if TYPE_CHECKING:
 
     from _pytest.capture import CaptureFixture
+
+SPARKLES = "\N{sparkles}"
+SHORTCAKE = "\N{shortcake}"
 
 
 def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> None:
@@ -59,13 +61,21 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     # check out and err
     out, err = capsys.readouterr()
     expected_out = ""
+    # replace \u with \\u for both expected_err and err
     expected_err = (
-        fr"reformatted {re.escape(path)}\r?\n"
-        r"All done! (\\u2728|\u2728) (\\U0001f370|\U0001f370) (\\u2728|\u2728)\r?\n"
-        r"1 file reformatted\.\r?\n"
+        (
+            f"reformatted {path}{os.linesep}"
+            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}{os.linesep}"
+            f"1 file reformatted.{os.linesep}"
+        )
+        .encode("ascii", "backslashreplace")
+        .decode()
     )
+    # This is required because linux supports emojis
+    # so both should have \\ for comparison
+    err = err.encode("ascii", "backslashreplace").decode()
     assert out == expected_out
-    assert re.match(expected_err, err)
+    assert expected_err == err
 
 
 def test_black_works_with_trailing_semicolons(
@@ -120,13 +130,21 @@ def test_black_works_with_trailing_semicolons(
     # check out and err
     out, err = capsys.readouterr()
     expected_out = ""
+    # replace \u with \\u for both expected_err and err
     expected_err = (
-        fr"reformatted {re.escape(path)}\r?\n"
-        r"All done! (\\u2728|\u2728) (\\U0001f370|\U0001f370) (\\u2728|\u2728)\r?\n"
-        r"1 file reformatted\.\r?\n"
+        (
+            f"reformatted {path}{os.linesep}"
+            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}{os.linesep}"
+            f"1 file reformatted.{os.linesep}"
+        )
+        .encode("ascii", "backslashreplace")
+        .decode()
     )
+    # This is required because linux supports emojis
+    # so both should have \\ for comparison
+    err = err.encode("ascii", "backslashreplace").decode()
     assert out == expected_out
-    assert re.match(expected_err, err)
+    assert expected_err == err
 
 
 def test_black_works_with_multiline(
@@ -175,13 +193,21 @@ def test_black_works_with_multiline(
     # check out and err
     out, err = capsys.readouterr()
     expected_out = ""
+    # replace \u with \\u for both expected_err and err
     expected_err = (
-        fr"reformatted {re.escape(path)}\r?\n"
-        r"All done! (\\u2728|\u2728) (\\U0001f370|\U0001f370) (\\u2728|\u2728)\r?\n"
-        r"1 file reformatted\.\r?\n"
+        (
+            f"reformatted {path}{os.linesep}"
+            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}{os.linesep}"
+            f"1 file reformatted.{os.linesep}"
+        )
+        .encode("ascii", "backslashreplace")
+        .decode()
     )
+    # This is required because linux supports emojis
+    # so both should have \\ for comparison
+    err = err.encode("ascii", "backslashreplace").decode()
     assert out == expected_out
-    assert re.match(expected_err, err)
+    assert expected_err == err
 
 
 def test_black_multiple_files(tmp_test_data: Path) -> None:

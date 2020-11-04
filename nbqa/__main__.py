@@ -39,8 +39,8 @@ CONFIG_FILES["isort"] = [
 CONFIG_FILES["pylint"] = ["pylintrc", ".pylintrc", "pyproject.toml", "setup.cfg"]
 BASE_ERROR_MESSAGE = dedent(
     f"""\
-    {BOLD}😭 {{}} 😭
-    Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏{RESET}
+    {BOLD}{{}}
+    Please report a bug at https://github.com/nbQA-dev/nbQA/issues {RESET}
     """
 )
 MIN_VERSIONS = {"isort": "5.3.0"}

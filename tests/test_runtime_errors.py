@@ -117,8 +117,8 @@ def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
     # pylint: disable=C0301
     expected_err = dedent(
         r"""\
-        \x1b\[1m😭 KeyError(.*) while parsing output from applying print_6174 to tests.data.notebook_for_testing\.ipynb 😭
-        Please report a bug at https://github\.com/nbQA\-dev/nbQA/issues 🙏\x1b\[0m
+        \x1b\[1mKeyError(.*) while parsing output from applying print_6174 to tests.data.notebook_for_testing\.ipynb
+        Please report a bug at https://github\.com/nbQA\-dev/nbQA/issues \x1b\[0m
         """  # noqa: E501
     )
     # pylint: enable=C0301
