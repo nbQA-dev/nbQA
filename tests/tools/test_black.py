@@ -2,6 +2,7 @@
 
 import difflib
 import os
+import re
 from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
@@ -58,8 +59,6 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     # check out and err
     out, err = capsys.readouterr()
     expected_out = ""
-    import re
-
     expected_err = (
         fr"reformatted {re.escape(path)}\r?\n"
         r"All done! (\\u2728|\u2728) (\\U0001f370|\U0001f370) (\\u2728|\u2728)\r?\n"
@@ -121,12 +120,13 @@ def test_black_works_with_trailing_semicolons(
     # check out and err
     out, err = capsys.readouterr()
     expected_out = ""
-    expected_err = os.linesep.join(
-        [f"reformatted {path}", "All done!   ", "1 file reformatted."]
+    expected_err = (
+        fr"reformatted {re.escape(path)}\r?\n"
+        r"All done! (\\u2728|\u2728) (\\U0001f370|\U0001f370) (\\u2728|\u2728)\r?\n"
+        r"1 file reformatted\.\r?\n"
     )
     assert out == expected_out
-    for i in (0, 2):  # haven't figured out how to test the emojis part
-        assert err.splitlines()[i] == expected_err.splitlines()[i]
+    assert re.match(expected_err, err)
 
 
 def test_black_works_with_multiline(
@@ -175,12 +175,13 @@ def test_black_works_with_multiline(
     # check out and err
     out, err = capsys.readouterr()
     expected_out = ""
-    expected_err = os.linesep.join(
-        [f"reformatted {path}", "All done!   ", "1 file reformatted."]
+    expected_err = (
+        fr"reformatted {re.escape(path)}\r?\n"
+        r"All done! (\\u2728|\u2728) (\\U0001f370|\U0001f370) (\\u2728|\u2728)\r?\n"
+        r"1 file reformatted\.\r?\n"
     )
     assert out == expected_out
-    for i in (0, 2):  # haven't figured out how to test the emojis part
-        assert err.splitlines()[i] == expected_err.splitlines()[i]
+    assert re.match(expected_err, err)
 
 
 def test_black_multiple_files(tmp_test_data: Path) -> None:
