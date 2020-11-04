@@ -58,13 +58,15 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     # check out and err
     out, err = capsys.readouterr()
     expected_out = ""
-    expected_err = (
-        f"reformatted {path}{os.linesep}"
-        "All done! \u2728 \U0001f370 \u2728" + f"{os.linesep}"
-        f"1 file reformatted.{os.linesep}"
+    import re
+
+    expected_err = dedent(
+        fr"reformatted {re.escape(path)}{re.escape(os.linesep)}"
+        fr"All done! ✨ 🍰 ✨{re.escape(os.linesep)}"
+        fr"1 file reformatted.{re.escape(os.linesep)}"
     )
     assert out == expected_out
-    assert err == expected_err
+    assert re.match(expected_err, err)
 
 
 def test_black_works_with_trailing_semicolons(
