@@ -60,10 +60,10 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     expected_out = ""
     import re
 
-    expected_err = dedent(
-        fr"reformatted {re.escape(path)}{re.escape(os.linesep)}"
-        fr"All done! ✨ 🍰 ✨{re.escape(os.linesep)}"
-        fr"1 file reformatted.{re.escape(os.linesep)}"
+    expected_err = (
+        fr"reformatted {re.escape(path)}\r?\n"
+        r"All done! (\\u2728|\u2728) (\\U0001f370|\U0001f370) (\\u2728|\u2728)\r?\n"
+        r"1 file reformatted\.\r?\n"
     )
     assert out == expected_out
     assert re.match(expected_err, err)
