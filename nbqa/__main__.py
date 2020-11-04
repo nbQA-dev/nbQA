@@ -551,7 +551,7 @@ def _run_on_one_root_dir(
                     # pylint: disable=C0301
                     msg = dedent(
                         f"""\
-                        {BOLD}💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:{RESET}
+                        {BOLD}Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:{RESET}
 
                             nbqa {cli_args.command} notebook.ipynb --nbqa-mutate
                         """
