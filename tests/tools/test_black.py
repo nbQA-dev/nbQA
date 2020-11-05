@@ -1,18 +1,21 @@
 """Check that :code:`black` works as intended."""
 
 import difflib
+import operator
 import os
+import subprocess
 from pathlib import Path
+from shutil import copyfile
 from textwrap import dedent
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 import pytest
 
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:
-
     from _pytest.capture import CaptureFixture
+    from py._path.local import LocalPath
 
 
 def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> None:
@@ -52,6 +55,8 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
         '+    "    return \\"hello {}\\".format(name)\\n",\n'
         '-    "hello(3)   "\n'
         '+    "hello(3)"\n'
+        '-    "    %time randint(5,10)"\n'
+        '+    "    %time randint(5, 10)"\n'
     )
     assert result == expected
 
@@ -210,3 +215,24 @@ def test_black_multiple_files(tmp_test_data: Path) -> None:
 
     diff = difflib.unified_diff(before, after)
     assert "".join(diff) != ""
+
+
+def test_successive_runs_using_black(tmpdir: "LocalPath") -> None:
+    """Check black returns 0 on the second run given a dirty notebook."""
+    src_notebook = Path(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
+    test_notebook = Path(tmpdir) / src_notebook.name
+    copyfile(src_notebook, test_notebook)
+
+    def run_black(
+        test_notebook: str, mod_time_compare_op: Callable[[float, float], bool]
+    ) -> bool:
+        """Run black using nbqa and validate the output."""
+        mod_time_before: float = os.path.getmtime(test_notebook)
+        output = subprocess.run(["nbqa", "black", test_notebook, "--nbqa-mutate"])
+        mod_time_after: float = os.path.getmtime(test_notebook)
+        return output.returncode == 0 and mod_time_compare_op(
+            mod_time_after, mod_time_before
+        )
+
+    assert run_black(str(test_notebook), operator.gt)
+    assert run_black(str(test_notebook), operator.eq)

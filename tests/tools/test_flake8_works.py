@@ -38,6 +38,10 @@ def test_flake8_works(capsys: "CaptureFixture") -> None:
         {path_0}:cell_1:3:1: F401 'glob' imported but unused
         {path_0}:cell_1:5:1: F401 'nbqa' imported but unused
         {path_0}:cell_2:19:9: W291 trailing whitespace
+        {path_0}:cell_4:1:1: E402 module level import not at top of file
+        {path_0}:cell_4:4:18: E231 missing whitespace after ','
+        {path_0}:cell_5:1:1: E402 module level import not at top of file
+        {path_0}:cell_5:2:1: E402 module level import not at top of file
         {path_1}:cell_1:1:1: F401 'os' imported but unused
         {path_1}:cell_1:3:1: F401 'glob' imported but unused
         {path_1}:cell_1:5:1: F401 'nbqa' imported but unused

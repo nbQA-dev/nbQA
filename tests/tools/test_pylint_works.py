@@ -34,6 +34,21 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
         f"{str(notebook1)}:cell_1:1:0: W0611: Unused import os (unused-import)",
         f"{str(notebook1)}:cell_1:3:0: W0611: Unused import glob (unused-import)",
         f"{str(notebook1)}:cell_1:5:0: W0611: Unused import nbqa (unused-import)",
+        f'{str(notebook1)}:cell_4:1:0: C0413: Import "from random import randint"'
+        + " should be placed at the top of the module (wrong-import-position)",
+        f'{str(notebook1)}:cell_5:1:0: C0413: Import "import pprint"'
+        + " should be placed at the top of the module (wrong-import-position)",
+        f'{str(notebook1)}:cell_5:2:0: C0413: Import "import sys"'
+        + " should be placed at the top of the module (wrong-import-position)",
+        f"{str(notebook1)}:cell_4:1:0: C0411: standard import"
+        + ' "from random import randint"'
+        + ' should be placed before "import nbqa" (wrong-import-order)',
+        f"{str(notebook1)}:cell_5:1:0: C0411: standard import"
+        + ' "import pprint"'
+        + ' should be placed before "import nbqa" (wrong-import-order)',
+        f"{str(notebook1)}:cell_5:2:0: C0411: standard import"
+        + ' "import sys"'
+        + ' should be placed before "import nbqa" (wrong-import-order)',
     ]
 
     notebook2_expected_warnings = [
@@ -47,8 +62,8 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
     # This is to ensure no additional warnings get generated apart
     # from the expected ones. This will also help to update the test when the
     # notebooks used for testing are modified later.
-    assert out.count(rf"{str(notebook1)}:cell_") == 4
-    assert out.count(rf"{str(notebook2)}:cell_") == 1
+    assert out.count(rf"{str(notebook1)}:cell_") == len(notebook1_expected_warnings)
+    assert out.count(rf"{str(notebook2)}:cell_") == len(notebook2_expected_warnings)
 
     assert all(warning in out for warning in notebook1_expected_warnings)
     assert all(warning in out for warning in notebook2_expected_warnings)
