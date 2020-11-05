@@ -39,8 +39,8 @@ CONFIG_FILES["isort"] = [
 CONFIG_FILES["pylint"] = ["pylintrc", ".pylintrc", "pyproject.toml", "setup.cfg"]
 BASE_ERROR_MESSAGE = dedent(
     f"""\
-    {BOLD}😭 {{}} 😭
-    Please report a bug at https://github.com/nbQA-dev/nbQA/issues 🙏{RESET}
+    {BOLD}{{}}
+    Please report a bug at https://github.com/nbQA-dev/nbQA/issues {RESET}
     """
 )
 MIN_VERSIONS = {"isort": "5.3.0"}
@@ -551,7 +551,7 @@ def _run_on_one_root_dir(
                     # pylint: disable=C0301
                     msg = dedent(
                         f"""\
-                        {BOLD}💥 Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:{RESET}
+                        {BOLD}Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:{RESET}
 
                             nbqa {cli_args.command} notebook.ipynb --nbqa-mutate
                         """
