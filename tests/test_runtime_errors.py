@@ -128,3 +128,18 @@ def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
     out, err = capsys.readouterr()
     re.match(expected_err, err)
     assert expected_out == out
+
+
+def test_directory_without_notebooks(capsys: "CaptureFixture"):
+    """
+    Check sensible error message is returned if none of the directories passed have notebooks.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    with pytest.raises(SystemExit):
+        main(["black", "docs"])
+    _, err = capsys.readouterr()
+    assert f"No .ipynb notebooks found in given directories: docs{os.linesep}" == err
