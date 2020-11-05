@@ -494,6 +494,13 @@ def _run_on_one_root_dir(
             for notebook in _get_all_notebooks(cli_args.root_dirs)
         }
 
+        if not nb_to_py_mapping:
+            sys.stderr.write(
+                "No .ipynb notebooks found in given directories: "
+                f"{' '.join(i for i in cli_args.root_dirs if Path(i).is_dir())}{os.linesep}"
+            )
+            return 0
+
         config_files = (
             [configs.nbqa_config]
             if configs.nbqa_config
