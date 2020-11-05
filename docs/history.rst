@@ -2,7 +2,21 @@
 Changelog
 =========
 
-0.3.6 (2020-10-25)
+0.4.0 (2020-11-05)
+------------------
+
+Added support for inline magics (thanks Girish Pasupathy for this huge effort!).
+Raise ``FileNotFoundError`` if non-existent notebook/directory is passed.
+Fixed bug whereby ``FileNotFoundError`` was being raised if directory without notebooks in it was passed.
+Users are encouraged to report bugs if we can't parse output from code quality tool.
+Output from ``black`` refers to cell number rather than python line number if command fails.
+More informative message is raised if ``nbqa`` is called without a code quality tool and a notebook/directory.
+Added some more cell magics to list of cell magics ignored by default.
+No longer use emojis in our own error reporting.
+``.git``, ``.venv``, and other common non-source-code directories are excluded from recursive search for notebooks.
+More tool-specific config files are preserved by default.
+
+0.3.6 (2020-10-30)
 ------------------
 
 Improved error reporting if file is not found.
