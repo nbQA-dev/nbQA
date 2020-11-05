@@ -3,6 +3,7 @@ import ast
 import contextlib
 import re
 import secrets
+import sys
 from abc import ABC
 from ast import AST
 from textwrap import dedent, indent
@@ -140,10 +141,10 @@ class MagicHandler(ABC):
         magic_handler: MagicHandler
         if ipython_magic[0] == "!":
             magic_handler = ShellCommandHandler(ipython_magic)
-        elif ipython_magic[0] == "?" or ipython_magic[-1] == "?":
+        elif ipython_magic.startswith("?") or ipython_magic.endswith("?"):
             magic_handler = HelpMagicHandler(ipython_magic)
         elif ipython_magic[0] == "%":
-            if len(ipython_magic) > 1 and ipython_magic[1] == "%":
+            if ipython_magic.startswith("%%"):
                 magic_handler = CellMagicHandler(ipython_magic)
             else:
                 magic_handler = LineMagicHandler(ipython_magic)
@@ -343,22 +344,19 @@ class LineMagicHandler(MagicHandler):
         str
             Cell source with ipython magic restored
 
-        Raises
-        ------
-        AssertionError
-            Raised when unable to extract the python code replacing ipython magic. This
-            error is handled with internally and not thrown to the caller.
         """
         ipython_magic = self._ipython_magic
 
         # In case of any assertion failures, we should gracefully handle it
         # by replacing the temporary python code with the original ipython magic
         # Hence AssertionError is caught and ignored.
-        with contextlib.suppress(AssertionError):
+        try:
             # Get the code used for replacing the ipython magic statement
             match_obj = replacement_code_pattern.search(cell_source)
             if match_obj is None:  # pragma: nocover
-                raise AssertionError("unable to extract the replaced python code")
+                raise AssertionError(
+                    "Unable to extract the python code substituted for ipython magic"
+                )
 
             extracted_code = self._extract_code(match_obj.group())
 
@@ -367,6 +365,17 @@ class LineMagicHandler(MagicHandler):
             ipython_magic = (
                 f"{self._extract_line_magic()} "
                 f"{self._indent_extracted_code(extracted_code)}"
+            )
+        except AssertionError as err:  # pragma: nocover
+            sys.stderr.write(
+                dedent(
+                    f"""
+                    Warning! Unable to process ipython magic `{self._ipython_magic}`
+                    Exception message: {str(err)}. If this warnings persists across
+                    multiple executions, please report a bug at
+                    https://github.com/nbQA-dev/nbQA/issues.
+                    """
+                )
             )
 
         return replacement_code_pattern.sub(ipython_magic, cell_source)
