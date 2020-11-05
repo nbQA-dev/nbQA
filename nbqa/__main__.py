@@ -48,7 +48,12 @@ MIN_VERSIONS = {"isort": "5.3.0"}
 VIRTUAL_ENVIRONMENTS_URL = (
     "https://realpython.com/python-virtual-environments-a-primer/"
 )
-EXCLUDES = r"/(\.ipynb_checkpoints|\.direnv|\.eggs|\.git|\.hg|\.mypy_cache|\.nox|\.tox|\.venv|venv|\.svn|_build|buck-out|build|dist)/"  # noqa: E501  # pylint: disable=C0301
+EXCLUDES = (
+    r"/("
+    r"\.direnv|\.eggs|\.git|\.hg|\.ipynb_checkpoints|\.mypy_cache|\.nox|\.svn|\.tox|\.venv|"
+    r"_build|buck-out|build|dist|venv"
+    r")/"
+)
 
 
 class UnsupportedPackageVersionError(Exception):
