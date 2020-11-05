@@ -19,8 +19,10 @@ if TYPE_CHECKING:
 
 CODE_SEPARATOR = "# %%"
 MAGIC = [
+    "%%!",
     "%%bash",
     "%%cython",
+    "%%HTML",
     "%%html",
     "%%javascript",
     "%%js",
@@ -31,6 +33,9 @@ MAGIC = [
     "%%ruby",
     "%%script",
     "%%sh",
+    "%%sx",
+    "%%system",
+    "%%SVG",
     "%%svg",
     "%%writefile",
 ]
