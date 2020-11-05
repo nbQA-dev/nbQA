@@ -1,6 +1,7 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
 
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -47,6 +48,12 @@ MIN_VERSIONS = {"isort": "5.3.0"}
 VIRTUAL_ENVIRONMENTS_URL = (
     "https://realpython.com/python-virtual-environments-a-primer/"
 )
+EXCLUDES = (
+    r"/("
+    r"\.direnv|\.eggs|\.git|\.hg|\.ipynb_checkpoints|\.mypy_cache|\.nox|\.svn|\.tox|\.venv|"
+    r"_build|buck-out|build|dist|venv"
+    r")/"
+)
 
 
 class UnsupportedPackageVersionError(Exception):
@@ -78,7 +85,9 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
     if not Path(root_dir).is_dir():
         return iter((Path(root_dir),))
     return (
-        i for i in Path(root_dir).rglob("*.ipynb") if ".ipynb_checkpoints" not in str(i)
+        i
+        for i in Path(root_dir).rglob("*.ipynb")
+        if not re.search(EXCLUDES, str(i.resolve().as_posix()))
     )
 
 
