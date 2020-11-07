@@ -20,6 +20,9 @@ Here's an example of what you could include in your ``.pre-commit-config.yaml`` 
        - id: nbqa-isort
          additional_dependencies: [isort==5.6.4]
 
+For best reproducibility, you should pin your dependencies (as above). Running ``pre-commit autoupdate`` will update your hooks' versions, but
+versions of additional dependencies need to updated manually.
+
 See `.pre-commit-hooks.yaml <https://github.com/nbQA-dev/nbQA/blob/master/.pre-commit-hooks.yaml>`_ for all available built-in hooks.
 
 Custom hooks
