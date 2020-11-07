@@ -6,3 +6,7 @@ isort = ["--treat-comment-as-code", "# %%"]
 [mutate]
 
 [ignore_cells]
+
+[files]
+
+[exclude]

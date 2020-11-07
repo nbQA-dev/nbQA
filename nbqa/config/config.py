@@ -16,6 +16,8 @@ class _ConfigSections(NamedTuple):  # pylint: disable=R0903
     CONFIG: str = "config"
     IGNORE_CELLS: str = "ignore_cells"
     MUTATE: str = "mutate"
+    FILES: str = "files"
+    EXCLUDE: str = "exclude"
 
 
 CONFIG_SECTIONS = _ConfigSections()
@@ -40,6 +42,10 @@ class Configs:
         Extra cells which nbqa should ignore.
     nbqa_addopts
         Additional arguments passed to the third party tool
+    nbqa_files
+        Global file include pattern.
+    nbqa_exclude
+        Global file exclude pattern.
     """
 
     _config_section_parsers: ClassVar[Dict[str, Callable]] = {
@@ -51,12 +57,16 @@ class Configs:
         if isinstance(arg, str)
         else arg,
         CONFIG_SECTIONS.MUTATE: bool,
+        CONFIG_SECTIONS.FILES: str,
+        CONFIG_SECTIONS.EXCLUDE: str,
     }
 
     _mutate: bool = False
     _config: Optional[str] = None
     _ignore_cells: List[str] = []
     _addopts: List[str] = []
+    _files: Optional[str] = None
+    _exclude: Optional[str] = None
 
     def set_config(self, config: str, value: Any) -> None:
         """
@@ -92,6 +102,16 @@ class Configs:
         """Additional cells which nbqa should ignore."""
         return self._ignore_cells
 
+    @property
+    def nbqa_files(self) -> Optional[str]:
+        """Additional cells which nbqa should ignore."""
+        return self._files
+
+    @property
+    def nbqa_exclude(self) -> Optional[str]:
+        """Additional cells which nbqa should ignore."""
+        return self._exclude
+
     def merge(self, other: "Configs") -> "Configs":
         """
         Merge another Config instance with this instance.
@@ -109,6 +129,8 @@ class Configs:
             CONFIG_SECTIONS.IGNORE_CELLS, self._ignore_cells or other.nbqa_ignore_cells
         )
         config.set_config(CONFIG_SECTIONS.MUTATE, self._mutate or other.nbqa_mutate)
+        config.set_config(CONFIG_SECTIONS.FILES, self._files or other.nbqa_files)
+        config.set_config(CONFIG_SECTIONS.EXCLUDE, self._exclude or other.nbqa_exclude)
         return config
 
     @staticmethod
@@ -127,6 +149,8 @@ class Configs:
         config.set_config(CONFIG_SECTIONS.CONFIG, cli_args.nbqa_config)
         config.set_config(CONFIG_SECTIONS.IGNORE_CELLS, cli_args.nbqa_ignore_cells)
         config.set_config(CONFIG_SECTIONS.MUTATE, cli_args.nbqa_mutate)
+        config.set_config(CONFIG_SECTIONS.FILES, cli_args.nbqa_files)
+        config.set_config(CONFIG_SECTIONS.EXCLUDE, cli_args.nbqa_exclude)
 
         return config
 
@@ -145,6 +169,10 @@ class Configs:
         )
         defaults.set_config(
             CONFIG_SECTIONS.MUTATE, DEFAULT_CONFIG["mutate"].get(command)
+        )
+        defaults.set_config(CONFIG_SECTIONS.FILES, DEFAULT_CONFIG["files"].get(command))
+        defaults.set_config(
+            CONFIG_SECTIONS.EXCLUDE, DEFAULT_CONFIG["exclude"].get(command)
         )
 
         return defaults
