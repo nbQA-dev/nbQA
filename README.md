@@ -136,7 +136,7 @@ Take some inspiration from their config files 😉
 
 ## 💬 Testimonials
 
-**Michael Kennedy & Brian Okken**, [hosts of the Python Bytes podcast](https://pythonbytes.fm/):
+**Michael Kennedy & Brian Okken**, [hosts of the Python Bytes podcast](https://pythonbytes.fm/episodes/show/204/take-the-psf-survey-and-will-carlton-drop-by):
 
 > This is really cool. I think it brings so much of the code formatting and code analysis, clean up to notebooks, which I think had been really lacking
 
