@@ -118,8 +118,11 @@ for details)
      rev: 0.4.0
      hooks:
        - id: nbqa-black
+         additional_dependencies: [black==20.8b1]
        - id: nbqa-pyupgrade
+         additional_dependencies: [pyupgrade==2.7.3]
        - id: nbqa-isort
+         additional_dependencies: [isort==5.6.4]
    ```
 
 ## 🥳 Used by

@@ -13,9 +13,15 @@ Here's an example of what you could include in your ``.pre-commit-config.yaml`` 
     - repo: https://github.com/nbQA-dev/nbQA
       rev: 0.4.0
       hooks:
-        - id: nbqa-black
-        - id: nbqa-isort
-        - id: nbqa-pyupgrade
+       - id: nbqa-black
+         additional_dependencies: [black==20.8b1]
+       - id: nbqa-pyupgrade
+         additional_dependencies: [pyupgrade==2.7.3]
+       - id: nbqa-isort
+         additional_dependencies: [isort==5.6.4]
+
+For best reproducibility, you should pin your dependencies (as above). Running ``pre-commit autoupdate`` will update your hooks' versions, but
+versions of additional dependencies need to updated manually.
 
 See `.pre-commit-hooks.yaml <https://github.com/nbQA-dev/nbQA/blob/master/.pre-commit-hooks.yaml>`_ for all available built-in hooks.
 
@@ -31,7 +37,7 @@ If you have your own custom tool (e.g. ``customtool``) for which we currently do
           args: [customtool]
           name: nbqa-customtool
           alias: nbqa-customtool
-          additional_dependencies: [customtool]
+          additional_dependencies: [customtool==<version number>]
 
 If there are additional Python code quality tools you would like us to make a hook for, please :ref:`open a pull request<contributing>`
 or let us know in the `issue tracker <https://github.com/nbQA-dev/nbQA/issues>`_!
