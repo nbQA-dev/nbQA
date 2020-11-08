@@ -149,6 +149,12 @@ Take some inspiration from their config files 😉
 
 > well done on `nbqa` @MarcoGorelli ! Will be super useful in CI
 
+**Matthew Feickert**
+[Postdoc at University of Illinois working on LHC physics with ATLASexperiment, CERN, and IRIS_HEP](https://www.matthewfeickert.com/):
+
+> nbqa in your pre-commit hooks along with @codewithanthony 's pre-commit CI service is amazing!
+Everyone using Jupyter notebooks should be doing this.
+
 **Girish Pasupathy**,
 [Software engineer and now core-contributor](https://github.com/girip11):
 
