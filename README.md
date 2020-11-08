@@ -140,23 +140,23 @@ Take some inspiration from their config files 😉
 
 > This is really cool. I think it brings so much of the code formatting and code analysis, clean up to notebooks, which I think had been really lacking
 
-**Nikita Sobolev**, [CTO at wemake.services](https://sobolevn.me/):
+**Nikita Sobolev**, [CTO at wemake.services](https://github.com/nbQA-dev/nbQA/issues/386#issuecomment-718046313):
 
 > It is amazing!
 
 **Alex Andorra**,
-[Data Scientist, ArviZ & PyMC Dev, Host of 'Learning Bayesian Statistics' Podcast](https://learnbayesstats.anvil.app/):
+[Data Scientist, ArviZ & PyMC Dev, Host of 'Learning Bayesian Statistics' Podcast](https://github.com/pymc-devs/pymc3/pull/4074#pullrequestreview-482589774):
 
 > well done on `nbqa` @MarcoGorelli ! Will be super useful in CI
 
 **Matthew Feickert**
-[Postdoc at University of Illinois working on LHC physics](https://www.matthewfeickert.com/):
+[Postdoc at University of Illinois working on LHC physics](https://twitter.com/HEPfeickert/status/1324823925898027008):
 
-> [nbqa in your pre-commit hooks along with @codewithanthony 's pre-commit CI service is amazing!
-Everyone using Jupyter notebooks should be doing this.](https://twitter.com/HEPfeickert/status/1324823925898027008)
+> nbqa in your pre-commit hooks along with @codewithanthony 's pre-commit CI service is amazing!
+Everyone using Jupyter notebooks should be doing this.
 
 **Girish Pasupathy**,
-[Software engineer and now core-contributor](https://github.com/girip11):
+[Software engineer and now core-contributor](https://github.com/nbQA-dev/nbQA/issues/164#issuecomment-674529528):
 
 > thanks a lot for your effort to create such a useful tool
 
