@@ -162,8 +162,7 @@ Everyone using Jupyter notebooks should be doing this.
 
 ## 👥 Contributing
 
-I will give write-access to anyone who contributes anything useful
-(e.g. pull request / bug report) - see the
+I will give write-access to anyone who makes a useful pull request - see the
 [contributing guide](https://nbqa.readthedocs.io/en/latest/contributing.html)
 for details on how to do so.
 
