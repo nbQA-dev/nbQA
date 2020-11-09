@@ -59,6 +59,6 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
     # check out and err
     out, err = capsys.readouterr()
     expected_out = ""
-    expected_err = f"Rewriting {path}{os.linesep}"
+    expected_err = f"Rewriting {path}\n"
     assert out == expected_out
     assert err == expected_err

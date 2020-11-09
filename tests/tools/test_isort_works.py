@@ -42,7 +42,7 @@ def test_isort_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
 
     # check out and err
     out, err = capsys.readouterr()
-    expected_out = f"Fixing {path}{os.linesep}"
+    expected_out = f"Fixing {path}\n"
     expected_err = ""
     assert out == expected_out
     assert err == expected_err
@@ -77,7 +77,7 @@ def test_isort_initial_md(
 
     # check out and err
     out, err = capsys.readouterr()
-    expected_out = f"Fixing {path}{os.linesep}"
+    expected_out = f"Fixing {path}\n"
     expected_err = ""
     assert out == expected_out
     assert err == expected_err

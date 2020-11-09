@@ -69,9 +69,9 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     # replace \u with \\u for both expected_err and err
     expected_err = (
         (
-            f"reformatted {path}{os.linesep}"
-            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}{os.linesep}"
-            f"1 file reformatted.{os.linesep}"
+            f"reformatted {path}\n"
+            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}\n"
+            f"1 file reformatted.\n"
         )
         .encode("ascii", "backslashreplace")
         .decode()
@@ -138,9 +138,9 @@ def test_black_works_with_trailing_semicolons(
     # replace \u with \\u for both expected_err and err
     expected_err = (
         (
-            f"reformatted {path}{os.linesep}"
-            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}{os.linesep}"
-            f"1 file reformatted.{os.linesep}"
+            f"reformatted {path}\n"
+            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}\n"
+            f"1 file reformatted.\n"
         )
         .encode("ascii", "backslashreplace")
         .decode()
@@ -201,9 +201,9 @@ def test_black_works_with_multiline(
     # replace \u with \\u for both expected_err and err
     expected_err = (
         (
-            f"reformatted {path}{os.linesep}"
-            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}{os.linesep}"
-            f"1 file reformatted.{os.linesep}"
+            f"reformatted {path}\n"
+            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}\n"
+            f"1 file reformatted.\n"
         )
         .encode("ascii", "backslashreplace")
         .decode()

@@ -1,6 +1,5 @@
 """Check user can check for other magics."""
 import json
-import os
 from pathlib import Path
 from shutil import copyfile
 from typing import TYPE_CHECKING, Callable, List, Optional, Tuple
@@ -31,7 +30,7 @@ def _validate_ignore_cells_with_warning(actual: str, test_nb_path: Path) -> bool
     expected_out = [
         "cell_2:3:1: F401 'glob' imported but unused",
     ]
-    expected = "".join(f"{str(test_nb_path)}:{i}{os.linesep}" for i in expected_out)
+    expected = "".join(f"{str(test_nb_path)}:{i}\n" for i in expected_out)
     return expected == actual
 
 

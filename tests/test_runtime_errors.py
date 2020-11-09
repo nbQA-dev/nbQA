@@ -122,7 +122,7 @@ def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
         """  # noqa: E501
     )
     # pylint: enable=C0301
-    expected_out = f"{str(path)}:6174:0 some silly warning{os.linesep}"
+    expected_out = f"{str(path)}:6174:0 some silly warning\n"
     with pytest.raises(SystemExit):
         main(["print_6174", str(path), "--nbqa-mutate"])
     out, err = capsys.readouterr()
@@ -142,4 +142,4 @@ def test_directory_without_notebooks(capsys: "CaptureFixture"):
     with pytest.raises(SystemExit):
         main(["black", "docs"])
     _, err = capsys.readouterr()
-    assert f"No .ipynb notebooks found in given directories: docs{os.linesep}" == err
+    assert "No .ipynb notebooks found in given directories: docs\n" == err
