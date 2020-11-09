@@ -398,7 +398,7 @@ def _run_command(
         stdout=subprocess.PIPE,
         cwd=tmpdirname,
         env=env,
-        text=True,
+        universal_newlines=True,  # from Python3.7 this can be replaced with `text`
     )
 
     mutated = [_get_mtimes(i) for i in args] != before
