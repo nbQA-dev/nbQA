@@ -398,14 +398,15 @@ def _run_command(
         stdout=subprocess.PIPE,
         cwd=tmpdirname,
         env=env,
+        text=True,
     )
 
     mutated = [_get_mtimes(i) for i in args] != before
 
     output_code = output.returncode
 
-    out = output.stdout.decode()
-    err = output.stderr.decode()
+    out = output.stdout
+    err = output.stderr
 
     return out, err, output_code, mutated
 
