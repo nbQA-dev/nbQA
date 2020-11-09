@@ -68,17 +68,10 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     expected_out = ""
     # replace \u with \\u for both expected_err and err
     expected_err = (
-        (
-            f"reformatted {path}\n"
-            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}\n"
-            f"1 file reformatted.\n"
-        )
-        .encode("ascii", "backslashreplace")
-        .decode()
+        f"reformatted {path}\n"
+        f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}\n"
+        f"1 file reformatted.\n"
     )
-    # This is required because linux supports emojis
-    # so both should have \\ for comparison
-    err = err.encode("ascii", "backslashreplace").decode()
     assert out == expected_out
     assert expected_err == err
 
