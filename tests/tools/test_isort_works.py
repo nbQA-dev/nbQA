@@ -37,7 +37,13 @@ def test_isort_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
         after = handle.readlines()
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
-    expected = '+    "import glob\\n",\n-    "\\n",\n-    "import glob\\n",\n'
+    expected = dedent(
+        """\
+            +    "import glob\\n",
+            -    "\\n",
+            -    "import glob\\n",
+            """
+    )
     assert result == expected
 
     # check out and err
@@ -72,7 +78,13 @@ def test_isort_initial_md(
         after = handle.readlines()
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
-    expected = '+    "import glob\\n",\n-    "\\n",\n-    "import glob\\n",\n'
+    expected = dedent(
+        """\
+            +    "import glob\\n",
+            -    "\\n",
+            -    "import glob\\n",
+            """
+    )
     assert result == expected
 
     # check out and err
@@ -148,12 +160,14 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: Path) ->
         after = handle.readlines()
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
-    expected = (
-        '-    "import glob;\\n",\n'
-        '+    "import glob\\n",\n'
-        '-    "    pass;\\n",\n'
-        '-    " "\n'
-        '+    "    pass;"\n'
+    expected = dedent(
+        """\
+            -    "import glob;\\n",
+            +    "import glob\\n",
+            -    "    pass;\\n",
+            -    " "
+            +    "    pass;"
+            """
     )
     assert result == expected
 
