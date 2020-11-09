@@ -39,10 +39,10 @@ def test_isort_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
     expected = dedent(
         """\
-            +    "import glob\\n",
-            -    "\\n",
-            -    "import glob\\n",
-            """
+        +    "import glob\\n",
+        -    "\\n",
+        -    "import glob\\n",
+        """
     )
     assert result == expected
 
@@ -80,10 +80,10 @@ def test_isort_initial_md(
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
     expected = dedent(
         """\
-            +    "import glob\\n",
-            -    "\\n",
-            -    "import glob\\n",
-            """
+        +    "import glob\\n",
+        -    "\\n",
+        -    "import glob\\n",
+        """
     )
     assert result == expected
 
@@ -162,12 +162,12 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: Path) ->
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
     expected = dedent(
         """\
-            -    "import glob;\\n",
-            +    "import glob\\n",
-            -    "    pass;\\n",
-            -    " "
-            +    "    pass;"
-            """
+        -    "import glob;\\n",
+        +    "import glob\\n",
+        -    "    pass;\\n",
+        -    " "
+        +    "    pass;"
+        """
     )
     assert result == expected
 

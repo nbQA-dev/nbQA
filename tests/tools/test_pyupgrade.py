@@ -52,9 +52,9 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
     expected = dedent(
         """\
-            -    \"    return 'hello {}'.format(name)\\n\",
-            +    \"    return f'hello {name}'\\n\",
-            """
+        -    \"    return 'hello {}'.format(name)\\n\",
+        +    \"    return f'hello {name}'\\n\",
+        """
     )
     assert result == expected
 

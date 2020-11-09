@@ -55,13 +55,13 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
     expected = dedent(
         """\
-            -    \"    return 'hello {}'.format(name)\\n\",
-            +    "    return \\"hello {}\\".format(name)\\n",
-            -    "hello(3)   "
-            +    "hello(3)"
-            -    "    %time randint(5,10)"
-            +    "    %time randint(5, 10)"
-            """
+        -    \"    return 'hello {}'.format(name)\\n\",
+        +    "    return \\"hello {}\\".format(name)\\n",
+        -    "hello(3)   "
+        +    "hello(3)"
+        -    "    %time randint(5,10)"
+        +    "    %time randint(5, 10)"
+        """
     )
     assert result == expected
 
@@ -125,16 +125,16 @@ def test_black_works_with_trailing_semicolons(
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
     expected = dedent(
         """\
-            -    "import glob;\\n",
-            +    "import glob\\n",
-            -    "def func(a, b):\\n",
-            -    "    pass;\\n",
-            -    " "
-            +    "def func(\\n",
-            +    "    a, b\\n",
-            +    "):\\n",
-            +    "    pass;"
-            """
+        -    "import glob;\\n",
+        +    "import glob\\n",
+        -    "def func(a, b):\\n",
+        -    "    pass;\\n",
+        -    " "
+        +    "def func(\\n",
+        +    "    a, b\\n",
+        +    "):\\n",
+        +    "    pass;"
+        """
     )
     assert result == expected
 
@@ -145,10 +145,10 @@ def test_black_works_with_trailing_semicolons(
     expected_err = (
         dedent(
             f"""\
-        reformatted {path}
-        All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
-        1 file reformatted.
-        """
+            reformatted {path}
+            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
+            1 file reformatted.
+            """
         )
         .encode("ascii", "backslashreplace")
         .decode()
@@ -198,10 +198,10 @@ def test_black_works_with_multiline(
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
     expected = dedent(
         """\
-            -    "assert 1 + 1 == 2;  assert 1 + 1 == 2;"
-            +    "assert 1 + 1 == 2\\n",
-            +    "assert 1 + 1 == 2;"
-            """
+        -    "assert 1 + 1 == 2;  assert 1 + 1 == 2;"
+        +    "assert 1 + 1 == 2\\n",
+        +    "assert 1 + 1 == 2;"
+        """
     )
     assert result == expected
 
