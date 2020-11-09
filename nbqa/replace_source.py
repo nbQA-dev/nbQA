@@ -105,6 +105,25 @@ def _get_new_source(
     return None
 
 
+def _get_pycells(python_file: "Path") -> Iterator[str]:
+    """
+    Parse cells from Python file.
+
+    Parameters
+    ----------
+    python_file
+        Temporary Python file notebook was converted to.
+    
+    Returns
+    -------
+    Iterator
+        Parsed cells.
+    """
+    pyfile = python_file.read_text()
+    pycells: Iterator[str] = iter(pyfile[len(CODE_SEPARATOR) :].split(CODE_SEPARATOR))
+    return pycells
+
+
 def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> None:
     """
     Replace :code:`source` code cells of original notebook.
@@ -120,9 +139,8 @@ def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -
     """
     notebook_json = json.loads(notebook.read_text())
 
-    pyfile = python_file.read_text()
+    pycells = _get_pycells(python_file)
 
-    pycells: Iterator[str] = iter(pyfile[len(CODE_SEPARATOR) :].split(CODE_SEPARATOR))
     code_cell_number = 0
     new_cells = []
     for cell in notebook_json["cells"]:
@@ -135,3 +153,49 @@ def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -
 
     notebook_json.update({"cells": new_cells})
     notebook.write_text(f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n")
+
+def _add_trailing_newline(seq):
+    # required by difflib
+    return [i if i.endswith('\n') else f"{i}\n" for i in seq]
+
+
+def print_red(message, end = '\n'):
+    return ('\x1b[1;31m' + message.strip() + '\x1b[0m' + end)
+
+
+def print_green(message, end = '\n'):
+    return ('\x1b[1;32m' + message.strip() + '\x1b[0m' + end)
+
+def _print_diff(code_cell_number, diff):
+    import sys
+    import os
+    sys.stdout.write(fr"Cell {code_cell_number}:\n")
+    sys.stdout.write(''.join(print_red(i) if i.startswith('+') else print_green(i) if i.startswith('-') else i for i in diff))
+
+def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> None:
+    """
+    Replace :code:`source` code cells of original notebook.
+
+    Parameters
+    ----------
+    python_file
+        Temporary Python file notebook was converted to.
+    notebook
+        Jupyter Notebook third-party tool is run against (unmodified).
+    notebook_info
+        Information about notebook cells used for processing
+    """
+    notebook_json = json.loads(notebook.read_text())
+
+    pycells = _get_pycells(python_file)
+
+    code_cell_number = 0
+    for cell in notebook_json["cells"]:
+        if cell["cell_type"] == "code":
+            code_cell_number += 1
+            new_source = _get_new_source(code_cell_number, notebook_info, pycells)
+            if new_source is not None:
+
+                from difflib import unified_diff
+                diff = unified_diff(_add_trailing_newline(cell['source']), _add_trailing_newline(new_source))
+                _print_diff(code_cell_number, diff)
