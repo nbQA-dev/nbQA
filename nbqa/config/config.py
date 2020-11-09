@@ -16,6 +16,7 @@ class _ConfigSections(NamedTuple):  # pylint: disable=R0903
     CONFIG: str = "config"
     IGNORE_CELLS: str = "ignore_cells"
     MUTATE: str = "mutate"
+    DIFF: str = "diff"
 
 
 CONFIG_SECTIONS = _ConfigSections()
@@ -51,12 +52,14 @@ class Configs:
         if isinstance(arg, str)
         else arg,
         CONFIG_SECTIONS.MUTATE: bool,
+        CONFIG_SECTIONS.DIFF: bool,
     }
 
     _mutate: bool = False
     _config: Optional[str] = None
     _ignore_cells: List[str] = []
     _addopts: List[str] = []
+    _diff: bool = False
 
     def set_config(self, config: str, value: Any) -> None:
         """
@@ -76,6 +79,11 @@ class Configs:
     def nbqa_mutate(self) -> bool:
         """Flag if nbqa is allowed to modify the original notebook(s)."""
         return self._mutate
+
+    @property
+    def nbqa_diff(self) -> bool:
+        """Show diff instead of replacing notebook code."""
+        return self._diff
 
     @property
     def nbqa_config(self) -> Optional[str]:
@@ -109,6 +117,7 @@ class Configs:
             CONFIG_SECTIONS.IGNORE_CELLS, self._ignore_cells or other.nbqa_ignore_cells
         )
         config.set_config(CONFIG_SECTIONS.MUTATE, self._mutate or other.nbqa_mutate)
+        config.set_config(CONFIG_SECTIONS.DIFF, self._diff or other.nbqa_diff)
         return config
 
     @staticmethod
@@ -127,6 +136,7 @@ class Configs:
         config.set_config(CONFIG_SECTIONS.CONFIG, cli_args.nbqa_config)
         config.set_config(CONFIG_SECTIONS.IGNORE_CELLS, cli_args.nbqa_ignore_cells)
         config.set_config(CONFIG_SECTIONS.MUTATE, cli_args.nbqa_mutate)
+        config.set_config(CONFIG_SECTIONS.DIFF, cli_args.nbqa_diff)
 
         return config
 
@@ -146,5 +156,6 @@ class Configs:
         defaults.set_config(
             CONFIG_SECTIONS.MUTATE, DEFAULT_CONFIG["mutate"].get(command)
         )
+        defaults.set_config(CONFIG_SECTIONS.DIFF, DEFAULT_CONFIG["diff"].get(command))
 
         return defaults

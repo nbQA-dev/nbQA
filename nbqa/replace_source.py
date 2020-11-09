@@ -5,7 +5,7 @@ The converted file will have had the third-party tool run against it by now.
 """
 
 import json
-from typing import TYPE_CHECKING, Iterator, List, Set
+from typing import TYPE_CHECKING, Iterator, List, Optional, Set
 
 from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
@@ -72,7 +72,40 @@ def _reinstate_magics(
     return "\n{}".format(source.strip("\n")).splitlines(True)[1:]
 
 
-def main(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> None:
+def _get_new_source(
+    code_cell_number: int,
+    notebook_info: NotebookInfo,
+    pycells: Iterator[str],
+) -> Optional[List[str]]:
+    """
+    Get new source to replace original one with.
+
+    Parameters
+    ----------
+    code_cell_number
+        Cell number (we start counting from 1).
+    notebook_info
+        Information about notebook cells used for processing
+    pycells
+        Cells from temporary Python script.
+
+    Returns
+    -------
+    List
+        New source for cell.
+    """
+    if code_cell_number not in notebook_info.code_cells_to_ignore:
+        source = _restore_semicolon(
+            next(pycells), code_cell_number, notebook_info.trailing_semicolons
+        )
+        return _reinstate_magics(
+            source,
+            notebook_info.temporary_lines.get(code_cell_number, []),
+        )
+    return None
+
+
+def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> None:
     """
     Replace :code:`source` code cells of original notebook.
 
@@ -95,15 +128,9 @@ def main(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> 
     for cell in notebook_json["cells"]:
         if cell["cell_type"] == "code":
             code_cell_number += 1
-            if code_cell_number not in notebook_info.code_cells_to_ignore:
-                source = _restore_semicolon(
-                    next(pycells), code_cell_number, notebook_info.trailing_semicolons
-                )
-                cell["source"] = _reinstate_magics(
-                    source,
-                    notebook_info.temporary_lines.get(code_cell_number, []),
-                )
-
+            new_source = _get_new_source(code_cell_number, notebook_info, pycells)
+            if new_source is not None:
+                cell["source"] = new_source
         new_cells.append(cell)
 
     notebook_json.update({"cells": new_cells})

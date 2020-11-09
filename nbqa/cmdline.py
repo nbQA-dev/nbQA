@@ -58,6 +58,7 @@ class CLIArgs:
     nbqa_mutate: bool
     nbqa_ignore_cells: Optional[str]
     nbqa_config: Optional[str]
+    nbqa_diff: bool
 
     def __init__(self, args: argparse.Namespace, cmd_args: List[str]) -> None:
         """
@@ -76,6 +77,7 @@ class CLIArgs:
         self.nbqa_mutate = args.nbqa_mutate or False
         self.nbqa_config = args.nbqa_config or None
         self.nbqa_ignore_cells = args.nbqa_ignore_cells or None
+        self.nbqa_diff = args.nbqa_diff or False
 
     def __str__(self) -> str:
         """Return the command from the parsed command line arguments."""
@@ -83,6 +85,8 @@ class CLIArgs:
         args.extend(self.root_dirs)
         if self.nbqa_mutate:
             args.append("--nbqa-mutate")
+        if self.nbqa_diff:
+            args.append("--nbqa-diff")
         if self.nbqa_config:
             args.append(f"--nbqa-config={self.nbqa_config}")
         if self.nbqa_ignore_cells:
@@ -117,6 +121,11 @@ class CLIArgs:
             "--nbqa-mutate",
             action="store_true",
             help="Allows `nbqa` to modify notebooks.",
+        )
+        parser.add_argument(
+            "--nbqa-diff",
+            action="store_true",
+            help="Show diff which would result from running --nbqa-mutate.",
         )
         parser.add_argument(
             "--nbqa-config",

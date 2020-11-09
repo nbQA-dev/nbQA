@@ -563,7 +563,7 @@ def _run_on_one_root_dir(
                 sys.stderr.write(BASE_ERROR_MESSAGE.format(msg))
 
             if mutated:
-                if not configs.nbqa_mutate:
+                if not configs.nbqa_mutate and not configs.nbqa_diff:
                     # pylint: disable=C0301
                     msg = dedent(
                         f"""\
@@ -576,8 +576,10 @@ def _run_on_one_root_dir(
                     raise SystemExit(msg)
 
                 try:
-                    replace_source.main(
-                        temp_python_file, notebook, nb_info_mapping[notebook]
+                    replace_source.mutate(
+                        temp_python_file,
+                        notebook,
+                        nb_info_mapping[notebook],
                     )
                 except Exception as exc:
                     raise RuntimeError(
