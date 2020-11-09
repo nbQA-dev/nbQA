@@ -68,10 +68,19 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     expected_out = ""
     # replace \u with \\u for both expected_err and err
     expected_err = (
-        f"reformatted {path}\n"
-        f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}\n"
-        f"1 file reformatted.\n"
+        dedent(
+            f"""\
+            reformatted {path}
+            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
+            1 file reformatted.
+            """
+        )
+        .encode("ascii", "backslashreplace")
+        .decode()
     )
+    # This is required because linux supports emojis
+    # so both should have \\ for comparison
+    err = err.encode("ascii", "backslashreplace").decode()
     assert out == expected_out
     assert expected_err == err
 
@@ -130,10 +139,12 @@ def test_black_works_with_trailing_semicolons(
     expected_out = ""
     # replace \u with \\u for both expected_err and err
     expected_err = (
-        (
-            f"reformatted {path}\n"
-            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}\n"
-            f"1 file reformatted.\n"
+        dedent(
+            f"""\
+            reformatted {path}
+            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
+            1 file reformatted.
+            """
         )
         .encode("ascii", "backslashreplace")
         .decode()
@@ -193,10 +204,12 @@ def test_black_works_with_multiline(
     expected_out = ""
     # replace \u with \\u for both expected_err and err
     expected_err = (
-        (
-            f"reformatted {path}\n"
-            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}\n"
-            f"1 file reformatted.\n"
+        dedent(
+            f"""\
+            reformatted {path}
+            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
+            1 file reformatted.
+            """
         )
         .encode("ascii", "backslashreplace")
         .decode()
