@@ -6,14 +6,26 @@ The converted file will have had the third-party tool run against it by now.
 
 import json
 from typing import TYPE_CHECKING, Iterator, List, Optional, Set
+import itertools
+import sys
+from difflib import unified_diff
 
 from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
 from nbqa.save_source import CODE_SEPARATOR
+from nbqa.cmdline import BOLD, RESET
 
 if TYPE_CHECKING:
     from pathlib import Path
 
+RED = '\033[31m' 
+GREEN = '\033[32m'
+def _peek(iterable):
+    try:
+        first = next(iterable)
+    except StopIteration:
+        return None
+    return first, itertools.chain([first], iterable)
 
 def _restore_semicolon(
     source: str,
@@ -154,23 +166,23 @@ def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -
     notebook_json.update({"cells": new_cells})
     notebook.write_text(f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n")
 
-def _add_trailing_newline(seq):
-    # required by difflib
-    return [i if i.endswith('\n') else f"{i}\n" for i in seq]
-
 
 def print_red(message, end = '\n'):
-    return ('\x1b[1;31m' + message.strip() + '\x1b[0m' + end)
+    return (RED+ message.strip() + RESET + end)
 
 
 def print_green(message, end = '\n'):
-    return ('\x1b[1;32m' + message.strip() + '\x1b[0m' + end)
+    return (GREEN + message.strip() + RESET + end)
 
 def _print_diff(code_cell_number, diff):
-    import sys
-    import os
-    sys.stdout.write(fr"Cell {code_cell_number}:\n")
-    sys.stdout.write(''.join(print_red(i) if i.startswith('+') else print_green(i) if i.startswith('-') else i for i in diff))
+    peek = _peek(diff)
+    if peek is not None:
+        _, diff = peek
+        header = f"Cell {code_cell_number}"
+        sys.stdout.write(f"{BOLD}{header}{RESET}\n")
+        sys.stdout.write(f"{'-'*len(header)}\n")
+        sys.stdout.write(''.join(print_red(i) if i.startswith('-') else print_green(i) if i.startswith('+') else i for i in diff))
+        sys.stdout.write('\n')
 
 def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> None:
     """
@@ -195,7 +207,5 @@ def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> 
             code_cell_number += 1
             new_source = _get_new_source(code_cell_number, notebook_info, pycells)
             if new_source is not None:
-
-                from difflib import unified_diff
-                diff = unified_diff(_add_trailing_newline(cell['source']), _add_trailing_newline(new_source))
+                diff = unified_diff(cell['source'], new_source, fromfile=str(notebook), tofile=str(notebook))
                 _print_diff(code_cell_number, diff)
