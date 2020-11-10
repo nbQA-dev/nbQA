@@ -53,13 +53,15 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
 
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
-    expected = (
-        "-    \"    return 'hello {}'.format(name)\\n\",\n"
-        '+    "    return \\"hello {}\\".format(name)\\n",\n'
-        '-    "hello(3)   "\n'
-        '+    "hello(3)"\n'
-        '-    "    %time randint(5,10)"\n'
-        '+    "    %time randint(5, 10)"\n'
+    expected = dedent(
+        """\
+        -    \"    return 'hello {}'.format(name)\\n\",
+        +    "    return \\"hello {}\\".format(name)\\n",
+        -    "hello(3)   "
+        +    "hello(3)"
+        -    "    %time randint(5,10)"
+        +    "    %time randint(5, 10)"
+        """
     )
     assert result == expected
 
@@ -68,10 +70,12 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     expected_out = ""
     # replace \u with \\u for both expected_err and err
     expected_err = (
-        (
-            f"reformatted {path}{os.linesep}"
-            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}{os.linesep}"
-            f"1 file reformatted.{os.linesep}"
+        dedent(
+            f"""\
+            reformatted {path}
+            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
+            1 file reformatted.
+            """
         )
         .encode("ascii", "backslashreplace")
         .decode()
@@ -119,16 +123,18 @@ def test_black_works_with_trailing_semicolons(
 
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
-    expected = (
-        '-    "import glob;\\n",\n'
-        '+    "import glob\\n",\n'
-        '-    "def func(a, b):\\n",\n'
-        '-    "    pass;\\n",\n'
-        '-    " "\n'
-        '+    "def func(\\n",\n'
-        '+    "    a, b\\n",\n'
-        '+    "):\\n",\n'
-        '+    "    pass;"\n'
+    expected = dedent(
+        """\
+        -    "import glob;\\n",
+        +    "import glob\\n",
+        -    "def func(a, b):\\n",
+        -    "    pass;\\n",
+        -    " "
+        +    "def func(\\n",
+        +    "    a, b\\n",
+        +    "):\\n",
+        +    "    pass;"
+        """
     )
     assert result == expected
 
@@ -137,10 +143,12 @@ def test_black_works_with_trailing_semicolons(
     expected_out = ""
     # replace \u with \\u for both expected_err and err
     expected_err = (
-        (
-            f"reformatted {path}{os.linesep}"
-            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}{os.linesep}"
-            f"1 file reformatted.{os.linesep}"
+        dedent(
+            f"""\
+            reformatted {path}
+            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
+            1 file reformatted.
+            """
         )
         .encode("ascii", "backslashreplace")
         .decode()
@@ -188,10 +196,12 @@ def test_black_works_with_multiline(
 
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
-    expected = (
-        '-    "assert 1 + 1 == 2;  assert 1 + 1 == 2;"\n'
-        '+    "assert 1 + 1 == 2\\n",\n'
-        '+    "assert 1 + 1 == 2;"\n'
+    expected = dedent(
+        """\
+        -    "assert 1 + 1 == 2;  assert 1 + 1 == 2;"
+        +    "assert 1 + 1 == 2\\n",
+        +    "assert 1 + 1 == 2;"
+        """
     )
     assert result == expected
 
@@ -200,10 +210,12 @@ def test_black_works_with_multiline(
     expected_out = ""
     # replace \u with \\u for both expected_err and err
     expected_err = (
-        (
-            f"reformatted {path}{os.linesep}"
-            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}{os.linesep}"
-            f"1 file reformatted.{os.linesep}"
+        dedent(
+            f"""\
+            reformatted {path}
+            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
+            1 file reformatted.
+            """
         )
         .encode("ascii", "backslashreplace")
         .decode()
