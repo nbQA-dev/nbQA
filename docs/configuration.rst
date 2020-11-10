@@ -76,3 +76,40 @@ or the :code:`ignore_cells` option in your :code:`pyproject.toml` file, e.g.
 
     [tool.nbqa.ignore_cells]
     black = "%%html,%%cython"
+
+Include / exclude
+~~~~~~~~~~~~~~~~~
+
+To include or exclude notebooks from being processed, we recommend using ``nbQA``'s own ``--nbqa-files`` and ``--nbqa-exclude`` flags.
+These take regex patterns and match posix-like paths, `exactly like the same options from pre-commit <https://pre-commit.com/#regular-expressions>`_.
+These can be set from the command-line with the ``--nbqa-files`` and ``--nbqa-exclude`` flags, or in your ``.pyproject.toml`` file in the
+``[tool.nbqa.files]`` and ``[tool.nbqa.exclude]`` sections.
+
+Say you're running ``nbqa isort`` on a directory ``my_directory``. Here are some examples of how to include/exclude files:
+
+- exclude notebooks in ``my_directory`` whose name starts with ``poc_``:
+
+    .. code-block:: toml
+
+        [tool.nbqa.exclude]
+        isort = "^my_directory/poc_"
+
+- exclude notebooks in subdirectory ``my_directory/my_subdirectory``:
+
+    .. code-block:: toml
+
+        [tool.nbqa.exclude]
+        isort = "^my_directory/my_subdirectory/"
+
+- only include notebooks in ``my_directory`` whose name starts with ``EDA``:
+
+    .. code-block:: toml
+
+        [tool.nbqa.files]
+        isort = "^my_directory/EDA"
+
+All the above examples can equivalently be run from the command-line, e.g. as
+
+.. code-block:: bash
+
+    nbqa isort my_directory --nbqa-exclude ^my_directory/poc_
