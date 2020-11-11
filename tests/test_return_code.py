@@ -29,6 +29,24 @@ def test_flake8_return_code() -> None:
     assert flake8_runner([CLEAN_NOTEBOOK]) == PASSED
 
 
+def test_autoflake_return_code() -> None:
+    """Check flake8 returns 0 if it passes, 1 otherwise."""
+    autoflake_options = [
+        "--check",
+        "--expand-star-imports",
+        "--remove-all-unused-imports",
+        "--remove-unused-variables",
+    ]
+    autoflake_runner = partial(_run_nbqa_with, "autoflake")
+    assert autoflake_runner([CLEAN_NOTEBOOK], *autoflake_options) == PASSED
+    assert (
+        autoflake_runner(
+            [TEST_DATA_DIR / "notebook_for_autoflake.ipynb"], *autoflake_options
+        )
+        != PASSED
+    )
+
+
 def test_pylint_return_code() -> None:
     """Check pylint returns 0 if it passes, 20 otherwise."""
     pylint_runner = partial(_run_nbqa_with, "pylint")
