@@ -32,7 +32,7 @@ USAGE_MSG = dedent(
 )
 
 
-class CLIArgs:
+class CLIArgs:  # pylint: disable=R0902
     """
     Stores the command line arguments passed.
 
@@ -50,6 +50,10 @@ class CLIArgs:
         Ignore cells whose first line starts with the input token
     nbqa_addopts
         Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
+    nbqa_files
+        Global file include pattern.
+    nbqa_exclude
+        Global file exclude pattern.
     """
 
     command: str
@@ -59,6 +63,8 @@ class CLIArgs:
     nbqa_ignore_cells: Optional[str]
     nbqa_config: Optional[str]
     nbqa_diff: bool
+    nbqa_files: Optional[str]
+    nbqa_exclude: Optional[str]
 
     def __init__(self, args: argparse.Namespace, cmd_args: List[str]) -> None:
         """
@@ -78,6 +84,8 @@ class CLIArgs:
         self.nbqa_config = args.nbqa_config or None
         self.nbqa_ignore_cells = args.nbqa_ignore_cells or None
         self.nbqa_diff = args.nbqa_diff or False
+        self.nbqa_files = args.nbqa_files or None
+        self.nbqa_exclude = args.nbqa_exclude or None
 
     def __str__(self) -> str:
         """Return the command from the parsed command line arguments."""
@@ -91,6 +99,10 @@ class CLIArgs:
             args.append(f"--nbqa-config={self.nbqa_config}")
         if self.nbqa_ignore_cells:
             args.append(f"--nbqa-ignore-cells={self.nbqa_ignore_cells}")
+        if self.nbqa_files:
+            args.append(f"--nbqa-files={self.nbqa_files}")
+        if self.nbqa_exclude:
+            args.append(f"--nbqa-exclude={self.nbqa_exclude}")
         args.extend(self.nbqa_addopts)
 
         return " ".join(args)
@@ -116,6 +128,14 @@ class CLIArgs:
         parser.add_argument("command", help="Command to run, e.g. `flake8`.")
         parser.add_argument(
             "root_dirs", nargs="+", help="Notebooks or directories to run command on."
+        )
+        parser.add_argument(
+            "--nbqa-files",
+            help="Global file include pattern.",
+        )
+        parser.add_argument(
+            "--nbqa-exclude",
+            help="Global file exclude pattern.",
         )
         parser.add_argument(
             "--nbqa-mutate",

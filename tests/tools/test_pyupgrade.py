@@ -50,15 +50,17 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
 
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
-    expected = (
-        "-    \"    return 'hello {}'.format(name)\\n\",\n"
-        "+    \"    return f'hello {name}'\\n\",\n"
+    expected = dedent(
+        """\
+        -    \"    return 'hello {}'.format(name)\\n\",
+        +    \"    return f'hello {name}'\\n\",
+        """
     )
     assert result == expected
 
     # check out and err
     out, err = capsys.readouterr()
     expected_out = ""
-    expected_err = f"Rewriting {path}{os.linesep}"
+    expected_err = f"Rewriting {path}\n"
     assert out == expected_out
     assert err == expected_err

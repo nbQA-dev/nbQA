@@ -4,28 +4,46 @@ Replace :code:`source` code cells of original notebook with ones from converted 
 The converted file will have had the third-party tool run against it by now.
 """
 
-import json
-from typing import TYPE_CHECKING, Iterator, List, Optional, Set
 import itertools
+import json
 import sys
 from difflib import unified_diff
+from typing import TYPE_CHECKING, Iterator, List, Optional, Set, Tuple
 
+from nbqa.cmdline import BOLD, RESET
 from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
 from nbqa.save_source import CODE_SEPARATOR
-from nbqa.cmdline import BOLD, RESET
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-RED = '\033[31m' 
-GREEN = '\033[32m'
-def _peek(iterable):
+RED = "\033[31m"
+GREEN = "\033[32m"
+
+
+def _peek(iterable: Iterator[str]) -> Tuple[Optional[str], Iterator[str]]:
+    """
+    Little hack to check whether iterable is empty.
+
+    Parameters
+    ----------
+    iterable
+        Iterable of strings.
+
+    Returns
+    -------
+    Optional[str]
+        First element of iterable, or None if iterable is empty.
+    Iterator
+        Original iterator.
+    """
     try:
         first = next(iterable)
     except StopIteration:
-        return None
+        return None, iterable
     return first, itertools.chain([first], iterable)
+
 
 def _restore_semicolon(
     source: str,
@@ -125,7 +143,7 @@ def _get_pycells(python_file: "Path") -> Iterator[str]:
     ----------
     python_file
         Temporary Python file notebook was converted to.
-    
+
     Returns
     -------
     Iterator
@@ -167,22 +185,57 @@ def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -
     notebook.write_text(f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n")
 
 
-def print_red(message, end = '\n'):
-    return (RED+ message.strip() + RESET + end)
+def print_red(message: str) -> str:
+    """
+    Print message in red.
+
+    Parameters
+    ----------
+    message
+        String to print in red.
+    """
+    return f"{RED}{message}{RESET}\n"
 
 
-def print_green(message, end = '\n'):
-    return (GREEN + message.strip() + RESET + end)
+def print_green(message: str) -> str:
+    """
+    Print message in green.
 
-def _print_diff(code_cell_number, diff):
-    peek = _peek(diff)
+    Parameters
+    ----------
+    message
+        String to print in green.
+    """
+    return f"{GREEN}{message}{RESET}\n"
+
+
+def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> None:
+    """
+    Print diff between cells, colouring as appropriate.
+
+    Parameters
+    ----------
+    code_cell_number
+        Current cell number
+    cell_diff
+        Diff between original and new versions of cell.
+    """
+    peek, cell_diff = _peek(cell_diff)
     if peek is not None:
-        _, diff = peek
         header = f"Cell {code_cell_number}"
         sys.stdout.write(f"{BOLD}{header}{RESET}\n")
         sys.stdout.write(f"{'-'*len(header)}\n")
-        sys.stdout.write(''.join(print_red(i) if i.startswith('-') else print_green(i) if i.startswith('+') else i for i in diff))
-        sys.stdout.write('\n')
+        for line in cell_diff:
+            if line.startswith("+++") or line.startswith("---"):
+                sys.stdout.write(line)
+            elif line.startswith("+"):
+                sys.stdout.write(print_green(line))
+            elif line.startswith("-"):
+                sys.stdout.write(print_red(line))
+            else:
+                sys.stdout.write(line)
+        sys.stdout.write("\n")
+
 
 def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> None:
     """
@@ -207,5 +260,10 @@ def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> 
             code_cell_number += 1
             new_source = _get_new_source(code_cell_number, notebook_info, pycells)
             if new_source is not None:
-                diff = unified_diff(cell['source'], new_source, fromfile=str(notebook), tofile=str(notebook))
-                _print_diff(code_cell_number, diff)
+                cell_diff = unified_diff(
+                    cell["source"],
+                    new_source,
+                    fromfile=str(notebook),
+                    tofile=str(notebook),
+                )
+                _print_diff(code_cell_number, cell_diff)

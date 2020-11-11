@@ -118,8 +118,11 @@ for details)
      rev: 0.4.0
      hooks:
        - id: nbqa-black
+         additional_dependencies: [black==20.8b1]
        - id: nbqa-pyupgrade
+         additional_dependencies: [pyupgrade==2.7.3]
        - id: nbqa-isort
+         additional_dependencies: [isort==5.6.4]
    ```
 
 ## 🥳 Used by
@@ -136,28 +139,33 @@ Take some inspiration from their config files 😉
 
 ## 💬 Testimonials
 
-**Michael Kennedy & Brian Okken**, [hosts of the Python Bytes podcast](https://pythonbytes.fm/):
+**Michael Kennedy & Brian Okken**, [hosts of the Python Bytes podcast](https://pythonbytes.fm/episodes/show/204/take-the-psf-survey-and-will-carlton-drop-by):
 
 > This is really cool. I think it brings so much of the code formatting and code analysis, clean up to notebooks, which I think had been really lacking
 
-**Nikita Sobolev**, [CTO at wemake.services](https://sobolevn.me/):
+**Nikita Sobolev**, [CTO at wemake.services](https://github.com/nbQA-dev/nbQA/issues/386#issuecomment-718046313):
 
 > It is amazing!
 
 **Alex Andorra**,
-[Data Scientist, ArviZ & PyMC Dev, Host of 'Learning Bayesian Statistics' Podcast](https://learnbayesstats.anvil.app/):
+[Data Scientist, ArviZ & PyMC Dev, Host of 'Learning Bayesian Statistics' Podcast](https://github.com/pymc-devs/pymc3/pull/4074#pullrequestreview-482589774):
 
 > well done on `nbqa` @MarcoGorelli ! Will be super useful in CI
 
+**Matthew Feickert**
+[Postdoc at University of Illinois working on LHC physics](https://twitter.com/HEPfeickert/status/1324823925898027008):
+
+> nbqa in your pre-commit hooks along with @codewithanthony 's pre-commit CI service is amazing!
+Everyone using Jupyter notebooks should be doing this.
+
 **Girish Pasupathy**,
-[Software engineer and now core-contributor](https://github.com/girip11):
+[Software engineer and now core-contributor](https://github.com/nbQA-dev/nbQA/issues/164#issuecomment-674529528):
 
 > thanks a lot for your effort to create such a useful tool
 
 ## 👥 Contributing
 
-I will give write-access to anyone who contributes anything useful
-(e.g. pull request / bug report) - see the
+I will give write-access to anyone who makes a useful pull request - see the
 [contributing guide](https://nbqa.readthedocs.io/en/latest/contributing.html)
 for details on how to do so.
 
@@ -183,6 +191,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://caioariede.github.io/"><img src="https://avatars0.githubusercontent.com/u/55533?v=4" width="100px;" alt=""/><br /><sub><b>Caio Ariede</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/commits?author=caioariede" title="Documentation">📖</a></td>
     <td align="center"><a href="https://sobolevn.me"><img src="https://avatars1.githubusercontent.com/u/4660275?v=4" width="100px;" alt=""/><br /><sub><b>Nikita Sobolev</b></sub></a><br /><a href="#ideas-sobolevn" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Asobolevn" title="Bug reports">🐛</a> <a href="https://github.com/nbQA-dev/nbQA/commits?author=sobolevn" title="Documentation">📖</a></td>
     <td align="center"><a href="https://www.linkedin.com/in/amichayoren/"><img src="https://avatars1.githubusercontent.com/u/48661380?v=4" width="100px;" alt=""/><br /><sub><b>Amichay Oren</b></sub></a><br /><a href="#ideas-amor71" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/pylang"><img src="https://avatars0.githubusercontent.com/u/10778668?v=4" width="100px;" alt=""/><br /><sub><b>pylang</b></sub></a><br /><a href="#ideas-pylang" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 

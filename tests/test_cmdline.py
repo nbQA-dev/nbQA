@@ -19,6 +19,8 @@ def test_cli_command_str() -> None:
         "--ignore=F401",
         r"--nbqa-ignore-cells=%%%%cython,%%%%html",
         "--nbqa-diff",
+        r"--nbqa-files=^tests/data",
+        r"--nbqa-exclude=^tests/data/notebook_for",
     ]
     cli_args = CLIArgs.parse_args(args[1:])
     command: str = str(cli_args)

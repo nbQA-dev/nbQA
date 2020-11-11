@@ -10,7 +10,7 @@ from collections import defaultdict
 from importlib import import_module
 from pathlib import Path
 from textwrap import dedent
-from typing import DefaultDict, Dict, Iterator, List, Optional, Set, Tuple, NamedTuple
+from typing import DefaultDict, Dict, Iterator, List, NamedTuple, Optional, Set, Tuple
 
 from pkg_resources import parse_version
 
@@ -54,7 +54,11 @@ EXCLUDES = (
     r"_build|buck-out|build|dist|venv"
     r")/"
 )
+
+
 class Choice(NamedTuple):
+    """Replace function choice."""
+
     diff: bool
     mutate: bool
 
@@ -100,9 +104,42 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
     )
 
 
-def _get_all_notebooks(root_dirs: List[str]) -> Iterator[Path]:
+def _filter_by_include_exclude(
+    notebooks: Iterator[Path],
+    include: Optional[str],
+    exclude: Optional[str],
+) -> Iterator[Path]:
     """
-    Get generator with all notebooks passed in via the command-line.
+    Include files which match include, exclude those matching exclude.
+
+    notebooks
+        Notebooks (not directories) to run code quality tool on.
+    include:
+        Global file include pattern.
+    exclude:
+        Global file exclude pattern.
+
+    Returns
+    -------
+    Iterator
+        Notebooks matching include and not matching exclude.
+    """
+    include = include or ""
+    exclude = exclude or "^$"
+    include_re, exclude_re = re.compile(include), re.compile(exclude)
+    return (
+        notebook
+        for notebook in notebooks
+        if include_re.search(str(notebook.as_posix()))
+        if not exclude_re.search(str(notebook.as_posix()))
+    )
+
+
+def _get_all_notebooks(
+    root_dirs: List[str], files: Optional[str], exclude: Optional[str]
+) -> Iterator[Path]:
+    """
+    Get generator with all notebooks passed in via the command-line, applying exclusions.
 
     Parameters
     ----------
@@ -114,7 +151,9 @@ def _get_all_notebooks(root_dirs: List[str]) -> Iterator[Path]:
     Iterator
         All Jupyter Notebooks found in all passed directories/notebooks.
     """
-    return (j for i in root_dirs for j in _get_notebooks(i))
+    return _filter_by_include_exclude(
+        (j for i in root_dirs for j in _get_notebooks(i)), files, exclude
+    )
 
 
 def _temp_python_file_for_notebook(
@@ -407,14 +446,15 @@ def _run_command(
         stdout=subprocess.PIPE,
         cwd=tmpdirname,
         env=env,
+        universal_newlines=True,  # from Python3.7 this can be replaced with `text`
     )
 
     mutated = [_get_mtimes(i) for i in args] != before
 
     output_code = output.returncode
 
-    out = output.stdout.decode()
-    err = output.stderr.decode()
+    out = output.stdout
+    err = output.stderr
 
     return out, err, output_code, mutated
 
@@ -509,13 +549,15 @@ def _run_on_one_root_dir(
 
         nb_to_py_mapping = {
             notebook: _temp_python_file_for_notebook(notebook, tmpdirname, project_root)
-            for notebook in _get_all_notebooks(cli_args.root_dirs)
+            for notebook in _get_all_notebooks(
+                cli_args.root_dirs, configs.nbqa_files, configs.nbqa_exclude
+            )
         }
 
         if not nb_to_py_mapping:
             sys.stderr.write(
                 "No .ipynb notebooks found in given directories: "
-                f"{' '.join(i for i in cli_args.root_dirs if Path(i).is_dir())}{os.linesep}"
+                f"{' '.join(i for i in cli_args.root_dirs if Path(i).is_dir())}\n"
             )
             return 0
 
@@ -584,9 +626,10 @@ def _run_on_one_root_dir(
                     # pylint: enable=C0301
                     raise SystemExit(msg)
 
-                replace_fn = REPLACE_FUNCTION[Choice(diff=configs.nbqa_diff, mutate=configs.nbqa_mutate)]
                 try:
-                    replace_fn(
+                    REPLACE_FUNCTION[
+                        Choice(diff=configs.nbqa_diff, mutate=configs.nbqa_mutate)
+                    ](
                         temp_python_file,
                         notebook,
                         nb_info_mapping[notebook],
@@ -599,7 +642,9 @@ def _run_on_one_root_dir(
                     ) from exc
 
         if configs.nbqa_diff:
-            sys.stdout.write('To apply changes (if any), use `--nbqa-mutate` instead of `--nbqa-diff`\n')
+            sys.stdout.write(
+                "To apply changes (if any), use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+            )
             return 0
 
         sys.stdout.write(out)
