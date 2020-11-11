@@ -365,8 +365,7 @@ def main(
             result.append(re.sub(r";(\s*)$", "\\1", parsed_cell))
             line_number += len(parsed_cell.splitlines())
 
-    result[-1] = result[-1].rstrip(NEWLINE)
-    temp_python_file.write_text("".join(result) + NEWLINE)
+    temp_python_file.write_text("".join(result).rstrip(NEWLINE) + NEWLINE)
 
     return NotebookInfo(
         cell_mapping, trailing_semicolons, temporary_lines, code_cells_to_ignore
