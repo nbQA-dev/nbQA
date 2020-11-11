@@ -1,6 +1,7 @@
 """Check :code:`mypy` works as intended."""
 
 import os
+from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
@@ -22,7 +23,14 @@ def test_mypy_works(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     with pytest.raises(SystemExit):
-        main(["mypy", "--ignore-missing-imports", "--allow-untyped-defs", "tests"])
+        main(
+            [
+                "mypy",
+                "--ignore-missing-imports",
+                "--allow-untyped-defs",
+                str(Path("tests") / "data"),
+            ]
+        )
 
     # check out and err
     out, err = capsys.readouterr()
