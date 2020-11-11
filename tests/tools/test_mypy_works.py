@@ -1,6 +1,7 @@
 """Check :code:`mypy` works as intended."""
 
 import os
+from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
@@ -22,7 +23,14 @@ def test_mypy_works(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     with pytest.raises(SystemExit):
-        main(["mypy", "--ignore-missing-imports", "--allow-untyped-defs", "tests"])
+        main(
+            [
+                "mypy",
+                "--ignore-missing-imports",
+                "--allow-untyped-defs",
+                str(Path("tests") / "data"),
+            ]
+        )
 
     # check out and err
     out, err = capsys.readouterr()
@@ -34,7 +42,7 @@ def test_mypy_works(capsys: "CaptureFixture") -> None:
         {path_2}:cell_3:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
         {path_1}:cell_2:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
         {path_0}:cell_2:19: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
-        Found 3 errors in 3 files (checked 15 source files)
+        Found 3 errors in 3 files (checked 14 source files)
         """  # noqa
     )
     expected_err = ""
