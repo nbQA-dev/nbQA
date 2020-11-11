@@ -9,6 +9,7 @@ TESTS_DIR = Path("tests")
 TEST_DATA_DIR = TESTS_DIR / "data"
 DIRTY_NOTEBOOK = TEST_DATA_DIR / "notebook_for_testing.ipynb"
 CLEAN_NOTEBOOK = TEST_DATA_DIR / "clean_notebook.ipynb"
+EMPTY_NOTEBOOK = TEST_DATA_DIR / "empty_notebook.ipynb"
 INVALID_SYNTAX_NOTEBOOK = TESTS_DIR / "invalid_data" / "invalid_syntax.ipynb"
 
 # Interpret the below constants in the same context as that of pre-commit tool
@@ -47,6 +48,7 @@ def test_black_return_code() -> None:
         CLEAN_NOTEBOOK,
         TEST_DATA_DIR / "notebook_with_cell_after_def.ipynb",
         TEST_DATA_DIR / "clean_notebook_with_trailing_semicolon.ipynb",
+        EMPTY_NOTEBOOK,
     ]
     assert black_runner(clean_notebooks, "--check") == PASSED
 
