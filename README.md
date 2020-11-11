@@ -191,6 +191,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://caioariede.github.io/"><img src="https://avatars0.githubusercontent.com/u/55533?v=4" width="100px;" alt=""/><br /><sub><b>Caio Ariede</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/commits?author=caioariede" title="Documentation">📖</a></td>
     <td align="center"><a href="https://sobolevn.me"><img src="https://avatars1.githubusercontent.com/u/4660275?v=4" width="100px;" alt=""/><br /><sub><b>Nikita Sobolev</b></sub></a><br /><a href="#ideas-sobolevn" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Asobolevn" title="Bug reports">🐛</a> <a href="https://github.com/nbQA-dev/nbQA/commits?author=sobolevn" title="Documentation">📖</a></td>
     <td align="center"><a href="https://www.linkedin.com/in/amichayoren/"><img src="https://avatars1.githubusercontent.com/u/48661380?v=4" width="100px;" alt=""/><br /><sub><b>Amichay Oren</b></sub></a><br /><a href="#ideas-amor71" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/pylang"><img src="https://avatars0.githubusercontent.com/u/10778668?v=4" width="100px;" alt=""/><br /><sub><b>pylang</b></sub></a><br /><a href="#ideas-pylang" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
