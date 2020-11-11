@@ -14,12 +14,42 @@ if TYPE_CHECKING:
 
 
 def _copy_notebook(src_notebook: Path, target_dir: Path) -> Path:
+    """
+    Copy source notebook to the target directory.
+
+    Parameters
+    ----------
+    src_notebook : Path
+        Notebook to copy
+    target_dir : Path
+        Destination directory
+
+    Returns
+    -------
+    Path
+        Path to the notebook in the destination directory
+    """
     target_notebook = target_dir / src_notebook.name
     copyfile(src_notebook, target_notebook)
     return target_notebook
 
 
 def _run_nbqa(command: str, notebook: str, *args: str) -> Tuple[List[str], List[str]]:
+    """
+    Run nbQA on the given notebook using the input command.
+
+    Parameters
+    ----------
+    command : str
+        Third party tool to run
+    notebook : str
+        Notebook given to nbQA
+
+    Returns
+    -------
+    Tuple[List[str], List[str]]
+        Content of the notebook before and after running nbQA
+    """
     with open(notebook) as handle:
         before = handle.readlines()
 
@@ -33,6 +63,22 @@ def _run_nbqa(command: str, notebook: str, *args: str) -> Tuple[List[str], List[
 
 
 def _validate(before: List[str], after: List[str]) -> bool:
+    """
+    Validate the state of the notebook before and after running nbqa with autoflake.
+
+    Parameters
+    ----------
+    before
+        Notebook contents before running nbqa with autoflake
+    after
+        Notebook contents after running nbqa with autoflake
+
+    Returns
+    -------
+    bool
+        True if validation succeeded else False
+    """
+
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
     expected = dedent(
@@ -73,6 +119,14 @@ def test_autoflake_cli(tmpdir: "LocalPath") -> None:
 
 
 def _create_toml_config(config_file: Path) -> None:
+    """
+    Create TOML configuration in the test directory.
+
+    Parameters
+    ----------
+    config_file : Path
+        nbqa configuration file
+    """
     config_file.write_text(
         dedent(
             """
