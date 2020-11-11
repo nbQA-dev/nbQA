@@ -1,3 +1,4 @@
+autoflake
 black
 coverage[toml]
 flake8
