@@ -194,7 +194,7 @@ def print_red(message: str) -> str:
     message
         String to print in red.
     """
-    return f"{RED}{message}{RESET}\n"
+    return f"{RED}{message}{RESET}"
 
 
 def print_green(message: str) -> str:
@@ -206,7 +206,7 @@ def print_green(message: str) -> str:
     message
         String to print in green.
     """
-    return f"{GREEN}{message}{RESET}\n"
+    return f"{GREEN}{message}{RESET}"
 
 
 def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> None:
@@ -237,6 +237,19 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> None:
         sys.stdout.write("\n")
 
 
+def add_newline_to_last_line(cell: List[str]) -> None:
+    """
+    Add trailing newline to last line in cell, as required by difflib.
+
+    Parameters
+    ----------
+    cell
+        Current cell being processed.
+    """
+    if cell:
+        cell[-1] += "\n"
+
+
 def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> None:
     """
     Replace :code:`source` code cells of original notebook.
@@ -260,6 +273,8 @@ def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> 
             code_cell_number += 1
             new_source = _get_new_source(code_cell_number, notebook_info, pycells)
             if new_source is not None:
+                add_newline_to_last_line(cell["source"])
+                add_newline_to_last_line(new_source)
                 cell_diff = unified_diff(
                     cell["source"],
                     new_source,
