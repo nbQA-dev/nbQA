@@ -26,13 +26,13 @@ def test_diff_present(capsys):
 @@ -12,8 +12,8 @@
      'hello goodbye'
      \"\"\"
-
+ \n\
 \x1b[31m-    return 'hello {}'.format(name)
 \x1b[0m\x1b[32m+    return "hello {}".format(name)
-\x1b[0m
-
+\x1b[0m \n\
+ \n\
  !ls
-\x1b[31m-hello(3)
+\x1b[31m-hello(3)   \n\
 \x1b[0m\x1b[32m+hello(3)
 \x1b[0m
 \x1b[1mCell 4\x1b[0m
@@ -41,7 +41,7 @@ def test_diff_present(capsys):
 +++ tests/data/notebook_for_testing.ipynb
 @@ -1,4 +1,4 @@
  from random import randint
-
+ \n\
  if __debug__:
 \x1b[31m-    %time randint(5,10)
 \x1b[0m\x1b[32m+    %time randint(5, 10)
