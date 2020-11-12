@@ -32,33 +32,3 @@ the trailing semicolon will be preserved:
 
     # some comment
     plt.plot();
-
-flake8 (and other linters)
---------------------------
-
-Line magics
-~~~~~~~~~~~
-
-If you import a module and then *only* use it in a line magic, then you may get an "unused import"
-warning from ``flake8``.
-
-Example:
-
-.. code:: python
-
-    # cell 1
-    import numpy as np
-
-    # cell 2
-    %time np.random.randn(1000)
-
-You can overcome this limitation by using a cell magic to time execution:
-
-.. code:: python
-
-    # cell 1
-    import numpy as np
-
-    # cell 2
-    %%time
-    np.random.randn(1000)
