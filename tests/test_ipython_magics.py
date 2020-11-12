@@ -1,7 +1,8 @@
 """Check user can check for other magics."""
-import json
+import difflib
 from pathlib import Path
 from shutil import copyfile
+from textwrap import dedent
 from typing import TYPE_CHECKING, Callable, List, Optional, Tuple
 
 import pytest
@@ -123,69 +124,116 @@ def test_ignore_cells(
     assert validate(out, test_nb_path)
 
 
-def _indented_magics_toml_input() -> List[Tuple[str, Callable[..., bool], str]]:
-    """Input for handling indented magics test case using toml configuration."""
-    toml_config_file = "pyproject.toml"
+def _validate_magics_with_black(before: List[str], after: List[str]) -> bool:
+    """
+    Validate the state of the notebook before and after running nbqa with black.
 
-    return [
-        (
-            "[tool.nbqa.mutate]\nblack=1",
-            _validate_indented_magics,
-            toml_config_file,
-        )
-    ]
+    Parameters
+    ----------
+    before
+        Notebook contents before running nbqa with autoflake
+    after
+        Notebook contents after running nbqa with autoflake
 
-
-def _validate_indented_magics(actual: str, test_nb_path: Path) -> bool:
-    """Validate the results of the notebook with indented magics after running black."""
-    expected_cell_source = [
-        ["import time\n", "\n", 'print(f"current_time: {time.time()}")'],
-        [
-            "from random import randint\n",
-            "\n",
-            "if randint(5, 10) > 8:\n",
-            '    %time print("Hello world")',
-        ],
-        ["str.split??"],
-        ["# indented line magic\n", "?str.splitlines"],
-        ["%time randint(5, 10)"],
-    ]
-    result: bool = True
-
-    actual_cells = json.loads(test_nb_path.read_text())["cells"]
-    actual_cell_source = (cell["source"] for cell in actual_cells)
-
-    for actual_src, expected_src in zip(actual_cell_source, expected_cell_source):
-        result = result and (actual_src == expected_src)
-
-    return result and (actual == "")
+    Returns
+    -------
+    bool
+        True if validation succeeded else False
+    """
+    diff = difflib.unified_diff(before, after)
+    result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
+    expected = dedent(
+        """\
+        -    "def compute(operand1,operand2, bin_op):\\n",
+        +    "def compute(operand1, operand2, bin_op):\\n",
+        -    "compute(5,1, operator.add)"
+        +    "compute(5, 1, operator.add)"
+        -    "    ?str.splitlines"
+        +    "?str.splitlines"
+        -    "    !grep -r '%%HTML' . | wc -l"
+        +    "!grep -r '%%HTML' . | wc -l"
+        -    "   %time randint(5,10)"
+        +    "%time randint(5, 10)"
+        -    "    %time compute(5,1, operator.mul)"
+        +    "    %time compute(5, 1, operator.mul)"
+        """
+    )
+    return result == expected
 
 
 @pytest.mark.parametrize(
     "config, validate, config_file",
-    [*_indented_magics_toml_input()],
+    [
+        (
+            "[tool.nbqa.mutate]\nblack=1",
+            _validate_magics_with_black,
+            "pyproject.toml",
+        )
+    ],
 )
 def test_indented_magics(
     config: str,
     validate: Callable[..., bool],
     config_file: Optional[str],
     tmpdir: "LocalPath",
-    capsys: "CaptureFixture",
 ) -> None:
     """Check if the indented line magics are retained properly after mutating."""
     test_nb_path = _copy_notebook(
         Path("tests/data/notebook_with_indented_magics.ipynb"), Path(tmpdir)
     )
 
-    nbqa_args = ["black", str(test_nb_path)]
-
     if config_file:
         _create_ignore_cell_config(Path(tmpdir) / config_file, config)
-    else:
-        nbqa_args.append(config)
+
+    with open(str(test_nb_path)) as handle:
+        before = handle.readlines()
 
     with pytest.raises(SystemExit):
-        main(nbqa_args)
+        main(["black", str(test_nb_path)])
+
+    with open(str(test_nb_path)) as handle:
+        after = handle.readlines()
+
+    assert validate(before, after)
+
+
+def _validate_magics_flake8_warnings(actual: str, test_nb_path: Path) -> bool:
+    """Validate the results of notebooks with warnings."""
+    expected_out = [
+        f"{str(test_nb_path)}:cell_3:6:21: E231 missing whitespace after ','",
+        f"{str(test_nb_path)}:cell_3:11:10: E231 missing whitespace after ','",
+        f"{str(test_nb_path)}:cell_9:1:14: E231 missing whitespace after ','",
+        f"{str(test_nb_path)}:cell_10:2:18: E231 missing whitespace after ','",
+        f"{str(test_nb_path)}:cell_12:1:1: E402 module level import not at top of file",
+        f"{str(test_nb_path)}:cell_12:2:1: E402 module level import not at top of file",
+    ]
+    return sorted(expected_out) == sorted(actual.splitlines())
+
+
+@pytest.mark.parametrize(
+    "config, validate",
+    [
+        (
+            "--extend-ignore=F821",
+            _validate_magics_flake8_warnings,
+        ),
+    ],
+)
+def test_magics_with_flake8(
+    config: str,
+    validate: Callable[..., bool],
+    tmpdir: "LocalPath",
+    capsys: "CaptureFixture",
+) -> None:
+    """
+    Validate if nbqa is able to run flake8 on notebooks with different types of ipython magics.
+    """
+    test_nb_path = _copy_notebook(
+        Path("tests/data/notebook_with_indented_magics.ipynb"), Path(tmpdir)
+    )
+
+    with pytest.raises(SystemExit):
+        main(["flake8", str(test_nb_path), config])
 
     out, _ = capsys.readouterr()
     assert validate(out, test_nb_path)
