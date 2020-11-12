@@ -189,9 +189,14 @@ class Configs:
 
         return defaults
 
-    def validate(self):
+    def validate(self) -> None:
         """
         Check specified configs are valid.
+
+        Raises
+        ------
+        ValueError
+            If both --nbqa-diff and --nbqa-mutate are used together.
         """
         if self._diff and self._mutate:
             raise ValueError(
@@ -203,4 +208,3 @@ class Configs:
                 """
                 )
             )
-        # todo: check that nbqa_config exists
