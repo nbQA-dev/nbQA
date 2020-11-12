@@ -1,6 +1,7 @@
 """Module responsible for storing and handling nbqa configuration."""
 
 from shlex import split
+from textwrap import dedent
 from typing import Any, Callable, ClassVar, Dict, List, Mapping, NamedTuple, Optional
 
 import toml
@@ -187,3 +188,19 @@ class Configs:
         )
 
         return defaults
+
+    def validate(self):
+        """
+        Check specified configs are valid.
+        """
+        if self._diff and self._mutate:
+            raise ValueError(
+                dedent(
+                    """\
+                Cannot use both `--nbqa-diff` and `--nbqa-mutate` flags together!
+
+                Use `--nbqa-diff` to preview changes, and `--nbqa-mutate` to apply them.
+                """
+                )
+            )
+        # todo: check that nbqa_config exists

@@ -10,7 +10,7 @@ from collections import defaultdict
 from importlib import import_module
 from pathlib import Path
 from textwrap import dedent
-from typing import DefaultDict, Dict, Iterator, List, NamedTuple, Optional, Set, Tuple
+from typing import DefaultDict, Dict, Iterator, List, Optional, Set, Tuple
 
 from pkg_resources import parse_version
 
@@ -56,16 +56,9 @@ EXCLUDES = (
 )
 
 
-class Choice(NamedTuple):
-    """Replace function choice."""
-
-    diff: bool
-    mutate: bool
-
-
 REPLACE_FUNCTION = {
-    Choice(diff=True, mutate=False): replace_source.diff,
-    Choice(diff=False, mutate=True): replace_source.mutate,
+    True: replace_source.diff,
+    False: replace_source.mutate,
 }
 
 
@@ -621,15 +614,17 @@ def _run_on_one_root_dir(
                         {BOLD}Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:{RESET}
 
                             nbqa {cli_args.command} notebook.ipynb --nbqa-mutate
+
+                        or, to only preview changes, use the `--nbqa-diff` flag, e.g.:
+
+                            nbqa {cli_args.command} notebook.ipynb --nbqa-diff
                         """
                     )
                     # pylint: enable=C0301
                     raise SystemExit(msg)
 
                 try:
-                    REPLACE_FUNCTION[
-                        Choice(diff=configs.nbqa_diff, mutate=configs.nbqa_mutate)
-                    ](
+                    REPLACE_FUNCTION[configs.nbqa_diff](
                         temp_python_file,
                         notebook,
                         nb_info_mapping[notebook],
@@ -644,7 +639,7 @@ def _run_on_one_root_dir(
         if configs.nbqa_diff:
             if mutated:
                 sys.stdout.write(
-                    "To apply changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+                    "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
                 )
             return 0
 
@@ -700,6 +695,7 @@ def main(argv: Optional[List[str]] = None) -> None:
     _check_command_is_installed(cli_args.command)
     project_root: Path = find_project_root(tuple(cli_args.root_dirs))
     configs: Configs = _get_configs(cli_args, project_root)
+    configs.validate()
 
     output_code = _run_on_one_root_dir(cli_args, configs, project_root)
 
