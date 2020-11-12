@@ -202,9 +202,9 @@ class Configs:
             raise ValueError(
                 dedent(
                     """\
-                Cannot use both `--nbqa-diff` and `--nbqa-mutate` flags together!
+                    Cannot use both `--nbqa-diff` and `--nbqa-mutate` flags together!
 
-                Use `--nbqa-diff` to preview changes, and `--nbqa-mutate` to apply them.
-                """
+                    Use `--nbqa-diff` to preview changes, and `--nbqa-mutate` to apply them.
+                    """
                 )
             )
