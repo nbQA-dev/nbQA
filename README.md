@@ -98,10 +98,6 @@ Here's an example of how to set up some pre-commit hooks:
 for details)
 
    ```toml
-   [tool.nbqa.config]
-   isort = "setup.cfg"
-   black = "pyproject.toml"
-
    [tool.nbqa.mutate]
    isort = 1
    black = 1
