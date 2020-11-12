@@ -337,10 +337,8 @@ def _get_arg(
     'tmpdir/my_notebook.py'
     """
     if Path(root_dir).is_dir():
-        arg = Path(tmpdirname) / Path(root_dir).resolve().relative_to(project_root)
-    else:
-        arg = nb_to_py_mapping[Path(root_dir)]
-    return arg
+        return Path(tmpdirname) / Path(root_dir).resolve().relative_to(project_root)
+    return nb_to_py_mapping[Path(root_dir)]
 
 
 def _get_all_args(
