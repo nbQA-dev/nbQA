@@ -2,6 +2,14 @@
 Changelog
 =========
 
+0.4.1 (2020-11-11)
+------------------
+
+Fixed bug whereby parsing notebooks without any code cells was throwing ``IndexError``.
+Fixed bug whereby piping output to a text file was introducing extra newlines on Windows.
+Added ``nbqa-check-ast`` pre-commit hook.
+Added ``--nbqa-files`` and ``--nbqa-exclude`` flags for file inclusion/exclusion.
+
 0.4.0 (2020-11-05)
 ------------------
 

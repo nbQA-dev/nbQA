@@ -115,7 +115,7 @@ for details)
 
    ```yaml
    - repo: https://github.com/nbQA-dev/nbQA
-     rev: 0.4.0
+     rev: 0.4.1
      hooks:
        - id: nbqa-black
          additional_dependencies: [black==20.8b1]
@@ -130,11 +130,14 @@ for details)
 Take some inspiration from their config files 😉
 
 - **alibi** [.pre-commit-config.yaml](https://github.com/SeldonIO/alibi/blob/master/.pre-commit-config.yaml)
+- **iminuit** [pyproject.toml](https://github.com/scikit-hep/iminuit/blob/develop/pyproject.toml) [.pre-commit-config.yaml](https://github.com/scikit-hep/iminuit/blob/develop/.pre-commit-config.yaml)
 - **LiuAlgoTrader**: [requirements/dev.txt](https://github.com/amor71/LiuAlgoTrader/blob/master/liualgotrader/requirements/dev.txt)
 - **NLP Profiler**: [pyproject.toml](https://github.com/neomatrix369/nlp_profiler/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/neomatrix369/nlp_profiler/blob/master/.pre-commit-config.yaml)
 - **pandas-profiling** [.pre-commit-config.yaml](https://github.com/pandas-profiling/pandas-profiling/blob/develop/.pre-commit-config.yaml)
 - **pyhf** [pyproject.toml](https://github.com/scikit-hep/pyhf/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/scikit-hep/pyhf/blob/master/.pre-commit-config.yaml)
 - **PyMC3**: [pyproject.toml](https://github.com/pymc-devs/pymc3/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/pymc-devs/pymc3/blob/master/.pre-commit-config.yaml)
+- **PyMC Resources**: [pyproject.toml](https://github.com/pymc-devs/resources/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/pymc-devs/resources/blob/master/.pre-commit-config.yaml)
+- **Python compiled microcourse**: [.pre-commit-config.yaml](https://github.com/henryiii/python-compiled-minicourse/blob/master/.pre-commit-config.yaml)
 - **sktime**: [.pre-commit-config.yaml](https://github.com/alan-turing-institute/sktime/blob/master/.pre-commit-config.yaml)
 
 ## 💬 Testimonials
@@ -192,6 +195,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://sobolevn.me"><img src="https://avatars1.githubusercontent.com/u/4660275?v=4" width="100px;" alt=""/><br /><sub><b>Nikita Sobolev</b></sub></a><br /><a href="#ideas-sobolevn" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Asobolevn" title="Bug reports">🐛</a> <a href="https://github.com/nbQA-dev/nbQA/commits?author=sobolevn" title="Documentation">📖</a></td>
     <td align="center"><a href="https://www.linkedin.com/in/amichayoren/"><img src="https://avatars1.githubusercontent.com/u/48661380?v=4" width="100px;" alt=""/><br /><sub><b>Amichay Oren</b></sub></a><br /><a href="#ideas-amor71" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/pylang"><img src="https://avatars0.githubusercontent.com/u/10778668?v=4" width="100px;" alt=""/><br /><sub><b>pylang</b></sub></a><br /><a href="#ideas-pylang" title="Ideas, Planning, & Feedback">🤔</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="http://iscinumpy.gitlab.io"><img src="https://avatars1.githubusercontent.com/u/4616906?v=4" width="100px;" alt=""/><br /><sub><b>Henry Schreiner</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Ahenryiii" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 

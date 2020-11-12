@@ -9,6 +9,7 @@ TESTS_DIR = Path("tests")
 TEST_DATA_DIR = TESTS_DIR / "data"
 DIRTY_NOTEBOOK = TEST_DATA_DIR / "notebook_for_testing.ipynb"
 CLEAN_NOTEBOOK = TEST_DATA_DIR / "clean_notebook.ipynb"
+EMPTY_NOTEBOOK = TEST_DATA_DIR / "empty_notebook.ipynb"
 INVALID_SYNTAX_NOTEBOOK = TESTS_DIR / "invalid_data" / "invalid_syntax.ipynb"
 
 # Interpret the below constants in the same context as that of pre-commit tool
@@ -30,6 +31,24 @@ def test_flake8_return_code() -> None:
     assert flake8_runner([CLEAN_NOTEBOOK]) == PASSED
 
 
+def test_autoflake_return_code() -> None:
+    """Check flake8 returns 0 if it passes, 1 otherwise."""
+    autoflake_options = [
+        "--check",
+        "--expand-star-imports",
+        "--remove-all-unused-imports",
+        "--remove-unused-variables",
+    ]
+    autoflake_runner = partial(_run_nbqa_with, "autoflake")
+    assert autoflake_runner([CLEAN_NOTEBOOK], *autoflake_options) == PASSED
+    assert (
+        autoflake_runner(
+            [TEST_DATA_DIR / "notebook_for_autoflake.ipynb"], *autoflake_options
+        )
+        != PASSED
+    )
+
+
 def test_pylint_return_code() -> None:
     """Check pylint returns 0 if it passes, 20 otherwise."""
     pylint_runner = partial(_run_nbqa_with, "pylint")
@@ -47,6 +66,7 @@ def test_black_return_code() -> None:
         CLEAN_NOTEBOOK,
         TEST_DATA_DIR / "notebook_with_cell_after_def.ipynb",
         TEST_DATA_DIR / "clean_notebook_with_trailing_semicolon.ipynb",
+        EMPTY_NOTEBOOK,
     ]
     assert black_runner(clean_notebooks, "--check") == PASSED
 
