@@ -6,8 +6,20 @@ import secrets
 import sys
 from abc import ABC
 from ast import AST
+from enum import Enum
 from textwrap import dedent, indent
-from typing import Optional, Pattern
+from typing import ClassVar, Dict, List, Optional, Pattern
+
+from nbconvert.filters import ipython2python
+
+
+class IPythonMagicType(Enum):
+    """Enumeration representing various types of IPython magics."""
+
+    SHELL = 0
+    HELP = 1
+    LINE = 2
+    CELL = 3
 
 
 class MagicHandler(ABC):
@@ -23,6 +35,16 @@ class MagicHandler(ABC):
     _MAGIC_REGEX_TEMPLATE: str = r"type\s*\(\s*{token}\s*\).*{token}"
     _token: str
     _ipython_magic: str
+
+    # To Developers: Its better to preserve the order in which
+    # this dictionary is populated. For instance, if HELP is inserted
+    # after LINE leads to bug, since they both share the same prefix.
+    _MAGIC_PREFIXES: ClassVar[Dict[IPythonMagicType, List[str]]] = {
+        IPythonMagicType.SHELL: ["get_ipython().system", "get_ipython().getoutput"],
+        IPythonMagicType.HELP: ["get_ipython().run_line_magic('pinfo"],
+        IPythonMagicType.LINE: ["get_ipython().run_line_magic", "get_ipython().magic"],
+        IPythonMagicType.CELL: ["get_ipython().run_cell_magic"],
+    }
 
     def __init__(self, ipython_magic: str) -> None:
         """Initialize this instance.
@@ -125,7 +147,41 @@ class MagicHandler(ABC):
         bool
             True if the source contains ipython magic
         """
-        return source.strip().startswith(("!", "%", "?")) or source.endswith("?")
+        # suppose a developer is developing a custom cell magic or line magic
+        # and wants to measure the performance of it using a code snippet like
+        # `%%timeit get_ipython().run_line_magic("custom_magic", "input to magic")`
+        # To handle such cases, we need to count if the original source itself
+        # contains any `get_ipython` function call.
+        # If the statement is a valid ipython magic, then ipython2python
+        # will transform using another `get_ipython()` function call.
+        src_count = source.count("get_ipython()")
+        return ipython2python(source).count("get_ipython()") == (1 + src_count)
+
+    @staticmethod
+    def get_ipython_magic_type(ipython_magic: str) -> Optional[IPythonMagicType]:
+        """Return the type of ipython magic.
+
+        This function assumes the input parameter to be a ipython magic. It is
+        recommended to call this method after checking `is_ipython_magic`.
+
+        Parameters
+        ----------
+        ipython_magic : str
+            Ipython magic statement
+
+        Returns
+        -------
+        Optional[IPythonMagicType]
+            Type of the IPython magic
+        """
+        python_code = ipython2python(ipython_magic)
+        magic_type: Optional[IPythonMagicType] = None
+        for magic, prefixes in MagicHandler._MAGIC_PREFIXES.items():
+            if any(prefix in python_code for prefix in prefixes):
+                magic_type = magic
+                break
+
+        return magic_type
 
     @staticmethod
     def get_magic_handler(ipython_magic: str) -> "MagicHandler":
@@ -138,16 +194,18 @@ class MagicHandler(ABC):
             An instance of MagicHandler or some subclass of MagicHandler.
         """
         ipython_magic = dedent(ipython_magic).strip()
+        magic_type = MagicHandler.get_ipython_magic_type(ipython_magic)
+
         magic_handler: MagicHandler
-        if ipython_magic[0] == "!":
+        if magic_type == IPythonMagicType.SHELL:
             magic_handler = ShellCommandHandler(ipython_magic)
-        elif ipython_magic.startswith("?") or ipython_magic.endswith("?"):
+        elif magic_type == IPythonMagicType.HELP:
             magic_handler = HelpMagicHandler(ipython_magic)
-        elif ipython_magic[0] == "%":
-            if ipython_magic.startswith("%%"):
-                magic_handler = CellMagicHandler(ipython_magic)
-            else:
-                magic_handler = LineMagicHandler(ipython_magic)
+        elif magic_type == IPythonMagicType.CELL:
+            magic_handler = CellMagicHandler(ipython_magic)
+        else:
+            # make this as the default case
+            magic_handler = LineMagicHandler(ipython_magic)
 
         return magic_handler
 
