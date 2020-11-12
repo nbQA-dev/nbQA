@@ -18,17 +18,16 @@ def test_diff_present(capsys):
     with pytest.raises(SystemExit):
         main(["black", str(DIRTY_NOTEBOOK), "--nbqa-diff"])
     out, err = capsys.readouterr()
-    expected_out = """\
-\x1b[1mCell 2\x1b[0m
+    expected_out = f"""\x1b[1mCell 2\x1b[0m
 ------
---- tests/data/notebook_for_testing.ipynb
-+++ tests/data/notebook_for_testing.ipynb
+--- {str(DIRTY_NOTEBOOK)}
++++ {str(DIRTY_NOTEBOOK)}
 @@ -12,8 +12,8 @@
      'hello goodbye'
      \"\"\"
  \n\
-\x1b[31m-    return 'hello {}'.format(name)
-\x1b[0m\x1b[32m+    return "hello {}".format(name)
+\x1b[31m-    return 'hello {{}}'.format(name)
+\x1b[0m\x1b[32m+    return "hello {{}}".format(name)
 \x1b[0m \n\
  \n\
  !ls
@@ -37,8 +36,8 @@ def test_diff_present(capsys):
 \x1b[0m
 \x1b[1mCell 4\x1b[0m
 ------
---- tests/data/notebook_for_testing.ipynb
-+++ tests/data/notebook_for_testing.ipynb
+--- {str(DIRTY_NOTEBOOK)}
++++ {str(DIRTY_NOTEBOOK)}
 @@ -1,4 +1,4 @@
  from random import randint
  \n\
