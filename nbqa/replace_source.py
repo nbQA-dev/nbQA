@@ -170,7 +170,7 @@ def _notebook_code_cells(
 
     Yields
     ------
-    List[str]
+    MutableMapping[str, Any]
         Cell content.
     """
     for cell in notebook_json["cells"]:
