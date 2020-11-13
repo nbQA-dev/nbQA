@@ -146,9 +146,7 @@ def _get_pycells(python_file: "Path") -> Iterator[str]:
     Iterator
         Parsed cells.
     """
-    pyfile = python_file.read_text()
-    pycells: Iterator[str] = iter(pyfile[len(CODE_SEPARATOR) :].split(CODE_SEPARATOR))
-    return pycells
+    return iter(python_file.read_text().lstrip(CODE_SEPARATOR).split(CODE_SEPARATOR))
 
 
 def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> None:
