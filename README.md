@@ -194,6 +194,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="http://iscinumpy.gitlab.io"><img src="https://avatars1.githubusercontent.com/u/4616906?v=4" width="100px;" alt=""/><br /><sub><b>Henry Schreiner</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Ahenryiii" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="http://www.linkedin.com/in/kaiqidong"><img src="https://avatars0.githubusercontent.com/u/9269816?v=4" width="100px;" alt=""/><br /><sub><b>Kaiqi Dong</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/commits?author=charlesdong1991" title="Documentation">📖</a></td>
   </tr>
 </table>
 
