@@ -10,16 +10,13 @@ import sys
 from difflib import unified_diff
 from typing import TYPE_CHECKING, Iterator, List, Optional, Set, Tuple
 
-from nbqa.cmdline import BOLD, RESET
 from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
 from nbqa.save_source import CODE_SEPARATOR
+from nbqa.text import BOLD, GREEN, RED, RESET
 
 if TYPE_CHECKING:
     from pathlib import Path
-
-RED = "\033[31m"
-GREEN = "\033[32m"
 
 
 def _peek(iterable: Iterator[str]) -> Tuple[Optional[str], Iterator[str]]:

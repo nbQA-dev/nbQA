@@ -4,9 +4,8 @@ from textwrap import dedent
 from typing import List, Optional
 
 from nbqa import __version__
+from nbqa.text import BOLD, RESET
 
-BOLD = "\033[1m"
-RESET = "\x1b[0m"
 CONFIGURATION_URL = "https://nbqa.readthedocs.io/en/latest/configuration.html"
 DOCS_URL = "https://nbqa.readthedocs.io/en/latest/index.html"
 USAGE_MSG = dedent(

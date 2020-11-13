@@ -15,12 +15,13 @@ from typing import DefaultDict, Dict, Iterator, List, Optional, Set, Tuple
 from pkg_resources import parse_version
 
 from nbqa import config_parser, replace_source, save_source
-from nbqa.cmdline import BOLD, RESET, CLIArgs
+from nbqa.cmdline import CLIArgs
 from nbqa.config.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
 from nbqa.output_parser import map_python_line_to_nb_lines
+from nbqa.text import BOLD, RESET
 
 CONFIG_FILES: DefaultDict[str, List[str]] = defaultdict(
     lambda: ["setup.cfg", "tox.ini", "pyproject.toml"]
