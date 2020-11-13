@@ -7,6 +7,8 @@ isort = ["--treat-comment-as-code", "# %%"]
 
 [ignore_cells]
 
+[diff]
+
 [files]
 
 [exclude]

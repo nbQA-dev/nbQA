@@ -15,12 +15,13 @@ from typing import DefaultDict, Dict, Iterator, List, Optional, Set, Tuple
 from pkg_resources import parse_version
 
 from nbqa import config_parser, replace_source, save_source
-from nbqa.cmdline import BOLD, RESET, CLIArgs
+from nbqa.cmdline import CLIArgs
 from nbqa.config.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
 from nbqa.output_parser import map_python_line_to_nb_lines
+from nbqa.text import BOLD, RESET
 
 CONFIG_FILES: DefaultDict[str, List[str]] = defaultdict(
     lambda: ["setup.cfg", "tox.ini", "pyproject.toml"]
@@ -54,6 +55,12 @@ EXCLUDES = (
     r"_build|buck-out|build|dist|venv"
     r")/"
 )
+
+
+REPLACE_FUNCTION = {
+    True: replace_source.diff,
+    False: replace_source.mutate,
+}
 
 
 class UnsupportedPackageVersionError(Exception):
@@ -331,10 +338,8 @@ def _get_arg(
     'tmpdir/my_notebook.py'
     """
     if Path(root_dir).is_dir():
-        arg = Path(tmpdirname) / Path(root_dir).resolve().relative_to(project_root)
-    else:
-        arg = nb_to_py_mapping[Path(root_dir)]
-    return arg
+        return Path(tmpdirname) / Path(root_dir).resolve().relative_to(project_root)
+    return nb_to_py_mapping[Path(root_dir)]
 
 
 def _get_all_args(
@@ -601,21 +606,27 @@ def _run_on_one_root_dir(
                 sys.stderr.write(BASE_ERROR_MESSAGE.format(msg))
 
             if mutated:
-                if not configs.nbqa_mutate:
+                if not configs.nbqa_mutate and not configs.nbqa_diff:
                     # pylint: disable=C0301
                     msg = dedent(
                         f"""\
                         {BOLD}Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:{RESET}
 
                             nbqa {cli_args.command} notebook.ipynb --nbqa-mutate
+
+                        or, to only preview changes, use the `--nbqa-diff` flag, e.g.:
+
+                            nbqa {cli_args.command} notebook.ipynb --nbqa-diff
                         """
                     )
                     # pylint: enable=C0301
                     raise SystemExit(msg)
 
                 try:
-                    replace_source.main(
-                        temp_python_file, notebook, nb_info_mapping[notebook]
+                    REPLACE_FUNCTION[configs.nbqa_diff](
+                        temp_python_file,
+                        notebook,
+                        nb_info_mapping[notebook],
                     )
                 except Exception as exc:
                     raise RuntimeError(
@@ -623,6 +634,13 @@ def _run_on_one_root_dir(
                             f"Error reconstructing {str(notebook)}"
                         )
                     ) from exc
+
+        if configs.nbqa_diff:
+            if mutated:
+                sys.stdout.write(
+                    "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+                )
+            return 0
 
         sys.stdout.write(out)
         sys.stderr.write(err)
@@ -676,6 +694,7 @@ def main(argv: Optional[List[str]] = None) -> None:
     _check_command_is_installed(cli_args.command)
     project_root: Path = find_project_root(tuple(cli_args.root_dirs))
     configs: Configs = _get_configs(cli_args, project_root)
+    configs.validate()
 
     output_code = _run_on_one_root_dir(cli_args, configs, project_root)
 

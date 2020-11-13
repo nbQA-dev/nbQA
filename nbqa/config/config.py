@@ -1,6 +1,7 @@
 """Module responsible for storing and handling nbqa configuration."""
 
 from shlex import split
+from textwrap import dedent
 from typing import Any, Callable, ClassVar, Dict, List, Mapping, NamedTuple, Optional
 
 import toml
@@ -16,6 +17,7 @@ class _ConfigSections(NamedTuple):  # pylint: disable=R0903
     CONFIG: str = "config"
     IGNORE_CELLS: str = "ignore_cells"
     MUTATE: str = "mutate"
+    DIFF: str = "diff"
     FILES: str = "files"
     EXCLUDE: str = "exclude"
 
@@ -57,6 +59,7 @@ class Configs:
         if isinstance(arg, str)
         else arg,
         CONFIG_SECTIONS.MUTATE: bool,
+        CONFIG_SECTIONS.DIFF: bool,
         CONFIG_SECTIONS.FILES: str,
         CONFIG_SECTIONS.EXCLUDE: str,
     }
@@ -65,6 +68,7 @@ class Configs:
     _config: Optional[str] = None
     _ignore_cells: List[str] = []
     _addopts: List[str] = []
+    _diff: bool = False
     _files: Optional[str] = None
     _exclude: Optional[str] = None
 
@@ -86,6 +90,11 @@ class Configs:
     def nbqa_mutate(self) -> bool:
         """Flag if nbqa is allowed to modify the original notebook(s)."""
         return self._mutate
+
+    @property
+    def nbqa_diff(self) -> bool:
+        """Show diff instead of replacing notebook code."""
+        return self._diff
 
     @property
     def nbqa_config(self) -> Optional[str]:
@@ -129,6 +138,7 @@ class Configs:
             CONFIG_SECTIONS.IGNORE_CELLS, self._ignore_cells or other.nbqa_ignore_cells
         )
         config.set_config(CONFIG_SECTIONS.MUTATE, self._mutate or other.nbqa_mutate)
+        config.set_config(CONFIG_SECTIONS.DIFF, self._diff or other.nbqa_diff)
         config.set_config(CONFIG_SECTIONS.FILES, self._files or other.nbqa_files)
         config.set_config(CONFIG_SECTIONS.EXCLUDE, self._exclude or other.nbqa_exclude)
         return config
@@ -149,6 +159,7 @@ class Configs:
         config.set_config(CONFIG_SECTIONS.CONFIG, cli_args.nbqa_config)
         config.set_config(CONFIG_SECTIONS.IGNORE_CELLS, cli_args.nbqa_ignore_cells)
         config.set_config(CONFIG_SECTIONS.MUTATE, cli_args.nbqa_mutate)
+        config.set_config(CONFIG_SECTIONS.DIFF, cli_args.nbqa_diff)
         config.set_config(CONFIG_SECTIONS.FILES, cli_args.nbqa_files)
         config.set_config(CONFIG_SECTIONS.EXCLUDE, cli_args.nbqa_exclude)
 
@@ -170,9 +181,30 @@ class Configs:
         defaults.set_config(
             CONFIG_SECTIONS.MUTATE, DEFAULT_CONFIG["mutate"].get(command)
         )
+        defaults.set_config(CONFIG_SECTIONS.DIFF, DEFAULT_CONFIG["diff"].get(command))
         defaults.set_config(CONFIG_SECTIONS.FILES, DEFAULT_CONFIG["files"].get(command))
         defaults.set_config(
             CONFIG_SECTIONS.EXCLUDE, DEFAULT_CONFIG["exclude"].get(command)
         )
 
         return defaults
+
+    def validate(self) -> None:
+        """
+        Check specified configs are valid.
+
+        Raises
+        ------
+        ValueError
+            If both --nbqa-diff and --nbqa-mutate are used together.
+        """
+        if self._diff and self._mutate:
+            raise ValueError(
+                dedent(
+                    """\
+                    Cannot use both `--nbqa-diff` and `--nbqa-mutate` flags together!
+
+                    Use `--nbqa-diff` to preview changes, and `--nbqa-mutate` to apply them.
+                    """
+                )
+            )

@@ -4,9 +4,8 @@ from textwrap import dedent
 from typing import List, Optional
 
 from nbqa import __version__
+from nbqa.text import BOLD, RESET
 
-BOLD = "\033[1m"
-RESET = "\x1b[0m"
 CONFIGURATION_URL = "https://nbqa.readthedocs.io/en/latest/configuration.html"
 DOCS_URL = "https://nbqa.readthedocs.io/en/latest/index.html"
 USAGE_MSG = dedent(
@@ -62,6 +61,7 @@ class CLIArgs:  # pylint: disable=R0902
     nbqa_mutate: bool
     nbqa_ignore_cells: Optional[str]
     nbqa_config: Optional[str]
+    nbqa_diff: bool
     nbqa_files: Optional[str]
     nbqa_exclude: Optional[str]
 
@@ -82,6 +82,7 @@ class CLIArgs:  # pylint: disable=R0902
         self.nbqa_mutate = args.nbqa_mutate or False
         self.nbqa_config = args.nbqa_config or None
         self.nbqa_ignore_cells = args.nbqa_ignore_cells or None
+        self.nbqa_diff = args.nbqa_diff or False
         self.nbqa_files = args.nbqa_files or None
         self.nbqa_exclude = args.nbqa_exclude or None
 
@@ -91,6 +92,8 @@ class CLIArgs:  # pylint: disable=R0902
         args.extend(self.root_dirs)
         if self.nbqa_mutate:
             args.append("--nbqa-mutate")
+        if self.nbqa_diff:
+            args.append("--nbqa-diff")
         if self.nbqa_config:
             args.append(f"--nbqa-config={self.nbqa_config}")
         if self.nbqa_ignore_cells:
@@ -137,6 +140,11 @@ class CLIArgs:  # pylint: disable=R0902
             "--nbqa-mutate",
             action="store_true",
             help="Allows `nbqa` to modify notebooks.",
+        )
+        parser.add_argument(
+            "--nbqa-diff",
+            action="store_true",
+            help="Show diff which would result from running --nbqa-mutate.",
         )
         parser.add_argument(
             "--nbqa-config",

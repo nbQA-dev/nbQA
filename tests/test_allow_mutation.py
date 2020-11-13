@@ -16,6 +16,10 @@ def test_allow_mutation() -> None:
         \x1b[1mMutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:\x1b[0m
 
             nbqa black notebook.ipynb --nbqa-mutate
+
+        or, to only preview changes, use the `--nbqa-diff` flag, e.g.:
+
+            nbqa black notebook.ipynb --nbqa-diff
         """
     )
 
