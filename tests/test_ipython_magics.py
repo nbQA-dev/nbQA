@@ -131,9 +131,9 @@ def _validate_magics_with_black(before: List[str], after: List[str]) -> bool:
     Parameters
     ----------
     before
-        Notebook contents before running nbqa with autoflake
+        Notebook contents before running nbqa with black
     after
-        Notebook contents after running nbqa with autoflake
+        Notebook contents after running nbqa with black
 
     Returns
     -------
@@ -225,9 +225,7 @@ def test_magics_with_flake8(
     tmpdir: "LocalPath",
     capsys: "CaptureFixture",
 ) -> None:
-    """
-    Validate if nbqa is able to run flake8 on notebooks with different types of ipython magics.
-    """
+    """Test nbqa with flake8 on notebook with different types of ipython magics."""
     test_nb_path = _copy_notebook(
         Path("tests/data/notebook_with_indented_magics.ipynb"), Path(tmpdir)
     )
