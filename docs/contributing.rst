@@ -17,7 +17,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/MarcoGorelli/nbqa/issues.
+Report bugs at https://github.com/nbQA-dev/nbQA/issues.
 
 If you are reporting a bug, please include:
 
@@ -47,7 +47,7 @@ articles, and such.
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/MarcoGorelli/nbqa/issues.
+The best way to send feedback is to file an issue at https://github.com/nbQA-dev/nbQA/issues.
 
 If you are proposing a feature:
 
@@ -61,7 +61,7 @@ Get Started!
 
 Ready to contribute? Here's how to set up ``nbqa`` for local development.
 
-1. Fork the ``nbqa`` repo on GitHub.
+1. Fork the ``nbqa`` repo on GitHub at https://github.com/nbQA-dev/nbQA.
 2. Clone your fork locally::
 
     $ git clone git@github.com:your_name_here/nbqa.git nbqa-dev
