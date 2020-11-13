@@ -4,21 +4,10 @@ Replace :code:`source` code cells of original notebook with ones from converted 
 The converted file will have had the third-party tool run against it by now.
 """
 
-import itertools
 import json
 import sys
 from difflib import unified_diff
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Iterator,
-    List,
-    Mapping,
-    MutableMapping,
-    Optional,
-    Set,
-    Tuple,
-)
+from typing import TYPE_CHECKING, Any, Iterator, List, Mapping, MutableMapping, Set
 
 from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
@@ -27,29 +16,6 @@ from nbqa.text import BOLD, GREEN, RED, RESET
 
 if TYPE_CHECKING:
     from pathlib import Path
-
-
-def _peek(cell_diff: Iterator[str]) -> Tuple[Optional[str], Iterator[str]]:
-    """
-    Little hack to check whether iterable is empty.
-
-    Parameters
-    ----------
-    cell_diff
-        Diff between two cells.
-
-    Returns
-    -------
-    Optional[str]
-        First element of iterable, or None if iterable is empty.
-    Iterator
-        Original iterator.
-    """
-    try:
-        first = next(cell_diff)
-    except StopIteration:
-        return None, cell_diff
-    return first, itertools.chain([first], cell_diff)
 
 
 def _restore_semicolon(
@@ -202,30 +168,6 @@ def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -
         cell["source"] = _get_new_source(code_cell_number, notebook_info, next(pycells))
 
     notebook.write_text(f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n")
-
-
-def print_red(message: str) -> str:
-    """
-    Print message in red.
-
-    Parameters
-    ----------
-    message
-        String to print in red.
-    """
-    return f"{RED}{message}{RESET}"
-
-
-def print_green(message: str) -> str:
-    """
-    Print message in green.
-
-    Parameters
-    ----------
-    message
-        String to print in green.
-    """
-    return f"{GREEN}{message}{RESET}"
 
 
 def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> None:
