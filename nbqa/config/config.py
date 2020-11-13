@@ -1,13 +1,42 @@
 """Module responsible for storing and handling nbqa configuration."""
 
+from collections import defaultdict
+from pathlib import Path
 from shlex import split
 from textwrap import dedent
-from typing import Any, Callable, ClassVar, Dict, List, Mapping, NamedTuple, Optional
+from typing import (
+    Any,
+    Callable,
+    ClassVar,
+    DefaultDict,
+    Dict,
+    List,
+    Mapping,
+    NamedTuple,
+    Optional,
+)
 
 import toml
 from pkg_resources import resource_filename
 
 from nbqa.cmdline import CLIArgs
+
+CONFIG_FILES: DefaultDict[str, List[str]] = defaultdict(
+    lambda: ["setup.cfg", "tox.ini", "pyproject.toml"]
+)
+CONFIG_FILES["black"] = ["pyproject.toml"]
+CONFIG_FILES["flake8"] = ["setup.cfg", "tox.ini", ".flake8"]
+CONFIG_FILES["pyupgrade"] = []
+CONFIG_FILES["mypy"] = ["mypy.ini", ".mypy.ini", "setup.cfg"]
+CONFIG_FILES["doctest"] = []
+CONFIG_FILES["isort"] = [
+    ".isort.cfg",
+    "pyproject.toml",
+    "setup.cfg",
+    "tox.ini",
+    ".editorconfig",
+]
+CONFIG_FILES["pylint"] = ["pylintrc", ".pylintrc", "pyproject.toml", "setup.cfg"]
 
 
 class _ConfigSections(NamedTuple):  # pylint: disable=R0903
@@ -189,14 +218,22 @@ class Configs:
 
         return defaults
 
-    def validate(self) -> None:
+    def validate(self, command: str) -> None:
         """
         Check specified configs are valid.
+
+        Parameters
+        ----------
+        command
+            Code quality tool being run.
 
         Raises
         ------
         ValueError
-            If both --nbqa-diff and --nbqa-mutate are used together.
+            If both --nbqa-diff and --nbqa-mutate are used together, or if
+            config file is not supported by given code quailty tool.
+        FileNotFoundError
+            If config file provided does not exist.
         """
         if self._diff and self._mutate:
             raise ValueError(
@@ -208,3 +245,28 @@ class Configs:
                     """
                 )
             )
+        if self.nbqa_config and not Path(self.nbqa_config).exists():
+            raise FileNotFoundError(f"{self.nbqa_config} not found.")
+        if (
+            self.nbqa_config
+            and (
+                command
+                in [
+                    i
+                    for i in CONFIG_FILES
+                    if CONFIG_FILES[i] != CONFIG_FILES.default_factory()  # type: ignore
+                ]
+            )
+            and self.nbqa_config not in CONFIG_FILES[command]
+        ):
+            # pylint: disable=C0301
+            raise ValueError(
+                dedent(
+                    f"""\
+                    {self.nbqa_config} is not a valid config file for '{command}'.
+
+                    If you believe it is, please file an issue at https://github.com/nbQA-dev/nbQA/issues.
+                    """
+                )
+            )
+            # pylint: enable=C0301
