@@ -156,6 +156,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "charlesdong1991",
+      "name": "Kaiqi Dong",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/9269816?v=4",
+      "profile": "http://www.linkedin.com/in/kaiqidong",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
