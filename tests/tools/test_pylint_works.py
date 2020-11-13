@@ -52,8 +52,20 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
     ]
 
     notebook2_expected_warnings = [
-        f'{str(notebook2)}:cell_2:1:0: C0413: Import "from random import randint"'
-        + " should be placed at the top of the module (wrong-import-position)"
+        f"{str(notebook2)}:cell_8:3:3: E0602: Undefined variable "
+        "'flake8_version' (undefined-variable)",
+        f"{str(notebook2)}:cell_8:4:10: E0602: Undefined variable "
+        "'flake8_version' (undefined-variable)",
+        f'{str(notebook2)}:cell_12:1:0: C0413: Import "import pprint" should be placed '
+        "at the top of the module (wrong-import-position)",
+        f'{str(notebook2)}:cell_12:2:0: C0413: Import "import sys" should be placed '
+        "at the top of the module (wrong-import-position)",
+        f'{str(notebook2)}:cell_3:3:0: C0411: standard import "import operator" should '
+        'be placed before "from IPython import get_ipython" (wrong-import-order)',
+        f'{str(notebook2)}:cell_12:1:0: C0411: standard import "import pprint" should '
+        'be placed before "from IPython import get_ipython" (wrong-import-order)',
+        f'{str(notebook2)}:cell_12:2:0: C0411: standard import "import sys" should '
+        'be placed before "from IPython import get_ipython" (wrong-import-order)',
     ]
 
     # check out and err
