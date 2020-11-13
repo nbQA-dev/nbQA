@@ -198,19 +198,6 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> None:
         sys.stdout.writelines(headers + line_changes + ["\n"])
 
 
-def add_newline_to_last_line(cell: List[str]) -> None:
-    """
-    Add trailing newline to last line in cell, as required by difflib.
-
-    Parameters
-    ----------
-    cell
-        Current cell being processed.
-    """
-    if cell:
-        cell[-1] += "\n"
-
-
 def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> None:
     """
     View diff between new source of code cells and original sources.
@@ -234,8 +221,10 @@ def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> 
         if code_cell_number in notebook_info.code_cells_to_ignore:
             continue
         new_source = _get_new_source(code_cell_number, notebook_info, next(pycells))
-        add_newline_to_last_line(cell["source"])
-        add_newline_to_last_line(new_source)
+        if cell["source"]:
+            cell["source"][-1] += "\n"
+        if new_source:
+            new_source[-1] += "\n"
         cell_diff = unified_diff(
             cell["source"],
             new_source,
