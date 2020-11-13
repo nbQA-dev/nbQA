@@ -13,6 +13,9 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
+CLEAN_NOTEBOOK = Path("tests") / "data/clean_notebook.ipynb"
+
+
 def test_configs_work(capsys: "CaptureFixture") -> None:
     """
     Check a flake8 cfg file is picked up by nbqa.
@@ -171,3 +174,10 @@ If you believe it is, please file an issue at https://github.com/nbQA-dev/nbQA/i
 def test_nonexistent_config():
     with pytest.raises(FileNotFoundError, match=r"situp\.cfg not found\."):
         main(["flake8", "tests", "--nbqa-config=situp.cfg"])
+
+
+def test_non_supported_tool():
+    with pytest.raises(SystemExit):
+        main(
+            ["py_compile", str(CLEAN_NOTEBOOK), "--nbqa-config=.pre-commit-config.yaml"]
+        )

@@ -25,10 +25,9 @@ CONFIG_FILES: DefaultDict[str, List[str]] = defaultdict(
     lambda: ["setup.cfg", "tox.ini", "pyproject.toml"]
 )
 CONFIG_FILES["black"] = ["pyproject.toml"]
-CONFIG_FILES["flake8"] = ["setup.cfg", "tox.ini", ".flake8"]
-CONFIG_FILES["pyupgrade"] = []
-CONFIG_FILES["mypy"] = ["mypy.ini", ".mypy.ini", "setup.cfg"]
+CONFIG_FILES["check-ast"] = []
 CONFIG_FILES["doctest"] = []
+CONFIG_FILES["flake8"] = ["setup.cfg", "tox.ini", ".flake8"]
 CONFIG_FILES["isort"] = [
     ".isort.cfg",
     "pyproject.toml",
@@ -36,7 +35,9 @@ CONFIG_FILES["isort"] = [
     "tox.ini",
     ".editorconfig",
 ]
+CONFIG_FILES["mypy"] = ["mypy.ini", ".mypy.ini", "setup.cfg"]
 CONFIG_FILES["pylint"] = ["pylintrc", ".pylintrc", "pyproject.toml", "setup.cfg"]
+CONFIG_FILES["pyupgrade"] = []
 
 
 class _ConfigSections(NamedTuple):  # pylint: disable=R0903
