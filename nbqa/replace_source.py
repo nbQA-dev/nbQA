@@ -29,14 +29,14 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-def _peek(iterable: Iterator[str]) -> Tuple[Optional[str], Iterator[str]]:
+def _peek(cell_diff: Iterator[str]) -> Tuple[Optional[str], Iterator[str]]:
     """
     Little hack to check whether iterable is empty.
 
     Parameters
     ----------
-    iterable
-        Iterable of strings.
+    cell_diff
+        Diff between two cells.
 
     Returns
     -------
@@ -46,10 +46,10 @@ def _peek(iterable: Iterator[str]) -> Tuple[Optional[str], Iterator[str]]:
         Original iterator.
     """
     try:
-        first = next(iterable)
+        first = next(cell_diff)
     except StopIteration:
-        return None, iterable
-    return first, itertools.chain([first], iterable)
+        return None, cell_diff
+    return first, itertools.chain([first], cell_diff)
 
 
 def _restore_semicolon(
@@ -239,21 +239,21 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> None:
     cell_diff
         Diff between original and new versions of cell.
     """
-    peek, cell_diff = _peek(cell_diff)
-    if peek is not None:
+    line_changes = []
+    for line in cell_diff:
+        if line.startswith("+++") or line.startswith("---"):
+            line_changes.append(line)
+        elif line.startswith("+"):
+            line_changes.append(f"{GREEN}{line}{RESET}")
+        elif line.startswith("-"):
+            line_changes.append(f"{RED}{line}{RESET}")
+        else:
+            line_changes.append(line)
+
+    if line_changes:
         header = f"Cell {code_cell_number}"
-        sys.stdout.write(f"{BOLD}{header}{RESET}\n")
-        sys.stdout.write(f"{'-'*len(header)}\n")
-        for line in cell_diff:
-            if line.startswith("+++") or line.startswith("---"):
-                sys.stdout.write(line)
-            elif line.startswith("+"):
-                sys.stdout.write(print_green(line))
-            elif line.startswith("-"):
-                sys.stdout.write(print_red(line))
-            else:
-                sys.stdout.write(line)
-        sys.stdout.write("\n")
+        headers = [f"{BOLD}{header}{RESET}\n", f"{'-'*len(header)}\n"]
+        sys.stdout.writelines(headers + line_changes + ["\n"])
 
 
 def add_newline_to_last_line(cell: List[str]) -> None:
@@ -271,7 +271,7 @@ def add_newline_to_last_line(cell: List[str]) -> None:
 
 def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> None:
     """
-    Replace :code:`source` code cells of original notebook.
+    View diff between new source of code cells and original sources.
 
     Parameters
     ----------
