@@ -141,6 +141,7 @@ latex_documents = [
     (master_doc, "nbqa.tex", "nbQA Documentation", "Marco Gorelli", "manual"),
 ]
 
+linkcheck_ignore = ["https://github.com/pre-commit/pre-commit-hooks#"]
 
 # -- Options for manual page output ------------------------------------
 

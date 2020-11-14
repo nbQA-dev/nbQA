@@ -77,7 +77,7 @@ Upgrade your syntax with `pyupgrade`_:
 
 .. _autoflake: https://github.com/myint/autoflake
 .. _black: https://black.readthedocs.io/en/stable/
-.. _check-ast: https://github.com/pre-commit/pre-commit-hooks
+.. _check-ast: https://github.com/pre-commit/pre-commit-hooks#check-ast
 .. _doctest: https://docs.python.org/3/library/doctest.html
 .. _flake8: https://flake8.pycqa.org/en/latest/
 .. _isort: https://timothycrosley.github.io/isort/
