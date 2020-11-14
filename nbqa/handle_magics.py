@@ -148,16 +148,16 @@ class MagicHandler(ABC):
         bool
             True if the source contains ipython magic
         """
-        # suppose a developer is developing a custom cell magic or line magic
-        # and wants to measure the performance of it using a code snippet like
-        # `%%timeit get_ipython().run_line_magic("custom_magic", "input to magic")`
-        # To handle such cases, we need to count if the original source itself
-        # contains any `get_ipython` function call.
-        # If the statement is a valid ipython magic, then ipython2python
-        # will transform using another `get_ipython()` function call.
-        src_count = source.count("get_ipython()")
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", DeprecationWarning)
+            # suppose a developer is developing a custom cell magic or line magic
+            # and wants to measure the performance of it using a code snippet like
+            # `%%timeit get_ipython().run_line_magic("custom_magic", "input to magic")`
+            # To handle such cases, we need to count if the original source itself
+            # contains any `get_ipython` function call.
+            # If the statement is a valid ipython magic, then ipython2python
+            # will transform using another `get_ipython()` function call.
+            src_count = source.count("get_ipython()")
             # see https://github.com/nbQA-dev/nbQA/issues/459
             return ipython2python(source).count("get_ipython()") == (1 + src_count)
 
