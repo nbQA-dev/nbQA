@@ -18,7 +18,7 @@ Reformat your notebooks with `black`_:
 
 Check whether your notebooks parse as valid Python code with `check-ast`_:
 
-.. code::console
+.. code:: console
 
    $ nbqa check-ast my_notebook.ipynb
 
