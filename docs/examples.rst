@@ -49,6 +49,13 @@ Check for style guide enforcement with `flake8`_:
    $ nbqa flake8 my_notebook.ipynb --extend-ignore=E203,E302,E305,E703
    my_notebook.ipynb:cell_3:1:1: F401 'import pandas as pd' imported but unused
 
+Cleanup unused imports and unused variables with `autoflake`_:
+
+.. code:: console
+
+   $ nbqa autoflake my_notebook.ipynb -i --remove-unused-variables --remove-all-unused-imports --nbqa-mutate
+
+
 Upgrade your syntax with `pyupgrade`_:
 
 .. code:: console
@@ -68,5 +75,6 @@ Perform static code analysis with `pylint`_:
 .. _mypy: http://mypy-lang.org/
 .. _doctest: https://docs.python.org/3/library/doctest.html
 .. _flake8: https://flake8.pycqa.org/en/latest/
+.. _autoflake: https://github.com/myint/autoflake
 .. _pyupgrade: https://github.com/asottile/pyupgrade
 .. _pylint: https://www.pylint.org/
