@@ -159,7 +159,7 @@ def test_setupcfg_is_preserved(capsys: "CaptureFixture") -> None:
     assert out == ""
 
 
-def test_invalid_config():
+def test_invalid_config() -> None:
     """Check that passing invalid config file raises."""
     msg = re.escape(
         """\
@@ -172,13 +172,13 @@ If you believe it is, please file an issue at https://github.com/nbQA-dev/nbQA/i
         main(["flake8", "tests", "--nbqa-config=pyproject.toml"])
 
 
-def test_nonexistent_config():
+def test_nonexistent_config() -> None:
     """Check that passing non-existent config file raises."""
     with pytest.raises(FileNotFoundError, match=r"situp\.cfg not found\."):
         main(["flake8", "tests", "--nbqa-config=situp.cfg"])
 
 
-def test_non_supported_tool():
+def test_non_supported_tool() -> None:
     """Check that any config file can be used for non-officially-supported tool."""
     with pytest.raises(SystemExit):
         main(
