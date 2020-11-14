@@ -15,6 +15,15 @@
   require_serial: true
   types: [jupyter]
   additional_dependencies: [pre-commit-hooks]
+- id: nbqa-autoflake
+  name: nbqa-autoflake
+  description: "Run 'autoflake' on a Jupyter Notebook"
+  entry: nbqa autoflake -i
+  language: python
+  language_version: python3
+  require_serial: true
+  types: [jupyter]
+  additional_dependencies: [autoflake]
 - id: nbqa-black
   name: nbqa-black
   description: "Run 'black' on a Jupyter Notebook"
