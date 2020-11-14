@@ -160,6 +160,7 @@ def test_setupcfg_is_preserved(capsys: "CaptureFixture") -> None:
 
 
 def test_invalid_config():
+    """Check that passing invalid config file raises."""
     msg = re.escape(
         """\
 pyproject.toml is not a valid config file for 'flake8'.
@@ -172,11 +173,13 @@ If you believe it is, please file an issue at https://github.com/nbQA-dev/nbQA/i
 
 
 def test_nonexistent_config():
+    """Check that passing non-existent config file raises."""
     with pytest.raises(FileNotFoundError, match=r"situp\.cfg not found\."):
         main(["flake8", "tests", "--nbqa-config=situp.cfg"])
 
 
 def test_non_supported_tool():
+    """Check that any config file can be used for non-officially-supported tool."""
     with pytest.raises(SystemExit):
         main(
             ["py_compile", str(CLEAN_NOTEBOOK), "--nbqa-config=.pre-commit-config.yaml"]
