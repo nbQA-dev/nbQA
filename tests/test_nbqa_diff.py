@@ -2,10 +2,15 @@
 
 import re
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
 from nbqa.__main__ import main
+
+if TYPE_CHECKING:
+    from _pytest.capture import CaptureFixture
+
 
 TESTS_DIR = Path("tests")
 TEST_DATA_DIR = TESTS_DIR / "data"
@@ -14,7 +19,7 @@ DIRTY_NOTEBOOK = TEST_DATA_DIR / "notebook_for_testing.ipynb"
 CLEAN_NOTEBOOK = TEST_DATA_DIR / "clean_notebook.ipynb"
 
 
-def test_diff_present(capsys):
+def test_diff_present(capsys: "CaptureFixture") -> None:
     with pytest.raises(SystemExit):
         main(["black", str(DIRTY_NOTEBOOK), "--nbqa-diff"])
     out, err = capsys.readouterr()
@@ -51,7 +56,7 @@ To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
     assert err == ""
 
 
-def test_diff_and_mutate():
+def test_diff_and_mutate() -> None:
     """
     Check a ValueError is raised if we use both --nbqa-mutate and --nbqa-diff.
     """

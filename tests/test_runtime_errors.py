@@ -35,7 +35,7 @@ def test_missing_command() -> None:
         main(["some-fictional-command", "tests", "--some-flag"])
 
 
-def test_missing_root_dir(capsys) -> None:
+def test_missing_root_dir(capsys: "CaptureFixture") -> None:
     """Check useful error message is raised if :code:`nbqa` is called without root_dir."""
     msg = dedent(
         """\
@@ -130,7 +130,7 @@ def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
     assert expected_out == out
 
 
-def test_directory_without_notebooks(capsys: "CaptureFixture"):
+def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
     """
     Check sensible error message is returned if none of the directories passed have notebooks.
 

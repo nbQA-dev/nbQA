@@ -15,7 +15,7 @@ CLEAN_NOTEBOOK = Path("tests") / "data/clean_notebook.ipynb"
 
 
 @pytest.mark.parametrize("dir_", [".git", "venv", "_build"])
-def test_get_notebooks(tmpdir: "LocalPath", dir_: str):
+def test_get_notebooks(tmpdir: "LocalPath", dir_: str) -> None:
     """
     Check that unwanted directories are excluded.
 
