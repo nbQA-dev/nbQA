@@ -6,15 +6,6 @@
   language_version: python3
   require_serial: true
   types: [jupyter]
-- id: nbqa-check-ast
-  name: nbqa-check-ast
-  description: "Run 'check-ast' on a Jupyter Notebook"
-  entry: nbqa pre_commit_hooks.check_ast
-  language: python
-  language_version: python3
-  require_serial: true
-  types: [jupyter]
-  additional_dependencies: [pre-commit-hooks]
 - id: nbqa-autoflake
   name: nbqa-autoflake
   description: "Run 'autoflake' on a Jupyter Notebook"
@@ -33,6 +24,15 @@
   require_serial: true
   types: [jupyter]
   additional_dependencies: [black]
+- id: nbqa-check-ast
+  name: nbqa-check-ast
+  description: "Run 'check-ast' on a Jupyter Notebook"
+  entry: nbqa pre_commit_hooks.check_ast
+  language: python
+  language_version: python3
+  require_serial: true
+  types: [jupyter]
+  additional_dependencies: [pre-commit-hooks]
 - id: nbqa-flake8
   name: nbqa-flake8
   description: "Run 'flake8' on a Jupyter Notebook"

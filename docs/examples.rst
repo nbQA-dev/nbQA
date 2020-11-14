@@ -1,6 +1,12 @@
 =====================
 Command-line examples
 =====================
+Cleanup unused imports and unused variables with `autoflake`_:
+
+.. code:: console
+
+   $ nbqa autoflake my_notebook.ipynb -i --remove-unused-variables --remove-all-unused-imports --nbqa-mutate
+
 Reformat your notebooks with `black`_:
 
 .. code:: console
@@ -10,19 +16,11 @@ Reformat your notebooks with `black`_:
    All done! ✨ 🍰 ✨
    1 files reformatted.
 
-Sort your imports with `isort`_:
+Check whether your notebooks parse as valid Python code with `check-ast`_:
 
-.. code:: console
+.. code::console
 
-   $ nbqa isort my_notebook.ipynb --nbqa-mutate
-   Fixing my_notebook.ipynb
-
-Check your type annotations with `mypy`_:
-
-.. code:: console
-
-   $ nbqa mypy my_notebook.ipynb --ignore-missing-imports
-   my_notebook.ipynb:cell_10:5: error: Argument "num1" to "add" has incompatible type "str"; expected "int"
+   $ nbqa check-ast my_notebook.ipynb
 
 Run your docstring tests with `doctest`_:
 
@@ -49,19 +47,19 @@ Check for style guide enforcement with `flake8`_:
    $ nbqa flake8 my_notebook.ipynb --extend-ignore=E203,E302,E305,E703
    my_notebook.ipynb:cell_3:1:1: F401 'import pandas as pd' imported but unused
 
-Cleanup unused imports and unused variables with `autoflake`_:
+Sort your imports with `isort`_:
 
 .. code:: console
 
-   $ nbqa autoflake my_notebook.ipynb -i --remove-unused-variables --remove-all-unused-imports --nbqa-mutate
+   $ nbqa isort my_notebook.ipynb --nbqa-mutate
+   Fixing my_notebook.ipynb
 
-
-Upgrade your syntax with `pyupgrade`_:
+Check your type annotations with `mypy`_:
 
 .. code:: console
 
-   $ nbqa pyupgrade my_notebook.ipynb --py36-plus --nbqa-mutate
-   Rewriting my_notebook.ipynb
+   $ nbqa mypy my_notebook.ipynb --ignore-missing-imports
+   my_notebook.ipynb:cell_10:5: error: Argument "num1" to "add" has incompatible type "str"; expected "int"
 
 Perform static code analysis with `pylint`_:
 
@@ -70,11 +68,19 @@ Perform static code analysis with `pylint`_:
    $ nbqa pylint my_notebook.ipynb --disable=C0114
    my_notebook.ipynb:cell_1:5:0: W0611: Unused import datetime (unused-import)
 
+Upgrade your syntax with `pyupgrade`_:
+
+.. code:: console
+
+   $ nbqa pyupgrade my_notebook.ipynb --py36-plus --nbqa-mutate
+   Rewriting my_notebook.ipynb
+
+.. _autoflake: https://github.com/myint/autoflake
 .. _black: https://black.readthedocs.io/en/stable/
-.. _isort: https://timothycrosley.github.io/isort/
-.. _mypy: http://mypy-lang.org/
+.. _check-ast: https://github.com/pre-commit/pre-commit-hooks#check-ast
 .. _doctest: https://docs.python.org/3/library/doctest.html
 .. _flake8: https://flake8.pycqa.org/en/latest/
-.. _autoflake: https://github.com/myint/autoflake
-.. _pyupgrade: https://github.com/asottile/pyupgrade
+.. _isort: https://timothycrosley.github.io/isort/
+.. _mypy: http://mypy-lang.org/
 .. _pylint: https://www.pylint.org/
+.. _pyupgrade: https://github.com/asottile/pyupgrade
