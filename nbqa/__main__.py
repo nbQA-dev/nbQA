@@ -677,7 +677,7 @@ def main(argv: Optional[List[str]] = None) -> None:
     _check_command_is_installed(cli_args.command)
     project_root: Path = find_project_root(tuple(cli_args.root_dirs))
     configs: Configs = _get_configs(cli_args, project_root)
-    configs.validate(cli_args.command)
+    configs.validate()
 
     output_code = _run_on_one_root_dir(cli_args, configs, project_root)
 
