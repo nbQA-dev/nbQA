@@ -24,6 +24,7 @@ from nbqa.cmdline import CLIArgs
 CONFIG_FILES: DefaultDict[str, List[str]] = defaultdict(
     lambda: ["setup.cfg", "tox.ini", "pyproject.toml"]
 )
+CONFIG_FILES["autoflake"] = []
 CONFIG_FILES["black"] = ["pyproject.toml"]
 CONFIG_FILES["check-ast"] = []
 CONFIG_FILES["doctest"] = []
