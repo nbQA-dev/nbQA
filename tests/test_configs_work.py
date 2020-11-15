@@ -1,6 +1,5 @@
 """Check local config files are picked up by nbqa."""
 
-import re
 from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
@@ -159,28 +158,7 @@ def test_setupcfg_is_preserved(capsys: "CaptureFixture") -> None:
     assert out == ""
 
 
-def test_invalid_config() -> None:
-    """Check that passing invalid config file raises."""
-    msg = re.escape(
-        """\
-pyproject.toml is not a valid config file for 'flake8'.
-
-If you believe it is, please file an issue at https://github.com/nbQA-dev/nbQA/issues.
-"""
-    )
-    with pytest.raises(ValueError, match=msg):
-        main(["flake8", "tests", "--nbqa-config=pyproject.toml"])
-
-
 def test_nonexistent_config() -> None:
     """Check that passing non-existent config file raises."""
     with pytest.raises(FileNotFoundError, match=r"situp\.cfg not found\."):
         main(["flake8", "tests", "--nbqa-config=situp.cfg"])
-
-
-def test_non_supported_tool() -> None:
-    """Check that any config file can be used for non-officially-supported tool."""
-    with pytest.raises(SystemExit):
-        main(
-            ["py_compile", str(CLEAN_NOTEBOOK), "--nbqa-config=.pre-commit-config.yaml"]
-        )

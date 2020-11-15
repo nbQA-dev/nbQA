@@ -220,14 +220,9 @@ class Configs:
 
         return defaults
 
-    def validate(self, command: str) -> None:
+    def validate(self) -> None:
         """
         Check specified configs are valid.
-
-        Parameters
-        ----------
-        command
-            Code quality tool being run.
 
         Raises
         ------
@@ -249,26 +244,3 @@ class Configs:
             )
         if self.nbqa_config and not Path(self.nbqa_config).exists():
             raise FileNotFoundError(f"{self.nbqa_config} not found.")
-        if (
-            self.nbqa_config
-            and (
-                command
-                in [
-                    i
-                    for i in CONFIG_FILES
-                    if CONFIG_FILES[i] != CONFIG_FILES.default_factory()  # type: ignore
-                ]
-            )
-            and self.nbqa_config not in CONFIG_FILES[command]
-        ):
-            # pylint: disable=C0301
-            raise ValueError(
-                dedent(
-                    f"""\
-                    {self.nbqa_config} is not a valid config file for '{command}'.
-
-                    If you believe it is, please file an issue at https://github.com/nbQA-dev/nbQA/issues.
-                    """
-                )
-            )
-            # pylint: enable=C0301
