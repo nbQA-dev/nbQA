@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-def test_cli_files(capsys: "CaptureFixture"):
+def test_cli_files(capsys: "CaptureFixture") -> None:
     """
     Test --nbqa-files is picked up correctly.
 
@@ -31,7 +31,7 @@ def test_cli_files(capsys: "CaptureFixture"):
     )
 
 
-def test_cli_exclude(capsys: "CaptureFixture"):
+def test_cli_exclude(capsys: "CaptureFixture") -> None:
     """
     Test --nbqa-exclude is picked up correctly.
 
@@ -49,7 +49,7 @@ def test_cli_exclude(capsys: "CaptureFixture"):
     )
 
 
-def test_config_files(capsys: "CaptureFixture"):
+def test_config_files(capsys: "CaptureFixture") -> None:
     """
     Test [nbqa.files] config is picked up correctly.
 
@@ -77,7 +77,7 @@ def test_config_files(capsys: "CaptureFixture"):
     )
 
 
-def test_config_exclude(capsys: "CaptureFixture"):
+def test_config_exclude(capsys: "CaptureFixture") -> None:
     """
     Test [nbqa.exclude] config is picked up correctly.
 

@@ -51,7 +51,6 @@ repos:
     rev: v0.790
     hooks:
       - id: mypy
-        files: ^nbqa/
   - repo: https://github.com/asottile/pyupgrade
     rev: v2.7.3
     hooks:

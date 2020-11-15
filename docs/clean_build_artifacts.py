@@ -3,7 +3,7 @@ from pathlib import Path
 from shutil import rmtree
 
 
-def delete_artifacts():
+def delete_artifacts() -> None:
     """Delete API and _build directories"""
     current_dir = Path(__file__).parent
     rmtree(current_dir / "api", ignore_errors=True)
