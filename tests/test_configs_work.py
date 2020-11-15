@@ -153,3 +153,9 @@ def test_setupcfg_is_preserved(capsys: "CaptureFixture") -> None:
     # check out and err
     out, _ = capsys.readouterr()
     assert out == ""
+
+
+def test_nonexistent_config() -> None:
+    """Check that passing non-existent config file raises."""
+    with pytest.raises(FileNotFoundError, match=r"situp\.cfg not found\."):
+        main(["flake8", "tests", "--nbqa-config=situp.cfg"])

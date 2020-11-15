@@ -1,13 +1,44 @@
 """Module responsible for storing and handling nbqa configuration."""
 
+from collections import defaultdict
+from pathlib import Path
 from shlex import split
 from textwrap import dedent
-from typing import Any, Callable, ClassVar, Dict, List, Mapping, NamedTuple, Optional
+from typing import (
+    Any,
+    Callable,
+    ClassVar,
+    DefaultDict,
+    Dict,
+    List,
+    Mapping,
+    NamedTuple,
+    Optional,
+)
 
 import toml
 from pkg_resources import resource_filename
 
 from nbqa.cmdline import CLIArgs
+
+CONFIG_FILES: DefaultDict[str, List[str]] = defaultdict(
+    lambda: ["setup.cfg", "tox.ini", "pyproject.toml"]
+)
+CONFIG_FILES["autoflake"] = []
+CONFIG_FILES["black"] = ["pyproject.toml"]
+CONFIG_FILES["check-ast"] = []
+CONFIG_FILES["doctest"] = []
+CONFIG_FILES["flake8"] = ["setup.cfg", "tox.ini", ".flake8"]
+CONFIG_FILES["isort"] = [
+    ".isort.cfg",
+    "pyproject.toml",
+    "setup.cfg",
+    "tox.ini",
+    ".editorconfig",
+]
+CONFIG_FILES["mypy"] = ["mypy.ini", ".mypy.ini", "setup.cfg"]
+CONFIG_FILES["pylint"] = ["pylintrc", ".pylintrc", "pyproject.toml", "setup.cfg"]
+CONFIG_FILES["pyupgrade"] = []
 
 
 class _ConfigSections(NamedTuple):  # pylint: disable=R0903
@@ -197,6 +228,8 @@ class Configs:
         ------
         ValueError
             If both --nbqa-diff and --nbqa-mutate are used together.
+        FileNotFoundError
+            If config file provided does not exist.
         """
         if self._diff and self._mutate:
             raise ValueError(
@@ -208,3 +241,5 @@ class Configs:
                     """
                 )
             )
+        if self.nbqa_config and not Path(self.nbqa_config).exists():
+            raise FileNotFoundError(f"{self.nbqa_config} not found.")
