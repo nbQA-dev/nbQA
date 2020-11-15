@@ -30,3 +30,7 @@ def test_allow_mutation() -> None:
     with pytest.raises(SystemExit) as excinfo:
         main(["black", path, "--line-length", "96"])
     assert msg == str(excinfo.value)
+
+    with pytest.raises(SystemExit) as excinfo:
+        main(["black", path, "--nbqa-config=tox.ini"])
+    assert msg == str(excinfo.value)
