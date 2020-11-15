@@ -227,8 +227,7 @@ class Configs:
         Raises
         ------
         ValueError
-            If both --nbqa-diff and --nbqa-mutate are used together, or if
-            config file is not supported by given code quailty tool.
+            If both --nbqa-diff and --nbqa-mutate are used together.
         FileNotFoundError
             If config file provided does not exist.
         """
