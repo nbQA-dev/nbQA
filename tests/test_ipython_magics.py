@@ -214,13 +214,13 @@ def _validate_magics_flake8_warnings(actual: str, test_nb_path: Path) -> bool:
     "config, validate",
     [
         (
-            "--extend-ignore=F821",
+            None,
             _validate_magics_flake8_warnings,
         ),
     ],
 )
 def test_magics_with_flake8(
-    config: str,
+    config: Optional[str],
     validate: Callable[..., bool],
     tmpdir: "LocalPath",
     capsys: "CaptureFixture",
@@ -230,8 +230,13 @@ def test_magics_with_flake8(
         Path("tests/data/notebook_with_indented_magics.ipynb"), Path(tmpdir)
     )
 
+    args = ["flake8", str(test_nb_path)]
+
+    if config:
+        args.append(config)
+
     with pytest.raises(SystemExit):
-        main(["flake8", str(test_nb_path), config])
+        main(args)
 
     out, _ = capsys.readouterr()
     assert validate(out, test_nb_path)

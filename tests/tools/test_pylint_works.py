@@ -52,10 +52,6 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
     ]
 
     notebook2_expected_warnings = [
-        f"{str(notebook2)}:cell_8:3:3: E0602: Undefined variable "
-        "'flake8_version' (undefined-variable)",
-        f"{str(notebook2)}:cell_8:4:10: E0602: Undefined variable "
-        "'flake8_version' (undefined-variable)",
         f'{str(notebook2)}:cell_12:1:0: C0413: Import "import pprint" should be placed '
         "at the top of the module (wrong-import-position)",
         f'{str(notebook2)}:cell_12:2:0: C0413: Import "import sys" should be placed '
