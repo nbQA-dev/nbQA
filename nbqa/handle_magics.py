@@ -134,9 +134,45 @@ class MagicHandler(ABC):
         return re.compile(pattern_template.format(token=token), re.RegexFlag.DOTALL)
 
     @staticmethod
+    def _ipython2python(source: str) -> str:
+        """
+        Return python code for the input ipython magic.
+
+        If the input source is not a valid ipython magic, this method returns the input
+        source unmodified. This method internally calls ``nbconvert.ipython2python``
+        which used the ``IPython.core.inputsplitter.IPythonInputSplitter`` class which
+        is deprecated. But the recommended transformer class
+        ``IPython.core.inputtransformer2.TransformerManager`` contains a bug as
+        captured at # see https://github.com/nbQA-dev/nbQA/issues/459. Till that bug
+        gets fixed, we have to use the deprecated method.
+
+        Parameters
+        ----------
+        source : str
+            Source code to transform
+
+        Returns
+        -------
+        str
+            If ipython magic is passed, it is transformed to valid python code
+        """
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            return ipython2python(source)
+
+    @staticmethod
     def is_ipython_magic(source: str) -> bool:
         """
         Return True if the source contains ipython magic.
+
+        A statement like ``%%timeit get_ipython().run_line_magic("magic", "input")``
+        already contains ``get_ipython()`` function call. To handle such cases, we need
+        to check if the original source itself contains any ``get_ipython()`` function
+        call before concluding the statement is an ipython magic.
+
+        Statement like ``some_result = str.split??`` gets transformed into two
+        statements of python code when using ``ipython2python``. Thus we need to check
+        if the count is more than the count on the input source.
 
         Parameters
         ----------
@@ -148,18 +184,9 @@ class MagicHandler(ABC):
         bool
             True if the source contains ipython magic
         """
-        with warnings.catch_warnings():
-            # suppose a developer is developing a custom cell magic or line magic
-            # and wants to measure the performance of it using a code snippet like
-            # `%%timeit get_ipython().run_line_magic("custom_magic", "input to magic")`
-            # To handle such cases, we need to count if the original source itself
-            # contains any `get_ipython` function call.
-            # If the statement is a valid ipython magic, then ipython2python
-            # will transform using another `get_ipython()` function call.
-            src_count = source.count("get_ipython()")
-            warnings.simplefilter("ignore", DeprecationWarning)
-            # see https://github.com/nbQA-dev/nbQA/issues/459
-            return ipython2python(source).count("get_ipython()") == (1 + src_count)
+        return MagicHandler._ipython2python(source).count(
+            "get_ipython()"
+        ) > source.count("get_ipython()")
 
     @staticmethod
     def get_ipython_magic_type(ipython_magic: str) -> Optional[IPythonMagicType]:
@@ -178,7 +205,7 @@ class MagicHandler(ABC):
         Optional[IPythonMagicType]
             Type of the IPython magic
         """
-        python_code = ipython2python(ipython_magic)
+        python_code = MagicHandler._ipython2python(ipython_magic)
         magic_type: Optional[IPythonMagicType] = None
         for magic, prefixes in MagicHandler._MAGIC_PREFIXES.items():
             if any(prefix in python_code for prefix in prefixes):
@@ -220,6 +247,90 @@ class HelpMagicHandler(MagicHandler):
 
 class ShellCommandHandler(MagicHandler):
     """Handle ipython magic containing !."""
+
+    _assign_shell_output = False
+    _cmd = ""
+    _var = ""
+
+    # r"\s*\w+\s*=\s*get_ipython(\s*).getoutput(\s*'(.*)'\s*)\s*"
+    _EXTRACT_COMMAND_PATTERN: str = r"getoutput\('(.*)'\)"
+    _EXTRACT_VARNAME_PATTERN: str = r"(\w+)\s*="
+    _REPLACE_MAGIC_TEMPLATE: str = r'{var} = ascii(""" {command} """)  # {token}'
+    _RESTORE_MAGIC_REGEX_TEMPLATE: str = r"{var}\s*=\s*ascii.*{token}"
+
+    @staticmethod
+    def _extract_from_py_src(pattern: str, python_code: str) -> str:
+        """
+        Return the content matching the pattern from the python code.
+
+        Parameters
+        ----------
+        pattern : str
+            Pattern to find in the python code
+        python_code : str
+            valid python code
+
+        Returns
+        -------
+        str
+            Extracted data
+        """
+        result: str = ""
+        match = re.search(pattern, python_code, re.DOTALL)
+        if match:
+            result = match.group(1)
+        return result
+
+    def replace_magic(self) -> str:
+        """
+        Return python code to be replace the input ipython magic.
+
+        Returns
+        -------
+        str
+            Python code to replace the ipython magic
+        """
+        # check if the output of the shell command should be assigned to a variable
+        assign_cmd_output_pattern = MagicHandler._MAGIC_PREFIXES[
+            IPythonMagicType.SHELL
+        ][1]
+
+        python_code = MagicHandler._ipython2python(self._ipython_magic)
+
+        if assign_cmd_output_pattern in python_code:
+            self._assign_shell_output = True
+            self._cmd = self._extract_from_py_src(
+                self._EXTRACT_COMMAND_PATTERN, python_code
+            )
+            self._var = self._extract_from_py_src(
+                self._EXTRACT_VARNAME_PATTERN, python_code
+            )
+            return self._REPLACE_MAGIC_TEMPLATE.format(
+                var=self._var, command=self._cmd, token=self._token
+            )
+
+        return super().replace_magic()
+
+    def restore_magic(self, cell_source: str) -> str:
+        """Return the cell source with the ipython magic restored.
+
+        Parameters
+        ----------
+        cell_source : str
+            Source code of the notebook cell
+
+        Returns
+        -------
+        str
+            Cell source with ipython magic restored.
+        """
+        if self._assign_shell_output:
+            pattern = self._RESTORE_MAGIC_REGEX_TEMPLATE.format(
+                var=self._var, token=self._token
+            )
+            return re.sub(pattern, self._ipython_magic, cell_source)
+
+        return super().restore_magic(cell_source)
 
 
 class CellMagicHandler(MagicHandler):
