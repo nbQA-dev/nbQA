@@ -252,7 +252,6 @@ class ShellCommandHandler(MagicHandler):
     _cmd = ""
     _var = ""
 
-    # r"\s*\w+\s*=\s*get_ipython(\s*).getoutput(\s*'(.*)'\s*)\s*"
     _EXTRACT_COMMAND_PATTERN: str = r"getoutput\('(.*)'\)"
     _EXTRACT_VARNAME_PATTERN: str = r"(\w+)\s*="
     _REPLACE_MAGIC_TEMPLATE: str = r'{var} = ascii(""" {command} """)  # {token}'
