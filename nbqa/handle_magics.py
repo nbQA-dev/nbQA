@@ -282,14 +282,28 @@ class ShellCommandHandler(MagicHandler):
 
     def replace_magic(self) -> str:
         """
-        Return python code to be replace the input ipython magic.
+        Return python code that replaces the input ipython magic.
+
+        With shell magics, one can assign the output of the shell command to a python
+        variable. Consider the following snippet as the source of a notebook cell.
+
+        .. code:: python
+
+            flake8_version = !pip list 2>&1 | grep flake8
+            if flake8_version:
+                print(flake8_version)
+
+        If we use the usual template ``type(hex_code)`` to replace this shell magic,
+        linters would raise warnings like "Name 'flake8_version' is not defined". For
+        such shell magics, the python code template used is
+        ``var_name = ascii(shell_command) # hex_token``, so that the linters would be
+        happy.
 
         Returns
         -------
         str
             Python code to replace the ipython magic
         """
-        # check if the output of the shell command should be assigned to a variable
         assign_cmd_output_pattern = MagicHandler._MAGIC_PREFIXES[
             IPythonMagicType.SHELL
         ][1]
