@@ -26,6 +26,7 @@ repos:
     rev: pylint-2.6.0
     hooks:
       - id: pylint
+        exclude: ^docs/.*\.py$
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.4
     hooks:
