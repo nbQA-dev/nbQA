@@ -287,7 +287,7 @@ class ShellCommandHandler(MagicHandler):
         With shell magics, one can assign the output of the shell command to a python
         variable. Consider the following snippet as the source of a notebook cell.
 
-        .. code:: python
+        .. code:: ipython3
 
             flake8_version = !pip list 2>&1 | grep flake8
             if flake8_version:
