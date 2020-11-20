@@ -8,11 +8,11 @@ You can configure :code:`nbQA` either at the command line, or by using a :code:`
 Extra flags
 ~~~~~~~~~~~
 
-If you wish to pass extra flags (e.g. :code:`--ignore W503` to :code:`flake8`) you can either run
+If you wish to pass extra flags (e.g. :code:`--extend-ignore E203` to :code:`flake8`) you can either run
 
 .. code-block:: bash
 
-    nbqa flake8 my_notebook.ipynb --ignore W503
+    nbqa flake8 my_notebook.ipynb --extend-ignore E203
 
 or you can put the following in your :code:`pyproject.toml` file
 
@@ -20,7 +20,7 @@ or you can put the following in your :code:`pyproject.toml` file
 
     [tool.nbqa.addopts]
     flake8 = [
-        "--ignore=W503"
+        "--extend-ignore=E203"
     ]
 
 Config file
