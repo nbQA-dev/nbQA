@@ -93,7 +93,7 @@ def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") ->
         Pytest fixture, we use it to override ``PYTHONPATH``.
     """
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
-    message = f"Error reconstructing {path}"
+    message = re.escape(f"Error reconstructing {path}")
     monkeypatch.setenv("PYTHONPATH", os.path.join(os.getcwd(), "tests"))
     monkeypatch.setattr("sys.path", sys.path + [os.path.join(os.getcwd(), "tests")])
     with pytest.raises(RuntimeError, match=message):
