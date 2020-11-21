@@ -11,7 +11,13 @@ from enum import Enum
 from textwrap import dedent, indent
 from typing import ClassVar, Dict, List, Optional, Pattern
 
-from nbconvert.filters import ipython2python
+with warnings.catch_warnings():
+    # see https://github.com/nbQA-dev/nbQA/issues/459
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    from IPython.core.inputsplitter import IPythonInputSplitter
+
+
+INPUT_SPLITTER = IPythonInputSplitter(line_input_checker=False)
 
 
 class IPythonMagicType(Enum):
@@ -148,18 +154,17 @@ class MagicHandler(ABC):
         bool
             True if the source contains ipython magic
         """
-        with warnings.catch_warnings():
-            # suppose a developer is developing a custom cell magic or line magic
-            # and wants to measure the performance of it using a code snippet like
-            # `%%timeit get_ipython().run_line_magic("custom_magic", "input to magic")`
-            # To handle such cases, we need to count if the original source itself
-            # contains any `get_ipython` function call.
-            # If the statement is a valid ipython magic, then ipython2python
-            # will transform using another `get_ipython()` function call.
-            src_count = source.count("get_ipython()")
-            warnings.simplefilter("ignore", DeprecationWarning)
-            # see https://github.com/nbQA-dev/nbQA/issues/459
-            return ipython2python(source).count("get_ipython()") == (1 + src_count)
+        # suppose a developer is developing a custom cell magic or line magic
+        # and wants to measure the performance of it using a code snippet like
+        # `%%timeit get_ipython().run_line_magic("custom_magic", "input to magic")`
+        # To handle such cases, we need to count if the original source itself
+        # contains any `get_ipython` function call.
+        # If the statement is a valid ipython magic, then ipython2python
+        # will transform using another `get_ipython()` function call.
+        src_count = source.count("get_ipython()")
+        return INPUT_SPLITTER.transform_cell(source).count("get_ipython()") == (
+            1 + src_count
+        )
 
     @staticmethod
     def get_ipython_magic_type(ipython_magic: str) -> Optional[IPythonMagicType]:
@@ -178,7 +183,7 @@ class MagicHandler(ABC):
         Optional[IPythonMagicType]
             Type of the IPython magic
         """
-        python_code = ipython2python(ipython_magic)
+        python_code = INPUT_SPLITTER.transform_cell(ipython_magic)
         magic_type: Optional[IPythonMagicType] = None
         for magic, prefixes in MagicHandler._MAGIC_PREFIXES.items():
             if any(prefix in python_code for prefix in prefixes):
