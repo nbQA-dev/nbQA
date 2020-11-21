@@ -70,6 +70,7 @@ Ready to contribute? Here's how to set up ``nbqa`` for local development.
 3. Create a virtual environment for local development::
 
     $ tox --devenv venv
+    $ . venv/bin/activate
 
 4. Create a branch for local development::
 
