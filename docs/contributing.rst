@@ -65,13 +65,11 @@ Ready to contribute? Here's how to set up ``nbqa`` for local development.
 2. Clone your fork locally::
 
     $ git clone git@github.com:your_name_here/nbqa.git nbqa-dev
+    $ cd nbqa-dev
 
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
+3. Create a virtual environment for local development::
 
-    $ mkvirtualenv nbqa
-    $ cd nbqa-dev/
-    $ pip install -r requirements-dev.txt
-    $ pip install -r docs/requirements-docs.txt  # for contributing to the documentation
+    $ tox --devenv venv
 
 4. Create a branch for local development::
 
@@ -81,7 +79,7 @@ Ready to contribute? Here's how to set up ``nbqa`` for local development.
 
 5. When you're done making changes, check that your changes pass tests:
 
-    $ pytest
+    $ tox -e py
 
 6. Commit your changes and push your branch to GitHub::
 
