@@ -1,7 +1,7 @@
 """Define some fixtures that can be re-used between tests."""
 
 import shutil
-from distutils.dir_util import copy_tree
+from distutils.dir_util import copy_tree  # pylint: disable=E0611
 from pathlib import Path
 from typing import TYPE_CHECKING, Iterator
 
