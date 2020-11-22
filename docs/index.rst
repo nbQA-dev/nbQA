@@ -1,4 +1,4 @@
-.. image:: https://github.com/nbQA-dev/nbQA-demo/blob/master/assets/logo.png
+.. image:: https://github.com/nbQA-dev/nbQA-demo/raw/master/assets/logo.png
   :width: 400
 
 nbQA
