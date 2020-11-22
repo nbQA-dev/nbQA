@@ -2,7 +2,6 @@
 
 import os
 import re
-import sys
 from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
@@ -95,7 +94,6 @@ def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") ->
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     message = re.escape(f"Error reconstructing {path}")
     monkeypatch.setenv("PYTHONPATH", os.path.join(os.getcwd(), "tests"))
-    monkeypatch.setattr("sys.path", sys.path + [os.path.join(os.getcwd(), "tests")])
     with pytest.raises(RuntimeError, match=message):
         main(["remove_comments", path, "--nbqa-mutate"])
 
