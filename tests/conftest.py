@@ -1,6 +1,7 @@
 """Define some fixtures that can be re-used between tests."""
 
 import shutil
+import sys
 from distutils.dir_util import copy_tree  # pylint: disable=E0611
 from pathlib import Path
 from typing import TYPE_CHECKING, Iterator
@@ -186,6 +187,7 @@ def tmp_remove_comments() -> Iterator[None]:
     shutil.copy(str(Path("tests") / temp_file), str(temp_file))
     yield
     temp_file.unlink()
+    del sys.modules["remove_comments"]
 
 
 @pytest.fixture
