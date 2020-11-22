@@ -84,3 +84,7 @@ repos:
     hooks:
       - id: check-hooks-apply
       - id: check-useless-excludes
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.3.9
+    hooks:
+      - id: nbstripout
