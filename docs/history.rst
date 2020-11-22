@@ -2,6 +2,14 @@
 Changelog
 =========
 
+0.5.0 (2020-11-22)
+------------------
+
+Fixed bug whereby formatters weren't parsing assignments to shell magic.
+Raise error if given config file doesn't exist.
+Added ``-nbqa-diff`` flag, which allows users to preview changes before applying them.
+Added ``nbqa-autoflake`` pre-commit hook.
+
 0.4.1 (2020-11-11)
 ------------------
 
