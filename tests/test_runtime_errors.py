@@ -2,6 +2,8 @@
 
 import os
 import re
+import subprocess
+import sys
 from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
@@ -92,10 +94,18 @@ def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") ->
         Pytest fixture, we use it to override ``PYTHONPATH``.
     """
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
-    message = re.escape(f"Error reconstructing {path}")
+    message = re.compile(
+        f"RuntimeError: \x1b\\[1mError reconstructing {re.escape(path)}"
+    )
     monkeypatch.setenv("PYTHONPATH", os.path.join(os.getcwd(), "tests"))
-    with pytest.raises(RuntimeError, match=message):
-        main(["remove_comments", path, "--nbqa-mutate"])
+    # We need to run the command via subprocess, so PYTHONPATH influences python
+    output = subprocess.run(
+        [sys.executable, "-m", "nbqa", "remove_comments", path, "--nbqa-mutate"],
+        stderr=subprocess.PIPE,
+        env=os.environ,
+        universal_newlines=True,  # from Python3.7 this can be replaced with `text`
+    )
+    assert re.search(message, str(output.stderr))
 
 
 def test_unable_to_parse() -> None:
