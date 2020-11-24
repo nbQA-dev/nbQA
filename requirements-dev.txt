@@ -7,4 +7,5 @@ mypy
 pre-commit-hooks
 pylint
 pytest
+pytest-randomly
 pyupgrade
