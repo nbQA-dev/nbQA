@@ -193,6 +193,33 @@ class MagicHandler(ABC):
         return magic_type
 
     @staticmethod
+    def preprocess_ipython_magic(ipython_magic: str) -> str:
+        r"""
+        Remove leading and trailing spaces, trailing slashes from ipython magic.
+
+        If the trailing slashes are present in ipython magic(its an incomplete magic),
+        then we would have issues with ``re.sub`` when replacing the ipython magic back
+        to the cell source. ``re.compile("something ending with slash\\")`` will fail to
+        compile. By stripping trailing slashes, the regex would compile fine during
+        substitution.
+
+        Parameters
+        ----------
+        ipython_magic : str
+            IPython magic
+
+        Returns
+        -------
+        str
+            IPython magic stripped of spaces and trailing slashes
+        """
+        ipython_magic = dedent(ipython_magic).strip()
+        if INPUT_SPLITTER.check_complete(ipython_magic)[0] == "incomplete":
+            ipython_magic = ipython_magic.rstrip("\\")
+
+        return ipython_magic
+
+    @staticmethod
     def get_magic_handler(ipython_magic: str) -> "MagicHandler":
         """
         Return MagicHandler based on the type of ipython magic.
@@ -202,7 +229,7 @@ class MagicHandler(ABC):
         MagicHandler
             An instance of MagicHandler or some subclass of MagicHandler.
         """
-        ipython_magic = dedent(ipython_magic).strip()
+        ipython_magic = MagicHandler.preprocess_ipython_magic(ipython_magic)
         magic_type = MagicHandler.get_ipython_magic_type(ipython_magic)
 
         magic_handler: MagicHandler

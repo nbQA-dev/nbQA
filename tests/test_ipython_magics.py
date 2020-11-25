@@ -156,6 +156,8 @@ def _validate_magics_with_black(before: List[str], after: List[str]) -> bool:
         +    "%time randint(5, 10)"
         -    "    %time compute(5,1, operator.mul)"
         +    "    %time compute(5, 1, operator.mul)"
+        -    "!pip list 2>&1 |\\\\"
+        +    "!pip list 2>&1 |"
         """
     )
     return result == expected
