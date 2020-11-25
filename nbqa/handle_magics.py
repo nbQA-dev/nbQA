@@ -149,9 +149,9 @@ class MagicHandler(ABC):
         to check if the original source itself contains any ``get_ipython()`` function
         call before concluding the statement is an ipython magic.
 
-        Statement like ``some_result = str.split??`` gets transformed into two
-        statements of python code when using ``ipython2python``. Thus we need to check
-        if the count is more than the count on the input source.
+        A statement like ``some_result = str.split??`` gets transformed into two
+        python statements when using ``IPythonInputSplitter.transform_cell``. Thus we
+        need to check if the count is more than the count on the input source.
 
         Parameters
         ----------
