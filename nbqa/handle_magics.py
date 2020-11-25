@@ -144,6 +144,15 @@ class MagicHandler(ABC):
         """
         Return True if the source contains ipython magic.
 
+        A statement like ``%%timeit get_ipython().run_line_magic("magic", "input")``
+        already contains ``get_ipython()`` function call. To handle such cases, we need
+        to check if the original source itself contains any ``get_ipython()`` function
+        call before concluding the statement is an ipython magic.
+
+        A statement like ``some_result = str.split??`` gets transformed into two
+        python statements when using ``IPythonInputSplitter.transform_cell``. Thus we
+        need to check if the count is more than the count on the input source.
+
         Parameters
         ----------
         source : str
@@ -154,17 +163,8 @@ class MagicHandler(ABC):
         bool
             True if the source contains ipython magic
         """
-        # suppose a developer is developing a custom cell magic or line magic
-        # and wants to measure the performance of it using a code snippet like
-        # `%%timeit get_ipython().run_line_magic("custom_magic", "input to magic")`
-        # To handle such cases, we need to count if the original source itself
-        # contains any `get_ipython` function call.
-        # If the statement is a valid ipython magic, then ipython2python
-        # will transform using another `get_ipython()` function call.
         src_count = source.count("get_ipython()")
-        return INPUT_SPLITTER.transform_cell(source).count("get_ipython()") == (
-            1 + src_count
-        )
+        return INPUT_SPLITTER.transform_cell(source).count("get_ipython()") > src_count
 
     @staticmethod
     def get_ipython_magic_type(ipython_magic: str) -> Optional[IPythonMagicType]:
