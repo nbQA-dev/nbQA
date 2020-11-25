@@ -2,6 +2,13 @@
 Changelog
 =========
 
+0.5.1 (2020-11-25)
+------------------
+
+Fixed bugs whereby ``nbqa`` wasn't handling incomplete IPython magics, nor was
+it handling assignments to help magics (thanks Girish Pasupathy for noticing
+and fixing both of these!).
+
 0.5.0 (2020-11-22)
 ------------------
 
