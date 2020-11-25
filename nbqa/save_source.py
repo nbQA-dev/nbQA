@@ -12,7 +12,7 @@ from itertools import takewhile
 from textwrap import indent
 from typing import TYPE_CHECKING, DefaultDict, Dict, Iterator, List, Mapping, Tuple
 
-from nbqa.handle_magics import MagicHandler
+from nbqa.handle_magics import INPUT_SPLITTER, IPythonMagicType, MagicHandler
 from nbqa.notebook_info import NotebookInfo
 
 if TYPE_CHECKING:
@@ -160,12 +160,13 @@ def _extract_ipython_magic(magic: str, cell_source: Iterator[Tuple[int, str]]) -
     str
         IPython line magic statement
     """
-    if re.match(r"\s*%\w+", magic) is not None:
-        # Here we look for line magics spanning across multiple lines.
-        while magic.endswith(f"\\{NEWLINE}"):
+    magic_type = MagicHandler.get_ipython_magic_type(magic)
+    if magic_type and magic_type not in [IPythonMagicType.CELL, IPythonMagicType.HELP]:
+        # Here we look for ipython magics spanning across multiple lines.
+        while INPUT_SPLITTER.check_complete(magic)[0] == "incomplete":
             try:
                 magic += next(cell_source)[1]
-            except StopIteration:  # pragma: nocover
+            except StopIteration:
                 # This scenario is a syntax error where a line magic
                 # ends with a backslash and does not have a next line.
                 break
