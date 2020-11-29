@@ -167,7 +167,9 @@ def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -
             continue
         cell["source"] = _get_new_source(code_cell_number, notebook_info, next(pycells))
 
-    notebook.write_text(f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n", encoding="utf-8")
+    notebook.write_text(
+        f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n", encoding="utf-8"
+    )
 
 
 def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> None:
