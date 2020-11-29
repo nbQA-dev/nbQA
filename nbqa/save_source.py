@@ -331,7 +331,7 @@ def main(
     NotebookInfo
 
     """
-    cells = json.loads(notebook.read_text())["cells"]
+    cells = json.loads(notebook.read_text(encoding="utf-8"))["cells"]
 
     result = []
     cell_mapping = {0: "cell_0:0"}
@@ -366,7 +366,7 @@ def main(
             result.append(re.sub(r";(\s*)$", "\\1", parsed_cell))
             line_number += len(parsed_cell.splitlines())
 
-    temp_python_file.write_text("".join(result).rstrip(NEWLINE) + NEWLINE)
+    temp_python_file.write_text("".join(result).rstrip(NEWLINE) + NEWLINE, encoding="utf-8")
 
     return NotebookInfo(
         cell_mapping, trailing_semicolons, temporary_lines, code_cells_to_ignore
