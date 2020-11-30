@@ -163,7 +163,7 @@ Everyone using Jupyter notebooks should be doing this.
 
 > thanks a lot for your effort to create such a useful tool
 
-**Simon Brugman**, [Co-Founder GraphKite](https://github.com/nbQA-dev/nbQA/pull/490#issue-529173596):
+**Simon Brugman**, [Co-Founder of GraphKite](https://github.com/nbQA-dev/nbQA/pull/490#issue-529173596):
 
 > nbQA helps us to keep notebooks to the same standards as the rest of the code. If you're serious about your code standards, you should keep them consistent across both notebooks and python scripts. Great addition to the ecosystem, thanks!
 
