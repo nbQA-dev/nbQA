@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.5.2 (2020-11-30)
+------------------
+
+Fixed bug whereby ``nbqa`` was throwing ``UnicodeDecodeError`` on Windows
+(thanks Simon Brugman for noticing the issue and for submitting a fix!).
+
 0.5.1 (2020-11-25)
 ------------------
 
