@@ -152,7 +152,7 @@ Take some inspiration from their config files 😉
 
 > well done on `nbqa` @MarcoGorelli ! Will be super useful in CI
 
-**Matthew Feickert**
+**Matthew Feickert**,
 [Postdoc at University of Illinois working on LHC physics](https://twitter.com/HEPfeickert/status/1324823925898027008):
 
 > nbqa in your pre-commit hooks along with @codewithanthony 's pre-commit CI service is amazing!
@@ -162,6 +162,10 @@ Everyone using Jupyter notebooks should be doing this.
 [Software engineer and now core-contributor](https://github.com/nbQA-dev/nbQA/issues/164#issuecomment-674529528):
 
 > thanks a lot for your effort to create such a useful tool
+
+**Simon Brugman**, [Co-Founder GraphKite]:
+
+> nbQA helps us to keep notebooks to the same standards as the rest of the code. If you're serious about your code standards, you should keep them consistent across both notebooks and python scripts. Great addition to the ecosystem, thanks!
 
 ## 👥 Contributing
 
