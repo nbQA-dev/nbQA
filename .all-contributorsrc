@@ -165,6 +165,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "sbrugman",
+      "name": "Simon Brugman",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/9756388?v=4",
+      "profile": "http://simonbrugman.nl",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
