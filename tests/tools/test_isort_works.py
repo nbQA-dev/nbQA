@@ -106,7 +106,7 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
     """
     Check isort works when a notebook has imports in different cells.
 
-    We will pass --treat-comment-as-code '# %%'.
+    We will pass --treat-comment-as-code '# %%NBQA-CELL-SEP'.
 
     Parameters
     ----------
@@ -119,7 +119,7 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
         dedent(
             """\
             [nbqa.isort]
-            addopts = --treat-comment-as-code "# %%%%"
+            addopts = --treat-comment-as-code "# %%%%NBQA-CELL-SEP"
             """
         )
     )
@@ -176,7 +176,7 @@ def test_old_isort_separated_imports(tmp_test_data: Path) -> None:
     """
     Check isort works when a notebook has imports in different cells.
 
-    This test would fail if we didn't pass --treat-comment-as-code '# %%'.
+    This test would fail if we didn't pass --treat-comment-as-code '# %%NBQA-CELL-SEP'.
 
     Parameters
     ----------
