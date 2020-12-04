@@ -18,7 +18,7 @@ from nbqa.notebook_info import NotebookInfo
 if TYPE_CHECKING:
     from pathlib import Path
 
-CODE_SEPARATOR = "# %%"
+CODE_SEPARATOR = "# %%\n"
 MAGIC = [
     "%%!",
     "%%bash",
@@ -232,7 +232,7 @@ def _parse_cell(
         Parsed cell.
     """
     substituted_magics: List[MagicHandler] = []
-    parsed_cell = f"{CODE_SEPARATOR}{NEWLINE}"
+    parsed_cell = CODE_SEPARATOR
 
     for parsed_line in _replace_magics(source, substituted_magics):
         parsed_cell += parsed_line
