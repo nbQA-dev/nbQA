@@ -278,3 +278,35 @@ def test_successive_runs_using_black(tmpdir: "LocalPath") -> None:
 
     assert run_black(str(test_notebook), operator.gt)
     assert run_black(str(test_notebook), operator.eq)
+
+
+def test_black_works_with_commented_magics(capsys: "CaptureFixture") -> None:
+    """
+    Check black works with notebooks with commented-out magics.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    path = os.path.abspath(os.path.join("tests", "data", "commented_out_magic.ipynb"))
+
+    with pytest.raises(SystemExit):
+        main(["black", path, "--nbqa-diff"])
+
+    out, err = capsys.readouterr()
+    expected_out = """\
+\x1b[1mCell 1\x1b[0m
+------
+--- /home/marco/nbQA-dev/tests/data/commented_out_magic.ipynb
++++ /home/marco/nbQA-dev/tests/data/commented_out_magic.ipynb
+@@ -1,2 +1 @@
+\x1b[31m-[1, 2,
+\x1b[0m\x1b[31m-3, 4]
+\x1b[0m\x1b[32m+[1, 2, 3, 4]
+\x1b[0m
+To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
+"""
+    expected_err = ""
+    assert expected_out == out
+    assert expected_err == err
