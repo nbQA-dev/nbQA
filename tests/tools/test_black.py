@@ -295,11 +295,11 @@ def test_black_works_with_commented_magics(capsys: "CaptureFixture") -> None:
         main(["black", path, "--nbqa-diff"])
 
     out, err = capsys.readouterr()
-    expected_out = """\
+    expected_out = f"""\
 \x1b[1mCell 1\x1b[0m
 ------
---- /home/marco/nbQA-dev/tests/data/commented_out_magic.ipynb
-+++ /home/marco/nbQA-dev/tests/data/commented_out_magic.ipynb
+--- {path}
++++ {path}
 @@ -1,2 +1 @@
 \x1b[31m-[1, 2,
 \x1b[0m\x1b[31m-3, 4]
