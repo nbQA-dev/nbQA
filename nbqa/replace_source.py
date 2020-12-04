@@ -71,8 +71,7 @@ def _reinstate_magics(
     """
     for magic_substitution in temporary_lines:
         source = magic_substitution.restore_magic(source)
-    # we take [1:] because the first cell is just '\n'
-    return "\n{}".format(source.strip("\n")).splitlines(True)[1:]
+    return source.strip("\n").splitlines(True)
 
 
 def _get_new_source(

@@ -18,7 +18,7 @@ from nbqa.notebook_info import NotebookInfo
 if TYPE_CHECKING:
     from pathlib import Path
 
-CODE_SEPARATOR = "# %%\n"
+CODE_SEPARATOR = "# %%NBQA-CELL-SEP\n"
 MAGIC = [
     "%%!",
     "%%bash",
