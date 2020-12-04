@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.5.3 (2020-12-04)
+------------------
+
+Fixed bug whereby commented-out cell magics were preventing ``nbqa`` from
+reconstructing notebooks properly (thanks John Sandall for filing the issue!).
+
 0.5.2 (2020-11-30)
 ------------------
 
