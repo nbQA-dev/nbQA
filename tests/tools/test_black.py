@@ -310,3 +310,36 @@ To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
     expected_err = ""
     assert expected_out == out
     assert expected_err == err
+
+
+def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
+    """
+    Check black works with notebooks with commented-out magics.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    path = os.path.abspath(os.path.join("tests", "data", "starting_with_comment.ipynb"))
+
+    with pytest.raises(SystemExit):
+        main(["black", path, "--nbqa-diff"])
+
+    out, err = capsys.readouterr()
+    expected_out = f"""\
+\x1b[1mCell 3\x1b[0m
+------
+--- {path}
++++ {path}
+@@ -1,3 +1,3 @@
+ # export
+\x1b[31m-def example_func(hi = "yo"):
+\x1b[0m\x1b[32m+def example_func(hi="yo"):
+\x1b[0m     pass
+
+To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
+"""
+    expected_err = ""
+    assert expected_out == out
+    assert expected_err == err
