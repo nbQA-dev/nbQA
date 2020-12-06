@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.5.4 (2020-12-06)
+------------------
+
+Fixed bug whereby notebooks starting with comments were being uncommented
+out when replacing notebooks (thanks Nathan Cooper for filing the issue!).
+
 0.5.3 (2020-12-04)
 ------------------
 

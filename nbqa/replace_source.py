@@ -119,7 +119,10 @@ def _get_pycells(python_file: "Path") -> Iterator[str]:
     Iterator
         Parsed cells.
     """
-    return iter(python_file.read_text().lstrip(CODE_SEPARATOR).split(CODE_SEPARATOR))
+    txt = python_file.read_text()
+    if txt.startswith(CODE_SEPARATOR):
+        txt = txt[len(CODE_SEPARATOR) :]
+    return iter(txt.split(CODE_SEPARATOR))
 
 
 def _notebook_code_cells(
