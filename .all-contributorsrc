@@ -183,6 +183,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "ncoop57",
+      "name": "Nathan Cooper",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/7613470?v=4",
+      "profile": "http://nathancooper.io",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
