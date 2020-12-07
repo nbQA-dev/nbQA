@@ -523,7 +523,7 @@ def _run_on_one_root_dir(
     with tempfile.TemporaryDirectory() as tmpdirname:
 
         nb_to_py_mapping = {
-            notebook: _temp_python_file_for_notebook(notebook,  tmpdirname, project_root)
+            notebook: _temp_python_file_for_notebook(notebook, tmpdirname, project_root)
             for notebook in _get_all_notebooks(
                 cli_args.root_dirs, configs.nbqa_files, configs.nbqa_exclude
             )
