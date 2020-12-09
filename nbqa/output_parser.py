@@ -38,7 +38,9 @@ def _get_pattern(
             (
                 rf"(?<=^error: cannot format {re.escape(str(notebook))}: Cannot parse: )\d+",
                 standard_substitution,
-            )
+            ),
+            (r"(?<=line )\d+(?=\)\nOh no! )", standard_substitution),
+            (r"line cell_(?=\d+:\d+\)\nOh no! )", "cell_"),
         ]
 
     if command == "doctest":

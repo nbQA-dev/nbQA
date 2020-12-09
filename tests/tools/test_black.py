@@ -19,6 +19,8 @@ if TYPE_CHECKING:
 
 SPARKLES = "\N{sparkles}"
 SHORTCAKE = "\N{shortcake}"
+COLLISION = "\N{collision symbol}"
+BROKEN_HEART = "\N{broken heart}"
 
 
 def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> None:
@@ -341,5 +343,41 @@ def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
 To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
 """
     expected_err = ""
+    assert expected_out == out
+    assert expected_err == err
+
+
+def test_black_works_with_literal_assignment(capsys: "CaptureFixture") -> None:
+    """
+    Check black works with notebooks with invalid syntax (e.g. assignment to literal).
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    path = os.path.abspath(
+        os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
+    )
+
+    with pytest.raises(SystemExit):
+        main(["black", path])
+
+    out, err = capsys.readouterr()
+    expected_out = ""
+    expected_err = (
+        (
+            f"error: cannot format {path}: "
+            "cannot use --safe with this file; failed to parse source file.  AST error message: "
+            "can't assign to literal (<unknown>, cell_1:1)\nOh no! "
+            f"{COLLISION} {BROKEN_HEART} {COLLISION}\n1 file failed to reformat.\n"
+        )
+        .encode("ascii", "backslashreplace")
+        .decode()
+    )
+    # This is required because linux supports emojis
+    # so both should have \\ for comparison
+    err = err.encode("ascii", "backslashreplace").decode()
+
     assert expected_out == out
     assert expected_err == err
