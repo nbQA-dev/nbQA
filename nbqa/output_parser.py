@@ -40,7 +40,7 @@ def _get_pattern(
                 standard_substitution,
             ),
             (r"(?<=line )\d+(?=\)\nOh no! )", standard_substitution),
-            ("line cell_", "cell_"),
+            (r"line cell_(?=\d+:\d+\)\nOh no! )", "cell_"),
         ]
 
     if command == "doctest":
