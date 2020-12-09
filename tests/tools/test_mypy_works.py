@@ -45,7 +45,7 @@ def test_mypy_works(capsys: "CaptureFixture") -> None:
         {path_0}:cell_2:19: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
         {path_3}:cell_8:3: error: Name 'flake8_version' is not defined
         {path_3}:cell_8:4: error: Name 'flake8_version' is not defined
-        Found 5 errors in 4 files (checked 19 source files)
+        Found 5 errors in 4 files (checked 18 source files)
         """  # noqa
     )
     expected_err = ""

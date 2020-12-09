@@ -354,7 +354,9 @@ def test_black_works_with_literal_assignment(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    path = os.path.abspath(os.path.join("tests", "data", "assignment_to_literal.ipynb"))
+    path = os.path.abspath(
+        os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
+    )
 
     with pytest.raises(SystemExit):
         main(["black", path])
@@ -362,7 +364,7 @@ def test_black_works_with_literal_assignment(capsys: "CaptureFixture") -> None:
     out, err = capsys.readouterr()
     expected_out = ""
     expected_err = (
-        "error: cannot format /home/marco/nbQA-dev/tests/data/assignment_to_literal.ipynb: "
+        f"error: cannot format {path}: "
         "cannot use --safe with this file; failed to parse source file.  AST error message: "
         "can't assign to literal (<unknown>, cell_1:1)\nOh no! 💥 💔 💥\n1 file failed to reformat.\n"
     )
