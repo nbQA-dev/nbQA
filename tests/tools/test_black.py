@@ -19,6 +19,8 @@ if TYPE_CHECKING:
 
 SPARKLES = "\N{sparkles}"
 SHORTCAKE = "\N{shortcake}"
+COLLISION = "\N{collision symbol}"
+BROKEN_HEART = "\N{broken heart}"
 
 
 def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> None:
@@ -364,9 +366,18 @@ def test_black_works_with_literal_assignment(capsys: "CaptureFixture") -> None:
     out, err = capsys.readouterr()
     expected_out = ""
     expected_err = (
-        f"error: cannot format {path}: "
-        "cannot use --safe with this file; failed to parse source file.  AST error message: "
-        "can't assign to literal (<unknown>, cell_1:1)\nOh no! 💥 💔 💥\n1 file failed to reformat.\n"
+        (
+            f"error: cannot format {path}: "
+            "cannot use --safe with this file; failed to parse source file.  AST error message: "
+            "can't assign to literal (<unknown>, cell_1:1)\nOh no! "
+            f"{COLLISION} {BROKEN_HEART} {COLLISION}\n1 file failed to reformat.\n"
+        )
+        .encode("ascii", "backslashreplace")
+        .decode()
     )
+    # This is required because linux supports emojis
+    # so both should have \\ for comparison
+    err = err.encode("ascii", "backslashreplace").decode()
+
     assert expected_out == out
     assert expected_err == err
