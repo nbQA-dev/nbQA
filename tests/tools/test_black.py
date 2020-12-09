@@ -347,7 +347,7 @@ To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
 
 def test_black_works_with_literal_assignment(capsys: "CaptureFixture") -> None:
     """
-    Check black works with notebooks with commented-out magics.
+    Check black works with notebooks with invalid syntax (e.g. assignment to literal).
 
     Parameters
     ----------
