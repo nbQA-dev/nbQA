@@ -2,6 +2,14 @@
 Changelog
 =========
 
+0.5.5 (2020-12-10)
+------------------
+
+Improved error parsing when ``nbqa black`` finds code which can't be parsed
+(e.g. assignment to a literal).
+You can now once again install all supported code-quality tools with
+``python -m pip install -U nbqa[toolchain]`` (thanks Sebastian Weigand!).
+
 0.5.4 (2020-12-06)
 ------------------
 
