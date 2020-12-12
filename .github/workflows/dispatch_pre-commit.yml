@@ -1,6 +1,6 @@
 on:
   repository_dispatch:
-    types: [run-black-command]
+    types: [run-pre-commit-command]
 jobs:
   runBlack:
     runs-on: ubuntu-latest
