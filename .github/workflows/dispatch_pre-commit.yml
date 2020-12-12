@@ -1,3 +1,5 @@
+name: run pre-commit
+
 on:
   repository_dispatch:
     types: [run-pre-commit-command]
