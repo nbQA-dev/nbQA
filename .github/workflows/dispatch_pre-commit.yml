@@ -4,7 +4,7 @@ on:
   repository_dispatch:
     types: [run-pre-commit-command]
 jobs:
-  runBlack:
+  runprecommit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
