@@ -9,7 +9,7 @@ jobs:
       - name: Slash Command Dispatch
         uses: peter-evans/slash-command-dispatch@v2
         with:
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.ACTION_TRIGGER_TOKEN }}
           issue-type: pull-request
           commands: |
-            run-pre-commit
+            pre-commit-run
