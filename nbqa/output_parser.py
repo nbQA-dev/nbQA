@@ -86,9 +86,7 @@ def map_python_line_to_nb_lines(
     """
     patterns = _get_pattern(notebook, command, cell_mapping)
     for pattern_, substitution_ in patterns:
-        out = re.sub(pattern_, substitution_, out,
-            flags=re.MULTILINE
-        )
+        out = re.sub(pattern_, substitution_, out, flags=re.MULTILINE)
         err = re.sub(pattern_, substitution_, err, flags=re.MULTILINE)
 
     return out, err
