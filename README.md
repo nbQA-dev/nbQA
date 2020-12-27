@@ -90,23 +90,7 @@ See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html)
 
 ### Pre-commit
 
-Here's an example of how to set up some pre-commit hooks:
-
-1. Put this in your `pyproject.toml` file (see
-[configuration](https://nbqa.readthedocs.io/en/latest/configuration.html)
-for details)
-
-   ```toml
-   [tool.nbqa.mutate]
-   isort = 1
-   black = 1
-   pyupgrade = 1
-
-   [tool.nbqa.addopts]
-   pyupgrade = ["--py36-plus"]
-   ```
-
-2. Put this in your `.pre-commit-config.yaml` file (see [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html))
+Here's an example of how to set up some pre-commit hooks: put this in your `.pre-commit-config.yaml` file (see [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html))
 
    ```yaml
    - repo: https://github.com/nbQA-dev/nbQA
@@ -114,10 +98,13 @@ for details)
      hooks:
        - id: nbqa-black
          additional_dependencies: [black==20.8b1]
+         args: [--nbqa-mutate]
        - id: nbqa-pyupgrade
          additional_dependencies: [pyupgrade==2.7.3]
+         args: [--nbqa-mutate, --py36-plus]
        - id: nbqa-isort
          additional_dependencies: [isort==5.6.4]
+         args: [--nbqa-mutate]
    ```
 
 ## 🥳 Used by
@@ -132,9 +119,9 @@ Take some inspiration from their config files 😉
 - **NLP Profiler**: [pyproject.toml](https://github.com/neomatrix369/nlp_profiler/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/neomatrix369/nlp_profiler/blob/master/.pre-commit-config.yaml)
 - **pandas-profiling** [.pre-commit-config.yaml](https://github.com/pandas-profiling/pandas-profiling/blob/develop/.pre-commit-config.yaml)
 - **pyhf** [pyproject.toml](https://github.com/scikit-hep/pyhf/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/scikit-hep/pyhf/blob/master/.pre-commit-config.yaml)
-- **PyMC3**: [pyproject.toml](https://github.com/pymc-devs/pymc3/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/pymc-devs/pymc3/blob/master/.pre-commit-config.yaml)
-- **PyMC Resources**: [pyproject.toml](https://github.com/pymc-devs/resources/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/pymc-devs/resources/blob/master/.pre-commit-config.yaml)
+- **PyMC3**: [pyproject.toml](https://github.com/pymc-devs/pymc-examples/blob/main/pyproject.toml) [.pre-commit-config.yaml](https://github.com/pymc-devs/pymc-examples/blob/main/.pre-commit-config.yaml)
 - **Python compiled microcourse**: [.pre-commit-config.yaml](https://github.com/henryiii/python-compiled-minicourse/blob/master/.pre-commit-config.yaml)
+- **ruptures**: [.pre-commit-config.yaml](https://github.com/deepcharles/ruptures/blob/master/.pre-commit-config.yaml)
 - **sktime**: [.pre-commit-config.yaml](https://github.com/alan-turing-institute/sktime/blob/master/.pre-commit-config.yaml)
 
 ## 💬 Testimonials
