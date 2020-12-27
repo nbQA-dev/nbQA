@@ -2,6 +2,12 @@
 Known limitations
 =================
 
+Automagic
+~~~~~~~~~
+
+`Automagic <https://ipython.readthedocs.io/en/stable/interactive/magics.html?highlight=automagic#magic-automagic>`_ ("Make magic functions callable without having to type the initial %") will not work well with most code quality tools,
+as it will not parse as valid Python syntax.
+
 Black
 -----
 
