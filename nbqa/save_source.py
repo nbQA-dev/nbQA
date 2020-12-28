@@ -175,7 +175,7 @@ def _extract_ipython_magic(magic: str, cell_source: Iterator[Tuple[int, str]]) -
 
 
 def _replace_magics(
-    source: List[str], magic_substitutions: List[MagicHandler]
+    source: List[str], magic_substitutions: List[MagicHandler], command: str
 ) -> Iterator[str]:
     """
     Replace IPython line magics with valid python code.
@@ -197,7 +197,7 @@ def _replace_magics(
         if MagicHandler.is_ipython_magic(line):
             # always pass the source starting from the current line
             ipython_magic = _extract_ipython_magic(line, source_itr)
-            magic_handler = MagicHandler.get_magic_handler(ipython_magic)
+            magic_handler = MagicHandler.get_magic_handler(ipython_magic, command)
             magic_substitutions.append(magic_handler)
             line = _handle_magic_indentation(
                 source[:line_no], ipython_magic, magic_handler.replace_magic()
@@ -234,7 +234,7 @@ def _parse_cell(
     substituted_magics: List[MagicHandler] = []
     parsed_cell = CODE_SEPARATOR
 
-    for parsed_line in _replace_magics(source, substituted_magics):
+    for parsed_line in _replace_magics(source, substituted_magics, command):
         parsed_cell += parsed_line
 
     if substituted_magics:
