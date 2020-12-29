@@ -19,6 +19,8 @@ with warnings.catch_warnings():
 
 INPUT_SPLITTER = IPythonInputSplitter(line_input_checker=False)
 
+COMMANDS_WITH_STRING_TOKEN = {"flake8"}
+
 
 class IPythonMagicType(Enum):
     """Enumeration representing various types of IPython magics."""
@@ -53,7 +55,7 @@ class MagicHandler(ABC):
         IPythonMagicType.CELL: ["get_ipython().run_cell_magic"],
     }
 
-    def __init__(self, ipython_magic: str) -> None:
+    def __init__(self, ipython_magic: str, command: str) -> None:
         """Initialize this instance.
 
         Parameters
@@ -62,7 +64,8 @@ class MagicHandler(ABC):
             Ipython magic statement present in the notebook cell
         """
         self._ipython_magic = ipython_magic
-        self._token: str = MagicHandler._get_unique_token()
+        self._command = command
+        self._token: str = MagicHandler._get_unique_token(command)
 
     def replace_magic(self) -> str:
         """
@@ -109,7 +112,7 @@ class MagicHandler(ABC):
         return False
 
     @staticmethod
-    def _get_unique_token() -> str:
+    def _get_unique_token(command: str) -> str:
         """
         Return randomly generated token of hexadecimal characters.
 
@@ -118,7 +121,10 @@ class MagicHandler(ABC):
         str
             Token to uniquely identify the ipython magic replacement code.
         """
-        return f"0x{int(secrets.token_hex(4), base=16):X}"
+        token = secrets.token_hex(4)
+        if command in COMMANDS_WITH_STRING_TOKEN:
+            return f'"{token}"'
+        return f"0x{int(token, base=16):X}"
 
     @staticmethod
     def _get_regex_pattern(pattern_template: str, token: str) -> Pattern[str]:
@@ -220,7 +226,7 @@ class MagicHandler(ABC):
         return ipython_magic
 
     @staticmethod
-    def get_magic_handler(ipython_magic: str) -> "MagicHandler":
+    def get_magic_handler(ipython_magic: str, command: str) -> "MagicHandler":
         """
         Return MagicHandler based on the type of ipython magic.
 
@@ -234,14 +240,14 @@ class MagicHandler(ABC):
 
         magic_handler: MagicHandler
         if magic_type == IPythonMagicType.SHELL:
-            magic_handler = ShellCommandHandler(ipython_magic)
+            magic_handler = ShellCommandHandler(ipython_magic, command)
         elif magic_type == IPythonMagicType.HELP:
-            magic_handler = HelpMagicHandler(ipython_magic)
+            magic_handler = HelpMagicHandler(ipython_magic, command)
         elif magic_type == IPythonMagicType.CELL:
-            magic_handler = CellMagicHandler(ipython_magic)
+            magic_handler = CellMagicHandler(ipython_magic, command)
         else:
             # make this as the default case
-            magic_handler = LineMagicHandler(ipython_magic)
+            magic_handler = LineMagicHandler(ipython_magic, command)
 
         return magic_handler
 
