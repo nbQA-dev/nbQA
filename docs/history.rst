@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.5.6 (2020-12-29)
+------------------
+
+Fixed bug whereby ``flake8`` with the ``wemake-python-styleguide`` pluging
+was throwing false-positives about magic number being present when they weren't.
+
 0.5.5 (2020-12-10)
 ------------------
 
