@@ -51,6 +51,7 @@ repos:
     rev: v0.790
     hooks:
       - id: mypy
+        exclude: ^docs/
   - repo: https://github.com/asottile/pyupgrade
     rev: v2.7.4
     hooks:

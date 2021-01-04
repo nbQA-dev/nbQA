@@ -14,6 +14,7 @@ from typing import (
     Mapping,
     NamedTuple,
     Optional,
+    Union,
 )
 
 import toml
@@ -40,6 +41,8 @@ CONFIG_FILES["mypy"] = ["mypy.ini", ".mypy.ini", "setup.cfg"]
 CONFIG_FILES["pylint"] = ["pylintrc", ".pylintrc", "pyproject.toml", "setup.cfg"]
 CONFIG_FILES["pyupgrade"] = []
 
+ConfigParser = Callable[[str], Union[str, bool, List[str]]]
+
 
 class _ConfigSections(NamedTuple):  # pylint: disable=R0903
     """Stores all the config section names."""
@@ -56,7 +59,7 @@ class _ConfigSections(NamedTuple):  # pylint: disable=R0903
 CONFIG_SECTIONS = _ConfigSections()
 
 
-DEFAULT_CONFIG: Mapping[str, Mapping] = toml.load(
+DEFAULT_CONFIG: Mapping[str, Mapping[str, List[str]]] = toml.load(
     resource_filename("nbqa.config", "default_config.toml")
 )
 
@@ -81,19 +84,18 @@ class Configs:
         Global file exclude pattern.
     """
 
-    _config_section_parsers: ClassVar[Dict[str, Callable]] = {
-        CONFIG_SECTIONS.ADDOPTS: lambda arg: split(arg)
-        if isinstance(arg, str)
-        else arg,
-        CONFIG_SECTIONS.CONFIG: str,
-        CONFIG_SECTIONS.IGNORE_CELLS: lambda arg: arg.split(",")
-        if isinstance(arg, str)
-        else arg,
-        CONFIG_SECTIONS.MUTATE: bool,
-        CONFIG_SECTIONS.DIFF: bool,
-        CONFIG_SECTIONS.FILES: str,
-        CONFIG_SECTIONS.EXCLUDE: str,
-    }
+    _config_section_parsers: ClassVar[Dict[str, ConfigParser]] = {}
+    _config_section_parsers[CONFIG_SECTIONS.ADDOPTS] = (
+        lambda arg: split(arg) if isinstance(arg, str) else arg
+    )
+    _config_section_parsers[CONFIG_SECTIONS.CONFIG] = str
+    _config_section_parsers[CONFIG_SECTIONS.IGNORE_CELLS] = (
+        lambda arg: arg.split(",") if isinstance(arg, str) else arg
+    )
+    _config_section_parsers[CONFIG_SECTIONS.MUTATE] = bool
+    _config_section_parsers[CONFIG_SECTIONS.DIFF] = bool
+    _config_section_parsers[CONFIG_SECTIONS.FILES] = str
+    _config_section_parsers[CONFIG_SECTIONS.EXCLUDE] = str
 
     _mutate: bool = False
     _config: Optional[str] = None
