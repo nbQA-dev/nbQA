@@ -3,7 +3,7 @@
 from pathlib import Path
 from textwrap import dedent
 
-from nbqa.__main__ import map_python_line_to_nb_lines
+from nbqa.output_parser import map_python_line_to_nb_lines
 
 
 def test_map_python_line_to_nb_lines() -> None:

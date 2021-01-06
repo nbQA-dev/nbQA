@@ -170,7 +170,10 @@ class MagicHandler(ABC):
             True if the source contains ipython magic
         """
         src_count = source.count("get_ipython()")
-        return INPUT_SPLITTER.transform_cell(source).count("get_ipython()") > src_count
+        get_ipython_count: int = INPUT_SPLITTER.transform_cell(source).count(
+            "get_ipython()"
+        )
+        return get_ipython_count > src_count
 
     @staticmethod
     def get_ipython_magic_type(ipython_magic: str) -> Optional[IPythonMagicType]:
