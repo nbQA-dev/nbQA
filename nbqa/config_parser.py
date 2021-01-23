@@ -2,7 +2,7 @@
 
 from configparser import ConfigParser
 from pathlib import Path
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, Optional, Sequence, Tuple
 
 from nbqa.cmdline import CLIArgs
 from nbqa.config.config import CONFIG_SECTIONS, Configs
@@ -89,7 +89,7 @@ _ConfigHandler = Callable[..., Optional[Configs]]
 
 CONFIG_PREFIX: str = "nbqa."
 
-_CONFIG_FILE_HANDLERS: List[Tuple[str, Optional[_ConfigHandler]]] = [
+_CONFIG_FILE_HANDLERS: Sequence[Tuple[str, Optional[_ConfigHandler]]] = [
     ("pyproject.toml", parse_from_pyproject_toml),
     ("setup.cfg", _parse_setupcfg_or_toxini_config),
     ("tox.ini", _parse_setupcfg_or_toxini_config),

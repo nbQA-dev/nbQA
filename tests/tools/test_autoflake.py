@@ -3,7 +3,7 @@ import difflib
 from pathlib import Path
 from shutil import copyfile
 from textwrap import dedent
-from typing import TYPE_CHECKING, List, Tuple
+from typing import TYPE_CHECKING, Sequence, Tuple
 
 import pytest
 
@@ -34,20 +34,22 @@ def _copy_notebook(src_notebook: Path, target_dir: Path) -> Path:
     return target_notebook
 
 
-def _run_nbqa(command: str, notebook: str, *args: str) -> Tuple[List[str], List[str]]:
+def _run_nbqa(
+    command: str, notebook: str, *args: str
+) -> Tuple[Sequence[str], Sequence[str]]:
     """
     Run nbQA on the given notebook using the input command.
 
     Parameters
     ----------
-    command : str
+    command
         Third party tool to run
-    notebook : str
+    notebook
         Notebook given to nbQA
 
     Returns
     -------
-    Tuple[List[str], List[str]]
+    Tuple[Sequence[str], Sequence[str]]
         Content of the notebook before and after running nbQA
     """
     with open(notebook) as handle:
@@ -62,7 +64,7 @@ def _run_nbqa(command: str, notebook: str, *args: str) -> Tuple[List[str], List[
     return (before, after)
 
 
-def _validate(before: List[str], after: List[str]) -> bool:
+def _validate(before: Sequence[str], after: Sequence[str]) -> bool:
     """
     Validate the state of the notebook before and after running nbqa with autoflake.
 
@@ -79,7 +81,8 @@ def _validate(before: List[str], after: List[str]) -> bool:
         True if validation succeeded else False
     """
     diff = difflib.unified_diff(before, after)
-    result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
+    result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
+
     expected = dedent(
         """\
         -    "    unused_var = \\"not used\\"\\n",

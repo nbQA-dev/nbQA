@@ -1,7 +1,7 @@
 """Tests the parsing of command line parameters."""
 
 import os
-from typing import List
+from typing import Sequence
 
 from nbqa.cmdline import CLIArgs
 
@@ -10,7 +10,7 @@ def test_cli_command_str() -> None:
     """Checks the command representation from the parsed CLI arguments."""
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
 
-    args: List[str] = [
+    args: Sequence[str] = [
         "nbqa",
         "flake8",
         path,

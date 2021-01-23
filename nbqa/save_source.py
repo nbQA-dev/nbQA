@@ -10,7 +10,16 @@ import re
 from collections import defaultdict
 from itertools import takewhile
 from textwrap import indent
-from typing import TYPE_CHECKING, DefaultDict, Dict, Iterator, List, Mapping, Tuple
+from typing import (
+    TYPE_CHECKING,
+    DefaultDict,
+    Iterator,
+    List,
+    Mapping,
+    MutableMapping,
+    Sequence,
+    Tuple,
+)
 
 from nbqa.handle_magics import INPUT_SPLITTER, IPythonMagicType, MagicHandler
 from nbqa.notebook_info import NotebookInfo
@@ -73,18 +82,18 @@ def _is_src_code_indentation_valid(source: str) -> bool:
 
 
 def _handle_magic_indentation(
-    source: List[str], line_magic: str, magic_replacement: str
+    source: Sequence[str], line_magic: str, magic_replacement: str
 ) -> str:
     """
     Handle the indentation of line magics. Remove unnecessary indentation.
 
     Parameters
     ----------
-    source : List[str]
+    source
         Source code of the notebook cell
-    line_magic : str
+    line_magic
         Line magic present in the notebook cell
-    magic_replacement : str
+    magic_replacement
         Python code replacing ipython magic
     Returns
     -------
@@ -95,7 +104,7 @@ def _handle_magic_indentation(
 
     # preserve the leading spaces and check if the syntax is valid
     replacement = indent(magic_replacement, leading_space)
-    cell_source = "".join(source + [replacement])
+    cell_source = "".join([*source, replacement])
 
     # If the cell contains multiple line magics `ast.parse` will raise
     # `SyntaxError`. Since we are interested in only checking the indentation
@@ -175,7 +184,7 @@ def _extract_ipython_magic(magic: str, cell_source: Iterator[Tuple[int, str]]) -
 
 
 def _replace_magics(
-    source: List[str], magic_substitutions: List[MagicHandler], command: str
+    source: Sequence[str], magic_substitutions: List[MagicHandler], command: str
 ) -> Iterator[str]:
     """
     Replace IPython line magics with valid python code.
@@ -207,9 +216,9 @@ def _replace_magics(
 
 
 def _parse_cell(
-    source: List[str],
+    source: Sequence[str],
     cell_number: int,
-    temporary_lines: Dict[int, List[MagicHandler]],
+    temporary_lines: MutableMapping[int, Sequence[MagicHandler]],
     command: str,
 ) -> str:
     """
@@ -247,15 +256,15 @@ def _parse_cell(
 
 
 def _get_line_numbers_for_mapping(
-    cell_source: str, magic_substitutions: List[MagicHandler]
+    cell_source: str, magic_substitutions: Sequence[MagicHandler]
 ) -> Mapping[int, int]:
     """Get the line number mapping from python file to notebook cell.
 
     Parameters
     ----------
-    cell_source : str
+    cell_source
         Source code of the notebook cell
-    magic_substitutions : List[MagicHandler]
+    magic_substitutions
         IPython magics substituted in the current notebook cell.
 
     Returns
@@ -264,7 +273,7 @@ def _get_line_numbers_for_mapping(
         Line number mapping from temporary python file to notebook cell
     """
     lines_in_cell = cell_source.splitlines()
-    line_mapping: Dict[int, int] = {}
+    line_mapping: MutableMapping[int, int] = {}
 
     if not magic_substitutions:
         line_mapping.update({i: i for i in range(len(lines_in_cell))})
@@ -289,15 +298,17 @@ def _get_line_numbers_for_mapping(
     return line_mapping
 
 
-def _should_ignore_code_cell(source: List[str], ignore_cells: List[str]) -> bool:
+def _should_ignore_code_cell(
+    source: Sequence[str], ignore_cells: Sequence[str]
+) -> bool:
     """
     Return True if the current cell should be ignored from processing.
 
     Parameters
     ----------
-    source : List[str]
+    source
         Source from the notebook cell
-    ignore_cells : List[str]
+    ignore_cells
         Extra cells which nbqa should ignore.
 
     Returns
@@ -310,7 +321,10 @@ def _should_ignore_code_cell(source: List[str], ignore_cells: List[str]) -> bool
 
 
 def main(
-    notebook: "Path", temp_python_file: "Path", ignore_cells: List[str], command: str
+    notebook: "Path",
+    temp_python_file: "Path",
+    ignore_cells: Sequence[str],
+    command: str,
 ) -> NotebookInfo:
     """
     Extract code cells from notebook and save them in temporary Python file.
@@ -338,7 +352,7 @@ def main(
     line_number = 0
     cell_number = 0
     trailing_semicolons = set()
-    temporary_lines: DefaultDict[int, List[MagicHandler]] = defaultdict(list)
+    temporary_lines: DefaultDict[int, Sequence[MagicHandler]] = defaultdict(list)
     code_cells_to_ignore = set()
 
     for cell in cells:
