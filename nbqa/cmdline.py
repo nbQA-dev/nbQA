@@ -1,7 +1,7 @@
 """Parses the command line arguments provided."""
 import argparse
 from textwrap import dedent
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
 from nbqa import __version__
 from nbqa.text import BOLD, RESET
@@ -56,8 +56,8 @@ class CLIArgs:  # pylint: disable=R0902
     """
 
     command: str
-    root_dirs: List[str]
-    nbqa_addopts: List[str]
+    root_dirs: Sequence[str]
+    nbqa_addopts: Sequence[str]
     nbqa_mutate: bool
     nbqa_ignore_cells: Optional[str]
     nbqa_config: Optional[str]
@@ -65,15 +65,15 @@ class CLIArgs:  # pylint: disable=R0902
     nbqa_files: Optional[str]
     nbqa_exclude: Optional[str]
 
-    def __init__(self, args: argparse.Namespace, cmd_args: List[str]) -> None:
+    def __init__(self, args: argparse.Namespace, cmd_args: Sequence[str]) -> None:
         """
         Initialize this instance with the parsed command line arguments.
 
         Parameters
         ----------
-        args (argparse.Namespace):
+        args
             Command line arguments passed to nbqa
-        cmd_args (List[str]):
+        cmd_args
             Additional options to pass to the tool
         """
         self.command = args.command
@@ -107,7 +107,7 @@ class CLIArgs:  # pylint: disable=R0902
         return " ".join(args)
 
     @staticmethod
-    def parse_args(argv: Optional[List[str]]) -> "CLIArgs":
+    def parse_args(argv: Optional[Sequence[str]]) -> "CLIArgs":
         """
         Parse command-line arguments.
 

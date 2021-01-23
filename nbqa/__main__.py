@@ -9,7 +9,7 @@ import tempfile
 from importlib import import_module
 from pathlib import Path
 from textwrap import dedent
-from typing import Dict, Iterator, List, Optional, Set, Tuple
+from typing import Iterator, Mapping, MutableMapping, Optional, Sequence, Set, Tuple
 
 from pkg_resources import parse_version
 
@@ -113,7 +113,7 @@ def _filter_by_include_exclude(
 
 
 def _get_all_notebooks(
-    root_dirs: List[str], files: Optional[str], exclude: Optional[str]
+    root_dirs: Sequence[str], files: Optional[str], exclude: Optional[str]
 ) -> Iterator[Path]:
     """
     Get generator with all notebooks passed in via the command-line, applying exclusions.
@@ -253,7 +253,7 @@ def _create_blank_init_files(
 
 
 def _preserve_config_files(
-    config_files: List[str], tmpdirname: str, project_root: Path
+    config_files: Sequence[str], tmpdirname: str, project_root: Path
 ) -> None:
     """
     Copy local config file to temporary directory.
@@ -283,7 +283,7 @@ def _preserve_config_files(
 def _get_arg(
     root_dir: str,
     tmpdirname: str,
-    nb_to_py_mapping: Dict[Path, Path],
+    nb_to_py_mapping: Mapping[Path, Path],
     project_root: Path,
 ) -> Path:
     """
@@ -326,11 +326,11 @@ def _get_arg(
 
 
 def _get_all_args(
-    root_dirs: List[str],
+    root_dirs: Sequence[str],
     tmpdirname: str,
-    nb_to_py_mapping: Dict[Path, Path],
+    nb_to_py_mapping: Mapping[Path, Path],
     project_root: Path,
-) -> List[Path]:
+) -> Sequence[Path]:
     """
     Get all arguments to run command against.
 
@@ -347,7 +347,7 @@ def _get_all_args(
 
     Returns
     -------
-    List[Path]
+    Sequence[Path]
         All notebooks or directories to run third-party tool against.
     """
     return [_get_arg(i, tmpdirname, nb_to_py_mapping, project_root) for i in root_dirs]
@@ -375,8 +375,8 @@ def _get_mtimes(arg: Path) -> Set[float]:
 def _run_command(
     command: str,
     tmpdirname: str,
-    cmd_args: List[str],
-    args: List[Path],
+    cmd_args: Sequence[str],
+    args: Sequence[Path],
 ) -> Tuple[str, str, int, bool]:
     """
     Run third-party tool against given file or directory.
@@ -543,7 +543,7 @@ def _run_on_one_root_dir(
         )
         _preserve_config_files(config_files, tmpdirname, project_root)
 
-        nb_info_mapping: Dict[Path, NotebookInfo] = {}
+        nb_info_mapping: MutableMapping[Path, NotebookInfo] = {}
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             try:
@@ -663,7 +663,7 @@ def _check_command_is_installed(command: str) -> None:
                 )
 
 
-def main(argv: Optional[List[str]] = None) -> None:
+def main(argv: Optional[Sequence[str]] = None) -> None:
     """
     Run third-party tool (e.g. :code:`mypy`) against notebook or directory.
 

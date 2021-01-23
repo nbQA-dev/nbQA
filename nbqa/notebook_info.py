@@ -1,6 +1,6 @@
 """Store information about the code cells for processing."""
 
-from typing import List, Mapping, Set
+from typing import Mapping, Sequence, Set
 
 from nbqa.handle_magics import MagicHandler
 
@@ -23,14 +23,14 @@ class NotebookInfo:
 
     _cell_mappings: Mapping[int, str] = {}
     _trailing_semicolons: Set[int] = set()
-    _temporary_lines: Mapping[int, List[MagicHandler]] = {}
+    _temporary_lines: Mapping[int, Sequence[MagicHandler]] = {}
     _code_cells_to_ignore: Set[int] = set()
 
     def __init__(
         self,
         cell_mappings: Mapping[int, str],
         trailing_semicolons: Set[int],
-        temporary_lines: Mapping[int, List[MagicHandler]],
+        temporary_lines: Mapping[int, Sequence[MagicHandler]],
         code_cells_to_ignore: Set[int],
     ) -> None:
         """
@@ -38,13 +38,13 @@ class NotebookInfo:
 
         Parameters
         ----------
-        cell_mappings : Dict[int, str]
+        cell_mappings
             Mapping from Python line numbers to Jupyter notebooks cells.
-        trailing_semicolons : Set[int]
+        trailing_semicolons
             Cell numbers where there were originally trailing semicolons.
-        temporary_lines : Mapping[int, List[MagicHandler]]
+        temporary_lines
             Mapping from cell number to all the magics substituted in those cell.
-        code_cells_to_ignore : Set[int]
+        code_cells_to_ignore
             List of cell numbers to ignore when modifying the source notebook.
         """
         self._cell_mappings = cell_mappings
@@ -63,7 +63,7 @@ class NotebookInfo:
         return self._trailing_semicolons
 
     @property
-    def temporary_lines(self) -> Mapping[int, List[MagicHandler]]:
+    def temporary_lines(self) -> Mapping[int, Sequence[MagicHandler]]:
         """Return mapping from cell number to all the magics substituted."""
         return self._temporary_lines
 

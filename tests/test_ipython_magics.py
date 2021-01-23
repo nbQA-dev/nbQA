@@ -3,7 +3,7 @@ import difflib
 from pathlib import Path
 from shutil import copyfile
 from textwrap import dedent
-from typing import TYPE_CHECKING, Callable, List, Optional, Tuple
+from typing import TYPE_CHECKING, Callable, Optional, Sequence, Tuple
 
 import pytest
 
@@ -41,7 +41,9 @@ def _validate_ignore_cells_without_warning(actual: str, _: Path) -> bool:
     return expected == actual
 
 
-def _ignore_cells_cli_input() -> List[Tuple[str, Callable[..., bool], Optional[str]]]:
+def _ignore_cells_cli_input() -> Sequence[
+    Tuple[str, Callable[..., bool], Optional[str]]
+]:
     """Input for ignore cells test case with configuration passed as CLI arguments."""
     return [
         (
@@ -57,7 +59,7 @@ def _ignore_cells_cli_input() -> List[Tuple[str, Callable[..., bool], Optional[s
     ]
 
 
-def _ignore_cells_ini_input() -> List[Tuple[str, Callable[..., bool], str]]:
+def _ignore_cells_ini_input() -> Sequence[Tuple[str, Callable[..., bool], str]]:
     """Input for ignore cells test case using .nbqa.ini configuration."""
     nbqa_config_file = ".nbqa.ini"
     return [
@@ -74,7 +76,7 @@ def _ignore_cells_ini_input() -> List[Tuple[str, Callable[..., bool], str]]:
     ]
 
 
-def _ignore_cells_toml_input() -> List[Tuple[str, Callable[..., bool], str]]:
+def _ignore_cells_toml_input() -> Sequence[Tuple[str, Callable[..., bool], str]]:
     """Input for ignore cells test case using pyproject.toml configuration."""
     toml_config_file = "pyproject.toml"
     return [
@@ -124,7 +126,7 @@ def test_ignore_cells(
     assert validate(out, test_nb_path)
 
 
-def _validate_magics_with_black(before: List[str], after: List[str]) -> bool:
+def _validate_magics_with_black(before: Sequence[str], after: Sequence[str]) -> bool:
     """
     Validate the state of the notebook before and after running nbqa with black.
 

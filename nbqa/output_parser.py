@@ -3,7 +3,7 @@
 import re
 from functools import partial
 from pathlib import Path
-from typing import Callable, List, Mapping, Match, Tuple, Union
+from typing import Callable, Mapping, Match, Sequence, Tuple, Union
 
 
 def _line_to_cell(match: Match[str], cell_mapping: Mapping[int, str]) -> str:
@@ -13,7 +13,7 @@ def _line_to_cell(match: Match[str], cell_mapping: Mapping[int, str]) -> str:
 
 def _get_pattern(
     notebook: Path, command: str, cell_mapping: Mapping[int, str]
-) -> List[Tuple[str, Union[str, Callable[[Match[str]], str]]]]:
+) -> Sequence[Tuple[str, Union[str, Callable[[Match[str]], str]]]]:
     """
     Get pattern and substitutions with which to process code quality tool's output.
 

@@ -9,7 +9,7 @@ from abc import ABC
 from ast import AST
 from enum import Enum
 from textwrap import dedent, indent
-from typing import ClassVar, Dict, List, Optional, Pattern
+from typing import ClassVar, Mapping, Optional, Pattern, Sequence
 
 with warnings.catch_warnings():
     # see https://github.com/nbQA-dev/nbQA/issues/459
@@ -48,7 +48,7 @@ class MagicHandler(ABC):
     # To Developers: Its better to preserve the order in which
     # this dictionary is populated. For instance, if HELP is inserted
     # after LINE leads to bug, since they both share the same prefix.
-    _MAGIC_PREFIXES: ClassVar[Dict[IPythonMagicType, List[str]]] = {
+    _MAGIC_PREFIXES: ClassVar[Mapping[IPythonMagicType, Sequence[str]]] = {
         IPythonMagicType.SHELL: ["get_ipython().system", "get_ipython().getoutput"],
         IPythonMagicType.HELP: ["get_ipython().run_line_magic('pinfo"],
         IPythonMagicType.LINE: ["get_ipython().run_line_magic", "get_ipython().magic"],

@@ -3,7 +3,7 @@
 import subprocess
 from functools import partial
 from pathlib import Path
-from typing import List
+from typing import Sequence
 
 TESTS_DIR = Path("tests")
 TEST_DATA_DIR = TESTS_DIR / "data"
@@ -17,7 +17,7 @@ INVALID_SYNTAX_NOTEBOOK = TESTS_DIR / "invalid_data" / "invalid_syntax.ipynb"
 PASSED = 0
 
 
-def _run_nbqa_with(command: str, notebooks: List[Path], *args: str) -> int:
+def _run_nbqa_with(command: str, notebooks: Sequence[Path], *args: str) -> int:
     """Run nbqa with the QA tool specified by command parameter."""
     notebook_paths = map(str, notebooks)
     output = subprocess.run(["nbqa", command, *notebook_paths, *args])

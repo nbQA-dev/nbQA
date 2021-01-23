@@ -10,10 +10,10 @@ from typing import (
     ClassVar,
     DefaultDict,
     Dict,
-    List,
     Mapping,
     NamedTuple,
     Optional,
+    Sequence,
     Union,
 )
 
@@ -22,7 +22,7 @@ from pkg_resources import resource_filename
 
 from nbqa.cmdline import CLIArgs
 
-CONFIG_FILES: DefaultDict[str, List[str]] = defaultdict(
+CONFIG_FILES: DefaultDict[str, Sequence[str]] = defaultdict(
     lambda: ["setup.cfg", "tox.ini", "pyproject.toml"]
 )
 CONFIG_FILES["autoflake"] = []
@@ -41,7 +41,7 @@ CONFIG_FILES["mypy"] = ["mypy.ini", ".mypy.ini", "setup.cfg"]
 CONFIG_FILES["pylint"] = ["pylintrc", ".pylintrc", "pyproject.toml", "setup.cfg"]
 CONFIG_FILES["pyupgrade"] = []
 
-ConfigParser = Callable[[str], Union[str, bool, List[str]]]
+ConfigParser = Callable[[str], Union[str, bool, Sequence[str]]]
 
 
 class _ConfigSections(NamedTuple):  # pylint: disable=R0903
@@ -59,7 +59,7 @@ class _ConfigSections(NamedTuple):  # pylint: disable=R0903
 CONFIG_SECTIONS = _ConfigSections()
 
 
-DEFAULT_CONFIG: Mapping[str, Mapping[str, List[str]]] = toml.load(
+DEFAULT_CONFIG: Mapping[str, Mapping[str, Sequence[str]]] = toml.load(
     resource_filename("nbqa.config", "default_config.toml")
 )
 
@@ -99,8 +99,8 @@ class Configs:
 
     _mutate: bool = False
     _config: Optional[str] = None
-    _ignore_cells: List[str] = []
-    _addopts: List[str] = []
+    _ignore_cells: Sequence[str] = []
+    _addopts: Sequence[str] = []
     _diff: bool = False
     _files: Optional[str] = None
     _exclude: Optional[str] = None
@@ -111,9 +111,9 @@ class Configs:
 
         Parameters
         ----------
-        config : str
+        config
             Config setting supported by nbqa
-        value : Any
+        value
             Config value
         """
         if value:
@@ -135,12 +135,12 @@ class Configs:
         return self._config
 
     @property
-    def nbqa_addopts(self) -> List[str]:
+    def nbqa_addopts(self) -> Sequence[str]:
         """Additional options to be passed to the third party command to run."""
         return self._addopts
 
     @property
-    def nbqa_ignore_cells(self) -> List[str]:
+    def nbqa_ignore_cells(self) -> Sequence[str]:
         """Additional cells which nbqa should ignore."""
         return self._ignore_cells
 
@@ -165,7 +165,9 @@ class Configs:
         """
         config: Configs = Configs()
 
-        config.set_config(CONFIG_SECTIONS.ADDOPTS, self._addopts + other.nbqa_addopts)
+        config.set_config(
+            CONFIG_SECTIONS.ADDOPTS, [*self._addopts, *other.nbqa_addopts]
+        )
         config.set_config(CONFIG_SECTIONS.CONFIG, self._config or other.nbqa_config)
         config.set_config(
             CONFIG_SECTIONS.IGNORE_CELLS, self._ignore_cells or other.nbqa_ignore_cells
