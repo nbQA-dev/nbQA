@@ -192,6 +192,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "agruenberger",
+      "name": "agruenberger",
+      "avatar_url": "https://avatars.githubusercontent.com/u/30429454?v=4",
+      "profile": "https://github.com/agruenberger",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
