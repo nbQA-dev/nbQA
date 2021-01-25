@@ -64,3 +64,22 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
     expected_err = f"Rewriting {path}\n"
     assert out == expected_out
     assert err == expected_err
+
+
+def test_pyupgrade_works_with_empty_file(capsys: "CaptureFixture") -> None:
+    """
+    Check pyupgrade works with empty notebook.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    path = os.path.abspath(os.path.join("tests", "data", "footer.ipynb"))
+
+    with pytest.raises(SystemExit):
+        main(["pyupgrade", path])
+
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == ""
