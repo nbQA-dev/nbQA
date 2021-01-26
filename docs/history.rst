@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.5.7 (2021-01-26)
+------------------
+
+Fixed bug whereby ``pyupgrade`` wasn't working with empty notebook due to
+``nbQA`` adding newlines to the end of the file even if the file was empty.
+
 0.5.6 (2020-12-29)
 ------------------
 
