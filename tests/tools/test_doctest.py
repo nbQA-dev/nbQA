@@ -1,6 +1,7 @@
 """Check that running :code:`doctest` works."""
 
 import os
+from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
@@ -89,7 +90,7 @@ def test_doctest_on_directory(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     with pytest.raises(SystemExit):
-        main(["doctest", "tests"])
+        main(["doctest", str(Path.cwd() / "tests")])
 
     _, err = capsys.readouterr()
     assert "IsADirectoryError: [Errno 21] Is a directory: 'tests'" in err
