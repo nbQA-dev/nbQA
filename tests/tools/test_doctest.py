@@ -80,7 +80,9 @@ def test_doctest_invalid_import(capsys: "CaptureFixture") -> None:
     assert "ModuleNotFoundError: No module named 'thisdoesnotexist'" in err
 
 
-@pytest.skip(sys.platform.startswith("win"), "Permission denied during CI")
+@pytest.mark.skipif(
+    sys.platform.startswith("win"), reason="Permission denied during CI"
+)
 def test_doctest_on_directory(capsys: "CaptureFixture") -> None:
     """
     Check that correct error is reported if notebook contains unimportable imports.
