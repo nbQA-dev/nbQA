@@ -1,6 +1,7 @@
 """Check that running :code:`doctest` works."""
 
 import os
+import sys
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
@@ -79,6 +80,7 @@ def test_doctest_invalid_import(capsys: "CaptureFixture") -> None:
     assert "ModuleNotFoundError: No module named 'thisdoesnotexist'" in err
 
 
+@pytest.skip(sys.platform.startswith("win"), "Permission denied during CI")
 def test_doctest_on_directory(capsys: "CaptureFixture") -> None:
     """
     Check that correct error is reported if notebook contains unimportable imports.
