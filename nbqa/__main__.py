@@ -222,6 +222,9 @@ def _replace_temp_python_file_references_in_out_err(
         out = out.replace(path, notebook_path)
         err = err.replace(path, notebook_path)
 
+    out = out.replace(str(Path(tmpdirname) / notebook.parts[0]), notebook.parts[0])
+    err = err.replace(str(Path(tmpdirname) / notebook.parts[0]), notebook.parts[0])
+
     return out, err
 
 

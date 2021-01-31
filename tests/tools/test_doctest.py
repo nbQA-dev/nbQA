@@ -77,3 +77,19 @@ def test_doctest_invalid_import(capsys: "CaptureFixture") -> None:
 
     _, err = capsys.readouterr()
     assert "ModuleNotFoundError: No module named 'thisdoesnotexist'" in err
+
+
+def test_doctest_on_directory(capsys: "CaptureFixture") -> None:
+    """
+    Check that correct error is reported if notebook contains unimportable imports.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    with pytest.raises(SystemExit):
+        main(["doctest", "tests"])
+
+    _, err = capsys.readouterr()
+    assert "IsADirectoryError: [Errno 21] Is a directory: 'tests'" in err
