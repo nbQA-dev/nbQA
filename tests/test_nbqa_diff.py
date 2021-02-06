@@ -70,3 +70,19 @@ Use `--nbqa-diff` to preview changes, and `--nbqa-mutate` to apply them.\
     )
     with pytest.raises(ValueError, match=msg):
         main(["black", str(DIRTY_NOTEBOOK), "--nbqa-mutate", "--nbqa-diff"])
+
+
+def test_diff_no_mutate(capsys: "CaptureFixture") -> None:
+    """
+    Check --nbqa-diff doesn't result in captured output.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    with pytest.raises(SystemExit):
+        main(["flake8", str(DIRTY_NOTEBOOK), "--nbqa-diff"])
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == ""
