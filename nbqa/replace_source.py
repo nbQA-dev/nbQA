@@ -7,6 +7,7 @@ The converted file will have had the third-party tool run against it by now.
 import json
 import sys
 from difflib import unified_diff
+from shutil import move
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -178,9 +179,11 @@ def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -
             continue
         cell["source"] = _get_new_source(code_cell_number, notebook_info, next(pycells))
 
-    notebook.write_text(
+    temp_notebook = python_file.parent / notebook.name
+    temp_notebook.write_text(
         f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n", encoding="utf-8"
     )
+    move(str(temp_notebook), str(notebook))
 
 
 def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> None:
