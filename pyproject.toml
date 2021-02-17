@@ -7,6 +7,7 @@ profile = "black"
 
 [tool.coverage.run]
 source = ["nbqa"]
+branch = true
 
 [tool.coverage.report]
 exclude_lines = [

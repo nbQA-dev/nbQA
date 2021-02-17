@@ -243,13 +243,9 @@ def _create_blank_init_files(
     parts = notebook.resolve().relative_to(project_root).parts
 
     for idx in range(1, len(parts)):
-        init_files = Path(os.path.join(*parts[:idx])).glob("__init__.py")
-        for init_file in init_files:
-            Path(tmpdirname).joinpath(init_file).parent.mkdir(
-                parents=True, exist_ok=True
-            )
-            Path(tmpdirname).joinpath(init_file).touch()
-            break  # Only need to copy one __init__ file.
+        init_file = Path(os.path.join(*parts[:idx])) / "__init__.py"
+        Path(tmpdirname).joinpath(init_file).parent.mkdir(parents=True, exist_ok=True)
+        Path(tmpdirname).joinpath(init_file).touch()
 
 
 def _preserve_config_files(

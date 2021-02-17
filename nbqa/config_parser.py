@@ -31,12 +31,8 @@ def _parse_nbqa_ini_config(command: str, file_path: Path) -> Optional[Configs]:
     config: Configs = Configs()
     section: str = command
 
-    if config_parser.has_section(section):
-        for option in config_parser.options(section):
-            if option in CONFIG_SECTIONS:
-                config.set_config(
-                    option, config_parser.get(section, option, fallback=None)
-                )
+    for option in config_parser.options(section):
+        config.set_config(option, config_parser.get(section, option, fallback=None))
 
     return config
 

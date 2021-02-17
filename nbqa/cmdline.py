@@ -1,7 +1,7 @@
 """Parses the command line arguments provided."""
 import argparse
 from textwrap import dedent
-from typing import List, Optional, Sequence
+from typing import Optional, Sequence
 
 from nbqa import __version__
 from nbqa.text import BOLD, RESET
@@ -31,7 +31,7 @@ USAGE_MSG = dedent(
 )
 
 
-class CLIArgs:  # pylint: disable=R0902
+class CLIArgs:  # pylint: disable=R0902,R0903
     """
     Stores the command line arguments passed.
 
@@ -85,26 +85,6 @@ class CLIArgs:  # pylint: disable=R0902
         self.nbqa_diff = args.nbqa_diff or False
         self.nbqa_files = args.nbqa_files or None
         self.nbqa_exclude = args.nbqa_exclude or None
-
-    def __str__(self) -> str:
-        """Return the command from the parsed command line arguments."""
-        args: List[str] = ["nbqa", self.command]
-        args.extend(self.root_dirs)
-        if self.nbqa_mutate:
-            args.append("--nbqa-mutate")
-        if self.nbqa_diff:
-            args.append("--nbqa-diff")
-        if self.nbqa_config:
-            args.append(f"--nbqa-config={self.nbqa_config}")
-        if self.nbqa_ignore_cells:
-            args.append(f"--nbqa-ignore-cells={self.nbqa_ignore_cells}")
-        if self.nbqa_files:
-            args.append(f"--nbqa-files={self.nbqa_files}")
-        if self.nbqa_exclude:
-            args.append(f"--nbqa-exclude={self.nbqa_exclude}")
-        args.extend(self.nbqa_addopts)
-
-        return " ".join(args)
 
     @staticmethod
     def parse_args(argv: Optional[Sequence[str]]) -> "CLIArgs":
