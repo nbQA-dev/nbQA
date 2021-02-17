@@ -85,7 +85,7 @@ def test_doctest_invalid_import(capsys: "CaptureFixture") -> None:
 )
 def test_doctest_on_directory(capsys: "CaptureFixture") -> None:
     """
-    Check that correct error is reported if notebook contains unimportable imports.
+    Check that IsADirectoryError doesn't report temporary folder
 
     Parameters
     ----------
