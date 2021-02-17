@@ -44,8 +44,8 @@
 - [Table of contents](#table-of-contents)
   - [🎉 Installation](#-installation)
   - [🚀 Examples](#-examples)
+    - [Pre-commit (recommended)](#pre-commit-recommended)
     - [Command-line](#command-line)
-    - [Pre-commit](#pre-commit)
   - [🥳 Used by](#-used-by)
   - [💬 Testimonials](#-testimonials)
   - [👥 Contributing](#-contributing)
@@ -59,6 +59,25 @@ In your [virtual environment](https://realpython.com/python-virtual-environments
 - `conda install -c conda-forge nbqa` (if you use conda)
 
 ## 🚀 Examples
+
+### Pre-commit (recommended)
+
+Here's an example of how to set up some pre-commit hooks: put this in your `.pre-commit-config.yaml` file (see [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html))
+
+```yaml
+- repo: https://github.com/nbQA-dev/nbQA
+  rev: 0.5.7
+  hooks:
+    - id: nbqa-black
+      additional_dependencies: [black==20.8b1]
+      args: [--nbqa-mutate]
+    - id: nbqa-pyupgrade
+      additional_dependencies: [pyupgrade==2.10.0]
+      args: [--nbqa-mutate, --py36-plus]
+    - id: nbqa-isort
+      additional_dependencies: [isort==5.7.0]
+      args: [--nbqa-mutate]
+```
 
 ### Command-line
 
@@ -87,25 +106,6 @@ Rewriting my_notebook.ipynb
 ```
 
 See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html) for examples involving [autoflake](https://github.com/myint/autoflake), [check-ast](https://github.com/pre-commit/pre-commit-hooks#check-ast), [doctest](https://docs.python.org/3/library/doctest.html), [flake8](https://flake8.pycqa.org/en/latest/), [mypy](http://mypy-lang.org/), and [pylint](https://www.pylint.org/).
-
-### Pre-commit
-
-Here's an example of how to set up some pre-commit hooks: put this in your `.pre-commit-config.yaml` file (see [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html))
-
-   ```yaml
-   - repo: https://github.com/nbQA-dev/nbQA
-     rev: 0.5.7
-     hooks:
-       - id: nbqa-black
-         additional_dependencies: [black==20.8b1]
-         args: [--nbqa-mutate]
-       - id: nbqa-pyupgrade
-         additional_dependencies: [pyupgrade==2.7.3]
-         args: [--nbqa-mutate, --py36-plus]
-       - id: nbqa-isort
-         additional_dependencies: [isort==5.6.4]
-         args: [--nbqa-mutate]
-   ```
 
 ## 🥳 Used by
 
