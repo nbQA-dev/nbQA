@@ -191,6 +191,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://coefficient.ai"><img src="https://avatars2.githubusercontent.com/u/2884159?v=4?s=100" width="100px;" alt=""/><br /><sub><b>John Sandall</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Ajohn-sandall" title="Bug reports">🐛</a></td>
     <td align="center"><a href="http://nathancooper.io"><img src="https://avatars0.githubusercontent.com/u/7613470?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nathan Cooper</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Ancoop57" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/agruenberger"><img src="https://avatars.githubusercontent.com/u/30429454?v=4?s=100" width="100px;" alt=""/><br /><sub><b>agruenberger</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Aagruenberger" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/ravwojdyla"><img src="https://avatars.githubusercontent.com/u/1419010?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rafal Wojdyla</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Aravwojdyla" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
