@@ -409,6 +409,10 @@ def _run_command(
     """
     env = os.environ.copy()
     env[
+        "MYPYPATH"
+    ] = f"{env.get('MYPYPATH', '').rstrip(os.pathsep)}{os.pathsep}{os.getcwd()}"
+
+    env[
         "PYTHONPATH"
     ] = f"{env.get('PYTHONPATH', '').rstrip(os.pathsep)}{os.pathsep}{os.getcwd()}"
 
