@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.5.8 (2021-02-20)
+------------------
+
+Fixed bug in which ``mypy`` wasn't finding local imports due to
+``MYPYPATH`` not being carried over by ``nbqa``.
+
 0.5.7 (2021-01-26)
 ------------------
 
