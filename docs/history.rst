@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.5.9 (2021-02-22)
+------------------
+
+Nothing, just fixing up the previous tag, sorry for the inconvenience caused.
+xref https://github.com/pre-commit-ci/issues/issues/45
+
 0.5.8 (2021-02-20)
 ------------------
 

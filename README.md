@@ -66,7 +66,7 @@ Here's an example of how to set up some pre-commit hooks: put this in your `.pre
 
 ```yaml
 - repo: https://github.com/nbQA-dev/nbQA
-  rev: 0.5.8
+  rev: 0.5.9
   hooks:
     - id: nbqa-black
       additional_dependencies: [black==20.8b1]
