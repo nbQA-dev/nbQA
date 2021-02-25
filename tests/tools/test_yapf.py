@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path
 from shutil import copyfile
 from textwrap import dedent
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, List
 
 import pytest
 
@@ -228,16 +228,16 @@ def test_successive_runs_using_yapf(tmpdir: "LocalPath") -> None:
     copyfile(src_notebook, test_notebook)
 
     def run_yapf(
-        test_notebook: str, content_compare_op: Callable[[float, float], bool]
+        test_notebook: str, content_compare_op: Callable[[List[str], List[str]], bool]
     ) -> bool:
         """Run yapf using nbqa and validate the output."""
-        with open(test_notebook) as f:
-            before_contents = f.readlines()
+        with open(test_notebook) as test_file:
+            before_contents: List[str] = test_file.readlines()
         output = subprocess.run(
             ["nbqa", "yapf", "--in-place", test_notebook, "--nbqa-mutate"]
         )
-        with open(test_notebook) as f:
-            after_contents = f.readlines()
+        with open(test_notebook) as test_file:
+            after_contents: List[str] = test_file.readlines()
         return output.returncode == 0 and content_compare_op(
             before_contents, after_contents
         )
