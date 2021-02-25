@@ -17,11 +17,6 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
     from py._path.local import LocalPath
 
-SPARKLES = "\N{sparkles}"
-SHORTCAKE = "\N{shortcake}"
-COLLISION = "\N{collision symbol}"
-BROKEN_HEART = "\N{broken heart}"
-
 
 def test_yapf_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> None:
     """
@@ -231,13 +226,13 @@ def test_successive_runs_using_yapf(tmpdir: "LocalPath") -> None:
         test_notebook: str, content_compare_op: Callable[[List[str], List[str]], bool]
     ) -> bool:
         """Run yapf using nbqa and validate the output."""
-        with open(test_notebook) as test_file:
-            before_contents: List[str] = test_file.readlines()
+        with open(test_notebook) as handle:
+            before_contents: List[str] = handle.readlines()
         output = subprocess.run(
             ["nbqa", "yapf", "--in-place", test_notebook, "--nbqa-mutate"]
         )
-        with open(test_notebook) as test_file:
-            after_contents: List[str] = test_file.readlines()
+        with open(test_notebook) as handle:
+            after_contents: List[str] = handle.readlines()
         return output.returncode == 0 and content_compare_op(
             before_contents, after_contents
         )
