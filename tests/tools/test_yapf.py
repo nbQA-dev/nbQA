@@ -231,10 +231,12 @@ def test_successive_runs_using_yapf(tmpdir: "LocalPath") -> None:
         test_notebook: str, content_compare_op: Callable[[float, float], bool]
     ) -> bool:
         """Run yapf using nbqa and validate the output."""
-        with open(test_notebook, "r") as f:
+        with open(test_notebook) as f:
             before_contents = f.readlines()
-        output = subprocess.run(["nbqa", "yapf", "--in-place", test_notebook, "--nbqa-mutate"])
-        with open(test_notebook, "r") as f:
+        output = subprocess.run(
+            ["nbqa", "yapf", "--in-place", test_notebook, "--nbqa-mutate"]
+        )
+        with open(test_notebook) as f:
             after_contents = f.readlines()
         return output.returncode == 0 and content_compare_op(
             before_contents, after_contents
