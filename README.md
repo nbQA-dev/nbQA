@@ -193,6 +193,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/agruenberger"><img src="https://avatars.githubusercontent.com/u/30429454?v=4?s=100" width="100px;" alt=""/><br /><sub><b>agruenberger</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Aagruenberger" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/ravwojdyla"><img src="https://avatars.githubusercontent.com/u/1419010?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rafal Wojdyla</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Aravwojdyla" title="Bug reports">🐛</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://bradleydice.com"><img src="https://avatars.githubusercontent.com/u/3943761?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Bradley Dice</b></sub></a><br /><a href="#ideas-bdice" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/nbQA-dev/nbQA/commits?author=bdice" title="Code">💻</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->
