@@ -75,6 +75,12 @@ Upgrade your syntax with `pyupgrade`_:
    $ nbqa pyupgrade my_notebook.ipynb --py36-plus --nbqa-mutate
    Rewriting my_notebook.ipynb
 
+Format code with `yapf`_:
+
+.. code:: console
+
+   $ nbqa yapf --in-place my_notebook.ipynb --nbqa-mutate
+
 .. _autoflake: https://github.com/myint/autoflake
 .. _black: https://black.readthedocs.io/en/stable/
 .. _check-ast: https://github.com/pre-commit/pre-commit-hooks#check-ast
@@ -84,3 +90,4 @@ Upgrade your syntax with `pyupgrade`_:
 .. _mypy: http://mypy-lang.org/
 .. _pylint: https://www.pylint.org/
 .. _pyupgrade: https://github.com/asottile/pyupgrade
+.. _yapf: https://github.com/google/yapf
