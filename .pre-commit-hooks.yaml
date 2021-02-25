@@ -81,7 +81,7 @@
 - id: nbqa-yapf
   name: nbqa-yapf
   description: "Run 'yapf' on a Jupyter Notebook"
-  entry: nbqa yapf
+  entry: nbqa yapf --in-place
   language: python
   language_version: python3
   require_serial: true
