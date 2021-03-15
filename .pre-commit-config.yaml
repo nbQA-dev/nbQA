@@ -10,7 +10,7 @@ repos:
       - id: trailing-whitespace
       - id: debug-statements
   - repo: https://github.com/pre-commit/pre-commit
-    rev: v2.11.0
+    rev: v2.11.1
     hooks:
       - id: validate_manifest
   - repo: https://github.com/psf/black
@@ -28,7 +28,7 @@ repos:
       - id: pylint
         files: ^(nbqa|tests)/
   - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.4
+    rev: 3.9.0
     hooks:
       - id: flake8
         additional_dependencies: [flake8-typing-imports==1.10.0]
@@ -73,7 +73,7 @@ repos:
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
   - repo: https://github.com/asottile/setup-cfg-fmt
-    rev: v1.16.0
+    rev: v1.17.0
     hooks:
       - id: setup-cfg-fmt
   - repo: https://github.com/myint/autoflake
