@@ -120,6 +120,7 @@ Take some inspiration from their config files 😉
 - **pandas-profiling** [.pre-commit-config.yaml](https://github.com/pandas-profiling/pandas-profiling/blob/develop/.pre-commit-config.yaml)
 - **pyhf** [pyproject.toml](https://github.com/scikit-hep/pyhf/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/scikit-hep/pyhf/blob/master/.pre-commit-config.yaml)
 - **PyMC3**: [pyproject.toml](https://github.com/pymc-devs/pymc-examples/blob/main/pyproject.toml) [.pre-commit-config.yaml](https://github.com/pymc-devs/pymc-examples/blob/main/.pre-commit-config.yaml)
+- **pytorch-forecasting**: [pyproject.toml](https://github.com/jdb78/pytorch-forecasting/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/jdb78/pytorch-forecasting/blob/master/.pre-commit-config.yaml)
 - **Python compiled microcourse**: [.pre-commit-config.yaml](https://github.com/henryiii/python-compiled-minicourse/blob/master/.pre-commit-config.yaml)
 - **ruptures**: [.pre-commit-config.yaml](https://github.com/deepcharles/ruptures/blob/master/.pre-commit-config.yaml)
 - **sktime**: [.pre-commit-config.yaml](https://github.com/alan-turing-institute/sktime/blob/master/.pre-commit-config.yaml)
@@ -153,6 +154,10 @@ Everyone using Jupyter notebooks should be doing this.
 **Simon Brugman**, [Data scientist & pandas-profiling dev](https://github.com/nbQA-dev/nbQA/pull/490#issue-529173596):
 
 > nbQA helps us to keep notebooks to the same standards as the rest of the code. If you're serious about your code standards, you should keep them consistent across both notebooks and python scripts. Great addition to the ecosystem, thanks!
+
+**Bradley Dice**, [PhD Candidate in Physics & Scientific Computing](https://github.com/nbQA-dev/nbQA/pull/547#issuecomment-786186156):
+
+> nbqa is a clean, easy to use, and effective tool for notebook code style. Formatting and readability makes a huge difference when rendering notebooks in a project's documentation!
 
 ## 👥 Contributing
 
