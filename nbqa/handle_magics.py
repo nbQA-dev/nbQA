@@ -29,6 +29,7 @@ class IPythonMagicType(Enum):
     HELP = 1
     LINE = 2
     CELL = 3
+    NO_MAGIC = 4
 
 
 class MagicHandler(ABC):
@@ -204,9 +205,7 @@ class MagicHandler(ABC):
                 magic_type = magic
                 break
         else:  # pragma: nocover
-            raise RuntimeError(
-                "Unreachable code reached - please report a bug at https://github.com/nbQA-dev/nbQA"
-            )
+            magic_type = IPythonMagicType.NO_MAGIC 
 
         return magic_type
 

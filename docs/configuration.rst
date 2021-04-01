@@ -70,11 +70,11 @@ To ignore extra cells, you can use the :code:`--nbqa-ignore-cells` CLI argument,
 
     nbqa black my_notebook.ipynb --nbqa-ignore-cells %%html,%%cython
 
-or the :code:`ignore_cells` option in your :code:`pyproject.toml` file, e.g.
+or the :code:`process_cells` option in your :code:`pyproject.toml` file, e.g.
 
 .. code-block:: toml
 
-    [tool.nbqa.ignore_cells]
+    [tool.nbqa.process_cells]
     black = "%%html,%%cython"
 
 Include / exclude

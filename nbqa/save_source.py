@@ -28,27 +28,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 CODE_SEPARATOR = "# %%NBQA-CELL-SEP\n"
-MAGIC = [
-    "%%!",
-    "%%bash",
-    "%%cython",
-    "%%HTML",
-    "%%html",
-    "%%javascript",
-    "%%js",
-    "%%latex",
-    "%%markdown",
-    "%%perl",
-    "%%python2",
-    "%%ruby",
-    "%%script",
-    "%%sh",
-    "%%sx",
-    "%%system",
-    "%%SVG",
-    "%%svg",
-    "%%writefile",
-]
+MAGIC = ["time", "timeit", "capture", "pypy", "python", "python3"]
 NEWLINE = "\n"
 NEWLINES = defaultdict(lambda: NEWLINE * 3)
 NEWLINES["isort"] = NEWLINE * 2
@@ -296,7 +276,7 @@ def _get_line_numbers_for_mapping(
 
 
 def _should_ignore_code_cell(
-    source: Sequence[str], ignore_cells: Sequence[str]
+    source: Sequence[str], process_cells: Sequence[str]
 ) -> bool:
     """
     Return True if the current cell should be ignored from processing.
@@ -305,7 +285,7 @@ def _should_ignore_code_cell(
     ----------
     source
         Source from the notebook cell
-    ignore_cells
+    process_cells
         Extra cells which nbqa should ignore.
 
     Returns
@@ -313,16 +293,22 @@ def _should_ignore_code_cell(
     bool
         True if the cell should ignored else False
     """
+    process = MAGIC + [i.strip() for i in process_cells]
+    # should ignore if it's empty and starts with something forbidden
+    # now, should ignore if it
     if not source:
         return True
-    ignore = MAGIC + [i.strip() for i in ignore_cells]
-    return any(source[0].lstrip().startswith(i) for i in ignore)
+    magic_type = MagicHandler.get_ipython_magic_type(source[0])
+    if magic_type != IPythonMagicType.CELL:
+        return False
+    first_line = source[0].lstrip()
+    return all(first_line.split()[0] != f"%%{i}" for i in process)
 
 
 def main(
     notebook: "Path",
     temp_python_file: "Path",
-    ignore_cells: Sequence[str],
+    process_cells: Sequence[str],
     command: str,
 ) -> NotebookInfo:
     """
@@ -334,7 +320,7 @@ def main(
         Jupyter Notebook third-party tool is being run against.
     temp_python_file
         Temporary Python file to save converted notebook in.
-    ignore_cells
+    process_cells
         Extra cells which nbqa should ignore.
     command
         The third-party tool being run.
@@ -358,7 +344,10 @@ def main(
         if cell["cell_type"] == "code":
             cell_number += 1
 
-            if _should_ignore_code_cell(cell["source"], ignore_cells):
+            if _should_ignore_code_cell(cell["source"], process_cells):
+                # I think we're gonna have to put it into here, right?
+                # do the same kind of magic here. get the ipython type
+                # , and if it's a cell magic, then compare with that thing.
                 code_cells_to_ignore.add(cell_number)
                 continue
 

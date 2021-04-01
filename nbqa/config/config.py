@@ -49,7 +49,7 @@ class _ConfigSections(NamedTuple):  # pylint: disable=R0903
 
     ADDOPTS: str = "addopts"
     CONFIG: str = "config"
-    IGNORE_CELLS: str = "ignore_cells"
+    process_cells: str = "process_cells"
     MUTATE: str = "mutate"
     DIFF: str = "diff"
     FILES: str = "files"
@@ -74,7 +74,7 @@ class Configs:
         Whether to allow nbqa to modify notebooks.
     nbqa_config
         Configuration of the third party tool.
-    nbqa_ignore_cells
+    nbqa_process_cells
         Extra cells which nbqa should ignore.
     nbqa_addopts
         Additional arguments passed to the third party tool
@@ -89,7 +89,7 @@ class Configs:
         lambda arg: split(arg) if isinstance(arg, str) else arg
     )
     _config_section_parsers[CONFIG_SECTIONS.CONFIG] = str
-    _config_section_parsers[CONFIG_SECTIONS.IGNORE_CELLS] = (
+    _config_section_parsers[CONFIG_SECTIONS.process_cells] = (
         lambda arg: arg.split(",") if isinstance(arg, str) else arg
     )
     _config_section_parsers[CONFIG_SECTIONS.MUTATE] = bool
@@ -99,7 +99,7 @@ class Configs:
 
     _mutate: bool = False
     _config: Optional[str] = None
-    _ignore_cells: Sequence[str] = []
+    _process_cells: Sequence[str] = []
     _addopts: Sequence[str] = []
     _diff: bool = False
     _files: Optional[str] = None
@@ -140,9 +140,9 @@ class Configs:
         return self._addopts
 
     @property
-    def nbqa_ignore_cells(self) -> Sequence[str]:
+    def nbqa_process_cells(self) -> Sequence[str]:
         """Additional cells which nbqa should ignore."""
-        return self._ignore_cells
+        return self._process_cells
 
     @property
     def nbqa_files(self) -> Optional[str]:
@@ -170,7 +170,7 @@ class Configs:
         )
         config.set_config(CONFIG_SECTIONS.CONFIG, self._config or other.nbqa_config)
         config.set_config(
-            CONFIG_SECTIONS.IGNORE_CELLS, self._ignore_cells or other.nbqa_ignore_cells
+            CONFIG_SECTIONS.process_cells, self._process_cells or other.nbqa_process_cells
         )
         config.set_config(CONFIG_SECTIONS.MUTATE, self._mutate or other.nbqa_mutate)
         config.set_config(CONFIG_SECTIONS.DIFF, self._diff or other.nbqa_diff)
@@ -192,7 +192,7 @@ class Configs:
 
         config.set_config(CONFIG_SECTIONS.ADDOPTS, cli_args.nbqa_addopts)
         config.set_config(CONFIG_SECTIONS.CONFIG, cli_args.nbqa_config)
-        config.set_config(CONFIG_SECTIONS.IGNORE_CELLS, cli_args.nbqa_ignore_cells)
+        config.set_config(CONFIG_SECTIONS.process_cells, cli_args.nbqa_process_cells)
         config.set_config(CONFIG_SECTIONS.MUTATE, cli_args.nbqa_mutate)
         config.set_config(CONFIG_SECTIONS.DIFF, cli_args.nbqa_diff)
         config.set_config(CONFIG_SECTIONS.FILES, cli_args.nbqa_files)
@@ -211,7 +211,7 @@ class Configs:
             CONFIG_SECTIONS.CONFIG, DEFAULT_CONFIG["config"].get(command)
         )
         defaults.set_config(
-            CONFIG_SECTIONS.IGNORE_CELLS, DEFAULT_CONFIG["ignore_cells"].get(command)
+            CONFIG_SECTIONS.process_cells, DEFAULT_CONFIG["process_cells"].get(command)
         )
         defaults.set_config(
             CONFIG_SECTIONS.MUTATE, DEFAULT_CONFIG["mutate"].get(command)

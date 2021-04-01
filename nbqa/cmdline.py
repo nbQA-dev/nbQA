@@ -45,7 +45,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         Whether to allow 3rd party tools to modify notebooks.
     nbqa_config
         Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
-    nbqa_ignore_cells
+    nbqa_process_cells
         Ignore cells whose first line starts with the input token
     nbqa_addopts
         Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
@@ -59,7 +59,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
     root_dirs: Sequence[str]
     nbqa_addopts: Sequence[str]
     nbqa_mutate: bool
-    nbqa_ignore_cells: Optional[str]
+    nbqa_process_cells: Optional[str]
     nbqa_config: Optional[str]
     nbqa_diff: bool
     nbqa_files: Optional[str]
@@ -81,7 +81,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         self.nbqa_addopts = cmd_args
         self.nbqa_mutate = args.nbqa_mutate or False
         self.nbqa_config = args.nbqa_config or None
-        self.nbqa_ignore_cells = args.nbqa_ignore_cells or None
+        self.nbqa_process_cells = args.nbqa_process_cells or None
         self.nbqa_diff = args.nbqa_diff or False
         self.nbqa_files = args.nbqa_files or None
         self.nbqa_exclude = args.nbqa_exclude or None
@@ -132,12 +132,12 @@ class CLIArgs:  # pylint: disable=R0902,R0903
             help="Config file for third-party tool (e.g. `setup.cfg`)",
         )
         parser.add_argument(
-            "--nbqa-ignore-cells",
+            "--nbqa-process-cells",
             required=False,
             help=dedent(
                 r"""
                 Ignore cells whose first line starts with this. You can pass multiple options,
-                e.g. `nbqa black my_notebook.ipynb --nbqa-ignore-cells %%%%cython,%%%%html`
+                e.g. `nbqa black my_notebook.ipynb --nbqa-process-cells %%%%cython,%%%%html`
                 by placing commas between them.
                 """
             ),
