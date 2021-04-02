@@ -112,7 +112,6 @@ See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html)
 Take some inspiration from their config files 😉
 
 - **alibi** [.pre-commit-config.yaml](https://github.com/SeldonIO/alibi/blob/master/.pre-commit-config.yaml)
-- **iminuit** [pyproject.toml](https://github.com/scikit-hep/iminuit/blob/develop/pyproject.toml) [.pre-commit-config.yaml](https://github.com/scikit-hep/iminuit/blob/develop/.pre-commit-config.yaml)
 - **intake-esm** [pyproject.toml](https://github.com/intake/intake-esm/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/intake/intake-esm/blob/master/.pre-commit-config.yaml)
 - **LiuAlgoTrader**: [requirements/dev.txt](https://github.com/amor71/LiuAlgoTrader/blob/master/liualgotrader/requirements/dev.txt)
 - **mplhep**: [pyproject.toml](https://github.com/scikit-hep/mplhep/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/scikit-hep/mplhep/blob/master/.pre-commit-config.yaml)
