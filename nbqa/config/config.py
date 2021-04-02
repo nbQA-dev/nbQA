@@ -49,7 +49,7 @@ class _ConfigSections(NamedTuple):  # pylint: disable=R0903
 
     ADDOPTS: str = "addopts"
     CONFIG: str = "config"
-    process_cells: str = "process_cells"
+    PROCESS_CELLS: str = "process_cells"
     MUTATE: str = "mutate"
     DIFF: str = "diff"
     FILES: str = "files"
@@ -89,7 +89,7 @@ class Configs:
         lambda arg: split(arg) if isinstance(arg, str) else arg
     )
     _config_section_parsers[CONFIG_SECTIONS.CONFIG] = str
-    _config_section_parsers[CONFIG_SECTIONS.process_cells] = (
+    _config_section_parsers[CONFIG_SECTIONS.PROCESS_CELLS] = (
         lambda arg: arg.split(",") if isinstance(arg, str) else arg
     )
     _config_section_parsers[CONFIG_SECTIONS.MUTATE] = bool
@@ -170,7 +170,8 @@ class Configs:
         )
         config.set_config(CONFIG_SECTIONS.CONFIG, self._config or other.nbqa_config)
         config.set_config(
-            CONFIG_SECTIONS.process_cells, self._process_cells or other.nbqa_process_cells
+            CONFIG_SECTIONS.PROCESS_CELLS,
+            self._process_cells or other.nbqa_process_cells,
         )
         config.set_config(CONFIG_SECTIONS.MUTATE, self._mutate or other.nbqa_mutate)
         config.set_config(CONFIG_SECTIONS.DIFF, self._diff or other.nbqa_diff)
@@ -192,7 +193,7 @@ class Configs:
 
         config.set_config(CONFIG_SECTIONS.ADDOPTS, cli_args.nbqa_addopts)
         config.set_config(CONFIG_SECTIONS.CONFIG, cli_args.nbqa_config)
-        config.set_config(CONFIG_SECTIONS.process_cells, cli_args.nbqa_process_cells)
+        config.set_config(CONFIG_SECTIONS.PROCESS_CELLS, cli_args.nbqa_process_cells)
         config.set_config(CONFIG_SECTIONS.MUTATE, cli_args.nbqa_mutate)
         config.set_config(CONFIG_SECTIONS.DIFF, cli_args.nbqa_diff)
         config.set_config(CONFIG_SECTIONS.FILES, cli_args.nbqa_files)
@@ -211,7 +212,7 @@ class Configs:
             CONFIG_SECTIONS.CONFIG, DEFAULT_CONFIG["config"].get(command)
         )
         defaults.set_config(
-            CONFIG_SECTIONS.process_cells, DEFAULT_CONFIG["process_cells"].get(command)
+            CONFIG_SECTIONS.PROCESS_CELLS, DEFAULT_CONFIG["process_cells"].get(command)
         )
         defaults.set_config(
             CONFIG_SECTIONS.MUTATE, DEFAULT_CONFIG["mutate"].get(command)
