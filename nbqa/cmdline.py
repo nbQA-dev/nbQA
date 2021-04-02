@@ -45,6 +45,8 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         Whether to allow 3rd party tools to modify notebooks.
     nbqa_config
         Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
+    nbqa_ignore_cells
+        Deprecated.
     nbqa_process_cells
         Ignore cells whose first line starts with the input token
     nbqa_addopts
@@ -59,6 +61,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
     root_dirs: Sequence[str]
     nbqa_addopts: Sequence[str]
     nbqa_mutate: bool
+    nbqa_ignore_cells: Optional[str]
     nbqa_process_cells: Optional[str]
     nbqa_config: Optional[str]
     nbqa_diff: bool
@@ -81,6 +84,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         self.nbqa_addopts = cmd_args
         self.nbqa_mutate = args.nbqa_mutate or False
         self.nbqa_config = args.nbqa_config or None
+        self.nbqa_ignore_cells = args.nbqa_ignore_cells or None
         self.nbqa_process_cells = args.nbqa_process_cells or None
         self.nbqa_diff = args.nbqa_diff or False
         self.nbqa_files = args.nbqa_files or None
@@ -144,6 +148,15 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         )
         parser.add_argument(
             "--version", action="version", version=f"nbqa {__version__}"
+        )
+        parser.add_argument(
+            "--nbqa-ignore-cells",
+            required=False,
+            help=dedent(
+                r"""
+                Deprecated, do not use.
+                """
+            ),
         )
         args, cmd_args = parser.parse_known_args(argv)
         return CLIArgs(args, cmd_args)

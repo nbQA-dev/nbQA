@@ -49,6 +49,7 @@ class _ConfigSections(NamedTuple):  # pylint: disable=R0903
 
     ADDOPTS: str = "addopts"
     CONFIG: str = "config"
+    IGNORE_CELLS: str = "ignore_cells"
     PROCESS_CELLS: str = "process_cells"
     MUTATE: str = "mutate"
     DIFF: str = "diff"
@@ -74,6 +75,8 @@ class Configs:
         Whether to allow nbqa to modify notebooks.
     nbqa_config
         Configuration of the third party tool.
+    nbqa_ignore_cells
+        Deprecated.
     nbqa_process_cells
         Extra cells which nbqa should ignore.
     nbqa_addopts
@@ -89,6 +92,9 @@ class Configs:
         lambda arg: split(arg) if isinstance(arg, str) else arg
     )
     _config_section_parsers[CONFIG_SECTIONS.CONFIG] = str
+    _config_section_parsers[CONFIG_SECTIONS.IGNORE_CELLS] = (
+        lambda arg: arg.split(",") if isinstance(arg, str) else arg
+    )
     _config_section_parsers[CONFIG_SECTIONS.PROCESS_CELLS] = (
         lambda arg: arg.split(",") if isinstance(arg, str) else arg
     )
@@ -99,6 +105,7 @@ class Configs:
 
     _mutate: bool = False
     _config: Optional[str] = None
+    _ignore_cells: Sequence[str] = []
     _process_cells: Sequence[str] = []
     _addopts: Sequence[str] = []
     _diff: bool = False
@@ -140,8 +147,13 @@ class Configs:
         return self._addopts
 
     @property
+    def nbqa_ignore_cells(self) -> Sequence[str]:
+        """Don't use, deprecated."""
+        return self._ignore_cells
+
+    @property
     def nbqa_process_cells(self) -> Sequence[str]:
-        """Additional cells which nbqa should ignore."""
+        """Additional cells which nbqa should process."""
         return self._process_cells
 
     @property
@@ -170,6 +182,10 @@ class Configs:
         )
         config.set_config(CONFIG_SECTIONS.CONFIG, self._config or other.nbqa_config)
         config.set_config(
+            CONFIG_SECTIONS.IGNORE_CELLS,
+            self._ignore_cells or other.nbqa_ignore_cells,
+        )
+        config.set_config(
             CONFIG_SECTIONS.PROCESS_CELLS,
             self._process_cells or other.nbqa_process_cells,
         )
@@ -193,6 +209,7 @@ class Configs:
 
         config.set_config(CONFIG_SECTIONS.ADDOPTS, cli_args.nbqa_addopts)
         config.set_config(CONFIG_SECTIONS.CONFIG, cli_args.nbqa_config)
+        config.set_config(CONFIG_SECTIONS.IGNORE_CELLS, cli_args.nbqa_ignore_cells)
         config.set_config(CONFIG_SECTIONS.PROCESS_CELLS, cli_args.nbqa_process_cells)
         config.set_config(CONFIG_SECTIONS.MUTATE, cli_args.nbqa_mutate)
         config.set_config(CONFIG_SECTIONS.DIFF, cli_args.nbqa_diff)
@@ -248,3 +265,8 @@ class Configs:
             )
         if self.nbqa_config and not Path(self.nbqa_config).exists():
             raise FileNotFoundError(f"{self.nbqa_config} not found.")
+        if self.nbqa_ignore_cells:
+            raise ValueError(
+                "--nbqa-ignore-cells is deprecated since version 0.6.0, "
+                "most cell magics are now excluded by default."
+            )
