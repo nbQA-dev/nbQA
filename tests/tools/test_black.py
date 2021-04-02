@@ -297,6 +297,7 @@ def test_black_works_with_commented_magics(capsys: "CaptureFixture") -> None:
         main(["black", path, "--nbqa-diff"])
 
     out, err = capsys.readouterr()
+    err = err.encode("ascii", "backslashreplace").decode()
     expected_out = f"""\
 \x1b[1mCell 1\x1b[0m
 ------
@@ -309,7 +310,17 @@ def test_black_works_with_commented_magics(capsys: "CaptureFixture") -> None:
 \x1b[0m
 To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
 """
-    expected_err = ""
+    expected_err = (
+        dedent(
+            f"""\
+            reformatted {path}
+            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
+            1 file reformatted.
+            """
+        )
+        .encode("ascii", "backslashreplace")
+        .decode()
+    )
     assert expected_out == out
     assert expected_err == err
 
@@ -329,6 +340,7 @@ def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
         main(["black", path, "--nbqa-diff"])
 
     out, err = capsys.readouterr()
+    err = err.encode("ascii", "backslashreplace").decode()
     expected_out = f"""\
 \x1b[1mCell 3\x1b[0m
 ------
@@ -342,7 +354,17 @@ def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
 
 To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
 """
-    expected_err = ""
+    expected_err = (
+        dedent(
+            f"""\
+            reformatted {path}
+            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
+            1 file reformatted.
+            """
+        )
+        .encode("ascii", "backslashreplace")
+        .decode()
+    )
     assert expected_out == out
     assert expected_err == err
 

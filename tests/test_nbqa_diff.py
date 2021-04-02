@@ -3,6 +3,7 @@
 import os
 import re
 from pathlib import Path
+from textwrap import dedent
 from typing import TYPE_CHECKING
 
 import pytest
@@ -29,6 +30,7 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
     with pytest.raises(SystemExit):
         main(["black", str(DIRTY_NOTEBOOK), "--nbqa-diff"])
     out, err = capsys.readouterr()
+    err = err.encode("ascii", "backslashreplace").decode()
     expected_out = f"""\x1b[1mCell 2\x1b[0m
 ------
 --- {str(DIRTY_NOTEBOOK)}
@@ -59,7 +61,18 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
 To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
 """
     assert out == expected_out
-    assert err == ""
+    expected_err = (
+        dedent(
+            f"""\
+            reformatted {str(DIRTY_NOTEBOOK)}
+            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
+            1 file reformatted.
+            """
+        )
+        .encode("ascii", "backslashreplace")
+        .decode()
+    )
+    assert err == expected_err
 
 
 def test_diff_and_mutate() -> None:
