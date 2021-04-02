@@ -343,9 +343,6 @@ def main(
             cell_number += 1
 
             if _should_ignore_code_cell(cell["source"], process_cells):
-                # I think we're gonna have to put it into here, right?
-                # do the same kind of magic here. get the ipython type
-                # , and if it's a cell magic, then compare with that thing.
                 code_cells_to_ignore.add(cell_number)
                 continue
 
