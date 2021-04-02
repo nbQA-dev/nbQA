@@ -1,5 +1,6 @@
 """Check --nbqa-diff flag."""
 
+import os
 import re
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -12,6 +13,10 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
+SPARKLES = "\N{sparkles}"
+SHORTCAKE = "\N{shortcake}"
+COLLISION = "\N{collision symbol}"
+BROKEN_HEART = "\N{broken heart}"
 TESTS_DIR = Path("tests")
 TEST_DATA_DIR = TESTS_DIR / "data"
 
@@ -72,17 +77,37 @@ Use `--nbqa-diff` to preview changes, and `--nbqa-mutate` to apply them.\
         main(["black", str(DIRTY_NOTEBOOK), "--nbqa-mutate", "--nbqa-diff"])
 
 
-def test_diff_no_mutate(capsys: "CaptureFixture") -> None:
+def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
     """
-    Check --nbqa-diff doesn't result in captured output.
+    Check that using nbqa-diff when there's invalid syntax doesn't have empty output.
 
     Parameters
     ----------
     capsys
         Pytest fixture to capture stdout and stderr.
     """
+    path = os.path.abspath(
+        os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
+    )
+
     with pytest.raises(SystemExit):
-        main(["flake8", str(DIRTY_NOTEBOOK), "--nbqa-diff"])
+        main(["black", path, "--nbqa-diff"])
+
     out, err = capsys.readouterr()
-    assert out == ""
-    assert err == ""
+    expected_out = ""
+    expected_err = (
+        (
+            f"error: cannot format {path}: "
+            "cannot use --safe with this file; failed to parse source file.  AST error message: "
+            "can't assign to literal (<unknown>, cell_1:1)\nOh no! "
+            f"{COLLISION} {BROKEN_HEART} {COLLISION}\n1 file failed to reformat.\n"
+        )
+        .encode("ascii", "backslashreplace")
+        .decode()
+    )
+    # This is required because linux supports emojis
+    # so both should have \\ for comparison
+    err = err.encode("ascii", "backslashreplace").decode()
+
+    assert expected_out == out
+    assert expected_err == err
