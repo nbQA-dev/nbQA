@@ -48,7 +48,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
     nbqa_ignore_cells
         Deprecated.
     nbqa_process_cells
-        Ignore cells whose first line starts with the input token
+        Process code within these cell magics.
     nbqa_addopts
         Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
     nbqa_files
@@ -136,6 +136,15 @@ class CLIArgs:  # pylint: disable=R0902,R0903
             help="Config file for third-party tool (e.g. `setup.cfg`)",
         )
         parser.add_argument(
+            "--nbqa-ignore-cells",
+            required=False,
+            help=dedent(
+                r"""
+                Deprecated, do not use.
+                """
+            ),
+        )
+        parser.add_argument(
             "--nbqa-process-cells",
             required=False,
             help=dedent(
@@ -148,15 +157,6 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         )
         parser.add_argument(
             "--version", action="version", version=f"nbqa {__version__}"
-        )
-        parser.add_argument(
-            "--nbqa-ignore-cells",
-            required=False,
-            help=dedent(
-                r"""
-                Deprecated, do not use.
-                """
-            ),
         )
         args, cmd_args = parser.parse_known_args(argv)
         return CLIArgs(args, cmd_args)

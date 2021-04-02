@@ -78,7 +78,7 @@ class Configs:
     nbqa_ignore_cells
         Deprecated.
     nbqa_process_cells
-        Extra cells which nbqa should ignore.
+        Process code within cells with these cell magics.
     nbqa_addopts
         Additional arguments passed to the third party tool
     nbqa_files
@@ -182,8 +182,7 @@ class Configs:
         )
         config.set_config(CONFIG_SECTIONS.CONFIG, self._config or other.nbqa_config)
         config.set_config(
-            CONFIG_SECTIONS.IGNORE_CELLS,
-            self._ignore_cells or other.nbqa_ignore_cells,
+            CONFIG_SECTIONS.IGNORE_CELLS, self._ignore_cells or other.nbqa_ignore_cells
         )
         config.set_config(
             CONFIG_SECTIONS.PROCESS_CELLS,
