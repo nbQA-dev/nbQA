@@ -293,11 +293,9 @@ def _should_ignore_code_cell(
     bool
         True if the cell should ignored else False
     """
-    process = MAGIC + [i.strip() for i in process_cells]
-    # should ignore if it's empty and starts with something forbidden
-    # now, should ignore if it
     if not source:
         return True
+    process = MAGIC + [i.strip() for i in process_cells]
     magic_type = MagicHandler.get_ipython_magic_type(source[0])
     if magic_type != IPythonMagicType.CELL:
         return False
