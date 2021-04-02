@@ -45,7 +45,7 @@ def test_mypy_works(capsys: "CaptureFixture") -> None:
         {path_0}:cell_2:19: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
         {path_3}:cell_8:3: error: Name 'flake8_version' is not defined
         {path_3}:cell_8:4: error: Name 'flake8_version' is not defined
-        Found 5 errors in 4 files (checked 20 source files)
+        Found 5 errors in 4 files (checked 21 source files)
         """  # noqa
     )
     expected_err = ""
@@ -74,3 +74,17 @@ def test_mypy_with_local_import(capsys: "CaptureFixture") -> None:
     out, _ = capsys.readouterr()
     expected = "Success: no issues found in 1 source file\n"
     assert out == expected
+
+
+def test_notebook_doesnt_shadow_python_module(capsys: "CaptureFixture") -> None:
+    """Check that notebook with same name as a Python file doesn't overshadow it."""
+    cwd = os.getcwd()
+    try:
+        os.chdir(os.path.join("tests", "data"))
+        with pytest.raises(SystemExit):
+            main(["mypy", "t.ipynb"])
+    finally:
+        os.chdir(cwd)
+    result, _ = capsys.readouterr()
+    expected = "Success: no issues found in 1 source file\n"
+    assert result == expected

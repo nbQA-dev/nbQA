@@ -2,6 +2,7 @@
 
 import os
 import re
+import secrets
 import shutil
 import subprocess
 import sys
@@ -38,7 +39,7 @@ EXCLUDES = (
     r"_build|buck-out|build|dist|venv"
     r")/"
 )
-
+TOKEN = secrets.token_hex(3)
 
 REPLACE_FUNCTION = {
     True: replace_source.diff,
@@ -164,8 +165,8 @@ def _temp_python_file_for_notebook(
             f"{BOLD}No such file or directory: {str(notebook)}{RESET}"
         )
     relative_notebook_path = (
-        notebook.resolve().relative_to(project_root).with_suffix(".py")
-    )
+        notebook.resolve().relative_to(project_root).parent / f"{notebook.stem}_{TOKEN}"
+    ).with_suffix(".py")
     temp_python_file = Path(tmpdir) / relative_notebook_path
     temp_python_file.parent.mkdir(parents=True, exist_ok=True)
     return temp_python_file
@@ -224,6 +225,9 @@ def _replace_temp_python_file_references_in_out_err(
 
     out = out.replace(f"{tmpdirname}{os.sep}", "")
     err = err.replace(f"{tmpdirname}{os.sep}", "")
+
+    out = out.replace(temp_python_file.stem, notebook.stem)
+    err = err.replace(temp_python_file.stem, notebook.stem)
 
     return out, err
 
