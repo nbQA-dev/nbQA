@@ -237,10 +237,8 @@ def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> 
         if code_cell_number in notebook_info.code_cells_to_ignore:
             continue
         new_source = _get_new_source(code_cell_number, notebook_info, next(pycells))
-        if cell["source"]:
-            cell["source"][-1] += "\n"
-        if new_source:
-            new_source[-1] += "\n"
+        cell["source"][-1] += "\n"
+        new_source[-1] += "\n"
         cell_diff = unified_diff(
             cell["source"],
             new_source,
