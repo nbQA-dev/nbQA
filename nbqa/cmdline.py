@@ -136,8 +136,8 @@ class CLIArgs:  # pylint: disable=R0902,R0903
             required=False,
             help=dedent(
                 r"""
-                Ignore cells whose first line starts with this. You can pass multiple options,
-                e.g. `nbqa black my_notebook.ipynb --nbqa-process-cells %%%%cython,%%%%html`
+                Process code within these cell magics. You can pass multiple options,
+                e.g. `nbqa black my_notebook.ipynb --nbqa-process-cells add_to,write_to`
                 by placing commas between them.
                 """
             ),
