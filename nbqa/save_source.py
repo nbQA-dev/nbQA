@@ -50,8 +50,8 @@ MAGIC = [
     "%%writefile",
 ]
 NEWLINE = "\n"
-NEWLINES = defaultdict(lambda: NEWLINE * 2)
-NEWLINES["isort"] = NEWLINE
+NEWLINES = defaultdict(lambda: NEWLINE * 3)
+NEWLINES["isort"] = NEWLINE * 2
 
 
 def _is_src_code_indentation_valid(source: str) -> bool:
@@ -249,9 +249,6 @@ def _parse_cell(
     if substituted_magics:
         temporary_lines[cell_number] = substituted_magics
 
-    if not parsed_cell.endswith(NEWLINE):
-        parsed_cell = f"{parsed_cell}{NEWLINE}"
-
     return f"{parsed_cell}{NEWLINES[command]}"
 
 
@@ -316,8 +313,10 @@ def _should_ignore_code_cell(
     bool
         True if the cell should ignored else False
     """
+    if not source:
+        return True
     ignore = MAGIC + [i.strip() for i in ignore_cells]
-    return source != [] and any(source[0].lstrip().startswith(i) for i in ignore)
+    return any(source[0].lstrip().startswith(i) for i in ignore)
 
 
 def main(
