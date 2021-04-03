@@ -286,7 +286,7 @@ def _should_ignore_code_cell(
     source
         Source from the notebook cell
     process_cells
-        Extra cells which nbqa should ignore.
+        Extra cells which nbqa should process.
 
     Returns
     -------
@@ -300,7 +300,7 @@ def _should_ignore_code_cell(
     if magic_type != IPythonMagicType.CELL:
         return False
     first_line = source[0].lstrip()
-    return all(first_line.split()[0] != f"%%{i}" for i in process)
+    return first_line.split()[0] not in {f"%%{magic}" for magic in process}
 
 
 def main(
