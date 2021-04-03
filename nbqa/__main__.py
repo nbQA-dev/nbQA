@@ -621,15 +621,15 @@ def _run_on_one_root_dir(
                         )
                     ) from exc
 
+        sys.stdout.write(out)
+        sys.stderr.write(err)
+
         if configs.nbqa_diff:
             if mutated:
                 sys.stdout.write(
                     "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
                 )
-            return 0
-
-        sys.stdout.write(out)
-        sys.stderr.write(err)
+            return output_code
 
     return output_code
 
