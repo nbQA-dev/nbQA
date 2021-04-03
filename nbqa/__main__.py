@@ -1,8 +1,6 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
-
 import os
 import re
-import secrets
 import shutil
 import subprocess
 import sys
@@ -39,12 +37,16 @@ EXCLUDES = (
     r"_build|buck-out|build|dist|venv"
     r")/"
 )
-TOKEN = secrets.token_hex(3)
 
 REPLACE_FUNCTION = {
     True: replace_source.diff,
     False: replace_source.mutate,
 }
+
+
+def _hash_notebook(string: str) -> int:
+    """Hash notebook name into 8-digits."""
+    return abs(hash(string)) % (10 ** 8)
 
 
 class UnsupportedPackageVersionError(Exception):
@@ -164,9 +166,9 @@ def _temp_python_file_for_notebook(
         raise FileNotFoundError(
             f"{BOLD}No such file or directory: {str(notebook)}{RESET}"
         )
-    relative_notebook_path = (
-        notebook.resolve().relative_to(project_root).parent / f"{notebook.stem}_{TOKEN}"
-    ).with_suffix(".py")
+    new_stem = f"{notebook.stem}_{_hash_notebook(notebook.stem)}"
+    new_parent = notebook.resolve().relative_to(project_root).parent
+    relative_notebook_path = (new_parent / new_stem).with_suffix(".py")
     temp_python_file = Path(tmpdir) / relative_notebook_path
     temp_python_file.parent.mkdir(parents=True, exist_ok=True)
     return temp_python_file
