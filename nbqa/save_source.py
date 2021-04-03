@@ -319,7 +319,7 @@ def main(
     temp_python_file
         Temporary Python file to save converted notebook in.
     process_cells
-        Extra cells which nbqa should ignore.
+        Extra cells which nbqa should process.
     command
         The third-party tool being run.
 
