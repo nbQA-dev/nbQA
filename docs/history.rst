@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.6.0 (2021-04-04)
+------------------
+
+Processing cell-magics is now opt-in rather than opt-out.
+Original output from tool is always printed with ``--nbqa-diff``.
+
 0.5.9 (2021-02-22)
 ------------------
 
