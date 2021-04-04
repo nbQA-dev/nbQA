@@ -5,7 +5,7 @@ isort = ["--treat-comment-as-code", "# %%NBQA-CELL-SEP"]
 
 [mutate]
 
-[ignore_cells]
+[process_cells]
 
 [diff]
 

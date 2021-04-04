@@ -46,7 +46,9 @@ class CLIArgs:  # pylint: disable=R0902,R0903
     nbqa_config
         Config file for 3rd party tool (e.g. :code:`.mypy.ini`)
     nbqa_ignore_cells
-        Ignore cells whose first line starts with the input token
+        Deprecated.
+    nbqa_process_cells
+        Process code within these cell magics.
     nbqa_addopts
         Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
     nbqa_files
@@ -60,6 +62,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
     nbqa_addopts: Sequence[str]
     nbqa_mutate: bool
     nbqa_ignore_cells: Optional[str]
+    nbqa_process_cells: Optional[str]
     nbqa_config: Optional[str]
     nbqa_diff: bool
     nbqa_files: Optional[str]
@@ -82,6 +85,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         self.nbqa_mutate = args.nbqa_mutate or False
         self.nbqa_config = args.nbqa_config or None
         self.nbqa_ignore_cells = args.nbqa_ignore_cells or None
+        self.nbqa_process_cells = args.nbqa_process_cells or None
         self.nbqa_diff = args.nbqa_diff or False
         self.nbqa_files = args.nbqa_files or None
         self.nbqa_exclude = args.nbqa_exclude or None
@@ -136,8 +140,17 @@ class CLIArgs:  # pylint: disable=R0902,R0903
             required=False,
             help=dedent(
                 r"""
-                Ignore cells whose first line starts with this. You can pass multiple options,
-                e.g. `nbqa black my_notebook.ipynb --nbqa-ignore-cells %%%%cython,%%%%html`
+                Deprecated, do not use.
+                """
+            ),
+        )
+        parser.add_argument(
+            "--nbqa-process-cells",
+            required=False,
+            help=dedent(
+                r"""
+                Process code within these cell magics. You can pass multiple options,
+                e.g. `nbqa black my_notebook.ipynb --nbqa-process-cells add_to,write_to`
                 by placing commas between them.
                 """
             ),

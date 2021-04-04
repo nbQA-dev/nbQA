@@ -63,19 +63,20 @@ or you can put the following in your :code:`pyproject.toml` file
 Ignore cells
 ~~~~~~~~~~~~
 
-By default, :code:`nbQA` will ignore line magics (e.g. :code:`%matplotlib inline`), and :code:`%%bash` and :code:`%%script` cell magics.
-To ignore extra cells, you can use the :code:`--nbqa-ignore-cells` CLI argument, e.g.
+By default, :code:`nbQA` will ignore line magics (e.g. :code:`%matplotlib inline`), as well as most cell magics.
+To process code in cells with cell magics, you can use the :code:`--nbqa-process-cells` CLI argument, e.g. to process
+code within :code:``%%add_to`` cell magics, use
 
 .. code-block:: bash
 
-    nbqa black my_notebook.ipynb --nbqa-ignore-cells %%html,%%cython
+    nbqa black my_notebook.ipynb --nbqa-process-cells add_to
 
-or the :code:`ignore_cells` option in your :code:`pyproject.toml` file, e.g.
+or the :code:`process_cells` option in your :code:`pyproject.toml` file, e.g.
 
 .. code-block:: toml
 
-    [tool.nbqa.ignore_cells]
-    black = "%%html,%%cython"
+    [tool.nbqa.process_cells]
+    black = add_to
 
 Include / exclude
 ~~~~~~~~~~~~~~~~~

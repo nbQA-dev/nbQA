@@ -559,7 +559,7 @@ def _run_on_one_root_dir(
                 nb_info_mapping[notebook] = save_source.main(
                     notebook,
                     temp_python_file,
-                    configs.nbqa_ignore_cells,
+                    configs.nbqa_process_cells,
                     cli_args.command,
                 )
             except Exception as exc:
