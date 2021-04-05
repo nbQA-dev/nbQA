@@ -23,12 +23,12 @@ repos:
       - id: prettier
         exclude: ^README\.md$
   - repo: https://github.com/PyCQA/pylint
-    rev: pylint-2.6.0
+    rev: pylint-2.7.4
     hooks:
       - id: pylint
         files: ^(nbqa|tests)/
         exclude: ^tests/data/
-  - repo: https://gitlab.com/pycqa/flake8
+  - repo: https://github.com/PyCQA/flake8
     rev: 3.9.0
     hooks:
       - id: flake8
@@ -64,7 +64,7 @@ repos:
       - id: codespell
         files: \.(py|rst|md)$
   - repo: https://github.com/terrencepreilly/darglint
-    rev: v1.7.0
+    rev: v1.8.0
     hooks:
       - id: darglint
   - repo: https://github.com/pre-commit/pygrep-hooks
