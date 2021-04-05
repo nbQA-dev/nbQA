@@ -87,21 +87,21 @@ class Configs:
         Global file exclude pattern.
     """
 
-    _config_section_parsers: ClassVar[Dict[str, ConfigParser]] = {}
-    _config_section_parsers[CONFIG_SECTIONS.ADDOPTS] = (
+    CONFIG_SECTION_PARSERS: ClassVar[Dict[str, ConfigParser]] = {}
+    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.ADDOPTS] = (
         lambda arg: split(arg) if isinstance(arg, str) else arg
     )
-    _config_section_parsers[CONFIG_SECTIONS.CONFIG] = str
-    _config_section_parsers[CONFIG_SECTIONS.IGNORE_CELLS] = (
+    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.CONFIG] = str
+    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.IGNORE_CELLS] = (
         lambda arg: arg.split(",") if isinstance(arg, str) else arg
     )
-    _config_section_parsers[CONFIG_SECTIONS.PROCESS_CELLS] = (
+    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.PROCESS_CELLS] = (
         lambda arg: arg.split(",") if isinstance(arg, str) else arg
     )
-    _config_section_parsers[CONFIG_SECTIONS.MUTATE] = bool
-    _config_section_parsers[CONFIG_SECTIONS.DIFF] = bool
-    _config_section_parsers[CONFIG_SECTIONS.FILES] = str
-    _config_section_parsers[CONFIG_SECTIONS.EXCLUDE] = str
+    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.MUTATE] = bool
+    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.DIFF] = bool
+    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.FILES] = str
+    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.EXCLUDE] = str
 
     _mutate: bool = False
     _config: Optional[str] = None
@@ -124,7 +124,7 @@ class Configs:
             Config value
         """
         if value:
-            self.__setattr__(f"_{config}", self._config_section_parsers[config](value))
+            self.__setattr__(f"_{config}", self.CONFIG_SECTION_PARSERS[config](value))
 
     @property
     def nbqa_mutate(self) -> bool:
