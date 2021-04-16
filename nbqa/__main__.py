@@ -168,7 +168,7 @@ def _temp_python_file_for_notebook(
         )
     new_stem = f"{notebook.stem}_{_hash_notebook(notebook.stem)}"
     new_parent = notebook.resolve().relative_to(project_root).parent
-    relative_notebook_path = (new_parent / new_stem).with_suffix(".py")
+    relative_notebook_path = Path(f"{str(new_parent/new_stem)}.py")
     temp_python_file = Path(tmpdir) / relative_notebook_path
     temp_python_file.parent.mkdir(parents=True, exist_ok=True)
     return temp_python_file
