@@ -1,8 +1,8 @@
 """Check function which lists notebooks in directory."""
 
+import os
 import re
 import shutil
-import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -34,13 +34,12 @@ def test_get_notebooks(tmpdir: "LocalPath", dir_: str) -> None:
     assert not result
 
 
-@pytest.mark.skipif("win" in sys.platform, reason="got no time for that")
 def test_name_with_dot() -> None:
     "Check conversion happens as expected when name contains dot."
     try:
         Path("UJ1.1 .ipynb").touch()
         result = _temp_python_file_for_notebook(Path("UJ1.1 .ipynb"), "tmp", Path.cwd())
-        expected = r"tmp/UJ1\.1 _\d+\.py"
+        expected = fr"tmp{re.escape(os.sep)}UJ1\.1 _\d+\.py"
         assert re.search(expected, str(result)) is not None
     finally:
         Path("UJ1.1 .ipynb").unlink()
