@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.6.1 (2021-04-16)
+------------------
+
+Fixed bug whereby notebooks with dots in their names
+were not being processed correctly (thank you Ivan Cheung for the issue!)
+
 0.6.0 (2021-04-04)
 ------------------
 
