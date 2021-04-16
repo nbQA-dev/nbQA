@@ -613,6 +613,7 @@ def _run_on_one_root_dir(
                     )
                     # pylint: enable=C0301
                     raise SystemExit(msg)
+
                 try:
                     REPLACE_FUNCTION[configs.nbqa_diff](
                         temp_python_file,
