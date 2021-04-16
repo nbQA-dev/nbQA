@@ -1,6 +1,8 @@
 """Check function which lists notebooks in directory."""
+
 import re
 import shutil
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -32,6 +34,7 @@ def test_get_notebooks(tmpdir: "LocalPath", dir_: str) -> None:
     assert not result
 
 
+@pytest.mark.skipif("win" in sys.platform, reason="got no time for that")
 def test_name_with_dot() -> None:
     "Check conversion happens as expected when name contains dot."
     try:
