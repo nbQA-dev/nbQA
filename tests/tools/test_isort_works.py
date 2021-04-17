@@ -210,7 +210,7 @@ def test_old_isort(monkeypatch: "MonkeyPatch") -> None:
 
 
 def test_comment_after_trailing_semicolons(capsys: "CaptureFixture") -> None:
-    """Check isort works when a notebook starts with a markdown cell."""
+    """Check isort works normally when there's a comment after trailing semicolon."""
     # check diff
     path = os.path.abspath(
         os.path.join("tests", "data", "comment_after_trailing_semicolon.ipynb")
