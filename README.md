@@ -162,6 +162,10 @@ Everyone using Jupyter notebooks should be doing this.
 
 > nbqa is a clean, easy to use, and effective tool for notebook code style. Formatting and readability makes a huge difference when rendering notebooks in a project's documentation!
 
+**James Lamb**, [engineer @saturn_cloud, LightGBM maintainer](https://twitter.com/_jameslamb/status/1346537148913221634)
+
+> today I learned about `nbqa`, a command-line tool to run linters like `flake8` over #Python code in @ProjectJupyter notebooks. Thanks to @jayyqi for pointing me to it. So far, I really really like it.
+
 ## 👥 Contributing
 
 I will give write-access to anyone who makes a useful pull request - see the
