@@ -504,7 +504,7 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
 
 def test_comment_after_trailing_comma(capsys: "CaptureFixture") -> None:
     """
-    Check that using nbqa-diff when there's invalid syntax doesn't have empty output.
+    Check trailing semicolon is still preserved if comment is after it.
 
     Parameters
     ----------
