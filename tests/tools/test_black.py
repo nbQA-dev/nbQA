@@ -504,7 +504,7 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
 
 def test_comment_after_trailing_comma(capsys: "CaptureFixture") -> None:
     """
-    Check trailing semicolon is still preserved if comma is after it.
+    Check trailing semicolon is still preserved if comment is after it.
 
     Parameters
     ----------
