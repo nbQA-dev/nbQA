@@ -210,6 +210,25 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "bdice",
+      "name": "Bradley Dice",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3943761?v=4",
+      "profile": "https://bradleydice.com",
+      "contributions": [
+        "ideas",
+        "code"
+      ]
+    },
+    {
+      "login": "ivanmkc",
+      "name": "Ivan Cheung",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1586049?v=4",
+      "profile": "https://github.com/ivanmkc",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

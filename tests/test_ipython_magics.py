@@ -26,75 +26,52 @@ def _copy_notebook(src_nb: Path, target_dir: Path) -> Path:
     return test_nb_path
 
 
-def _validate_ignore_cells_with_warning(actual: str, test_nb_path: Path) -> bool:
-    """Validate the results of notebooks with warnings."""
-    expected_out = [
-        "cell_2:3:1: F401 'glob' imported but unused",
-    ]
-    expected = "".join(f"{str(test_nb_path)}:{i}\n" for i in expected_out)
-    return expected == actual
-
-
-def _validate_ignore_cells_without_warning(actual: str, _: Path) -> bool:
-    """Validate the results of notebooks without warnings."""
-    expected = ""
-    return expected == actual
-
-
-def _ignore_cells_cli_input() -> Sequence[
-    Tuple[str, Callable[..., bool], Optional[str]]
-]:
+def _ignore_cells_cli_input() -> Sequence[Tuple[str, Optional[str]]]:
     """Input for ignore cells test case with configuration passed as CLI arguments."""
     return [
         (
             "--nbqa-ignore-cells=%%custommagic",
-            _validate_ignore_cells_with_warning,
             None,
         ),
         (
             "--nbqa-ignore-cells=%%custommagic,%%anothercustommagic",
-            _validate_ignore_cells_without_warning,
             None,
         ),
     ]
 
 
-def _ignore_cells_ini_input() -> Sequence[Tuple[str, Callable[..., bool], str]]:
+def _ignore_cells_ini_input() -> Sequence[Tuple[str, str]]:
     """Input for ignore cells test case using .nbqa.ini configuration."""
     nbqa_config_file = ".nbqa.ini"
     return [
         (
             "[flake8]\nignore_cells=%%%%custommagic",
-            _validate_ignore_cells_with_warning,
             nbqa_config_file,
         ),
         (
             "[flake8]\nignore_cells=%%%%custommagic,%%%%anothercustommagic",
-            _validate_ignore_cells_without_warning,
             nbqa_config_file,
         ),
     ]
 
 
-def _ignore_cells_toml_input() -> Sequence[Tuple[str, Callable[..., bool], str]]:
+def _ignore_cells_toml_input() -> Sequence[Tuple[str, str]]:
     """Input for ignore cells test case using pyproject.toml configuration."""
     toml_config_file = "pyproject.toml"
     return [
         (
             '[tool.nbqa.ignore_cells]\nflake8=["%%custommagic"]',
-            _validate_ignore_cells_with_warning,
             toml_config_file,
         ),
         (
             '[tool.nbqa.ignore_cells]\nflake8=["%%custommagic", "%%anothercustommagic"]',
-            _validate_ignore_cells_without_warning,
             toml_config_file,
         ),
     ]
 
 
 @pytest.mark.parametrize(
-    "config, validate, config_file",
+    "config, config_file",
     [
         *_ignore_cells_cli_input(),
         *_ignore_cells_ini_input(),
@@ -103,10 +80,8 @@ def _ignore_cells_toml_input() -> Sequence[Tuple[str, Callable[..., bool], str]]
 )
 def test_ignore_cells(
     config: str,
-    validate: Callable[..., bool],
     config_file: Optional[str],
     tmpdir: "LocalPath",
-    capsys: "CaptureFixture",
 ) -> None:
     """Validate we can ignore custom cell magics configured via cli, .ini and .toml."""
     test_nb_path = _copy_notebook(
@@ -119,11 +94,12 @@ def test_ignore_cells(
     else:
         nbqa_args.append(config)
 
-    with pytest.raises(SystemExit):
+    msg = (
+        "--nbqa-ignore-cells is deprecated since version 0.6.0, "
+        "most cell magics are now excluded by default."
+    )
+    with pytest.raises(ValueError, match=msg):
         main(nbqa_args)
-
-    out, _ = capsys.readouterr()
-    assert validate(out, test_nb_path)
 
 
 def _validate_magics_with_black(before: Sequence[str], after: Sequence[str]) -> bool:

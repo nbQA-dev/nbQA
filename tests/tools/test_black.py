@@ -297,6 +297,7 @@ def test_black_works_with_commented_magics(capsys: "CaptureFixture") -> None:
         main(["black", path, "--nbqa-diff"])
 
     out, err = capsys.readouterr()
+    err = err.encode("ascii", "backslashreplace").decode()
     expected_out = f"""\
 \x1b[1mCell 1\x1b[0m
 ------
@@ -309,7 +310,17 @@ def test_black_works_with_commented_magics(capsys: "CaptureFixture") -> None:
 \x1b[0m
 To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
 """
-    expected_err = ""
+    expected_err = (
+        dedent(
+            f"""\
+            reformatted {path}
+            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
+            1 file reformatted.
+            """
+        )
+        .encode("ascii", "backslashreplace")
+        .decode()
+    )
     assert expected_out == out
     assert expected_err == err
 
@@ -329,6 +340,7 @@ def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
         main(["black", path, "--nbqa-diff"])
 
     out, err = capsys.readouterr()
+    err = err.encode("ascii", "backslashreplace").decode()
     expected_out = f"""\
 \x1b[1mCell 3\x1b[0m
 ------
@@ -342,7 +354,17 @@ def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
 
 To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
 """
-    expected_err = ""
+    expected_err = (
+        dedent(
+            f"""\
+            reformatted {path}
+            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
+            1 file reformatted.
+            """
+        )
+        .encode("ascii", "backslashreplace")
+        .decode()
+    )
     assert expected_out == out
     assert expected_err == err
 
@@ -362,6 +384,103 @@ def test_black_works_with_literal_assignment(capsys: "CaptureFixture") -> None:
 
     with pytest.raises(SystemExit):
         main(["black", path])
+
+    out, err = capsys.readouterr()
+    expected_out = ""
+    expected_err = (
+        (
+            f"error: cannot format {path}: "
+            "cannot use --safe with this file; failed to parse source file.  AST error message: "
+            "can't assign to literal (<unknown>, cell_1:1)\nOh no! "
+            f"{COLLISION} {BROKEN_HEART} {COLLISION}\n1 file failed to reformat.\n"
+        )
+        .encode("ascii", "backslashreplace")
+        .decode()
+    )
+    # This is required because linux supports emojis
+    # so both should have \\ for comparison
+    err = err.encode("ascii", "backslashreplace").decode()
+
+    assert expected_out == out
+    assert expected_err == err
+
+
+def test_not_allowlisted_magic(capsys: "CaptureFixture") -> None:
+    """
+    Notebook contains magic which isn't in the default allowlist.
+    """
+    path = os.path.abspath(os.path.join("tests", "data", "non_default_magic.ipynb"))
+
+    with pytest.raises(SystemExit):
+        main(["black", path])
+
+    _, err = capsys.readouterr()
+    assert "1 file left unchanged" in err
+
+
+def test_allowlisted_magic(capsys: "CaptureFixture") -> None:
+    """
+    Notebook contains magic which is in the default allowlist.
+    """
+    path = os.path.abspath(os.path.join("tests", "data", "default_magic.ipynb"))
+    with pytest.raises(SystemExit):
+        main(["black", path, "--nbqa-diff"])
+    out, _ = capsys.readouterr()
+    expected = (
+        "\x1b[1mCell 1\x1b[0m\n"
+        "------\n"
+        f"--- {path}\n"
+        f"+++ {path}\n@@ -1,3 +1,3 @@\n"
+        " %%timeit\n"
+        " \n"
+        "\x1b[31m-a = 2 \n"
+        "\x1b[0m\x1b[32m+a = 2\n"
+        "\x1b[0m\n"
+        "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+    )
+    assert out == expected
+
+
+def test_process_cells_magic(capsys: "CaptureFixture") -> None:
+    """
+    Notebook contains non-allowlist magic, but it's in process_cells.
+    """
+    path = os.path.abspath(os.path.join("tests", "data", "non_default_magic.ipynb"))
+    with pytest.raises(SystemExit):
+        main(["black", path, "--nbqa-diff", "--nbqa-process-cells", "javascript"])
+
+    out, _ = capsys.readouterr()
+    expected = (
+        "\x1b[1mCell 1\x1b[0m\n"
+        "------\n"
+        f"--- {path}\n"
+        f"+++ {path}\n"
+        "@@ -1,3 +1,3 @@\n"
+        " %%javascript\n"
+        " \n"
+        "\x1b[31m-a = 2 \n"
+        "\x1b[0m\x1b[32m+a = 2\n"
+        "\x1b[0m\n"
+        "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+    )
+    assert out == expected
+
+
+def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
+    """
+    Check that using nbqa-diff when there's invalid syntax doesn't have empty output.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    path = os.path.abspath(
+        os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
+    )
+
+    with pytest.raises(SystemExit):
+        main(["black", path, "--nbqa-diff"])
 
     out, err = capsys.readouterr()
     expected_out = ""

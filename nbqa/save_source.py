@@ -28,30 +28,10 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 CODE_SEPARATOR = "# %%NBQA-CELL-SEP\n"
-MAGIC = [
-    "%%!",
-    "%%bash",
-    "%%cython",
-    "%%HTML",
-    "%%html",
-    "%%javascript",
-    "%%js",
-    "%%latex",
-    "%%markdown",
-    "%%perl",
-    "%%python2",
-    "%%ruby",
-    "%%script",
-    "%%sh",
-    "%%sx",
-    "%%system",
-    "%%SVG",
-    "%%svg",
-    "%%writefile",
-]
+MAGIC = ["time", "timeit", "capture", "pypy", "python", "python3"]
 NEWLINE = "\n"
-NEWLINES = defaultdict(lambda: NEWLINE * 2)
-NEWLINES["isort"] = NEWLINE
+NEWLINES = defaultdict(lambda: NEWLINE * 3)
+NEWLINES["isort"] = NEWLINE * 2
 
 
 def _is_src_code_indentation_valid(source: str) -> bool:
@@ -249,9 +229,6 @@ def _parse_cell(
     if substituted_magics:
         temporary_lines[cell_number] = substituted_magics
 
-    if not parsed_cell.endswith(NEWLINE):
-        parsed_cell = f"{parsed_cell}{NEWLINE}"
-
     return f"{parsed_cell}{NEWLINES[command]}"
 
 
@@ -299,7 +276,7 @@ def _get_line_numbers_for_mapping(
 
 
 def _should_ignore_code_cell(
-    source: Sequence[str], ignore_cells: Sequence[str]
+    source: Sequence[str], process_cells: Sequence[str]
 ) -> bool:
     """
     Return True if the current cell should be ignored from processing.
@@ -308,22 +285,28 @@ def _should_ignore_code_cell(
     ----------
     source
         Source from the notebook cell
-    ignore_cells
-        Extra cells which nbqa should ignore.
+    process_cells
+        Extra cells which nbqa should process.
 
     Returns
     -------
     bool
         True if the cell should ignored else False
     """
-    ignore = MAGIC + [i.strip() for i in ignore_cells]
-    return source != [] and any(source[0].lstrip().startswith(i) for i in ignore)
+    if not source:
+        return True
+    process = MAGIC + [i.strip() for i in process_cells]
+    magic_type = MagicHandler.get_ipython_magic_type(source[0])
+    if magic_type != IPythonMagicType.CELL:
+        return False
+    first_line = source[0].lstrip()
+    return first_line.split()[0] not in {f"%%{magic}" for magic in process}
 
 
 def main(
     notebook: "Path",
     temp_python_file: "Path",
-    ignore_cells: Sequence[str],
+    process_cells: Sequence[str],
     command: str,
 ) -> NotebookInfo:
     """
@@ -335,8 +318,8 @@ def main(
         Jupyter Notebook third-party tool is being run against.
     temp_python_file
         Temporary Python file to save converted notebook in.
-    ignore_cells
-        Extra cells which nbqa should ignore.
+    process_cells
+        Extra cells which nbqa should process.
     command
         The third-party tool being run.
 
@@ -359,7 +342,7 @@ def main(
         if cell["cell_type"] == "code":
             cell_number += 1
 
-            if _should_ignore_code_cell(cell["source"], ignore_cells):
+            if _should_ignore_code_cell(cell["source"], process_cells):
                 code_cells_to_ignore.add(cell_number)
                 continue
 

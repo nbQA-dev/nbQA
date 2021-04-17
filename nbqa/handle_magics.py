@@ -29,6 +29,7 @@ class IPythonMagicType(Enum):
     HELP = 1
     LINE = 2
     CELL = 3
+    NO_MAGIC = 4
 
 
 class MagicHandler(ABC):
@@ -191,11 +192,6 @@ class MagicHandler(ABC):
         -------
         Optional[IPythonMagicType]
             Type of the IPython magic
-
-        Raises
-        ------
-        RuntimeError
-            This shouldn't normally happen, it's just a defensive check.
         """
         python_code = INPUT_SPLITTER.transform_cell(ipython_magic)
         magic_type: Optional[IPythonMagicType] = None
@@ -203,10 +199,8 @@ class MagicHandler(ABC):
             if any(prefix in python_code for prefix in prefixes):
                 magic_type = magic
                 break
-        else:  # pragma: nocover
-            raise RuntimeError(
-                "Unreachable code reached - please report a bug at https://github.com/nbQA-dev/nbQA"
-            )
+        else:
+            magic_type = IPythonMagicType.NO_MAGIC
 
         return magic_type
 

@@ -66,7 +66,7 @@ Here's an example of how to set up some pre-commit hooks: put this in your `.pre
 
 ```yaml
 - repo: https://github.com/nbQA-dev/nbQA
-  rev: 0.5.9
+  rev: 0.6.1
   hooks:
     - id: nbqa-black
       additional_dependencies: [black==20.8b1]
@@ -112,14 +112,15 @@ See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html)
 Take some inspiration from their config files 😉
 
 - **alibi** [.pre-commit-config.yaml](https://github.com/SeldonIO/alibi/blob/master/.pre-commit-config.yaml)
-- **iminuit** [pyproject.toml](https://github.com/scikit-hep/iminuit/blob/develop/pyproject.toml) [.pre-commit-config.yaml](https://github.com/scikit-hep/iminuit/blob/develop/.pre-commit-config.yaml)
 - **intake-esm** [pyproject.toml](https://github.com/intake/intake-esm/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/intake/intake-esm/blob/master/.pre-commit-config.yaml)
 - **LiuAlgoTrader**: [requirements/dev.txt](https://github.com/amor71/LiuAlgoTrader/blob/master/liualgotrader/requirements/dev.txt)
 - **mplhep**: [pyproject.toml](https://github.com/scikit-hep/mplhep/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/scikit-hep/mplhep/blob/master/.pre-commit-config.yaml)
 - **NLP Profiler**: [pyproject.toml](https://github.com/neomatrix369/nlp_profiler/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/neomatrix369/nlp_profiler/blob/master/.pre-commit-config.yaml)
 - **pandas-profiling** [.pre-commit-config.yaml](https://github.com/pandas-profiling/pandas-profiling/blob/develop/.pre-commit-config.yaml)
+- **PlasmaPy** [.pre-commit-config.yaml](https://github.com/PlasmaPy/PlasmaPy/blob/master/.pre-commit-config.yaml)
 - **pyhf** [pyproject.toml](https://github.com/scikit-hep/pyhf/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/scikit-hep/pyhf/blob/master/.pre-commit-config.yaml)
 - **PyMC3**: [pyproject.toml](https://github.com/pymc-devs/pymc-examples/blob/main/pyproject.toml) [.pre-commit-config.yaml](https://github.com/pymc-devs/pymc-examples/blob/main/.pre-commit-config.yaml)
+- **pytorch-forecasting**: [pyproject.toml](https://github.com/jdb78/pytorch-forecasting/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/jdb78/pytorch-forecasting/blob/master/.pre-commit-config.yaml)
 - **Python compiled microcourse**: [.pre-commit-config.yaml](https://github.com/henryiii/python-compiled-minicourse/blob/master/.pre-commit-config.yaml)
 - **ruptures**: [.pre-commit-config.yaml](https://github.com/deepcharles/ruptures/blob/master/.pre-commit-config.yaml)
 - **sktime**: [.pre-commit-config.yaml](https://github.com/alan-turing-institute/sktime/blob/master/.pre-commit-config.yaml)
@@ -153,6 +154,10 @@ Everyone using Jupyter notebooks should be doing this.
 **Simon Brugman**, [Data scientist & pandas-profiling dev](https://github.com/nbQA-dev/nbQA/pull/490#issue-529173596):
 
 > nbQA helps us to keep notebooks to the same standards as the rest of the code. If you're serious about your code standards, you should keep them consistent across both notebooks and python scripts. Great addition to the ecosystem, thanks!
+
+**Bradley Dice**, [PhD Candidate in Physics & Scientific Computing](https://github.com/nbQA-dev/nbQA/pull/547#issuecomment-786186156):
+
+> nbqa is a clean, easy to use, and effective tool for notebook code style. Formatting and readability makes a huge difference when rendering notebooks in a project's documentation!
 
 ## 👥 Contributing
 
@@ -192,6 +197,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://nathancooper.io"><img src="https://avatars0.githubusercontent.com/u/7613470?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nathan Cooper</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Ancoop57" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/agruenberger"><img src="https://avatars.githubusercontent.com/u/30429454?v=4?s=100" width="100px;" alt=""/><br /><sub><b>agruenberger</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Aagruenberger" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/ravwojdyla"><img src="https://avatars.githubusercontent.com/u/1419010?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rafal Wojdyla</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Aravwojdyla" title="Bug reports">🐛</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://bradleydice.com"><img src="https://avatars.githubusercontent.com/u/3943761?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Bradley Dice</b></sub></a><br /><a href="#ideas-bdice" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/nbQA-dev/nbQA/commits?author=bdice" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/ivanmkc"><img src="https://avatars.githubusercontent.com/u/1586049?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ivan Cheung</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Aivanmkc" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
