@@ -112,6 +112,7 @@ See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html)
 Take some inspiration from their config files 😉
 
 - **alibi** [.pre-commit-config.yaml](https://github.com/SeldonIO/alibi/blob/master/.pre-commit-config.yaml)
+- **GoogleCloudPlatform/ai-platform-samples** [pyproject.toml](https://github.com/GoogleCloudPlatform/ai-platform-samples/blob/master/pyproject.toml)
 - **intake-esm** [pyproject.toml](https://github.com/intake/intake-esm/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/intake/intake-esm/blob/master/.pre-commit-config.yaml)
 - **LiuAlgoTrader**: [requirements/dev.txt](https://github.com/amor71/LiuAlgoTrader/blob/master/liualgotrader/requirements/dev.txt)
 - **mplhep**: [pyproject.toml](https://github.com/scikit-hep/mplhep/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/scikit-hep/mplhep/blob/master/.pre-commit-config.yaml)
@@ -124,6 +125,8 @@ Take some inspiration from their config files 😉
 - **Python compiled microcourse**: [.pre-commit-config.yaml](https://github.com/henryiii/python-compiled-minicourse/blob/master/.pre-commit-config.yaml)
 - **ruptures**: [.pre-commit-config.yaml](https://github.com/deepcharles/ruptures/blob/master/.pre-commit-config.yaml)
 - **sktime**: [.pre-commit-config.yaml](https://github.com/alan-turing-institute/sktime/blob/master/.pre-commit-config.yaml)
+
+Is your project missing? Let us know, or open a pull request!
 
 ## 💬 Testimonials
 
