@@ -74,6 +74,7 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
     # This is to ensure no additional warnings get generated apart
     # from the expected ones. This will also help to update the test when the
     # notebooks used for testing are modified later.
+    breakpoint()
     assert out.count(rf"{str(notebook1)}:cell_") == len(notebook1_expected_warnings)
     assert out.count(rf"{str(notebook2)}:cell_") == len(notebook2_expected_warnings)
 

@@ -78,23 +78,3 @@ def test_doctest_invalid_import(capsys: "CaptureFixture") -> None:
 
     _, err = capsys.readouterr()
     assert "ModuleNotFoundError: No module named 'thisdoesnotexist'" in err
-
-
-@pytest.mark.skipif(
-    sys.platform.startswith("win"), reason="Permission denied during CI"
-)
-def test_doctest_on_directory(capsys: "CaptureFixture") -> None:
-    """
-    Check that IsADirectoryError doesn't report temporary folder.
-
-    Parameters
-    ----------
-    capsys
-        Pytest fixture to capture stdout and stderr.
-    """
-    dir_ = os.path.join("tests", "data")
-    with pytest.raises(SystemExit):
-        main(["doctest", dir_])
-
-    _, err = capsys.readouterr()
-    assert f"IsADirectoryError: [Errno 21] Is a directory: '{dir_}'" in err

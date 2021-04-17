@@ -163,9 +163,7 @@ def _temp_python_file_for_notebook(
         If notebook doesn't exist.
     """
     if not notebook.exists():
-        raise FileNotFoundError(
-            f"{BOLD}No such file or directory: {str(notebook)}{RESET}"
-        )
+        raise FileNotFoundError( f"{BOLD}No such file or directory: {str(notebook)}{RESET}")
     new_stem = f"{notebook.stem}_{_hash_notebook(notebook.stem)}"
     new_parent = notebook.resolve().relative_to(project_root).parent
     relative_notebook_path = Path(f"{str(new_parent/new_stem)}.py")
@@ -175,7 +173,6 @@ def _temp_python_file_for_notebook(
 
 
 def _replace_temp_python_file_references_in_out_err(
-    tmpdirname: str,
     temp_python_file: Path,
     notebook: Path,
     out: str,
@@ -216,7 +213,7 @@ def _replace_temp_python_file_references_in_out_err(
         for path in [
             temp_python_file,
             temp_python_file.resolve(),
-            temp_python_file.relative_to(tmpdirname),
+            # temp_python_file.relative_to(tmpdirname),
         ]
     )
 
@@ -225,8 +222,8 @@ def _replace_temp_python_file_references_in_out_err(
         out = out.replace(path, notebook_path)
         err = err.replace(path, notebook_path)
 
-    out = out.replace(f"{tmpdirname}{os.sep}", "")
-    err = err.replace(f"{tmpdirname}{os.sep}", "")
+    # out = out.replace(f"{tmpdirname}{os.sep}", "")
+    # err = err.replace(f"{tmpdirname}{os.sep}", "")
 
     out = out.replace(temp_python_file.stem, notebook.stem)
     err = err.replace(temp_python_file.stem, notebook.stem)
@@ -287,7 +284,6 @@ def _preserve_config_files(
 
 def _get_arg(
     root_dir: str,
-    tmpdirname: str,
     nb_to_py_mapping: Mapping[Path, Path],
     project_root: Path,
 ) -> Path:
@@ -326,13 +322,12 @@ def _get_arg(
     'tmpdir/my_notebook.py'
     """
     if Path(root_dir).is_dir():
-        return Path(tmpdirname) / Path(root_dir).resolve().relative_to(project_root)
+        return Path(root_dir).resolve().relative_to(project_root)
     return nb_to_py_mapping[Path(root_dir)]
 
 
 def _get_all_args(
     root_dirs: Sequence[str],
-    tmpdirname: str,
     nb_to_py_mapping: Mapping[Path, Path],
     project_root: Path,
 ) -> Sequence[Path]:
@@ -355,7 +350,7 @@ def _get_all_args(
     Sequence[Path]
         All notebooks or directories to run third-party tool against.
     """
-    return [_get_arg(i, tmpdirname, nb_to_py_mapping, project_root) for i in root_dirs]
+    return [_get_arg(i, nb_to_py_mapping, project_root) for i in root_dirs]
 
 
 def _get_mtimes(arg: Path) -> Set[float]:
@@ -379,7 +374,6 @@ def _get_mtimes(arg: Path) -> Set[float]:
 
 def _run_command(
     command: str,
-    tmpdirname: str,
     cmd_args: Sequence[str],
     args: Sequence[Path],
 ) -> Tuple[str, str, int, bool]:
@@ -428,7 +422,6 @@ def _run_command(
         [sys.executable, "-m", command, *(str(i) for i in args), *cmd_args],
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
-        cwd=tmpdirname,
         env=env,
         universal_newlines=True,  # from Python3.7 this can be replaced with `text`
     )
@@ -529,32 +522,41 @@ def _run_on_one_root_dir(
         If third-party tool would've reformatted notebook but ``--nbqa-mutate``
         wasn't passed.
     """
-    with tempfile.TemporaryDirectory() as tmpdirname:
 
-        nb_to_py_mapping = {
-            notebook: _temp_python_file_for_notebook(notebook, tmpdirname, project_root)
-            for notebook in _get_all_notebooks(
-                cli_args.root_dirs, configs.nbqa_files, configs.nbqa_exclude
-            )
-        }
+    temp_fds = []
+    temp_notebooks = []
+    for notebook in _get_all_notebooks(cli_args.root_dirs, configs.nbqa_files, configs.nbqa_exclude):
+        if not notebook.exists():
+            raise FileNotFoundError( f"{BOLD}No such file or directory: {str(notebook)}{RESET}")
 
-        if not nb_to_py_mapping:
+        fd, path = tempfile.mkstemp(
+            dir=os.path.dirname(notebook.parent),
+            prefix=os.path.basename(notebook.stem),
+            suffix='.py',
+        )
+        temp_fds.append(fd)
+        temp_notebooks.append((notebook, Path(path)))
+    nb_to_py_mapping = dict(temp_notebooks)
+
+    try:
+
+        if not temp_notebooks:
             sys.stderr.write(
                 "No .ipynb notebooks found in given directories: "
                 f"{' '.join(i for i in cli_args.root_dirs if Path(i).is_dir())}\n"
             )
             return 0
 
-        config_files = (
-            [configs.nbqa_config]
-            if configs.nbqa_config
-            else CONFIG_FILES[cli_args.command]
-        )
-        _preserve_config_files(config_files, tmpdirname, project_root)
+        # config_files = (
+        #     [configs.nbqa_config]
+        #     if configs.nbqa_config
+        #     else CONFIG_FILES[cli_args.command]
+        # )
+        # _preserve_config_files(config_files, tmpdirname, project_root)
 
         nb_info_mapping: MutableMapping[Path, NotebookInfo] = {}
 
-        for notebook, temp_python_file in nb_to_py_mapping.items():
+        for notebook, temp_python_file in temp_notebooks:
             try:
                 nb_info_mapping[notebook] = save_source.main(
                     notebook,
@@ -567,20 +569,15 @@ def _run_on_one_root_dir(
                     BASE_ERROR_MESSAGE.format(f"Error parsing {str(notebook)}")
                 ) from exc
 
-            _create_blank_init_files(notebook, tmpdirname, project_root)
-
         out, err, output_code, mutated = _run_command(
             cli_args.command,
-            tmpdirname,
             configs.nbqa_addopts,
-            _get_all_args(
-                cli_args.root_dirs, tmpdirname, nb_to_py_mapping, project_root
-            ),
+            [i[1] for i in temp_notebooks],
         )
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(
-                tmpdirname, temp_python_file, notebook, out, err
+                temp_python_file, notebook, out, err
             )
             try:
                 out, err = map_python_line_to_nb_lines(
@@ -636,6 +633,10 @@ def _run_on_one_root_dir(
                     "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
                 )
             return output_code
+
+    finally:
+        for _, path  in temp_notebooks:
+            os.remove(path)
 
     return output_code
 
