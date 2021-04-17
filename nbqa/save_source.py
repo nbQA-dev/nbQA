@@ -306,6 +306,7 @@ def _should_ignore_code_cell(
 def main(
     notebook: "Path",
     temp_python_file: "Path",
+    fd,
     process_cells: Sequence[str],
     command: str,
 ) -> NotebookInfo:
@@ -364,7 +365,8 @@ def main(
             line_number += len(parsed_cell.splitlines())
 
     result_txt = "".join(result).rstrip(NEWLINE) + NEWLINE if result else ""
-    temp_python_file.write_text(result_txt, encoding="utf-8")
+    with open(fd, "w", encoding="utf-8") as f:
+        f.write(result_txt)
 
     return NotebookInfo(
         cell_mapping, trailing_semicolons, temporary_lines, code_cells_to_ignore

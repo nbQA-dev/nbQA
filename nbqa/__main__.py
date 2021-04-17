@@ -333,12 +333,12 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
                 f"{BOLD}No such file or directory: {str(notebook)}{RESET}"
             )
 
-        _, path = tempfile.mkstemp(
+        fd, path = tempfile.mkstemp(
             dir=str(notebook.parent),
             prefix=notebook.stem,
             suffix=".py",
         )
-        nb_to_py_mapping[notebook] = Path(path)
+        nb_to_py_mapping[notebook] = (Path(path), fd)
 
     try:  # pylint disable=R0912
 
@@ -351,11 +351,12 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
 
         nb_info_mapping: MutableMapping[Path, NotebookInfo] = {}
 
-        for notebook, temp_python_file in nb_to_py_mapping.items():
+        for notebook, (temp_python_file, fd) in nb_to_py_mapping.items():
             try:
                 nb_info_mapping[notebook] = save_source.main(
                     notebook,
                     temp_python_file,
+                    fd,
                     configs.nbqa_process_cells,
                     cli_args.command,
                 )
@@ -367,10 +368,10 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
         out, err, output_code, mutated = _run_command(
             cli_args.command,
             configs.nbqa_addopts,
-            list(nb_to_py_mapping.values()),
+            [i[0] for i in nb_to_py_mapping.values()],
         )
 
-        for notebook, temp_python_file in nb_to_py_mapping.items():
+        for notebook, (temp_python_file, fd) in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(
                 temp_python_file, notebook, out, err
             )
@@ -430,7 +431,7 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
             return output_code
 
     finally:
-        for tmp_path in nb_to_py_mapping.values():
+        for tmp_path, _ in nb_to_py_mapping.values():
             os.remove(str(tmp_path))
 
     return output_code
