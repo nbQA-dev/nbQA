@@ -21,6 +21,8 @@ from typing import (
     Tuple,
 )
 
+import tokenize_rt
+
 from nbqa.handle_magics import INPUT_SPLITTER, IPythonMagicType, MagicHandler
 from nbqa.notebook_info import NotebookInfo
 
@@ -303,6 +305,27 @@ def _should_ignore_code_cell(
     return first_line.split()[0] not in {f"%%{magic}" for magic in process}
 
 
+def _has_trailing_semicolon(src: str) -> bool:
+    """
+    Check if cell has trailing semicolon.
+
+    Parameters
+    ----------
+    src
+        Notebook cell source.
+
+    Returns
+    -------
+    bool
+        Whether notebook has trailing semicolon.
+    """
+    tokens = tokenize_rt.src_to_tokens(src)
+    token = tokens.pop()
+    while tokens and (not token.src.strip(" \n") or token.name == "COMMENT"):
+        token = tokens.pop()
+    return bool(token.name == "OP" and token.src == ";")
+
+
 def main(
     notebook: "Path",
     temp_python_file: "Path",
@@ -358,7 +381,7 @@ def main(
                     ).items()
                 }
             )
-            if parsed_cell.rstrip().endswith(";"):
+            if _has_trailing_semicolon(parsed_cell):
                 trailing_semicolons.add(cell_number)
             result.append(re.sub(r";(\s*)$", "\\1", parsed_cell))
             line_number += len(parsed_cell.splitlines())

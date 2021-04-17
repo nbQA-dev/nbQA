@@ -36,7 +36,8 @@ def test_isort_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     with open(tmp_notebook_for_testing) as handle:
         after = handle.readlines()
     diff = difflib.unified_diff(before, after)
-    result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
+    result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
+
     expected = dedent(
         """\
         +    "import glob\\n",
@@ -77,7 +78,8 @@ def test_isort_initial_md(
     with open(tmp_notebook_starting_with_md) as handle:
         after = handle.readlines()
     diff = difflib.unified_diff(before, after)
-    result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
+    result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
+
     expected = dedent(
         """\
         +    "import glob\\n",
@@ -159,16 +161,9 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: Path) ->
     with open(tmp_notebook_with_trailing_semicolon) as handle:
         after = handle.readlines()
     diff = difflib.unified_diff(before, after)
-    result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
-    expected = dedent(
-        """\
-        -    "import glob;\\n",
-        +    "import glob\\n",
-        -    "    pass;\\n",
-        -    " "
-        +    "    pass;"
-        """
-    )
+    result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
+
+    expected = '-    "import glob;\\n",\n+    "import glob\\n",\n'
     assert result == expected
 
 
@@ -212,3 +207,33 @@ def test_old_isort(monkeypatch: "MonkeyPatch") -> None:
 
     msg = "\x1b[1mnbqa only works with isort >= 5.3.0, while you have 4.3.21 installed.\x1b[0m"
     assert msg == str(excinfo.value)
+
+
+def test_comment_after_trailing_semicolons(capsys: "CaptureFixture") -> None:
+    """Check isort works when a notebook starts with a markdown cell."""
+    # check diff
+    path = os.path.abspath(
+        os.path.join("tests", "data", "comment_after_trailing_semicolon.ipynb")
+    )
+
+    with pytest.raises(SystemExit):
+        main(["isort", path, "--nbqa-diff"])
+
+    out, _ = capsys.readouterr()
+    expected_out = (
+        "\x1b[1mCell 1\x1b[0m\n"
+        "------\n"
+        f"--- {path}\n"
+        f"+++ {path}\n"
+        "@@ -1,4 +1,5 @@\n"
+        "\x1b[31m-import glob;\n"
+        "\x1b[0m\x1b[32m+import glob\n"
+        "\x1b[0m \n"
+        " import nbqa;\n"
+        "\x1b[32m+\n"
+        "\x1b[0m # this is a comment\n"
+        "\n"
+        f"Fixing {path}\n"
+        "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+    )
+    assert out == expected_out
