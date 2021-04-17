@@ -43,11 +43,6 @@ REPLACE_FUNCTION = {
 }
 
 
-def _hash_notebook(string: str) -> int:
-    """Hash notebook name into 8-digits."""
-    return abs(hash(string)) % (10 ** 8)
-
-
 class UnsupportedPackageVersionError(Exception):
     """Raise if installed module is older than minimum required version."""
 
@@ -135,44 +130,6 @@ def _get_all_notebooks(
     )
 
 
-def _temp_python_file_for_notebook(
-    notebook: Path, tmpdir: str, project_root: Path
-) -> Path:
-    """
-    Get temporary file to save converted notebook into.
-
-    Parameters
-    ----------
-    notebook
-        Notebook that third-party tool will be run on.
-    tmpdir
-        Temporary directory where converted notebooks will be saved.
-    project_root
-        Root of repository, where .git / .hg / .nbqa.ini file is.
-
-    Returns
-    -------
-    Path
-        Temporary Python file whose location mirrors that of the notebook, but
-        inside the temporary directory.
-
-    Raises
-    ------
-    FileNotFoundError
-        If notebook doesn't exist.
-    """
-    if not notebook.exists():
-        raise FileNotFoundError(
-            f"{BOLD}No such file or directory: {str(notebook)}{RESET}"
-        )
-    new_stem = f"{notebook.stem}_{_hash_notebook(notebook.stem)}"
-    new_parent = notebook.resolve().relative_to(project_root).parent
-    relative_notebook_path = Path(f"{str(new_parent/new_stem)}.py")
-    temp_python_file = Path(tmpdir) / relative_notebook_path
-    temp_python_file.parent.mkdir(parents=True, exist_ok=True)
-    return temp_python_file
-
-
 def _replace_temp_python_file_references_in_out_err(
     temp_python_file: Path,
     notebook: Path,
@@ -216,16 +173,14 @@ def _get_mtimes(arg: Path) -> Set[float]:
     Parameters
     ----------
     arg
-        Notebook or directory to run 3rd party tool on.
+        Notebook to run 3rd party tool on.
 
     Returns
     -------
     Set
         Modification times of any converted notebooks.
     """
-    if not arg.is_dir():
-        return {os.path.getmtime(str(arg))}
-    return {os.path.getmtime(str(i)) for i in arg.rglob("*.py")}
+    return {os.path.getmtime(str(arg))}
 
 
 def _run_command(
