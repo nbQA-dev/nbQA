@@ -4,6 +4,7 @@ Replace :code:`source` code cells of original notebook with ones from converted 
 The converted file will have had the third-party tool run against it by now.
 """
 
+import copy
 import json
 import sys
 from difflib import unified_diff
@@ -156,7 +157,7 @@ def _notebook_code_cells(
             yield cell
 
 
-def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> None:
+def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> bool:
     """
     Replace :code:`source` code cells of original notebook.
 
@@ -168,8 +169,14 @@ def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -
         Jupyter Notebook third-party tool is run against (unmodified).
     notebook_info
         Information about notebook cells used for processing
+
+    Returns
+    -------
+    bool
+        Whether mutation actually happened.
     """
     notebook_json = json.loads(notebook.read_text(encoding="utf-8"))
+    original_notebook_json = copy.deepcopy(notebook_json)
 
     pycells = _get_pycells(python_file)
     for code_cell_number, cell in enumerate(
@@ -179,14 +186,18 @@ def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -
             continue
         cell["source"] = _get_new_source(code_cell_number, notebook_info, next(pycells))
 
+    if original_notebook_json == notebook_json:
+        return False
+
     temp_notebook = python_file.parent / notebook.name
     temp_notebook.write_text(
         f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n", encoding="utf-8"
     )
     move(str(temp_notebook), str(notebook))
+    return True
 
 
-def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> None:
+def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> bool:
     """
     Print diff between cells, colouring as appropriate.
 
@@ -196,6 +207,11 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> None:
         Current cell number
     cell_diff
         Diff between original and new versions of cell.
+
+    Returns
+    -------
+    bool
+        Whether non-null diff was printed.
     """
     line_changes = []
     for line in cell_diff:
@@ -212,9 +228,11 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> None:
         header = f"Cell {code_cell_number}"
         headers = [f"{BOLD}{header}{RESET}\n", f"{'-'*len(header)}\n"]
         sys.stdout.writelines(headers + line_changes + ["\n"])
+        return True
+    return False
 
 
-def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> None:
+def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> bool:
     """
     View diff between new source of code cells and original sources.
 
@@ -226,10 +244,17 @@ def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> 
         Jupyter Notebook third-party tool is run against (unmodified).
     notebook_info
         Information about notebook cells used for processing
+
+    Returns
+    -------
+    bool
+        Whether non-null diff was produced.
     """
     notebook_json = json.loads(notebook.read_text(encoding="utf-8"))
 
     pycells = _get_pycells(python_file)
+
+    actually_mutated = False
 
     for code_cell_number, cell in enumerate(
         _notebook_code_cells(notebook_json), start=1
@@ -245,4 +270,5 @@ def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> 
             fromfile=str(notebook),
             tofile=str(notebook),
         )
-        _print_diff(code_cell_number, cell_diff)
+        actually_mutated = _print_diff(code_cell_number, cell_diff) or actually_mutated
+    return actually_mutated

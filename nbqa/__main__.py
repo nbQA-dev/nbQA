@@ -18,7 +18,7 @@ from nbqa.config.config import CONFIG_FILES, Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
-from nbqa.output_parser import map_python_line_to_nb_lines
+from nbqa.output_parser import Output, map_python_line_to_nb_lines
 from nbqa.text import BOLD, RESET
 
 BASE_ERROR_MESSAGE = dedent(
@@ -180,7 +180,7 @@ def _replace_temp_python_file_references_in_out_err(
     notebook: Path,
     out: str,
     err: str,
-) -> Tuple[str, str]:
+) -> Output:
     """
     Replace references to temporary Python file with references to notebook.
 
@@ -199,10 +199,8 @@ def _replace_temp_python_file_references_in_out_err(
 
     Returns
     -------
-    out
-        Stdout with temporary directory replaced by current working directory.
-    err
-        Stderr with temporary directory replaced by current working directory.
+    Output
+        Stdout, stderr with temporary directory replaced by current working directory.
     """
     # 1. Relative path is used because some tools like pylint always report only
     # the relative path of the file(relative to project root),
@@ -231,7 +229,7 @@ def _replace_temp_python_file_references_in_out_err(
     out = out.replace(temp_python_file.stem, notebook.stem)
     err = err.replace(temp_python_file.stem, notebook.stem)
 
-    return out, err
+    return Output(out, err)
 
 
 def _create_blank_init_files(
@@ -382,7 +380,7 @@ def _run_command(
     tmpdirname: str,
     cmd_args: Sequence[str],
     args: Sequence[Path],
-) -> Tuple[str, str, int, bool]:
+) -> Tuple[Output, int, bool]:
     """
     Run third-party tool against given file or directory.
 
@@ -399,10 +397,8 @@ def _run_command(
 
     Returns
     -------
-    out
-        Captured stdout from running third-party tool.
-    err
-        Captured stderr from running third-party tool.
+    output
+        Captured stdout, stderr from running third-party tool.
     output_code
         Return code from third-party tool.
     mutated
@@ -440,7 +436,7 @@ def _run_command(
     out = output.stdout
     err = output.stderr
 
-    return out, err, output_code, mutated
+    return Output(out, err), output_code, mutated
 
 
 def _get_command_not_found_msg(command: str) -> str:
@@ -569,7 +565,7 @@ def _run_on_one_root_dir(
 
             _create_blank_init_files(notebook, tmpdirname, project_root)
 
-        out, err, output_code, mutated = _run_command(
+        output, output_code, mutated = _run_command(
             cli_args.command,
             tmpdirname,
             configs.nbqa_addopts,
@@ -578,15 +574,16 @@ def _run_on_one_root_dir(
             ),
         )
 
+        actually_mutated = False
         for notebook, temp_python_file in nb_to_py_mapping.items():
-            out, err = _replace_temp_python_file_references_in_out_err(
-                tmpdirname, temp_python_file, notebook, out, err
+            output = _replace_temp_python_file_references_in_out_err(
+                tmpdirname, temp_python_file, notebook, output.out, output.err
             )
             try:
-                out, err = map_python_line_to_nb_lines(
+                output = map_python_line_to_nb_lines(
                     cli_args.command,
-                    out,
-                    err,
+                    output.out,
+                    output.err,
                     notebook,
                     nb_info_mapping[notebook].cell_mappings,
                 )
@@ -615,10 +612,13 @@ def _run_on_one_root_dir(
                     raise SystemExit(msg)
 
                 try:
-                    REPLACE_FUNCTION[configs.nbqa_diff](
-                        temp_python_file,
-                        notebook,
-                        nb_info_mapping[notebook],
+                    actually_mutated = (
+                        REPLACE_FUNCTION[configs.nbqa_diff](
+                            temp_python_file,
+                            notebook,
+                            nb_info_mapping[notebook],
+                        )
+                        or actually_mutated
                     )
                 except Exception as exc:
                     raise RuntimeError(
@@ -627,8 +627,12 @@ def _run_on_one_root_dir(
                         )
                     ) from exc
 
-        sys.stdout.write(out)
-        sys.stderr.write(err)
+        sys.stdout.write(output.out)
+        sys.stderr.write(output.err)
+
+        if mutated and not actually_mutated:
+            output_code = 0
+            mutated = False
 
         if configs.nbqa_diff:
             if mutated:
