@@ -382,7 +382,7 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
                     notebook,
                     nb_info_mapping[notebook].cell_mappings,
                 )
-            except Exception as exc:  # pylint: disable=W0703
+            except Exception as exc:  # pylint: disable=W0703  # pragma: nocover
                 msg = (
                     f"{repr(exc)} while parsing output "
                     f"from applying {cli_args.command} to {str(notebook)}"

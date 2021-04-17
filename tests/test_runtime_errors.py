@@ -119,33 +119,6 @@ def test_unable_to_parse() -> None:
     assert message in str(excinfo.value)
 
 
-@pytest.mark.usefixtures("tmp_print_6174")
-def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
-    """
-    Check user is encouraged to report bug if we're unable to parse tool's output.
-
-    Parameters
-    ----------
-    capsys
-        Pytest fixture to capture stdout and stderr.
-    """
-    path = Path("tests") / "data/notebook_for_testing.ipynb"
-    expected_err = dedent(
-        """\
-        \x1b\\[1mKeyError(.*) while parsing output from applying print_6174 to \
-tests.data.notebook_for_testing\\.ipynb
-        Please report a bug at https://github\\.com/nbQA\\-dev/nbQA/issues \x1b\\[0m
-        """
-    )
-    expected_out = f"{str(path)}:6174:0 some silly warning\n"
-    with pytest.raises(SystemExit):
-        main(["print_6174", str(path), "--nbqa-mutate"])
-    out, err = capsys.readouterr()
-    re.match(expected_err, err)
-    expected_out = f"{os.path.abspath(path)}:6174:0 some silly warning\n"
-    assert expected_out == out
-
-
 def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
     """
     Check sensible error message is returned if none of the directories passed have notebooks.
