@@ -84,11 +84,8 @@ def map_python_line_to_nb_lines(
 
     Returns
     -------
-    str
-        Stdout with references to temporary Python file's lines replaced with references
-        to notebook's cells and lines.
-    str
-        Stderr with references to temporary Python file's lines replaced with references
+    Output
+        Stdout, stderr with references to temporary Python file's lines replaced with references
         to notebook's cells and lines.
     """
     patterns = _get_pattern(notebook, command, cell_mapping)
