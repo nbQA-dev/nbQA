@@ -1,20 +1,19 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
 import os
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
 from importlib import import_module
 from pathlib import Path
 from textwrap import dedent
-from typing import Iterator, Mapping, MutableMapping, Optional, Sequence, Set, Tuple
+from typing import Iterator, MutableMapping, Optional, Sequence, Set, Tuple
 
 from pkg_resources import parse_version
 
 from nbqa import config_parser, replace_source, save_source
 from nbqa.cmdline import CLIArgs
-from nbqa.config.config import CONFIG_FILES, Configs
+from nbqa.config.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
@@ -163,7 +162,9 @@ def _temp_python_file_for_notebook(
         If notebook doesn't exist.
     """
     if not notebook.exists():
-        raise FileNotFoundError( f"{BOLD}No such file or directory: {str(notebook)}{RESET}")
+        raise FileNotFoundError(
+            f"{BOLD}No such file or directory: {str(notebook)}{RESET}"
+        )
     new_stem = f"{notebook.stem}_{_hash_notebook(notebook.stem)}"
     new_parent = notebook.resolve().relative_to(project_root).parent
     relative_notebook_path = Path(f"{str(new_parent/new_stem)}.py")
@@ -183,8 +184,6 @@ def _replace_temp_python_file_references_in_out_err(
 
     Parameters
     ----------
-    tmpdirname
-        Temporary directory used for converting notebooks to python files
     temp_python_file
         Temporary Python file where notebook was converted to.
     notebook
@@ -201,156 +200,13 @@ def _replace_temp_python_file_references_in_out_err(
     err
         Stderr with temporary directory replaced by current working directory.
     """
-    # 1. Relative path is used because some tools like pylint always report only
-    # the relative path of the file(relative to project root),
-    # though absolute path was passed as the input.
-    # 2. This `resolve()` part is necessary to handle cases when the path used
-    # is a symlink as well as no normalize the path.
-    # I couldn't reproduce this locally, but during CI, on the Windows job, I found
-    # that VSSADM~1 was changing into VssAdministrator.
-    paths = (
-        str(path)
-        for path in [
-            temp_python_file,
-            temp_python_file.resolve(),
-            # temp_python_file.relative_to(tmpdirname),
-        ]
-    )
-
-    notebook_path = str(notebook)
-    for path in paths:
-        out = out.replace(path, notebook_path)
-        err = err.replace(path, notebook_path)
-
-    # out = out.replace(f"{tmpdirname}{os.sep}", "")
-    # err = err.replace(f"{tmpdirname}{os.sep}", "")
+    out = out.replace(temp_python_file.name, str(notebook.stem) + ".ipynb")
+    err = err.replace(temp_python_file.name, str(notebook.stem) + ".ipynb")
 
     out = out.replace(temp_python_file.stem, notebook.stem)
     err = err.replace(temp_python_file.stem, notebook.stem)
 
     return out, err
-
-
-def _create_blank_init_files(
-    notebook: Path, tmpdirname: str, project_root: Path
-) -> None:
-    """
-    Replicate local (possibly blank) __init__ files to temporary directory.
-
-    Parameters
-    ----------
-    notebook
-        Notebook third-party tool is being run against.
-    tmpdirname
-        Temporary directory to store converted notebooks in.
-    project_root
-        Root of repository, where .git / .hg / .nbqa.ini file is.
-    """
-    parts = notebook.resolve().relative_to(project_root).parts
-
-    for idx in range(1, len(parts)):
-        init_file = Path(os.path.join(*parts[:idx])) / "__init__.py"
-        Path(tmpdirname).joinpath(init_file).parent.mkdir(parents=True, exist_ok=True)
-        Path(tmpdirname).joinpath(init_file).touch()
-
-
-def _preserve_config_files(
-    config_files: Sequence[str], tmpdirname: str, project_root: Path
-) -> None:
-    """
-    Copy local config file to temporary directory.
-
-    Parameters
-    ----------
-    config_files
-        Config files for third-party tool (e.g. mypy).
-    tmpdirname
-        Temporary directory to store converted notebooks in.
-    project_root
-        Root of repository, where .git / .hg / .nbqa.ini file is.
-    """
-    for config_file in config_files:
-        config_file_path = project_root / config_file
-        if config_file_path.exists():
-            target_location = Path(tmpdirname) / config_file_path.resolve().relative_to(
-                project_root
-            )
-            target_location.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy(
-                str(config_file_path),
-                str(target_location),
-            )
-
-
-def _get_arg(
-    root_dir: str,
-    nb_to_py_mapping: Mapping[Path, Path],
-    project_root: Path,
-) -> Path:
-    """
-    Get argument to run command against.
-
-    If running against a single notebook, it'll be the filepath of the converted
-    notebook in the temporary directory.
-    If running against a directory, it'll be the directory mirrored in the temporary
-    directory.
-
-    Parameters
-    ----------
-    root_dir
-        Notebook or directory third-party tool is being run against.
-    tmpdirname
-        Temporary directory where converted notebooks are stored.
-    nb_to_py_mapping
-        Mapping between notebooks and Python files corresponding to converted notebooks.
-    project_root
-        Root of repository, where .git / .hg / .nbqa.ini file is.
-
-    Returns
-    -------
-    Path
-        Notebook or directory to run third-party tool against.
-
-    Examples
-    --------
-    >>> root_dir = "root_dir"
-    >>> tmpdirname = "tmpdir"
-    >>> nb_to_py_mapping = {
-    ...     Path('my_notebook.ipynb'): Path('tmpdir').joinpath('my_notebook.py')
-    ... }
-    >>> _get_arg(root_dir, tmpdirname, nb_to_py_mapping).as_posix()
-    'tmpdir/my_notebook.py'
-    """
-    if Path(root_dir).is_dir():
-        return Path(root_dir).resolve().relative_to(project_root)
-    return nb_to_py_mapping[Path(root_dir)]
-
-
-def _get_all_args(
-    root_dirs: Sequence[str],
-    nb_to_py_mapping: Mapping[Path, Path],
-    project_root: Path,
-) -> Sequence[Path]:
-    """
-    Get all arguments to run command against.
-
-    Parameters
-    ----------
-    root_dirs
-        All notebooks or directories third-party tool is being run against.
-    tmpdirname
-        Temporary directory where converted notebooks are stored.
-    nb_to_py_mapping
-        Mapping between notebooks and Python files corresponding to converted notebooks.
-    project_root
-        Root of repository, where .git / .hg / .nbqa.ini file is.
-
-    Returns
-    -------
-    Sequence[Path]
-        All notebooks or directories to run third-party tool against.
-    """
-    return [_get_arg(i, nb_to_py_mapping, project_root) for i in root_dirs]
 
 
 def _get_mtimes(arg: Path) -> Set[float]:
@@ -384,8 +240,6 @@ def _run_command(
     ----------
     command
         Third-party tool (e.g. :code:`mypy`) to run against notebook.
-    tmpdirname
-        Temporary directory where converted notebooks will be stored.
     cmd_args
         Flags to pass to third-party tool (e.g. :code:`--verbose`).
     args
@@ -407,22 +261,12 @@ def _run_command(
     ValueError
         If third-party tool isn't found in system.
     """
-    env = os.environ.copy()
-    env[
-        "MYPYPATH"
-    ] = f"{env.get('MYPYPATH', '').rstrip(os.pathsep)}{os.pathsep}{os.getcwd()}"
-
-    env[
-        "PYTHONPATH"
-    ] = f"{env.get('PYTHONPATH', '').rstrip(os.pathsep)}{os.pathsep}{os.getcwd()}"
-
     before = [_get_mtimes(i) for i in args]
 
     output = subprocess.run(
         [sys.executable, "-m", command, *(str(i) for i in args), *cmd_args],
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
-        env=env,
         universal_newlines=True,  # from Python3.7 this can be replaced with `text`
     )
 
@@ -494,8 +338,8 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     return cli_config.merge(Configs.get_default_config(cli_args.command))
 
 
-def _run_on_one_root_dir(
-    cli_args: CLIArgs, configs: Configs, project_root: Path
+def _run_on_one_root_dir(  # pylint: disable=R0912
+    cli_args: CLIArgs, configs: Configs
 ) -> int:
     """
     Run third-party tool on a single notebook or directory.
@@ -506,8 +350,6 @@ def _run_on_one_root_dir(
         Commanline arguments passed to nbqa.
     configs
         Configuration passed to nbqa from commandline or via a config file
-    project_root
-        Root of repository, where .git / .hg / .nbqa.ini file is.
 
     Returns
     -------
@@ -521,42 +363,40 @@ def _run_on_one_root_dir(
     SystemExit
         If third-party tool would've reformatted notebook but ``--nbqa-mutate``
         wasn't passed.
+
+    Raises
+    ------
+    FileNotFoundError
+        If notebook which doesn't exist is passed.
     """
-
-    temp_fds = []
-    temp_notebooks = []
-    for notebook in _get_all_notebooks(cli_args.root_dirs, configs.nbqa_files, configs.nbqa_exclude):
+    nb_to_py_mapping = {}
+    for notebook in _get_all_notebooks(
+        cli_args.root_dirs, configs.nbqa_files, configs.nbqa_exclude
+    ):
         if not notebook.exists():
-            raise FileNotFoundError( f"{BOLD}No such file or directory: {str(notebook)}{RESET}")
+            raise FileNotFoundError(
+                f"{BOLD}No such file or directory: {str(notebook)}{RESET}"
+            )
 
-        fd, path = tempfile.mkstemp(
-            dir=os.path.dirname(notebook.parent),
-            prefix=os.path.basename(notebook.stem),
-            suffix='.py',
+        _, path = tempfile.mkstemp(
+            dir=str(notebook.parent),
+            prefix=notebook.stem,
+            suffix=".py",
         )
-        temp_fds.append(fd)
-        temp_notebooks.append((notebook, Path(path)))
-    nb_to_py_mapping = dict(temp_notebooks)
+        nb_to_py_mapping[notebook] = Path(path)
 
-    try:
+    try:  # pylint disable=R0912
 
-        if not temp_notebooks:
+        if not nb_to_py_mapping:
             sys.stderr.write(
                 "No .ipynb notebooks found in given directories: "
                 f"{' '.join(i for i in cli_args.root_dirs if Path(i).is_dir())}\n"
             )
             return 0
 
-        # config_files = (
-        #     [configs.nbqa_config]
-        #     if configs.nbqa_config
-        #     else CONFIG_FILES[cli_args.command]
-        # )
-        # _preserve_config_files(config_files, tmpdirname, project_root)
-
         nb_info_mapping: MutableMapping[Path, NotebookInfo] = {}
 
-        for notebook, temp_python_file in temp_notebooks:
+        for notebook, temp_python_file in nb_to_py_mapping.items():
             try:
                 nb_info_mapping[notebook] = save_source.main(
                     notebook,
@@ -572,7 +412,7 @@ def _run_on_one_root_dir(
         out, err, output_code, mutated = _run_command(
             cli_args.command,
             configs.nbqa_addopts,
-            [i[1] for i in temp_notebooks],
+            list(nb_to_py_mapping.values()),
         )
 
         for notebook, temp_python_file in nb_to_py_mapping.items():
@@ -635,8 +475,8 @@ def _run_on_one_root_dir(
             return output_code
 
     finally:
-        for _, path  in temp_notebooks:
-            os.remove(path)
+        for tmp_path in nb_to_py_mapping.values():
+            os.remove(str(tmp_path))
 
     return output_code
 
@@ -689,7 +529,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     configs: Configs = _get_configs(cli_args, project_root)
     configs.validate()
 
-    output_code = _run_on_one_root_dir(cli_args, configs, project_root)
+    output_code = _run_on_one_root_dir(cli_args, configs)
 
     sys.exit(output_code)
 

@@ -21,9 +21,7 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     # Pass one file with absolute path and the other one with relative path
-    notebook1 = os.path.abspath(
-        os.path.join("tests", "data", "notebook_for_testing.ipynb")
-    )
+    notebook1 = os.path.join("tests", "data", "notebook_for_testing.ipynb")
     notebook2 = os.path.join("tests", "data", "notebook_with_indented_magics.ipynb")
 
     with pytest.raises(SystemExit):
@@ -74,7 +72,6 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
     # This is to ensure no additional warnings get generated apart
     # from the expected ones. This will also help to update the test when the
     # notebooks used for testing are modified later.
-    breakpoint()
     assert out.count(rf"{str(notebook1)}:cell_") == len(notebook1_expected_warnings)
     assert out.count(rf"{str(notebook2)}:cell_") == len(notebook2_expected_warnings)
 

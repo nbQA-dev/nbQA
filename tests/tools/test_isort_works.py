@@ -89,7 +89,7 @@ def test_isort_initial_md(
 
     # check out and err
     out, err = capsys.readouterr()
-    expected_out = f"Fixing {path}\n"
+    expected_out = f"Fixing {os.path.abspath(path)}\n"
     expected_err = ""
     assert out == expected_out
     assert err == expected_err

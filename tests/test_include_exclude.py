@@ -27,7 +27,7 @@ def test_cli_files(capsys: "CaptureFixture") -> None:
 
     out, _ = capsys.readouterr()
     assert out and all(
-        re.search(r"^tests.data.notebook_for", i) for i in out.splitlines()
+        re.search(r"tests.data.notebook_for", i) for i in out.splitlines()
     )
 
 
@@ -73,7 +73,7 @@ def test_config_files(capsys: "CaptureFixture") -> None:
 
     out, _ = capsys.readouterr()
     assert out and all(
-        re.search(r"^tests.data.notebook_for", i) for i in out.splitlines()
+        re.search(r"tests.data.notebook_for", i) for i in out.splitlines()
     )
 
 

@@ -142,6 +142,7 @@ tests.data.notebook_for_testing\\.ipynb
         main(["print_6174", str(path), "--nbqa-mutate"])
     out, err = capsys.readouterr()
     re.match(expected_err, err)
+    expected_out = f"{os.path.abspath(path)}:6174:0 some silly warning\n"
     assert expected_out == out
 
 

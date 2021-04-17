@@ -1,7 +1,6 @@
 """Check that running :code:`doctest` works."""
 
 import os
-import sys
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
@@ -43,10 +42,11 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
     # check out and err
     out, err = capsys.readouterr()
 
+    # pylint: disable=C0301
     expected_out = dedent(
         f"""\
         **********************************************************************
-        File "{WRONG_EXAMPLE_NOTEBOOK}", cell_2:10, in notebook_for_testing_copy.hello
+        File "{os.path.abspath(WRONG_EXAMPLE_NOTEBOOK)}", cell_2:10, in notebook_for_testing_copy.hello
         Failed example:
             hello("goodbye")
         Expected:
@@ -59,7 +59,7 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
         ***Test Failed*** 1 failures.
         """
     )
-
+    # pylint: enable=C0301
     assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
     assert err == ""
 

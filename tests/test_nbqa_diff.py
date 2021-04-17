@@ -64,7 +64,7 @@ To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
     expected_err = (
         dedent(
             f"""\
-            reformatted {str(DIRTY_NOTEBOOK)}
+            reformatted {os.path.abspath(str(DIRTY_NOTEBOOK))}
             All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
             1 file reformatted.
             """
