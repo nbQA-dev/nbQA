@@ -229,24 +229,14 @@ def test_black_works_with_multiline(
     assert expected_err == err
 
 
-def test_black_multiple_files(tmp_test_data: Path) -> None:
-    """
-    Check black works when running on a directory. Should reformat notebooks.
-
-    Parameters
-    ----------
-    tmp_test_data
-        Temporary copy of test data.
-    """
-    # check diff
-    with open(str(tmp_test_data / "notebook_for_testing.ipynb")) as handle:
-        before = handle.readlines()
+def test_black_multiple_files(capsys: "CaptureFixture") -> None:
+    """Check black works when running on a directory. Should reformat notebooks."""
     path = os.path.abspath(os.path.join("tests", "data"))
 
     Path("setup.cfg").write_text(
         dedent(
             """\
-            [nbqa.mutate]
+            [nbqa.diff]
             black=1
             """
         )
@@ -254,11 +244,9 @@ def test_black_multiple_files(tmp_test_data: Path) -> None:
     with pytest.raises(SystemExit):
         main(["black", path])
     Path("setup.cfg").unlink()
-    with open(str(tmp_test_data / "notebook_for_testing.ipynb")) as handle:
-        after = handle.readlines()
 
-    diff = difflib.unified_diff(before, after)
-    assert "".join(diff) != ""
+    out, _ = capsys.readouterr()
+    assert out != ""
 
 
 def test_successive_runs_using_black(tmpdir: "LocalPath") -> None:
