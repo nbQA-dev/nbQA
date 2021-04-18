@@ -109,6 +109,7 @@ def test_unable_to_parse(capsys: "CaptureFixture") -> None:
     path = Path("tests") / "data/invalid_notebook.ipynb"
     path.write_text("foo")
     main(["flake8", str(path), "--nbqa-mutate"])
+    path.unlink()
     message = f"Error parsing {str(path)}"
     _, err = capsys.readouterr()
     assert message in err

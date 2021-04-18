@@ -346,7 +346,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     configs.nbqa_process_cells,
                     cli_args.command,
                 )
-            except Exception:  # pragma: nocover  # pylint: disable=W0703
+            except Exception:  # pylint: disable=W0703
                 sys.stderr.write(
                     BASE_ERROR_MESSAGE.format(f"Error parsing {str(notebook)}")
                 )
@@ -370,7 +370,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     notebook,
                     nb_info_mapping[notebook].cell_mappings,
                 )
-            except Exception as exc:  # pylint: disable=W0703  # pragma: nocover
+            except Exception as exc:  # pylint: disable=W0703
                 msg = (
                     f"{repr(exc)} while parsing output "
                     f"from applying {cli_args.command} to {str(notebook)}"

@@ -41,7 +41,7 @@ def test_cli_exclude(capsys: "CaptureFixture") -> None:
 
     out, _ = capsys.readouterr()
     assert out and all(
-        re.search(r"^tests.data.notebook_for", i) is None for i in out.splitlines()
+        re.search(r"tests.data.notebook_for", i) is None for i in out.splitlines()
     )
 
 
@@ -95,5 +95,5 @@ def test_config_exclude(capsys: "CaptureFixture") -> None:
 
     out, _ = capsys.readouterr()
     assert out and all(
-        re.search(r"^tests.data.notebook_for", i) is None for i in out.splitlines()
+        re.search(r"tests.data.notebook_for", i) is None for i in out.splitlines()
     )
