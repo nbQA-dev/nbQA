@@ -371,7 +371,7 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
             [i[1] for i in nb_to_py_mapping.values()],
         )
 
-        for notebook, (file_descriptor, temp_python_file) in nb_to_py_mapping.items():
+        for notebook, (_, temp_python_file) in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(
                 temp_python_file, notebook, out, err
             )
