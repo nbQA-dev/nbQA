@@ -166,7 +166,7 @@ def _replace_temp_python_file_references_in_out_err(
     return out, err
 
 
-def _get_mtimes(arg: Path) -> Set[float]:
+def _get_mtimes(arg: str) -> Set[float]:
     """
     Get the modification times of any converted notebooks.
 
@@ -180,13 +180,13 @@ def _get_mtimes(arg: Path) -> Set[float]:
     Set
         Modification times of any converted notebooks.
     """
-    return {os.path.getmtime(str(arg))}
+    return {os.path.getmtime(arg)}
 
 
 def _run_command(
     command: str,
     cmd_args: Sequence[str],
-    args: Sequence[Path],
+    args: Sequence[str],
 ) -> Tuple[str, str, int, bool]:
     """
     Run third-party tool against given file or directory.
@@ -219,7 +219,7 @@ def _run_command(
     before = [_get_mtimes(i) for i in args]
 
     output = subprocess.run(
-        [sys.executable, "-m", command, *(str(i) for i in args), *cmd_args],
+        [sys.executable, "-m", command, *args, *cmd_args],
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         universal_newlines=True,  # from Python3.7 this can be replaced with `text`
@@ -366,7 +366,7 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
         out, err, output_code, mutated = _run_command(
             cli_args.command,
             configs.nbqa_addopts,
-            [Path(i[1]) for i in nb_to_py_mapping.values()],
+            [i[1] for i in nb_to_py_mapping.values()],
         )
 
         for notebook, (file_descriptor, temp_python_file) in nb_to_py_mapping.items():
