@@ -4,7 +4,6 @@ import os
 import re
 import subprocess
 import sys
-from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
@@ -106,15 +105,6 @@ def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") ->
         universal_newlines=True,  # from Python3.7 this can be replaced with `text`
     )
     assert re.search(message, str(output.stderr))
-
-
-def test_unable_to_parse() -> None:
-    """Check error message shows if we're unable to parse notebook."""
-    path = Path("tests") / "invalid_data/invalid_notebook.ipynb"
-    message = f"Error parsing {str(path)}"
-    with pytest.raises(RuntimeError) as excinfo:
-        main(["flake8", str(path), "--nbqa-diff"])
-    assert message in str(excinfo.value)
 
 
 def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
