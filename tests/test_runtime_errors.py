@@ -87,6 +87,7 @@ def test_unable_to_reconstruct_message(capsys: "CaptureFixture") -> None:
 def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") -> None:
     """
     Same as ``test_unable_to_reconstruct_message`` but we check ``PYTHONPATH`` updates correctly.
+
     Parameters
     ----------
     monkeypatch
