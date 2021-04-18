@@ -1,19 +1,10 @@
 """Module responsible for storing and handling nbqa configuration."""
 
+import collections
 from pathlib import Path
 from shlex import split
 from textwrap import dedent
-from typing import (
-    Any,
-    Callable,
-    ClassVar,
-    Dict,
-    Mapping,
-    NamedTuple,
-    Optional,
-    Sequence,
-    Union,
-)
+from typing import Any, Callable, ClassVar, Dict, Mapping, Optional, Sequence, Union
 
 import toml
 from pkg_resources import resource_filename
@@ -23,17 +14,48 @@ from nbqa.cmdline import CLIArgs
 ConfigParser = Callable[[str], Union[str, bool, Sequence[str]]]
 
 
-class _ConfigSections(NamedTuple):  # pylint: disable=R0903
-    """Stores all the config section names."""
+class _ConfigSections(
+    collections.namedtuple(
+        "_ConfigSections",
+        (
+            "ADDOPTS",
+            "CONFIG",
+            "IGNORE_CELLS",
+            "PROCESS_CELLS",
+            "MUTATE",
+            "DIFF",
+            "FILES",
+            "EXCLUDE",
+        ),
+    )
+):
+    """Config sections."""
 
-    ADDOPTS: str = "addopts"
-    CONFIG: str = "config"
-    IGNORE_CELLS: str = "ignore_cells"
-    PROCESS_CELLS: str = "process_cells"
-    MUTATE: str = "mutate"
-    DIFF: str = "diff"
-    FILES: str = "files"
-    EXCLUDE: str = "exclude"
+    __slots__ = ()
+
+    def __new__(  # pylint: disable=R0913
+        cls,
+        ADDOPTS: str = "addopts",
+        CONFIG: str = "config",
+        IGNORE_CELLS: str = "ignore_cells",
+        PROCESS_CELLS: str = "process_cells",
+        MUTATE: str = "mutate",
+        DIFF: str = "diff",
+        FILES: str = "files",
+        EXCLUDE: str = "exclude",
+    ) -> "_ConfigSections":
+        """Python3.6.0 doesn't support defaults for namedtuples."""
+        return super().__new__(
+            cls,
+            ADDOPTS,
+            CONFIG,
+            IGNORE_CELLS,
+            PROCESS_CELLS,
+            MUTATE,
+            DIFF,
+            FILES,
+            EXCLUDE,
+        )
 
 
 CONFIG_SECTIONS = _ConfigSections()
