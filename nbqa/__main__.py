@@ -131,7 +131,7 @@ def _get_all_notebooks(
 
 
 def _replace_temp_python_file_references_in_out_err(
-    temp_python_file: Path,
+    temp_python_file: str,
     notebook: Path,
     out: str,
     err: str,
@@ -157,11 +157,13 @@ def _replace_temp_python_file_references_in_out_err(
     err
         Stderr with temporary directory replaced by current working directory.
     """
-    out = out.replace(temp_python_file.name, str(notebook.stem) + ".ipynb")
-    err = err.replace(temp_python_file.name, str(notebook.stem) + ".ipynb")
+    basename = os.path.basename(temp_python_file)
+    out = out.replace(basename, str(notebook.stem) + ".ipynb")
+    err = err.replace(basename, str(notebook.stem) + ".ipynb")
 
-    out = out.replace(temp_python_file.stem, notebook.stem)
-    err = err.replace(temp_python_file.stem, notebook.stem)
+    suffix = ".py"
+    out = out.replace(basename[: -len(suffix)], notebook.stem)
+    err = err.replace(basename[: -len(suffix)], notebook.stem)
 
     return out, err
 
@@ -371,7 +373,7 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
 
         for notebook, (file_descriptor, temp_python_file) in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(
-                Path(temp_python_file), notebook, out, err
+                temp_python_file, notebook, out, err
             )
             try:
                 out, err = map_python_line_to_nb_lines(
@@ -407,7 +409,7 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
 
                 try:
                     REPLACE_FUNCTION[configs.nbqa_diff](
-                        Path(temp_python_file),
+                        temp_python_file,
                         notebook,
                         nb_info_mapping[notebook],
                     )

@@ -5,6 +5,7 @@ The converted file will have had the third-party tool run against it by now.
 """
 
 import json
+import os
 import sys
 from difflib import unified_diff
 from shutil import move
@@ -115,7 +116,7 @@ def _get_new_source(
     )
 
 
-def _get_pycells(python_file: "Path") -> Iterator[str]:
+def _get_pycells(python_file: str) -> Iterator[str]:
     """
     Parse cells from Python file.
 
@@ -129,7 +130,8 @@ def _get_pycells(python_file: "Path") -> Iterator[str]:
     Iterator
         Parsed cells.
     """
-    txt = python_file.read_text()
+    with open(python_file, encoding="utf-8") as handle:
+        txt = handle.read()
     if txt.startswith(CODE_SEPARATOR):
         txt = txt[len(CODE_SEPARATOR) :]
     return iter(txt.split(CODE_SEPARATOR))
@@ -156,7 +158,7 @@ def _notebook_code_cells(
             yield cell
 
 
-def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> None:
+def mutate(python_file: str, notebook: "Path", notebook_info: NotebookInfo) -> None:
     """
     Replace :code:`source` code cells of original notebook.
 
@@ -179,11 +181,10 @@ def mutate(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -
             continue
         cell["source"] = _get_new_source(code_cell_number, notebook_info, next(pycells))
 
-    temp_notebook = python_file.parent / notebook.name
-    temp_notebook.write_text(
-        f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n", encoding="utf-8"
-    )
-    move(str(temp_notebook), str(notebook))
+    temp_notebook = os.path.join(os.path.dirname(python_file), notebook.name)
+    with open(temp_notebook, "w", encoding="utf-8") as handle:
+        handle.write(f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n")
+    move(temp_notebook, str(notebook))
 
 
 def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> None:
@@ -214,7 +215,7 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> None:
         sys.stdout.writelines(headers + line_changes + ["\n"])
 
 
-def diff(python_file: "Path", notebook: "Path", notebook_info: NotebookInfo) -> None:
+def diff(python_file: str, notebook: "Path", notebook_info: NotebookInfo) -> None:
     """
     View diff between new source of code cells and original sources.
 
