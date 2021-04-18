@@ -432,7 +432,11 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:  # pylint: disable=R0912
             return output_code
 
     finally:
-        for _, tmp_path in nb_to_py_mapping.values():
+        for fd, tmp_path in nb_to_py_mapping.values():
+            try:
+                os.close(fd)
+            except:
+                pass
             os.remove(tmp_path)
 
     return output_code
