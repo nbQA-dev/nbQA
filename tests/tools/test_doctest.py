@@ -4,7 +4,6 @@ import os
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
-
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:

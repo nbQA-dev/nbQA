@@ -5,7 +5,6 @@ from shutil import copyfile
 from textwrap import dedent
 from typing import TYPE_CHECKING, Sequence, Tuple
 
-
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:

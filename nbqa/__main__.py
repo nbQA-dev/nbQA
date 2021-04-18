@@ -295,7 +295,9 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     return cli_config.merge(Configs.get_default_config(cli_args.command))
 
 
-def _main(cli_args: CLIArgs, configs: Configs) -> int:  # pylint: disable=R0912
+def _main(  # pylint: disable=R0912,R0914,R0911
+    cli_args: CLIArgs, configs: Configs
+) -> int:
     """
     Run third-party tool on a single notebook or directory.
 
@@ -310,19 +312,6 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:  # pylint: disable=R0912
     -------
     int
         Output code from third-party tool.
-
-    Raises
-    ------
-    RuntimeError
-        If unable to parse or reconstruct notebook.
-    SystemExit
-        If third-party tool would've reformatted notebook but ``--nbqa-mutate``
-        wasn't passed.
-
-    Raises
-    ------
-    FileNotFoundError
-        If notebook which doesn't exist is passed.
     """
     nb_to_py_mapping = {}
     for notebook in _get_all_notebooks(
@@ -357,7 +346,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:  # pylint: disable=R0912
                     configs.nbqa_process_cells,
                     cli_args.command,
                 )
-            except Exception as exc:  # pragma: nocover
+            except Exception:  # pragma: nocover  # pylint: disable=W0703
                 sys.stderr.write(
                     BASE_ERROR_MESSAGE.format(f"Error parsing {str(notebook)}")
                 )
@@ -413,7 +402,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:  # pylint: disable=R0912
                         notebook,
                         nb_info_mapping[notebook],
                     )
-                except Exception as exc:
+                except Exception:  # pylint: disable=W0703
                     sys.stderr.write(
                         BASE_ERROR_MESSAGE.format(
                             f"Error reconstructing {str(notebook)}"
@@ -432,10 +421,11 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:  # pylint: disable=R0912
             return output_code
 
     finally:
-        for fd, tmp_path in nb_to_py_mapping.values():
+        for file_descriptor, tmp_path in nb_to_py_mapping.values():
             try:
-                os.close(fd)
-            except:
+                os.close(file_descriptor)
+            except OSError:
+                # was already closed
                 pass
             os.remove(tmp_path)
 
@@ -474,7 +464,7 @@ def _check_command_is_installed(command: str) -> None:
                 )
 
 
-def main(argv: Optional[Sequence[str]] = None) -> None:
+def main(argv: Optional[Sequence[str]] = None) -> int:
     """
     Run third-party tool (e.g. :code:`mypy`) against notebook or directory.
 

@@ -11,6 +11,7 @@ from nbqa.__main__ import main
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
+    from py._path.local import LocalPath
 
 
 def test_missing_command() -> None:
@@ -71,22 +72,22 @@ how to run `nbqa`.\
 
 
 @pytest.mark.usefixtures("tmp_remove_comments")
-def test_unable_to_reconstruct_message(capsys) -> None:
+def test_unable_to_reconstruct_message(capsys: "CaptureFixture") -> None:
     """Check error message shows if we're unable to reconstruct notebook."""
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     message = f"Error reconstructing {path}"
     main(["remove_comments", path, "--nbqa-mutate"])
-    out, err = capsys.readouterr()
+    _, err = capsys.readouterr()
     assert message in err
 
 
-def test_unable_to_parse(capsys, tmpdir) -> None:
+def test_unable_to_parse(capsys: "CaptureFixture", tmpdir: "LocalPath") -> None:
     """Check error message shows if we're unable to parse notebook."""
-    path = tmpdir.join("invalid.ipynb")
+    path = tmpdir.join("invalid.ipynb")  # type: ignore
     path.write("foo")
     main(["flake8", str(path), "--nbqa-mutate"])
     message = f"Error parsing {str(path)}"
-    out, err = capsys.readouterr()
+    _, err = capsys.readouterr()
     assert message in err
 
 

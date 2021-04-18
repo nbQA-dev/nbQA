@@ -2,12 +2,15 @@
 
 import os
 from textwrap import dedent
-
+from typing import TYPE_CHECKING
 
 from nbqa.__main__ import main
 
+if TYPE_CHECKING:
+    from _pytest.capture import CaptureFixture
 
-def test_allow_mutation(capsys) -> None:
+
+def test_allow_mutation(capsys: "CaptureFixture") -> None:
     """Check black, without --nbqa-mutate, errors."""
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     msg = dedent(
