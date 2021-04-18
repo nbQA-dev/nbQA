@@ -326,7 +326,14 @@ def main(  # pylint: disable=R0914
     NotebookInfo
 
     """
-    cells = json.loads(notebook.read_text(encoding="utf-8"))["cells"]
+    with open(notebook, encoding="utf-8") as handle:
+        try:
+            content = json.loads(notebook.read_text(encoding="utf-8"))
+        except Exception as exc:
+            handle.close()
+            raise RuntimeError(exc)
+
+    cells = content["cells"]
 
     result = []
     cell_mapping = {0: "cell_0:0"}
