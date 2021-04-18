@@ -33,7 +33,7 @@ def test_configs_work(capsys: "CaptureFixture") -> None:
     )
 
     with pytest.raises(SystemExit):
-        main(["flake8", "tests/data", "--ignore", "E302", "--nbqa-config", ".flake8"])
+        main(["flake8", "tests", "--ignore", "E302", "--nbqa-config", ".flake8"])
 
     Path(".flake8").unlink()
 
