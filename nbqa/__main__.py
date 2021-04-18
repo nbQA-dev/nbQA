@@ -371,66 +371,68 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
             [i[1] for i in nb_to_py_mapping.values()],
         )
 
+        for notebook, (file_descriptor, temp_python_file) in nb_to_py_mapping.items():
+            out, err = _replace_temp_python_file_references_in_out_err(
+                temp_python_file, notebook, out, err
+            )
+            try:
+                out, err = map_python_line_to_nb_lines(
+                    cli_args.command,
+                    out,
+                    err,
+                    notebook,
+                    nb_info_mapping[notebook].cell_mappings,
+                )
+            except Exception as exc:  # pylint: disable=W0703  # pragma: nocover
+                msg = (
+                    f"{repr(exc)} while parsing output "
+                    f"from applying {cli_args.command} to {str(notebook)}"
+                )
+                sys.stderr.write(BASE_ERROR_MESSAGE.format(msg))
+
+            if mutated:
+                if not configs.nbqa_mutate and not configs.nbqa_diff:
+                    # pylint: disable=C0301
+                    msg = dedent(
+                        f"""\
+                        {BOLD}Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:{RESET}
+
+                            nbqa {cli_args.command} notebook.ipynb --nbqa-mutate
+
+                        or, to only preview changes, use the `--nbqa-diff` flag, e.g.:
+
+                            nbqa {cli_args.command} notebook.ipynb --nbqa-diff
+                        """
+                    )
+                    # pylint: enable=C0301
+                    raise SystemExit(msg)
+
+                try:
+                    REPLACE_FUNCTION[configs.nbqa_diff](
+                        temp_python_file,
+                        notebook,
+                        nb_info_mapping[notebook],
+                    )
+                except Exception as exc:
+                    raise RuntimeError(
+                        BASE_ERROR_MESSAGE.format(
+                            f"Error reconstructing {str(notebook)}"
+                        )
+                    ) from exc
+
+        sys.stdout.write(out)
+        sys.stderr.write(err)
+
+        if configs.nbqa_diff:
+            if mutated:
+                sys.stdout.write(
+                    "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+                )
+            return output_code
+
     finally:
         for _, tmp_path in nb_to_py_mapping.values():
             os.remove(tmp_path)
-
-    for notebook, (_, temp_python_file) in nb_to_py_mapping.items():
-        out, err = _replace_temp_python_file_references_in_out_err(
-            temp_python_file, notebook, out, err
-        )
-        try:
-            out, err = map_python_line_to_nb_lines(
-                cli_args.command,
-                out,
-                err,
-                notebook,
-                nb_info_mapping[notebook].cell_mappings,
-            )
-        except Exception as exc:  # pylint: disable=W0703  # pragma: nocover
-            msg = (
-                f"{repr(exc)} while parsing output "
-                f"from applying {cli_args.command} to {str(notebook)}"
-            )
-            sys.stderr.write(BASE_ERROR_MESSAGE.format(msg))
-
-        if mutated:
-            if not configs.nbqa_mutate and not configs.nbqa_diff:
-                # pylint: disable=C0301
-                msg = dedent(
-                    f"""\
-                    {BOLD}Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:{RESET}
-
-                        nbqa {cli_args.command} notebook.ipynb --nbqa-mutate
-
-                    or, to only preview changes, use the `--nbqa-diff` flag, e.g.:
-
-                        nbqa {cli_args.command} notebook.ipynb --nbqa-diff
-                    """
-                )
-                # pylint: enable=C0301
-                raise SystemExit(msg)
-
-            try:
-                REPLACE_FUNCTION[configs.nbqa_diff](
-                    temp_python_file,
-                    notebook,
-                    nb_info_mapping[notebook],
-                )
-            except Exception as exc:
-                raise RuntimeError(
-                    BASE_ERROR_MESSAGE.format(f"Error reconstructing {str(notebook)}")
-                ) from exc
-
-    sys.stdout.write(out)
-    sys.stderr.write(err)
-
-    if configs.nbqa_diff:
-        if mutated:
-            sys.stdout.write(
-                "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
-            )
-        return output_code
 
     return output_code
 
