@@ -2,6 +2,16 @@
 Changelog
 =========
 
+0.7.0 (2021-04-18)
+------------------
+
+Fixed historic known limitation of ``nbqa-black`` removing trailing semicolons
+when they were followed by comments.
+Fixed bug whereby local modules were not properly being picked up by ``nbqa-mypy``
+(thanks Rafal Wojdyla for the excellent bug report!).
+Added support for ``yapf`` (thanks Bradley Dice for the suggestion + PR!).
+Added support for Python3.6.0 (previously was 3.6.1+).
+
 0.6.1 (2021-04-16)
 ------------------
 
