@@ -331,9 +331,8 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
         cli_args.root_dirs, configs.nbqa_files, configs.nbqa_exclude
     ):
         if not notebook.exists():
-            raise FileNotFoundError(
-                f"{BOLD}No such file or directory: {str(notebook)}{RESET}"
-            )
+            sys.stdout.write(f"{BOLD}No such file or directory: {str(notebook)}{RESET}")
+            sys.exit(1)
 
         nb_to_py_mapping[notebook] = tempfile.mkstemp(
             dir=str(notebook.parent),
@@ -361,9 +360,10 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
                     cli_args.command,
                 )
             except Exception as exc:  # pragma: nocover
-                raise RuntimeError(
+                sys.stdout.write(
                     BASE_ERROR_MESSAGE.format(f"Error parsing {str(notebook)}")
-                ) from exc
+                )
+                sys.exit(1)
 
         out, err, output_code, mutated = _run_command(
             cli_args.command,
@@ -389,6 +389,7 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
                     f"from applying {cli_args.command} to {str(notebook)}"
                 )
                 sys.stderr.write(BASE_ERROR_MESSAGE.format(msg))
+                sys.exit(1)
 
             if mutated:
                 if not configs.nbqa_mutate and not configs.nbqa_diff:
@@ -414,11 +415,12 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
                         nb_info_mapping[notebook],
                     )
                 except Exception as exc:
-                    raise RuntimeError(
+                    sys.stdout.write(
                         BASE_ERROR_MESSAGE.format(
                             f"Error reconstructing {str(notebook)}"
                         )
-                    ) from exc
+                    )
+                    sys.exit(1)
 
         sys.stdout.write(out)
         sys.stderr.write(err)
