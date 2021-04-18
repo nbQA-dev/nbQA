@@ -210,8 +210,7 @@ def test_comment_after_trailing_semicolons(capsys: "CaptureFixture") -> None:
         os.path.join("tests", "data", "comment_after_trailing_semicolon.ipynb")
     )
 
-    with pytest.raises(SystemExit):
-        main(["isort", path, "--nbqa-diff"])
+    main(["isort", path, "--nbqa-diff"])
 
     out, _ = capsys.readouterr()
     expected_out = (
