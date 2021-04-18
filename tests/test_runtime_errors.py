@@ -107,6 +107,20 @@ def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") ->
     assert re.search(message, str(output.stderr))
 
 
+def test_unable_to_parse() -> None:
+    """Check error message shows if we're unable to parse notebook."""
+    path = os.path.join("tests", "data", "invalid_notebook.ipynb")
+    try:
+        with open(path, "w") as handle:
+            handle.write("foo")
+        message = f"Error parsing {str(path)}"
+        with pytest.raises(RuntimeError) as excinfo:
+            main(["flake8", str(path), "--nbqa-mutate"])
+        assert message in str(excinfo.value)
+    finally:
+        os.remove(path)
+
+
 def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
     """
     Check sensible error message is returned if none of the directories passed have notebooks.
