@@ -295,7 +295,7 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     return cli_config.merge(Configs.get_default_config(cli_args.command))
 
 
-def _run_on_one_root_dir(  # pylint: disable=R0912
+def _main(  # pylint: disable=R0912
     cli_args: CLIArgs, configs: Configs
 ) -> int:
     """
@@ -331,8 +331,8 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
         cli_args.root_dirs, configs.nbqa_files, configs.nbqa_exclude
     ):
         if not notebook.exists():
-            sys.stdout.write(f"{BOLD}No such file or directory: {str(notebook)}{RESET}")
-            sys.exit(1)
+            sys.stderr.write(f"{BOLD}No such file or directory: {str(notebook)}{RESET}")
+            return 1
 
         nb_to_py_mapping[notebook] = tempfile.mkstemp(
             dir=str(notebook.parent),
@@ -360,9 +360,10 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
                     cli_args.command,
                 )
             except Exception as exc:  # pragma: nocover
-                raise SystemExit(
+                sys.stderr.write(
                     BASE_ERROR_MESSAGE.format(f"Error parsing {str(notebook)}")
                 )
+                return 1
 
         out, err, output_code, mutated = _run_command(
             cli_args.command,
@@ -388,7 +389,7 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
                     f"from applying {cli_args.command} to {str(notebook)}"
                 )
                 sys.stderr.write(BASE_ERROR_MESSAGE.format(msg))
-                sys.exit(1)
+                return 1
 
             if mutated:
                 if not configs.nbqa_mutate and not configs.nbqa_diff:
@@ -405,7 +406,8 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
                         """
                     )
                     # pylint: enable=C0301
-                    raise SystemExit(msg)
+                    sys.stderr.write(msg)
+                    return 1
 
                 try:
                     REPLACE_FUNCTION[configs.nbqa_diff](
@@ -414,12 +416,12 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
                         nb_info_mapping[notebook],
                     )
                 except Exception as exc:
-                    sys.stdout.write(
+                    sys.stderr.write(
                         BASE_ERROR_MESSAGE.format(
                             f"Error reconstructing {str(notebook)}"
                         )
                     )
-                    sys.exit(1)
+                    return 1
 
         sys.stdout.write(out)
         sys.stderr.write(err)
@@ -486,7 +488,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     configs: Configs = _get_configs(cli_args, project_root)
     configs.validate()
 
-    output_code = _run_on_one_root_dir(cli_args, configs)
+    output_code = _main(cli_args, configs)
 
     sys.exit(output_code)
 

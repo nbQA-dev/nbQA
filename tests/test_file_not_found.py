@@ -12,4 +12,4 @@ def test_file_not_found(capsys) -> None:
     with pytest.raises(SystemExit):
         main(["isort", "I don't exist", "--profile=black", "--nbqa-mutate"])
     out, err = capsys.readouterr()
-    assert msg in out
+    assert msg in err
