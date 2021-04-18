@@ -15,7 +15,6 @@ from nbqa.__main__ import main
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
     from _pytest.monkeypatch import MonkeyPatch
-    from py._path.local import LocalPath
 
 
 def test_missing_command() -> None:
@@ -105,10 +104,10 @@ def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") ->
     assert "Error reconstructing" in output.stderr
 
 
-def test_unable_to_parse(capsys: "CaptureFixture", tmpdir: "LocalPath") -> None:
+def test_unable_to_parse(capsys: "CaptureFixture") -> None:
     """Check error message shows if we're unable to parse notebook."""
-    path = tmpdir.join("invalid.ipynb")  # type: ignore
-    path.write("foo")
+    path = Path("tests") / "data/invalid_notebook.ipynb"
+    path.write_text("foo")
     main(["flake8", str(path), "--nbqa-mutate"])
     message = f"Error parsing {str(path)}"
     _, err = capsys.readouterr()
