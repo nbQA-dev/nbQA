@@ -2,6 +2,9 @@
 
 import os
 import re
+import subprocess
+import sys
+from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
@@ -11,6 +14,7 @@ from nbqa.__main__ import main
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
+    from _pytest.monkeypatch import MonkeyPatch
     from py._path.local import LocalPath
 
 
@@ -81,6 +85,26 @@ def test_unable_to_reconstruct_message(capsys: "CaptureFixture") -> None:
     assert message in err
 
 
+def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") -> None:
+    """
+    Same as ``test_unable_to_reconstruct_message`` but we check ``PYTHONPATH`` updates correctly.
+    Parameters
+    ----------
+    monkeypatch
+        Pytest fixture, we use it to override ``PYTHONPATH``.
+    """
+    path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
+    monkeypatch.setenv("PYTHONPATH", os.path.join(os.getcwd(), "tests"))
+    # We need to run the command via subprocess, so PYTHONPATH influences python
+    output = subprocess.run(
+        [sys.executable, "-m", "nbqa", "remove_comments", path, "--nbqa-mutate"],
+        stderr=subprocess.PIPE,
+        env=os.environ,
+        universal_newlines=True,  # from Python3.7 this can be replaced with `text`
+    )
+    assert "Error reconstructing" in output.stderr
+
+
 def test_unable_to_parse(capsys: "CaptureFixture", tmpdir: "LocalPath") -> None:
     """Check error message shows if we're unable to parse notebook."""
     path = tmpdir.join("invalid.ipynb")  # type: ignore
@@ -103,3 +127,28 @@ def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
     main(["black", "docs"])
     _, err = capsys.readouterr()
     assert err == "No .ipynb notebooks found in given directories: docs\n"
+
+
+@pytest.mark.usefixtures("tmp_print_6174")
+def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
+    """
+    Check user is encouraged to report bug if we're unable to parse tool's output.
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    path = Path("tests") / "data/notebook_for_testing.ipynb"
+    expected_err = dedent(
+        """\
+        \x1b\\[1mKeyError(.*) while parsing output from applying print_6174 to \
+tests.data.notebook_for_testing\\.ipynb
+        Please report a bug at https://github\\.com/nbQA\\-dev/nbQA/issues \x1b\\[0m
+        """
+    )
+    expected_out = f"{os.path.abspath(str(path))}:6174:0 some silly warning\n"
+    main(["print_6174", str(path), "--nbqa-mutate"])
+    out, err = capsys.readouterr()
+    re.match(expected_err, err)
+
+    assert expected_out == out
