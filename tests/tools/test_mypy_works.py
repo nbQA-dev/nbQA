@@ -5,8 +5,6 @@ from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
-import pytest
-
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:
@@ -22,15 +20,14 @@ def test_mypy_works(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with pytest.raises(SystemExit):
-        main(
-            [
-                "mypy",
-                "--ignore-missing-imports",
-                "--allow-untyped-defs",
-                str(Path("tests") / "data"),
-            ]
-        )
+    main(
+        [
+            "mypy",
+            "--ignore-missing-imports",
+            "--allow-untyped-defs",
+            str(Path("tests") / "data"),
+        ]
+    )
 
     # check out and err
     out, err = capsys.readouterr()
@@ -45,7 +42,7 @@ def test_mypy_works(capsys: "CaptureFixture") -> None:
         {path_0}:cell_2:19: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
         {path_3}:cell_8:3: error: Name 'flake8_version' is not defined
         {path_3}:cell_8:4: error: Name 'flake8_version' is not defined
-        Found 5 errors in 4 files (checked 24 source files)
+        Found 5 errors in 4 files (checked 23 source files)
         """  # noqa
     )
     expected_err = ""
@@ -62,13 +59,12 @@ def test_mypy_with_local_import(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr
     """
-    with pytest.raises(SystemExit):
-        main(
-            [
-                "mypy",
-                str(Path("tests") / "data/notebook_with_local_import.ipynb"),
-            ]
-        )
+    main(
+        [
+            "mypy",
+            str(Path("tests") / "data/notebook_with_local_import.ipynb"),
+        ]
+    )
 
     # check out and err
     out, _ = capsys.readouterr()
@@ -81,8 +77,7 @@ def test_notebook_doesnt_shadow_python_module(capsys: "CaptureFixture") -> None:
     cwd = os.getcwd()
     try:
         os.chdir(os.path.join("tests", "data"))
-        with pytest.raises(SystemExit):
-            main(["mypy", "t.ipynb"])
+        main(["mypy", "t.ipynb"])
     finally:
         os.chdir(cwd)
     result, _ = capsys.readouterr()

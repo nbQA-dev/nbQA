@@ -1,11 +1,8 @@
 """Check that running :code:`doctest` works."""
 
 import os
-import sys
 from textwrap import dedent
 from typing import TYPE_CHECKING
-
-import pytest
 
 from nbqa.__main__ import main
 
@@ -29,24 +26,23 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with pytest.raises(SystemExit):
-        main(["doctest", GOOD_EXAMPLE_NOTEBOOK])
+    main(["doctest", GOOD_EXAMPLE_NOTEBOOK])
 
     # check out and err
     out, err = capsys.readouterr()
     assert out == ""
     assert err == ""
 
-    with pytest.raises(SystemExit):
-        main(["doctest", WRONG_EXAMPLE_NOTEBOOK])
+    main(["doctest", WRONG_EXAMPLE_NOTEBOOK])
 
     # check out and err
     out, err = capsys.readouterr()
 
+    # pylint: disable=C0301
     expected_out = dedent(
         f"""\
         **********************************************************************
-        File "{WRONG_EXAMPLE_NOTEBOOK}", cell_2:10, in notebook_for_testing_copy.hello
+        File "{os.path.abspath(WRONG_EXAMPLE_NOTEBOOK)}", cell_2:10, in notebook_for_testing_copy.hello
         Failed example:
             hello("goodbye")
         Expected:
@@ -59,7 +55,7 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
         ***Test Failed*** 1 failures.
         """
     )
-
+    # pylint: enable=C0301
     assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
     assert err == ""
 
@@ -73,28 +69,7 @@ def test_doctest_invalid_import(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with pytest.raises(SystemExit):
-        main(["doctest", INVALID_IMPORT_NOTEBOOK])
+    main(["doctest", INVALID_IMPORT_NOTEBOOK])
 
     _, err = capsys.readouterr()
     assert "ModuleNotFoundError: No module named 'thisdoesnotexist'" in err
-
-
-@pytest.mark.skipif(
-    sys.platform.startswith("win"), reason="Permission denied during CI"
-)
-def test_doctest_on_directory(capsys: "CaptureFixture") -> None:
-    """
-    Check that IsADirectoryError doesn't report temporary folder.
-
-    Parameters
-    ----------
-    capsys
-        Pytest fixture to capture stdout and stderr.
-    """
-    dir_ = os.path.join("tests", "data")
-    with pytest.raises(SystemExit):
-        main(["doctest", dir_])
-
-    _, err = capsys.readouterr()
-    assert f"IsADirectoryError: [Errno 21] Is a directory: '{dir_}'" in err

@@ -6,8 +6,6 @@ from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
-import pytest
-
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:
@@ -42,8 +40,7 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
             """
         )
     )
-    with pytest.raises(SystemExit):
-        main(["pyupgrade", path])
+    main(["pyupgrade", path])
     Path("setup.cfg").unlink()
     with open(tmp_notebook_for_testing) as handle:
         after = handle.readlines()
@@ -77,8 +74,7 @@ def test_pyupgrade_works_with_empty_file(capsys: "CaptureFixture") -> None:
     """
     path = os.path.abspath(os.path.join("tests", "data", "footer.ipynb"))
 
-    with pytest.raises(SystemExit):
-        main(["pyupgrade", path])
+    main(["pyupgrade", path])
 
     out, err = capsys.readouterr()
     assert out == ""

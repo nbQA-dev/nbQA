@@ -341,9 +341,9 @@ def _has_trailing_semicolon(src: str) -> Tuple[str, bool]:
     return tokenize_rt.tokens_to_src(tokens), True
 
 
-def main(
+def main(  # pylint: disable=R0914
     notebook: "Path",
-    temp_python_file: "Path",
+    file_descriptor: int,
     process_cells: Sequence[str],
     command: str,
 ) -> NotebookInfo:
@@ -354,8 +354,6 @@ def main(
     ----------
     notebook
         Jupyter Notebook third-party tool is being run against.
-    temp_python_file
-        Temporary Python file to save converted notebook in.
     process_cells
         Extra cells which nbqa should process.
     command
@@ -366,7 +364,10 @@ def main(
     NotebookInfo
 
     """
-    cells = json.loads(notebook.read_text(encoding="utf-8"))["cells"]
+    with open(str(notebook), encoding="utf-8") as handle:
+        content = handle.read()
+
+    cells = json.loads(content)["cells"]
 
     result = []
     cell_mapping = {0: "cell_0:0"}
@@ -406,7 +407,8 @@ def main(
             )
 
     result_txt = "".join(result).rstrip(NEWLINE) + NEWLINE if result else ""
-    temp_python_file.write_text(result_txt, encoding="utf-8")
+    with open(file_descriptor, "w", encoding="utf-8") as handle:
+        handle.write(result_txt)
 
     return NotebookInfo(
         cell_mapping, trailing_semicolons, temporary_lines, code_cells_to_ignore

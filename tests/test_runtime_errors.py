@@ -75,13 +75,13 @@ how to run `nbqa`.\
 
 
 @pytest.mark.usefixtures("tmp_remove_comments")
-def test_unable_to_reconstruct_message() -> None:
+def test_unable_to_reconstruct_message(capsys: "CaptureFixture") -> None:
     """Check error message shows if we're unable to reconstruct notebook."""
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     message = f"Error reconstructing {path}"
-    with pytest.raises(RuntimeError) as excinfo:
-        main(["remove_comments", path, "--nbqa-mutate"])
-    assert message in str(excinfo.value)
+    main(["remove_comments", path, "--nbqa-mutate"])
+    _, err = capsys.readouterr()
+    assert message in err
 
 
 def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") -> None:
@@ -94,9 +94,6 @@ def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") ->
         Pytest fixture, we use it to override ``PYTHONPATH``.
     """
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
-    message = re.compile(
-        f"RuntimeError: \x1b\\[1mError reconstructing {re.escape(path)}"
-    )
     monkeypatch.setenv("PYTHONPATH", os.path.join(os.getcwd(), "tests"))
     # We need to run the command via subprocess, so PYTHONPATH influences python
     output = subprocess.run(
@@ -105,25 +102,24 @@ def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") ->
         env=os.environ,
         universal_newlines=True,  # from Python3.7 this can be replaced with `text`
     )
-    assert re.search(message, str(output.stderr))
+    assert "Error reconstructing" in output.stderr
 
 
-def test_unable_to_parse() -> None:
+def test_unable_to_parse(capsys: "CaptureFixture") -> None:
     """Check error message shows if we're unable to parse notebook."""
     path = Path("tests") / "data/invalid_notebook.ipynb"
     path.write_text("foo")
-    message = f"Error parsing {str(path)}"
-    with pytest.raises(RuntimeError) as excinfo:
-        main(["flake8", str(path), "--nbqa-mutate"])
+    main(["flake8", str(path), "--nbqa-mutate"])
     path.unlink()
-    assert message in str(excinfo.value)
+    message = f"Error parsing {str(path)}"
+    _, err = capsys.readouterr()
+    assert message in err
 
 
 @pytest.mark.usefixtures("tmp_print_6174")
 def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
     """
     Check user is encouraged to report bug if we're unable to parse tool's output.
-
     Parameters
     ----------
     capsys
@@ -137,11 +133,11 @@ tests.data.notebook_for_testing\\.ipynb
         Please report a bug at https://github\\.com/nbQA\\-dev/nbQA/issues \x1b\\[0m
         """
     )
-    expected_out = f"{str(path)}:6174:0 some silly warning\n"
-    with pytest.raises(SystemExit):
-        main(["print_6174", str(path), "--nbqa-mutate"])
+    expected_out = f"{os.path.abspath(str(path))}:6174:0 some silly warning\n"
+    main(["print_6174", str(path), "--nbqa-mutate"])
     out, err = capsys.readouterr()
     re.match(expected_err, err)
+
     assert expected_out == out
 
 
@@ -154,7 +150,6 @@ def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with pytest.raises(SystemExit):
-        main(["black", "docs"])
+    main(["black", "docs"])
     _, err = capsys.readouterr()
     assert err == "No .ipynb notebooks found in given directories: docs\n"

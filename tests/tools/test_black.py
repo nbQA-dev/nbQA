@@ -9,8 +9,6 @@ from shutil import copyfile
 from textwrap import dedent
 from typing import TYPE_CHECKING, Callable
 
-import pytest
-
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:
@@ -47,8 +45,7 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
             """
         )
     )
-    with pytest.raises(SystemExit):
-        main(["black", path])
+    main(["black", path])
     Path("setup.cfg").unlink()
     with open(tmp_notebook_for_testing) as handle:
         after = handle.readlines()
@@ -117,8 +114,7 @@ def test_black_works_with_trailing_semicolons(
             """
         )
     )
-    with pytest.raises(SystemExit):
-        main(["black", path, "--line-length=10"])
+    main(["black", path, "--line-length=10"])
     Path("setup.cfg").unlink()
     with open(tmp_notebook_with_trailing_semicolon) as handle:
         after = handle.readlines()
@@ -190,8 +186,7 @@ def test_black_works_with_multiline(
             """
         )
     )
-    with pytest.raises(SystemExit):
-        main(["black", path])
+    main(["black", path])
     Path("setup.cfg").unlink()
     with open(tmp_notebook_with_multiline) as handle:
         after = handle.readlines()
@@ -251,8 +246,7 @@ def test_black_multiple_files(tmp_test_data: Path) -> None:
             """
         )
     )
-    with pytest.raises(SystemExit):
-        main(["black", path])
+    main(["black", path])
     Path("setup.cfg").unlink()
     with open(str(tmp_test_data / "notebook_for_testing.ipynb")) as handle:
         after = handle.readlines()
@@ -293,8 +287,7 @@ def test_black_works_with_commented_magics(capsys: "CaptureFixture") -> None:
     """
     path = os.path.abspath(os.path.join("tests", "data", "commented_out_magic.ipynb"))
 
-    with pytest.raises(SystemExit):
-        main(["black", path, "--nbqa-diff"])
+    main(["black", path, "--nbqa-diff"])
 
     out, err = capsys.readouterr()
     err = err.encode("ascii", "backslashreplace").decode()
@@ -336,8 +329,7 @@ def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
     """
     path = os.path.abspath(os.path.join("tests", "data", "starting_with_comment.ipynb"))
 
-    with pytest.raises(SystemExit):
-        main(["black", path, "--nbqa-diff"])
+    main(["black", path, "--nbqa-diff"])
 
     out, err = capsys.readouterr()
     err = err.encode("ascii", "backslashreplace").decode()
@@ -382,8 +374,7 @@ def test_black_works_with_literal_assignment(capsys: "CaptureFixture") -> None:
         os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
     )
 
-    with pytest.raises(SystemExit):
-        main(["black", path])
+    main(["black", path])
 
     out, err = capsys.readouterr()
     expected_out = ""
@@ -411,8 +402,7 @@ def test_not_allowlisted_magic(capsys: "CaptureFixture") -> None:
     """
     path = os.path.abspath(os.path.join("tests", "data", "non_default_magic.ipynb"))
 
-    with pytest.raises(SystemExit):
-        main(["black", path])
+    main(["black", path])
 
     _, err = capsys.readouterr()
     assert "1 file left unchanged" in err
@@ -423,8 +413,7 @@ def test_allowlisted_magic(capsys: "CaptureFixture") -> None:
     Notebook contains magic which is in the default allowlist.
     """
     path = os.path.abspath(os.path.join("tests", "data", "default_magic.ipynb"))
-    with pytest.raises(SystemExit):
-        main(["black", path, "--nbqa-diff"])
+    main(["black", path, "--nbqa-diff"])
     out, _ = capsys.readouterr()
     expected = (
         "\x1b[1mCell 1\x1b[0m\n"
@@ -446,8 +435,7 @@ def test_process_cells_magic(capsys: "CaptureFixture") -> None:
     Notebook contains non-allowlist magic, but it's in process_cells.
     """
     path = os.path.abspath(os.path.join("tests", "data", "non_default_magic.ipynb"))
-    with pytest.raises(SystemExit):
-        main(["black", path, "--nbqa-diff", "--nbqa-process-cells", "javascript"])
+    main(["black", path, "--nbqa-diff", "--nbqa-process-cells", "javascript"])
 
     out, _ = capsys.readouterr()
     expected = (
@@ -479,8 +467,7 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
         os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
     )
 
-    with pytest.raises(SystemExit):
-        main(["black", path, "--nbqa-diff"])
+    main(["black", path, "--nbqa-diff"])
 
     out, err = capsys.readouterr()
     expected_out = ""
@@ -515,8 +502,7 @@ def test_comment_after_trailing_comma(capsys: "CaptureFixture") -> None:
         os.path.join("tests", "data", "comment_after_trailing_semicolon.ipynb")
     )
 
-    with pytest.raises(SystemExit):
-        main(["black", path, "--nbqa-diff"])
+    main(["black", path, "--nbqa-diff"])
 
     out, _ = capsys.readouterr()
     expected_out = (

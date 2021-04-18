@@ -32,8 +32,7 @@ def test_configs_work(capsys: "CaptureFixture") -> None:
         )
     )
 
-    with pytest.raises(SystemExit):
-        main(["flake8", "tests", "--ignore", "E302", "--nbqa-config", ".flake8"])
+    main(["flake8", "tests", "--ignore", "E302", "--nbqa-config", ".flake8"])
 
     Path(".flake8").unlink()
 
@@ -72,8 +71,7 @@ def test_configs_work_in_setupcfg(capsys: "CaptureFixture") -> None:
         )
     )
 
-    with pytest.raises(SystemExit):
-        main(["flake8", "tests", "--ignore", "E302"])
+    main(["flake8", "tests", "--ignore", "E302"])
 
     Path(".flake8").unlink()
     Path("setup.cfg").unlink()
@@ -116,8 +114,7 @@ def test_configs_work_in_nbqaini(capsys: "CaptureFixture") -> None:
         )
     )
 
-    with pytest.raises(SystemExit):
-        main(["flake8", "tests", "--ignore", "E302"])
+    main(["flake8", "tests", "--ignore", "E302"])
 
     Path(".flake8").unlink()
     Path(".nbqa.ini").unlink()
@@ -147,8 +144,7 @@ def test_setupcfg_is_preserved(capsys: "CaptureFixture") -> None:
         )
     )
 
-    with pytest.raises(SystemExit):
-        main(["flake8", "tests", "--ignore", "E302"])
+    main(["flake8", "tests", "--ignore", "E302"])
 
     # check out and err
     out, _ = capsys.readouterr()

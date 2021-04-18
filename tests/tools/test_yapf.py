@@ -5,8 +5,6 @@ from pathlib import Path
 from shutil import copyfile
 from typing import TYPE_CHECKING
 
-import pytest
-
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:
@@ -21,8 +19,7 @@ def test_successive_runs_using_yapf(
     src_notebook = Path(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     test_notebook = Path(tmpdir) / src_notebook.name
     copyfile(src_notebook, test_notebook)
-    with pytest.raises(SystemExit):
-        main(["yapf", str(test_notebook), "--in-place", "--nbqa-diff"])
+    main(["yapf", str(test_notebook), "--in-place", "--nbqa-diff"])
     out, _ = capsys.readouterr()
     expected_out = (
         "\x1b[1mCell 2\x1b[0m\n"
@@ -70,10 +67,8 @@ def test_successive_runs_using_yapf(
     )
     assert out == expected_out
 
-    with pytest.raises(SystemExit):
-        main(["yapf", str(test_notebook), "--in-place", "--nbqa-mutate"])
-    with pytest.raises(SystemExit):
-        main(["yapf", str(test_notebook), "--in-place", "--nbqa-diff"])
+    main(["yapf", str(test_notebook), "--in-place", "--nbqa-mutate"])
+    main(["yapf", str(test_notebook), "--in-place", "--nbqa-diff"])
 
     out, _ = capsys.readouterr()
     expected_out = ""

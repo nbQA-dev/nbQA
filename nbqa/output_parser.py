@@ -1,5 +1,5 @@
 """Parse output from code quality tools."""
-
+import os
 import re
 from functools import partial
 from pathlib import Path
@@ -53,10 +53,10 @@ def _get_pattern(
     if command == "doctest":
         return [
             (
-                rf'(?<=^File "{re.escape(str(notebook))}", line )\d+',
+                rf'(?<=^File "{re.escape(os.path.abspath(str(notebook)))}", line )\d+',
                 standard_substitution,
             ),
-            (rf'(?<=^File "{re.escape(str(notebook))}",) line', ""),
+            (rf'(?<=^File "{re.escape(os.path.abspath(str(notebook)))}",) line', ""),
         ]
 
     # This is the most common one and is used by flake, pylint, mypy, and more.

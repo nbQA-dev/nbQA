@@ -3,8 +3,6 @@
 import os
 from typing import TYPE_CHECKING
 
-import pytest
-
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:
@@ -21,13 +19,10 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     # Pass one file with absolute path and the other one with relative path
-    notebook1 = os.path.abspath(
-        os.path.join("tests", "data", "notebook_for_testing.ipynb")
-    )
+    notebook1 = os.path.join("tests", "data", "notebook_for_testing.ipynb")
     notebook2 = os.path.join("tests", "data", "notebook_with_indented_magics.ipynb")
 
-    with pytest.raises(SystemExit):
-        main(["pylint", notebook1, notebook2, "--disable=C0114"])
+    main(["pylint", notebook1, notebook2, "--disable=C0114"])
 
     notebook1_expected_warnings = [
         f"{str(notebook1)}:cell_2:19:8: C0303: Trailing whitespace (trailing-whitespace)",

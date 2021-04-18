@@ -30,8 +30,7 @@ def test_isort_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     with open(tmp_notebook_for_testing) as handle:
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
-    with pytest.raises(SystemExit):
-        main(["isort", path, "--nbqa-mutate"])
+    main(["isort", path, "--nbqa-mutate"])
 
     with open(tmp_notebook_for_testing) as handle:
         after = handle.readlines()
@@ -72,8 +71,7 @@ def test_isort_initial_md(
     with open(tmp_notebook_starting_with_md) as handle:
         before = handle.readlines()
     path = os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
-    with pytest.raises(SystemExit):
-        main(["isort", path, "--nbqa-mutate"])
+    main(["isort", path, "--nbqa-mutate"])
 
     with open(tmp_notebook_starting_with_md) as handle:
         after = handle.readlines()
@@ -91,7 +89,7 @@ def test_isort_initial_md(
 
     # check out and err
     out, err = capsys.readouterr()
-    expected_out = f"Fixing {path}\n"
+    expected_out = f"Fixing {os.path.abspath(path)}\n"
     expected_err = ""
     assert out == expected_out
     assert err == expected_err
@@ -127,8 +125,7 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
     )
 
     path = os.path.abspath(os.path.join("tests", "data", notebook))
-    with pytest.raises(SystemExit):
-        main(["isort", path, "--nbqa-mutate"])
+    main(["isort", path, "--nbqa-mutate"])
 
     Path("setup.cfg").unlink()
 
@@ -155,8 +152,7 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: Path) ->
     path = os.path.abspath(
         os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
     )
-    with pytest.raises(SystemExit):
-        main(["isort", path, "--nbqa-mutate"])
+    main(["isort", path, "--nbqa-mutate"])
 
     with open(tmp_notebook_with_trailing_semicolon) as handle:
         after = handle.readlines()
@@ -181,14 +177,12 @@ def test_old_isort_separated_imports(tmp_test_data: Path) -> None:
     notebook = tmp_test_data / "notebook_with_separated_imports_other.ipynb"
 
     before_mtime = os.path.getmtime(str(notebook))
-    with pytest.raises(SystemExit):
-        main(["isort", str(notebook), "--nbqa-mutate"])
+    main(["isort", str(notebook), "--nbqa-mutate"])
     assert os.path.getmtime(str(notebook)) == before_mtime
 
     # check that adding extra command-line arguments doesn't interfere with
     # --treat-comment-as-code
-    with pytest.raises(SystemExit):
-        main(["isort", str(notebook), "--profile=black", "--nbqa-mutate"])
+    main(["isort", str(notebook), "--profile=black", "--nbqa-mutate"])
     assert os.path.getmtime(str(notebook)) == before_mtime
 
 
@@ -216,8 +210,7 @@ def test_comment_after_trailing_semicolons(capsys: "CaptureFixture") -> None:
         os.path.join("tests", "data", "comment_after_trailing_semicolon.ipynb")
     )
 
-    with pytest.raises(SystemExit):
-        main(["isort", path, "--nbqa-diff"])
+    main(["isort", path, "--nbqa-diff"])
 
     out, _ = capsys.readouterr()
     expected_out = (

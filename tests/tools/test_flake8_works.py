@@ -4,8 +4,6 @@ import os
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
-import pytest
-
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:
@@ -22,14 +20,19 @@ def test_flake8_works(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     # check passing both absolute and relative paths
-    path_0 = os.path.join("tests", "data", "notebook_for_testing.ipynb")
-    path_1 = os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
+    path_0 = os.path.abspath(
+        os.path.join("tests", "data", "notebook_for_testing.ipynb")
+    )
+    path_1 = os.path.abspath(
+        os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
+    )
     path_2 = os.path.abspath(
-        os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
+        os.path.abspath(
+            os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
+        )
     )
 
-    with pytest.raises(SystemExit):
-        main(["flake8", path_0, path_1, path_2])
+    main(["flake8", path_0, path_1, path_2])
 
     out, err = capsys.readouterr()
     expected_out = dedent(

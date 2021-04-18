@@ -1,6 +1,5 @@
 """Module responsible for storing and handling nbqa configuration."""
 
-from collections import defaultdict
 from pathlib import Path
 from shlex import split
 from textwrap import dedent
@@ -8,7 +7,6 @@ from typing import (
     Any,
     Callable,
     ClassVar,
-    DefaultDict,
     Dict,
     Mapping,
     NamedTuple,
@@ -21,25 +19,6 @@ import toml
 from pkg_resources import resource_filename
 
 from nbqa.cmdline import CLIArgs
-
-CONFIG_FILES: DefaultDict[str, Sequence[str]] = defaultdict(
-    lambda: ["setup.cfg", "tox.ini", "pyproject.toml"]
-)
-CONFIG_FILES["autoflake"] = []
-CONFIG_FILES["black"] = ["pyproject.toml"]
-CONFIG_FILES["check-ast"] = []
-CONFIG_FILES["doctest"] = []
-CONFIG_FILES["flake8"] = ["setup.cfg", "tox.ini", ".flake8"]
-CONFIG_FILES["isort"] = [
-    ".isort.cfg",
-    "pyproject.toml",
-    "setup.cfg",
-    "tox.ini",
-    ".editorconfig",
-]
-CONFIG_FILES["mypy"] = ["mypy.ini", ".mypy.ini", "setup.cfg"]
-CONFIG_FILES["pylint"] = ["pylintrc", ".pylintrc", "pyproject.toml", "setup.cfg"]
-CONFIG_FILES["pyupgrade"] = []
 
 ConfigParser = Callable[[str], Union[str, bool, Sequence[str]]]
 
