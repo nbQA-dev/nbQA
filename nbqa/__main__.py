@@ -360,10 +360,9 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
                     cli_args.command,
                 )
             except Exception as exc:  # pragma: nocover
-                sys.stdout.write(
+                raise SystemExit(
                     BASE_ERROR_MESSAGE.format(f"Error parsing {str(notebook)}")
                 )
-                sys.exit(1)
 
         out, err, output_code, mutated = _run_command(
             cli_args.command,

@@ -85,11 +85,11 @@ def test_unable_to_parse(capsys, tmpdir) -> None:
     """Check error message shows if we're unable to parse notebook."""
     path = tmpdir.join("invalid.ipynb")
     path.write('foo')
-    with pytest.raises(SystemExit):
+    with pytest.raises(SystemExit) as exc:
         main(["flake8", str(path), "--nbqa-mutate"])
     message = f"Error parsing {str(path)}"
     out, err = capsys.readouterr()
-    assert message in out
+    assert message in str(exc.value)
 
 
 def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
