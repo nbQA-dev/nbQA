@@ -328,7 +328,7 @@ def main(  # pylint: disable=R0914
     """
     with open(notebook, encoding="utf-8") as handle:
         try:
-            content = json.loads(notebook.read_text(encoding="utf-8"))
+            content = json.loads(handle)
         except Exception as exc:
             handle.close()
             raise RuntimeError(exc)
