@@ -110,12 +110,10 @@ def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") ->
 
 def test_unable_to_parse() -> None:
     """Check error message shows if we're unable to parse notebook."""
-    path = Path("tests") / "data/invalid_notebook.ipynb"
-    path.write_text("foo")
+    path = Path("tests") / "invalid_data/invalid_notebook.ipynb"
     message = f"Error parsing {str(path)}"
     with pytest.raises(RuntimeError) as excinfo:
-        main(["flake8", str(path), "--nbqa-mutate"])
-    path.unlink()
+        main(["flake8", str(path), "--nbqa-diff"])
     assert message in str(excinfo.value)
 
 
