@@ -112,6 +112,7 @@ See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html)
 Take some inspiration from their config files 😉
 
 - **alibi** [.pre-commit-config.yaml](https://github.com/SeldonIO/alibi/blob/master/.pre-commit-config.yaml)
+- **GoogleCloudPlatform/ai-platform-samples** [pyproject.toml](https://github.com/GoogleCloudPlatform/ai-platform-samples/blob/master/pyproject.toml)
 - **intake-esm** [pyproject.toml](https://github.com/intake/intake-esm/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/intake/intake-esm/blob/master/.pre-commit-config.yaml)
 - **LiuAlgoTrader**: [requirements/dev.txt](https://github.com/amor71/LiuAlgoTrader/blob/master/liualgotrader/requirements/dev.txt)
 - **mplhep**: [pyproject.toml](https://github.com/scikit-hep/mplhep/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/scikit-hep/mplhep/blob/master/.pre-commit-config.yaml)
@@ -124,6 +125,8 @@ Take some inspiration from their config files 😉
 - **Python compiled microcourse**: [.pre-commit-config.yaml](https://github.com/henryiii/python-compiled-minicourse/blob/master/.pre-commit-config.yaml)
 - **ruptures**: [.pre-commit-config.yaml](https://github.com/deepcharles/ruptures/blob/master/.pre-commit-config.yaml)
 - **sktime**: [.pre-commit-config.yaml](https://github.com/alan-turing-institute/sktime/blob/master/.pre-commit-config.yaml)
+
+Is your project missing? Let us know, or open a pull request!
 
 ## 💬 Testimonials
 
@@ -158,6 +161,10 @@ Everyone using Jupyter notebooks should be doing this.
 **Bradley Dice**, [PhD Candidate in Physics & Scientific Computing](https://github.com/nbQA-dev/nbQA/pull/547#issuecomment-786186156):
 
 > nbqa is a clean, easy to use, and effective tool for notebook code style. Formatting and readability makes a huge difference when rendering notebooks in a project's documentation!
+
+**James Lamb**, [engineer @saturn_cloud, LightGBM maintainer](https://twitter.com/_jameslamb/status/1346537148913221634)
+
+> today I learned about `nbqa`, a command-line tool to run linters like `flake8` over #Python code in @ProjectJupyter notebooks. Thanks to @jayyqi for pointing me to it. So far, I really really like it.
 
 ## 👥 Contributing
 
