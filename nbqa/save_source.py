@@ -326,12 +326,8 @@ def main(  # pylint: disable=R0914
     NotebookInfo
 
     """
-    with open(notebook, encoding="utf-8") as handle:
-        try:
-            content = json.load(handle)
-        except Exception as exc:
-            handle.close()
-            raise RuntimeError(exc)
+    with open(str(notebook), encoding="utf-8") as handle:
+        content = json.load(handle)
 
     cells = content["cells"]
 
