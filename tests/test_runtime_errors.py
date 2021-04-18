@@ -114,20 +114,6 @@ def test_unable_to_parse(capsys: "CaptureFixture") -> None:
     assert message in err
 
 
-def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
-    """
-    Check sensible error message is returned if none of the directories passed have notebooks.
-
-    Parameters
-    ----------
-    capsys
-        Pytest fixture to capture stdout and stderr.
-    """
-    main(["black", "docs"])
-    _, err = capsys.readouterr()
-    assert err == "No .ipynb notebooks found in given directories: docs\n"
-
-
 @pytest.mark.usefixtures("tmp_print_6174")
 def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
     """
@@ -151,3 +137,17 @@ tests.data.notebook_for_testing\\.ipynb
     re.match(expected_err, err)
 
     assert expected_out == out
+
+
+def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
+    """
+    Check sensible error message is returned if none of the directories passed have notebooks.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    main(["black", "docs"])
+    _, err = capsys.readouterr()
+    assert err == "No .ipynb notebooks found in given directories: docs\n"
