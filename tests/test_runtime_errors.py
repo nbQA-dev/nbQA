@@ -81,19 +81,13 @@ def test_unable_to_reconstruct_message(capsys) -> None:
     assert message in out
 
 
-def test_unable_to_parse(capsys) -> None:
+def test_unable_to_parse(capsys, tmp_unparseable) -> None:
     """Check error message shows if we're unable to parse notebook."""
-    path = os.path.join("tests", "data", "invalid_notebook.ipynb")
-    try:
-        with open(path, "w") as fd:
-            fd.write("foo")
-        message = f"Error parsing {str(path)}"
-        with pytest.raises(SystemExit):
-            main(["flake8", str(path), "--nbqa-mutate"])
-        out, err = capsys.readouterr()
-        assert message in out
-    finally:
-        os.remove(path)
+    message = f"Error parsing {str(tmp_unparseable)}"
+    with pytest.raises(SystemExit):
+        main(["flake8", str(tmp_unparseable), "--nbqa-mutate"])
+    out, err = capsys.readouterr()
+    assert message in out
 
 
 def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:

@@ -70,6 +70,27 @@ def tmp_notebook_for_testing(tmpdir: "LocalPath") -> Iterator[Path]:
 
 
 @pytest.fixture
+def tmp_unparseable(tmpdir: "LocalPath") -> Iterator[Path]:
+    """
+    Make temporary copy of test notebook before it's operated on, then revert it.
+
+    Parameters
+    ----------
+    tmpdir
+        Pytest fixture, gives us a temporary directory.
+
+    Yields
+    ------
+    Path
+        Temporary copy of test notebook.
+    """
+    temp_file = Path(tmpdir) / "tmp.ipynb"
+    temp_file.touch()
+    temp_file.write_text("foo")
+    yield temp_file
+
+
+@pytest.fixture
 def tmp_notebook_with_multiline(tmpdir: "LocalPath") -> Iterator[Path]:
     """
     Make temporary copy of test notebook before it's operated on, then revert it.
