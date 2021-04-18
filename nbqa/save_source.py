@@ -327,9 +327,9 @@ def main(  # pylint: disable=R0914
 
     """
     with open(str(notebook), encoding="utf-8") as handle:
-        content = json.load(handle)
+        content = handle.read()
 
-    cells = content["cells"]
+    cells = json.loads(content)["cells"]
 
     result = []
     cell_mapping = {0: "cell_0:0"}
