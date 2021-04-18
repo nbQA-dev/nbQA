@@ -360,7 +360,7 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
                     configs.nbqa_process_cells,
                     cli_args.command,
                 )
-            except Exception as exc:
+            except Exception as exc:  # pragma: nocover
                 raise RuntimeError(
                     BASE_ERROR_MESSAGE.format(f"Error parsing {str(notebook)}")
                 ) from exc
