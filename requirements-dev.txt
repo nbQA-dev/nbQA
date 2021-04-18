@@ -9,3 +9,4 @@ pylint
 pytest
 pytest-randomly
 pyupgrade
+yapf
