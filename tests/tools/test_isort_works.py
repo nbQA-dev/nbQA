@@ -30,8 +30,7 @@ def test_isort_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     with open(tmp_notebook_for_testing) as handle:
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
-    with pytest.raises(SystemExit):
-        main(["isort", path, "--nbqa-mutate"])
+    main(["isort", path, "--nbqa-mutate"])
 
     with open(tmp_notebook_for_testing) as handle:
         after = handle.readlines()
@@ -71,8 +70,7 @@ def test_isort_initial_md(
     with open(tmp_notebook_starting_with_md) as handle:
         before = handle.readlines()
     path = os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
-    with pytest.raises(SystemExit):
-        main(["isort", path, "--nbqa-mutate"])
+    main(["isort", path, "--nbqa-mutate"])
 
     with open(tmp_notebook_starting_with_md) as handle:
         after = handle.readlines()
@@ -125,8 +123,7 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
     )
 
     path = os.path.abspath(os.path.join("tests", "data", notebook))
-    with pytest.raises(SystemExit):
-        main(["isort", path, "--nbqa-mutate"])
+    main(["isort", path, "--nbqa-mutate"])
 
     Path("setup.cfg").unlink()
 
@@ -153,8 +150,7 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: Path) ->
     path = os.path.abspath(
         os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
     )
-    with pytest.raises(SystemExit):
-        main(["isort", path, "--nbqa-mutate"])
+    main(["isort", path, "--nbqa-mutate"])
 
     with open(tmp_notebook_with_trailing_semicolon) as handle:
         after = handle.readlines()
@@ -182,15 +178,13 @@ def test_old_isort_separated_imports(capsys: "CaptureFixture") -> None:
         "tests", "data", "notebook_with_separated_imports_other.ipynb"
     )
 
-    with pytest.raises(SystemExit):
-        main(["isort", notebook, "--nbqa-diff"])
+    main(["isort", notebook, "--nbqa-diff"])
     out, err = capsys.readouterr()
     assert out == ""
     assert err == ""
     # check that adding extra command-line arguments doesn't interfere with
     # --treat-comment-as-code
-    with pytest.raises(SystemExit):
-        main(["isort", notebook, "--profile=black", "--nbqa-diff"])
+    main(["isort", notebook, "--profile=black", "--nbqa-diff"])
     out, _ = capsys.readouterr()
     assert out == ""
     assert err == ""

@@ -5,7 +5,6 @@ from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
-import pytest
 
 from nbqa.__main__ import main
 
@@ -22,15 +21,14 @@ def test_mypy_works(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with pytest.raises(SystemExit):
-        main(
-            [
-                "mypy",
-                "--ignore-missing-imports",
-                "--allow-untyped-defs",
-                str(Path("tests") / "data"),
-            ]
-        )
+    main(
+        [
+            "mypy",
+            "--ignore-missing-imports",
+            "--allow-untyped-defs",
+            str(Path("tests") / "data"),
+        ]
+    )
 
     # check out and err
     out, err = capsys.readouterr()
@@ -62,13 +60,12 @@ def test_mypy_with_local_import(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr
     """
-    with pytest.raises(SystemExit):
-        main(
-            [
-                "mypy",
-                str(Path("tests") / "data/notebook_with_local_import.ipynb"),
-            ]
-        )
+    main(
+        [
+            "mypy",
+            str(Path("tests") / "data/notebook_with_local_import.ipynb"),
+        ]
+    )
 
     # check out and err
     out, _ = capsys.readouterr()
@@ -81,8 +78,7 @@ def test_notebook_doesnt_shadow_python_module(capsys: "CaptureFixture") -> None:
     cwd = os.getcwd()
     try:
         os.chdir(os.path.join("tests", "data"))
-        with pytest.raises(SystemExit):
-            main(["mypy", "t.ipynb"])
+        main(["mypy", "t.ipynb"])
     finally:
         os.chdir(cwd)
     result, _ = capsys.readouterr()

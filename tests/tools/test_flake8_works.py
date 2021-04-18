@@ -4,7 +4,6 @@ import os
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
-import pytest
 
 from nbqa.__main__ import main
 
@@ -34,8 +33,7 @@ def test_flake8_works(capsys: "CaptureFixture") -> None:
         )
     )
 
-    with pytest.raises(SystemExit):
-        main(["flake8", path_0, path_1, path_2])
+    main(["flake8", path_0, path_1, path_2])
 
     out, err = capsys.readouterr()
     expected_out = dedent(

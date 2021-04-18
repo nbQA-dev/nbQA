@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from nbqa.__main__ import main, _main
+from nbqa.__main__ import main
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -75,8 +75,7 @@ def test_unable_to_reconstruct_message(capsys) -> None:
     """Check error message shows if we're unable to reconstruct notebook."""
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     message = f"Error reconstructing {path}"
-    with pytest.raises(SystemExit):
-        main(["remove_comments", path, "--nbqa-mutate"])
+    main(["remove_comments", path, "--nbqa-mutate"])
     out, err = capsys.readouterr()
     assert message in err
 
@@ -85,8 +84,7 @@ def test_unable_to_parse(capsys, tmpdir) -> None:
     """Check error message shows if we're unable to parse notebook."""
     path = tmpdir.join("invalid.ipynb")
     path.write("foo")
-    with pytest.raises(SystemExit):
-        main(["flake8", str(path), "--nbqa-mutate"])
+    main(["flake8", str(path), "--nbqa-mutate"])
     message = f"Error parsing {str(path)}"
     out, err = capsys.readouterr()
     assert message in err
@@ -101,7 +99,6 @@ def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with pytest.raises(SystemExit):
-        main(["black", "docs"])
+    main(["black", "docs"])
     _, err = capsys.readouterr()
     assert err == "No .ipynb notebooks found in given directories: docs\n"

@@ -3,7 +3,6 @@
 import os
 from textwrap import dedent
 
-import pytest
 
 from nbqa.__main__ import main
 
@@ -24,17 +23,14 @@ def test_allow_mutation(capsys) -> None:
         """
     )
 
-    with pytest.raises(SystemExit):
-        main(["black", path])
+    main(["black", path])
     _, err = capsys.readouterr()
     assert msg == err
 
-    with pytest.raises(SystemExit):
-        main(["black", path, "--line-length", "96"])
+    main(["black", path, "--line-length", "96"])
     _, err = capsys.readouterr()
     assert msg == err
 
-    with pytest.raises(SystemExit):
-        main(["black", path, "--nbqa-config=tox.ini"])
+    main(["black", path, "--nbqa-config=tox.ini"])
     _, err = capsys.readouterr()
     assert msg == err

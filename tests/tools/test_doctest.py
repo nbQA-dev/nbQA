@@ -4,7 +4,6 @@ import os
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
-import pytest
 
 from nbqa.__main__ import main
 
@@ -28,16 +27,14 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with pytest.raises(SystemExit):
-        main(["doctest", GOOD_EXAMPLE_NOTEBOOK])
+    main(["doctest", GOOD_EXAMPLE_NOTEBOOK])
 
     # check out and err
     out, err = capsys.readouterr()
     assert out == ""
     assert err == ""
 
-    with pytest.raises(SystemExit):
-        main(["doctest", WRONG_EXAMPLE_NOTEBOOK])
+    main(["doctest", WRONG_EXAMPLE_NOTEBOOK])
 
     # check out and err
     out, err = capsys.readouterr()
@@ -73,8 +70,7 @@ def test_doctest_invalid_import(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with pytest.raises(SystemExit):
-        main(["doctest", INVALID_IMPORT_NOTEBOOK])
+    main(["doctest", INVALID_IMPORT_NOTEBOOK])
 
     _, err = capsys.readouterr()
     assert "ModuleNotFoundError: No module named 'thisdoesnotexist'" in err

@@ -295,9 +295,7 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     return cli_config.merge(Configs.get_default_config(cli_args.command))
 
 
-def _main(  # pylint: disable=R0912
-    cli_args: CLIArgs, configs: Configs
-) -> int:
+def _main(cli_args: CLIArgs, configs: Configs) -> int:  # pylint: disable=R0912
     """
     Run third-party tool on a single notebook or directory.
 
@@ -488,10 +486,8 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     configs: Configs = _get_configs(cli_args, project_root)
     configs.validate()
 
-    output_code = _main(cli_args, configs)
-
-    sys.exit(output_code)
+    return _main(cli_args, configs)
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

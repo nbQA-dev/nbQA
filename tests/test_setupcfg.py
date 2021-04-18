@@ -4,7 +4,6 @@ from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
-import pytest
 
 from nbqa.__main__ import main
 
@@ -32,8 +31,7 @@ def test_nbqa_ini_works(capsys: "CaptureFixture") -> None:
         )
     )
 
-    with pytest.raises(SystemExit):
-        main(["flake8", "tests", "--ignore", "E302"])
+    main(["flake8", "tests", "--ignore", "E302"])
 
     Path("setup.cfg").unlink()
 

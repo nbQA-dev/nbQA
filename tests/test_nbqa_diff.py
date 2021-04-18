@@ -27,8 +27,7 @@ CLEAN_NOTEBOOK = TEST_DATA_DIR / "clean_notebook.ipynb"
 
 def test_diff_present(capsys: "CaptureFixture") -> None:
     """Test the results on --nbqa-diff on a dirty notebook."""
-    with pytest.raises(SystemExit):
-        main(["black", str(DIRTY_NOTEBOOK), "--nbqa-diff"])
+    main(["black", str(DIRTY_NOTEBOOK), "--nbqa-diff"])
     out, err = capsys.readouterr()
     err = err.encode("ascii", "backslashreplace").decode()
     expected_out = f"""\x1b[1mCell 2\x1b[0m
@@ -103,8 +102,7 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
         os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
     )
 
-    with pytest.raises(SystemExit):
-        main(["black", path, "--nbqa-diff"])
+    main(["black", path, "--nbqa-diff"])
 
     out, err = capsys.readouterr()
     expected_out = ""

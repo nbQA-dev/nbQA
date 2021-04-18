@@ -5,7 +5,6 @@ from shutil import copyfile
 from textwrap import dedent
 from typing import TYPE_CHECKING, Sequence, Tuple
 
-import pytest
 
 from nbqa.__main__ import main
 
@@ -55,8 +54,7 @@ def _run_nbqa(
     with open(notebook) as handle:
         before = handle.readlines()
 
-    with pytest.raises(SystemExit):
-        main([command, notebook, *args])
+    main([command, notebook, *args])
 
     with open(notebook) as handle:
         after = handle.readlines()

@@ -5,7 +5,6 @@ from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
-import pytest
 
 from nbqa.__main__ import main
 
@@ -22,8 +21,7 @@ def test_cli_files(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with pytest.raises(SystemExit):
-        main(["flake8", "tests", "--nbqa-files", "^tests/data/notebook_for"])
+    main(["flake8", "tests", "--nbqa-files", "^tests/data/notebook_for"])
 
     out, _ = capsys.readouterr()
     assert out and all(
@@ -40,8 +38,7 @@ def test_cli_exclude(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    with pytest.raises(SystemExit):
-        main(["flake8", "tests", "--nbqa-exclude", "^tests/data/notebook_for"])
+    main(["flake8", "tests", "--nbqa-exclude", "^tests/data/notebook_for"])
 
     out, _ = capsys.readouterr()
     assert out and all(
@@ -67,8 +64,7 @@ def test_config_files(capsys: "CaptureFixture") -> None:
         )
     )
 
-    with pytest.raises(SystemExit):
-        main(["flake8", "tests"])
+    main(["flake8", "tests"])
     Path("setup.cfg").unlink()
 
     out, _ = capsys.readouterr()
@@ -95,8 +91,7 @@ def test_config_exclude(capsys: "CaptureFixture") -> None:
         )
     )
 
-    with pytest.raises(SystemExit):
-        main(["flake8", "tests"])
+    main(["flake8", "tests"])
     Path("setup.cfg").unlink()
 
     out, _ = capsys.readouterr()

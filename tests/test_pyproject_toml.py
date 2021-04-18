@@ -4,7 +4,6 @@ from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
-import pytest
 
 from nbqa.__main__ import main
 
@@ -38,8 +37,7 @@ def test_pyproject_toml_works(
         )
     )
 
-    with pytest.raises(SystemExit):
-        main(["flake8", "tests", "--ignore", "E302"])
+    main(["flake8", "tests", "--ignore", "E302"])
 
     tmp_pyprojecttoml.unlink()
 

@@ -168,8 +168,7 @@ def test_indented_magics(
     with open(str(test_nb_path)) as handle:
         before = handle.readlines()
 
-    with pytest.raises(SystemExit):
-        main(["black", str(test_nb_path)])
+    main(["black", str(test_nb_path)])
 
     with open(str(test_nb_path)) as handle:
         after = handle.readlines()
@@ -210,8 +209,7 @@ def test_magics_with_flake8(
         Path("tests/data/notebook_with_indented_magics.ipynb"), Path(tmpdir)
     )
 
-    with pytest.raises(SystemExit):
-        main(["flake8", str(test_nb_path), config])
+    main(["flake8", str(test_nb_path), config])
 
     out, _ = capsys.readouterr()
     assert validate(out, test_nb_path)
