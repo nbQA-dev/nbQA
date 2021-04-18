@@ -17,9 +17,12 @@ from typing import (
     List,
     Mapping,
     MutableMapping,
+    NamedTuple,
     Sequence,
     Tuple,
 )
+
+import tokenize_rt
 
 from nbqa.handle_magics import INPUT_SPLITTER, IPythonMagicType, MagicHandler
 from nbqa.notebook_info import NotebookInfo
@@ -32,6 +35,13 @@ MAGIC = ["time", "timeit", "capture", "pypy", "python", "python3"]
 NEWLINE = "\n"
 NEWLINES = defaultdict(lambda: NEWLINE * 3)
 NEWLINES["isort"] = NEWLINE * 2
+
+
+class Index(NamedTuple):
+    """Keep track of line and cell number while iterating over cells."""
+
+    line_number: int
+    cell_number: int
 
 
 def _is_src_code_indentation_valid(source: str) -> bool:
@@ -303,6 +313,34 @@ def _should_ignore_code_cell(
     return first_line.split()[0] not in {f"%%{magic}" for magic in process}
 
 
+def _has_trailing_semicolon(src: str) -> Tuple[str, bool]:
+    """
+    Check if cell has trailing semicolon.
+
+    Parameters
+    ----------
+    src
+        Notebook cell source.
+
+    Returns
+    -------
+    bool
+        Whether notebook has trailing semicolon.
+    """
+    tokens = tokenize_rt.src_to_tokens(src)
+    trailing_semicolon = False
+    for idx, token in tokenize_rt.reversed_enumerate(tokens):
+        if not token.src.strip(" \n") or token.name == "COMMENT":
+            continue
+        if token.name == "OP" and token.src == ";":
+            tokens[idx] = token._replace(src="")
+            trailing_semicolon = True
+        break
+    if not trailing_semicolon:
+        return src, False
+    return tokenize_rt.tokens_to_src(tokens), True
+
+
 def main(  # pylint: disable=R0914
     notebook: "Path",
     file_descriptor: int,
@@ -333,36 +371,40 @@ def main(  # pylint: disable=R0914
 
     result = []
     cell_mapping = {0: "cell_0:0"}
-    line_number = 0
-    cell_number = 0
+    index = Index(line_number=0, cell_number=0)
     trailing_semicolons = set()
     temporary_lines: DefaultDict[int, Sequence[MagicHandler]] = defaultdict(list)
     code_cells_to_ignore = set()
 
     for cell in cells:
         if cell["cell_type"] == "code":
-            cell_number += 1
+            index = index._replace(cell_number=index.cell_number + 1)
 
             if _should_ignore_code_cell(cell["source"], process_cells):
-                code_cells_to_ignore.add(cell_number)
+                code_cells_to_ignore.add(index.cell_number)
                 continue
 
             parsed_cell = _parse_cell(
-                cell["source"], cell_number, temporary_lines, command
+                cell["source"], index.cell_number, temporary_lines, command
             )
 
             cell_mapping.update(
                 {
-                    py_line + line_number + 1: f"cell_{cell_number}:{cell_line}"
+                    py_line
+                    + index.line_number
+                    + 1: f"cell_{index.cell_number}:{cell_line}"
                     for py_line, cell_line in _get_line_numbers_for_mapping(
-                        parsed_cell, temporary_lines[cell_number]
+                        parsed_cell, temporary_lines[index.cell_number]
                     ).items()
                 }
             )
-            if parsed_cell.rstrip().endswith(";"):
-                trailing_semicolons.add(cell_number)
-            result.append(re.sub(r";(\s*)$", "\\1", parsed_cell))
-            line_number += len(parsed_cell.splitlines())
+            parsed_cell, trailing_semicolon = _has_trailing_semicolon(parsed_cell)
+            if trailing_semicolon:
+                trailing_semicolons.add(index.cell_number)
+            result.append(parsed_cell)
+            index = index._replace(
+                line_number=index.line_number + len(parsed_cell.splitlines())
+            )
 
     result_txt = "".join(result).rstrip(NEWLINE) + NEWLINE if result else ""
     with open(file_descriptor, "w", encoding="utf-8") as handle:

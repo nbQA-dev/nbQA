@@ -20,6 +20,8 @@ from typing import (
     Set,
 )
 
+import tokenize_rt
+
 from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
 from nbqa.save_source import CODE_SEPARATOR
@@ -53,11 +55,24 @@ def _restore_semicolon(
     -------
     str
         New source with removed semicolon restored.
-    """
-    rstripped_source = source.rstrip()
-    if cell_number in trailing_semicolons and not rstripped_source.endswith(";"):
-        source = rstripped_source + ";"
 
+    Raises
+    ------
+    AssertionError
+        If code thought to be unreachable is reached.
+    """
+    if cell_number in trailing_semicolons:
+        tokens = tokenize_rt.src_to_tokens(source)
+        for idx, token in tokenize_rt.reversed_enumerate(tokens):
+            if not token.src.strip(" \n") or token.name == "COMMENT":
+                continue
+            tokens[idx] = token._replace(src=token.src + ";")
+            break
+        else:  # pragma: nocover
+            raise AssertionError(
+                "Unreachable code, please report bug at https://github.com/nbQA-dev/nbQA/issues"
+            )
+        source = tokenize_rt.tokens_to_src(tokens)
     return source
 
 
