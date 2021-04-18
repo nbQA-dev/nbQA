@@ -172,16 +172,11 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: Path) ->
     assert result == expected
 
 
-def test_old_isort_separated_imports(capsys) -> None:
+def test_old_isort_separated_imports(capsys: "CaptureFixture") -> None:
     """
     Check isort works when a notebook has imports in different cells.
 
     This test would fail if we didn't pass --treat-comment-as-code '# %%NBQA-CELL-SEP'.
-
-    Parameters
-    ----------
-    tmp_test_data
-        Temporary copy of test data.
     """
     notebook = os.path.join(
         "tests", "data", "notebook_with_separated_imports_other.ipynb"

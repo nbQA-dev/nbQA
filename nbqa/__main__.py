@@ -333,12 +333,11 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
                 f"{BOLD}No such file or directory: {str(notebook)}{RESET}"
             )
 
-        fd, path = tempfile.mkstemp(
+        nb_to_py_mapping[notebook] = tempfile.mkstemp(
             dir=str(notebook.parent),
             prefix=notebook.stem,
             suffix=".py",
         )
-        nb_to_py_mapping[notebook] = (Path(path), fd)
 
     try:  # pylint disable=R0912
 
@@ -351,12 +350,11 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
 
         nb_info_mapping: MutableMapping[Path, NotebookInfo] = {}
 
-        for notebook, (temp_python_file, fd) in nb_to_py_mapping.items():
+        for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
             try:
                 nb_info_mapping[notebook] = save_source.main(
                     notebook,
-                    temp_python_file,
-                    fd,
+                    file_descriptor,
                     configs.nbqa_process_cells,
                     cli_args.command,
                 )
@@ -368,12 +366,12 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
         out, err, output_code, mutated = _run_command(
             cli_args.command,
             configs.nbqa_addopts,
-            [i[0] for i in nb_to_py_mapping.values()],
+            [Path(i[1]) for i in nb_to_py_mapping.values()],
         )
 
-        for notebook, (temp_python_file, fd) in nb_to_py_mapping.items():
+        for notebook, (file_descriptor, temp_python_file) in nb_to_py_mapping.items():
             out, err = _replace_temp_python_file_references_in_out_err(
-                temp_python_file, notebook, out, err
+                Path(temp_python_file), notebook, out, err
             )
             try:
                 out, err = map_python_line_to_nb_lines(
@@ -409,7 +407,7 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
 
                 try:
                     REPLACE_FUNCTION[configs.nbqa_diff](
-                        temp_python_file,
+                        Path(temp_python_file),
                         notebook,
                         nb_info_mapping[notebook],
                     )
@@ -431,8 +429,8 @@ def _run_on_one_root_dir(  # pylint: disable=R0912
             return output_code
 
     finally:
-        for tmp_path, _ in nb_to_py_mapping.values():
-            os.remove(str(tmp_path))
+        for _, tmp_path in nb_to_py_mapping.values():
+            os.remove(tmp_path)
 
     return output_code
 

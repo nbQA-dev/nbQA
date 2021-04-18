@@ -303,10 +303,9 @@ def _should_ignore_code_cell(
     return first_line.split()[0] not in {f"%%{magic}" for magic in process}
 
 
-def main(
+def main(  # pylint: disable=R0914
     notebook: "Path",
-    temp_python_file: "Path",
-    fd,
+    file_descriptor: int,
     process_cells: Sequence[str],
     command: str,
 ) -> NotebookInfo:
@@ -317,8 +316,6 @@ def main(
     ----------
     notebook
         Jupyter Notebook third-party tool is being run against.
-    temp_python_file
-        Temporary Python file to save converted notebook in.
     process_cells
         Extra cells which nbqa should process.
     command
@@ -365,8 +362,8 @@ def main(
             line_number += len(parsed_cell.splitlines())
 
     result_txt = "".join(result).rstrip(NEWLINE) + NEWLINE if result else ""
-    with open(fd, "w", encoding="utf-8") as f:
-        f.write(result_txt)
+    with open(file_descriptor, "w", encoding="utf-8") as handle:
+        handle.write(result_txt)
 
     return NotebookInfo(
         cell_mapping, trailing_semicolons, temporary_lines, code_cells_to_ignore
