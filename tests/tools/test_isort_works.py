@@ -172,7 +172,7 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: Path) ->
     assert result == expected
 
 
-def test_old_isort_separated_imports(tmp_test_data: Path) -> None:
+def test_old_isort_separated_imports(capsys) -> None:
     """
     Check isort works when a notebook has imports in different cells.
 
@@ -183,18 +183,22 @@ def test_old_isort_separated_imports(tmp_test_data: Path) -> None:
     tmp_test_data
         Temporary copy of test data.
     """
-    notebook = tmp_test_data / "notebook_with_separated_imports_other.ipynb"
+    notebook = os.path.join(
+        "tests", "data", "notebook_with_separated_imports_other.ipynb"
+    )
 
-    before_mtime = os.path.getmtime(str(notebook))
     with pytest.raises(SystemExit):
-        main(["isort", str(notebook), "--nbqa-mutate"])
-    assert os.path.getmtime(str(notebook)) == before_mtime
-
+        main(["isort", notebook, "--nbqa-diff"])
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == ""
     # check that adding extra command-line arguments doesn't interfere with
     # --treat-comment-as-code
     with pytest.raises(SystemExit):
-        main(["isort", str(notebook), "--profile=black", "--nbqa-mutate"])
-    assert os.path.getmtime(str(notebook)) == before_mtime
+        main(["isort", notebook, "--profile=black", "--nbqa-diff"])
+    out, _ = capsys.readouterr()
+    assert out == ""
+    assert err == ""
 
 
 def test_old_isort(monkeypatch: "MonkeyPatch") -> None:
