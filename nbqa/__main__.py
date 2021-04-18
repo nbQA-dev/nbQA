@@ -17,7 +17,7 @@ from nbqa.config.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
-from nbqa.output_parser import map_python_line_to_nb_lines
+from nbqa.output_parser import Output, map_python_line_to_nb_lines
 from nbqa.text import BOLD, RESET
 
 BASE_ERROR_MESSAGE = dedent(
@@ -135,7 +135,7 @@ def _replace_temp_python_file_references_in_out_err(
     notebook: Path,
     out: str,
     err: str,
-) -> Tuple[str, str]:
+) -> Output:
     """
     Replace references to temporary Python file with references to notebook.
 
@@ -152,10 +152,8 @@ def _replace_temp_python_file_references_in_out_err(
 
     Returns
     -------
-    out
-        Stdout with temporary directory replaced by current working directory.
-    err
-        Stderr with temporary directory replaced by current working directory.
+    Output
+        Stdout, stderr with temporary directory replaced by current working directory.
     """
     basename = os.path.basename(temp_python_file)
     out = out.replace(basename, str(notebook.stem) + ".ipynb")
@@ -165,7 +163,7 @@ def _replace_temp_python_file_references_in_out_err(
     out = out.replace(basename[: -len(suffix)], notebook.stem)
     err = err.replace(basename[: -len(suffix)], notebook.stem)
 
-    return out, err
+    return Output(out, err)
 
 
 def _get_mtimes(arg: str) -> Set[float]:
@@ -189,7 +187,7 @@ def _run_command(
     command: str,
     cmd_args: Sequence[str],
     args: Sequence[str],
-) -> Tuple[str, str, int, bool]:
+) -> Tuple[Output, int, bool]:
     """
     Run third-party tool against given file or directory.
 
@@ -204,10 +202,8 @@ def _run_command(
 
     Returns
     -------
-    out
-        Captured stdout from running third-party tool.
-    err
-        Captured stderr from running third-party tool.
+    output
+        Captured stdout, stderr from running third-party tool.
     output_code
         Return code from third-party tool.
     mutated
@@ -234,7 +230,7 @@ def _run_command(
     out = output.stdout
     err = output.stderr
 
-    return out, err, output_code, mutated
+    return Output(out, err), output_code, mutated
 
 
 def _get_command_not_found_msg(command: str) -> str:
@@ -352,21 +348,22 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                 )
                 return 1
 
-        out, err, output_code, mutated = _run_command(
+        output, output_code, mutated = _run_command(
             cli_args.command,
             configs.nbqa_addopts,
             [i[1] for i in nb_to_py_mapping.values()],
         )
 
+        actually_mutated = False
         for notebook, (_, temp_python_file) in nb_to_py_mapping.items():
-            out, err = _replace_temp_python_file_references_in_out_err(
-                temp_python_file, notebook, out, err
+            output = _replace_temp_python_file_references_in_out_err(
+                temp_python_file, notebook, output.out, output.err
             )
             try:
-                out, err = map_python_line_to_nb_lines(
+                output = map_python_line_to_nb_lines(
                     cli_args.command,
-                    out,
-                    err,
+                    output.out,
+                    output.err,
                     notebook,
                     nb_info_mapping[notebook].cell_mappings,
                 )
@@ -397,10 +394,13 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     return 1
 
                 try:
-                    REPLACE_FUNCTION[configs.nbqa_diff](
-                        temp_python_file,
-                        notebook,
-                        nb_info_mapping[notebook],
+                    actually_mutated = (
+                        REPLACE_FUNCTION[configs.nbqa_diff](
+                            temp_python_file,
+                            notebook,
+                            nb_info_mapping[notebook],
+                        )
+                        or actually_mutated
                     )
                 except Exception:  # pylint: disable=W0703
                     sys.stderr.write(
@@ -410,8 +410,12 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     )
                     return 1
 
-        sys.stdout.write(out)
-        sys.stderr.write(err)
+        sys.stdout.write(output.out)
+        sys.stderr.write(output.err)
+
+        if mutated and not actually_mutated:
+            output_code = 0
+            mutated = False
 
         if configs.nbqa_diff:
             if mutated:

@@ -3,12 +3,19 @@ import os
 import re
 from functools import partial
 from pathlib import Path
-from typing import Callable, Mapping, Match, Sequence, Tuple, Union
+from typing import Callable, Mapping, Match, NamedTuple, Sequence, Tuple, Union
 
 
 def _line_to_cell(match: Match[str], cell_mapping: Mapping[int, str]) -> str:
     """Replace Python line with corresponding Jupyter notebook cell."""
     return str(cell_mapping[int(match.group())])
+
+
+class Output(NamedTuple):
+    """Captured stdout and stderr."""
+
+    out: str
+    err: str
 
 
 def _get_pattern(
@@ -58,7 +65,7 @@ def _get_pattern(
 
 def map_python_line_to_nb_lines(
     command: str, out: str, err: str, notebook: Path, cell_mapping: Mapping[int, str]
-) -> Tuple[str, str]:
+) -> Output:
     """
     Make sure stdout and stderr make reference to Jupyter Notebook cells and lines.
 
@@ -77,11 +84,8 @@ def map_python_line_to_nb_lines(
 
     Returns
     -------
-    str
-        Stdout with references to temporary Python file's lines replaced with references
-        to notebook's cells and lines.
-    str
-        Stderr with references to temporary Python file's lines replaced with references
+    Output
+        Stdout, stderr with references to temporary Python file's lines replaced with references
         to notebook's cells and lines.
     """
     patterns = _get_pattern(notebook, command, cell_mapping)
@@ -89,4 +93,4 @@ def map_python_line_to_nb_lines(
         out = re.sub(pattern_, substitution_, out, flags=re.MULTILINE)
         err = re.sub(pattern_, substitution_, err, flags=re.MULTILINE)
 
-    return out, err
+    return Output(out, err)
