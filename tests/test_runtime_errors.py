@@ -84,7 +84,7 @@ def test_unable_to_reconstruct_message(capsys) -> None:
 def test_unable_to_parse(capsys, tmpdir) -> None:
     """Check error message shows if we're unable to parse notebook."""
     path = tmpdir.join("invalid.ipynb")
-    path.write('foo')
+    path.write("foo")
     with pytest.raises(SystemExit):
         main(["flake8", str(path), "--nbqa-mutate"])
     message = f"Error parsing {str(path)}"
