@@ -54,9 +54,8 @@
 
 In your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/), run one of the following:
 
-- `python -m pip install -U nbqa` (minimal installation)
-- `python -m pip install -U nbqa[toolchain]` (install supported code quality tools as well)
-- `conda install -c conda-forge nbqa` (if you use conda)
+- `python -m pip install -U nbqa`
+- `conda install -c conda-forge nbqa`
 
 ## 🚀 Examples
 
