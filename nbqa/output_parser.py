@@ -60,7 +60,17 @@ def _get_pattern(
         ]
 
     # This is the most common one and is used by flake, pylint, mypy, and more.
-    return [(rf"(?<=^{re.escape(str(notebook))}:)\d+", standard_substitution)]
+    absolute_path = notebook.resolve()
+    try:
+        relative_path = absolute_path.relative_to(Path.cwd())
+    except ValueError:
+        relative_path = absolute_path
+    return [
+        (
+            rf"(?<=^{re.escape(str(absolute_path))}:)\d+|(?<=^{re.escape(str(relative_path))}:)\d+",
+            standard_substitution,
+        )
+    ]
 
 
 def map_python_line_to_nb_lines(

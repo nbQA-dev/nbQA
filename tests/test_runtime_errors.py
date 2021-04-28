@@ -133,12 +133,9 @@ tests.data.notebook_for_testing\\.ipynb
         Please report a bug at https://github\\.com/nbQA\\-dev/nbQA/issues \x1b\\[0m
         """
     )
-    expected_out = f"{os.path.abspath(str(path))}:6174:0 some silly warning\n"
     main(["print_6174", str(path), "--nbqa-mutate"])
-    out, err = capsys.readouterr()
-    re.match(expected_err, err)
-
-    assert expected_out == out
+    _, err = capsys.readouterr()
+    assert re.match(expected_err, err)
 
 
 def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:

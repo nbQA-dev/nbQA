@@ -4,13 +4,38 @@ import os
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
+import pytest
+
 from nbqa.__main__ import main
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-def test_flake8_works(capsys: "CaptureFixture") -> None:
+@pytest.mark.parametrize(
+    "path_0, path_1, path_2",
+    (
+        (
+            os.path.abspath(
+                os.path.join("tests", "data", "notebook_for_testing.ipynb")
+            ),
+            os.path.abspath(
+                os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
+            ),
+            os.path.abspath(
+                os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
+            ),
+        ),
+        (
+            os.path.join("tests", "data", "notebook_for_testing.ipynb"),
+            os.path.join("tests", "data", "notebook_for_testing_copy.ipynb"),
+            os.path.join("tests", "data", "notebook_starting_with_md.ipynb"),
+        ),
+    ),
+)
+def test_flake8_works(
+    path_0: str, path_1: str, path_2: str, capsys: "CaptureFixture"
+) -> None:
     """
     Check flake8 works. Shouldn't alter the notebook content.
 
@@ -20,38 +45,27 @@ def test_flake8_works(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     # check passing both absolute and relative paths
-    path_0 = os.path.abspath(
-        os.path.join("tests", "data", "notebook_for_testing.ipynb")
-    )
-    path_1 = os.path.abspath(
-        os.path.join("tests", "data", "notebook_for_testing_copy.ipynb")
-    )
-    path_2 = os.path.abspath(
-        os.path.abspath(
-            os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
-        )
-    )
 
     main(["flake8", path_0, path_1, path_2])
 
     out, err = capsys.readouterr()
     expected_out = dedent(
         f"""\
-        {path_0}:cell_1:1:1: F401 'os' imported but unused
-        {path_0}:cell_1:3:1: F401 'glob' imported but unused
-        {path_0}:cell_1:5:1: F401 'nbqa' imported but unused
-        {path_0}:cell_2:19:9: W291 trailing whitespace
-        {path_0}:cell_4:1:1: E402 module level import not at top of file
-        {path_0}:cell_4:4:18: E231 missing whitespace after ','
-        {path_0}:cell_5:1:1: E402 module level import not at top of file
-        {path_0}:cell_5:2:1: E402 module level import not at top of file
-        {path_1}:cell_1:1:1: F401 'os' imported but unused
-        {path_1}:cell_1:3:1: F401 'glob' imported but unused
-        {path_1}:cell_1:5:1: F401 'nbqa' imported but unused
-        {path_2}:cell_1:1:1: F401 'os' imported but unused
-        {path_2}:cell_1:3:1: F401 'glob' imported but unused
-        {path_2}:cell_1:5:1: F401 'nbqa' imported but unused
-        {path_2}:cell_3:2:1: E302 expected 2 blank lines, found 0
+        {os.path.abspath(path_0)}:cell_1:1:1: F401 'os' imported but unused
+        {os.path.abspath(path_0)}:cell_1:3:1: F401 'glob' imported but unused
+        {os.path.abspath(path_0)}:cell_1:5:1: F401 'nbqa' imported but unused
+        {os.path.abspath(path_0)}:cell_2:19:9: W291 trailing whitespace
+        {os.path.abspath(path_0)}:cell_4:1:1: E402 module level import not at top of file
+        {os.path.abspath(path_0)}:cell_4:4:18: E231 missing whitespace after ','
+        {os.path.abspath(path_0)}:cell_5:1:1: E402 module level import not at top of file
+        {os.path.abspath(path_0)}:cell_5:2:1: E402 module level import not at top of file
+        {os.path.abspath(path_1)}:cell_1:1:1: F401 'os' imported but unused
+        {os.path.abspath(path_1)}:cell_1:3:1: F401 'glob' imported but unused
+        {os.path.abspath(path_1)}:cell_1:5:1: F401 'nbqa' imported but unused
+        {os.path.abspath(path_2)}:cell_1:1:1: F401 'os' imported but unused
+        {os.path.abspath(path_2)}:cell_1:3:1: F401 'glob' imported but unused
+        {os.path.abspath(path_2)}:cell_1:5:1: F401 'nbqa' imported but unused
+        {os.path.abspath(path_2)}:cell_3:2:1: E302 expected 2 blank lines, found 0
         """
     )
     expected_err = ""

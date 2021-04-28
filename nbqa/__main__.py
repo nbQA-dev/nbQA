@@ -367,7 +367,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     notebook,
                     nb_info_mapping[notebook].cell_mappings,
                 )
-            except Exception as exc:  # pylint: disable=W0703  # pragma: nocover
+            except Exception as exc:  # pylint: disable=W0703
                 msg = (
                     f"{repr(exc)} while parsing output "
                     f"from applying {cli_args.command} to {str(notebook)}"
@@ -425,7 +425,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
             return output_code
 
     finally:
-        for file_descriptor, tmp_path in nb_to_py_mapping.values():  # pragma: nocover
+        for file_descriptor, tmp_path in nb_to_py_mapping.values():
             try:
                 os.close(file_descriptor)
             except OSError:
