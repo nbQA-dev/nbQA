@@ -2,6 +2,13 @@
 Changelog
 =========
 
+0.7.1 (2021-04-28)
+------------------
+
+Fixed regression (introduced in 0.7.0) whereby ``nbqa-flake8`` wasn't
+reporting error messages with cell numbers if absolute path of notebook
+was used.
+
 0.7.0 (2021-04-18)
 ------------------
 
