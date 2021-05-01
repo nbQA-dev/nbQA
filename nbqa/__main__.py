@@ -7,7 +7,16 @@ import tempfile
 from importlib import import_module
 from pathlib import Path
 from textwrap import dedent
-from typing import Dict, Iterator, MutableMapping, Optional, Sequence, Set, Tuple
+from typing import (
+    Dict,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+)
 
 from pkg_resources import parse_version
 
@@ -295,6 +304,17 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     return cli_config.merge(Configs.get_default_config(cli_args.command))
 
 
+def _clean_up_tmp_files(nb_to_py_mapping: Mapping[Path, Tuple[int, str]]) -> None:
+    """Remove temporary files."""
+    for file_descriptor, tmp_path in nb_to_py_mapping.values():
+        try:
+            os.close(file_descriptor)
+        except OSError:
+            # was already closed
+            pass
+        os.remove(tmp_path)
+
+
 def _get_nb_to_py_mapping(
     root_dirs: Sequence[str], files: Optional[str], exclude: Optional[str]
 ) -> Dict[Path, Tuple[int, str]]:
@@ -320,9 +340,10 @@ def _get_nb_to_py_mapping(
     FileNotFoundError
         If notebook isn't found.
     """
-    nb_to_py_mapping = {}
+    nb_to_py_mapping: Dict[Path, Tuple[int, str]] = {}
     for notebook in _get_all_notebooks(root_dirs, files, exclude):
         if not notebook.exists():
+            _clean_up_tmp_files(nb_to_py_mapping)
             raise FileNotFoundError(
                 f"{BOLD}No such file or directory: {str(notebook)}{RESET}\n"
             )
@@ -463,14 +484,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
             return output_code
 
     finally:
-        for file_descriptor, tmp_path in nb_to_py_mapping.values():
-            try:
-                os.close(file_descriptor)
-            except OSError:
-                # was already closed
-                pass
-            os.remove(tmp_path)
-
+        _clean_up_tmp_files(nb_to_py_mapping)
     return output_code
 
 
