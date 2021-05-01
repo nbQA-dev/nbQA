@@ -104,7 +104,7 @@ $ nbqa pyupgrade my_notebook.ipynb --py36-plus --nbqa-mutate
 Rewriting my_notebook.ipynb
 ```
 
-See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html) for examples involving [autoflake](https://github.com/myint/autoflake), [check-ast](https://github.com/pre-commit/pre-commit-hooks#check-ast), [doctest](https://docs.python.org/3/library/doctest.html), [flake8](https://flake8.pycqa.org/en/latest/), [mypy](http://mypy-lang.org/), and [pylint](https://www.pylint.org/).
+See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html) for examples involving [autoflake](https://github.com/myint/autoflake), [check-ast](https://github.com/pre-commit/pre-commit-hooks#check-ast), [doctest](https://docs.python.org/3/library/doctest.html), [flake8](https://flake8.pycqa.org/en/latest/), [mypy](http://mypy-lang.org/), [pylint](https://www.pylint.org/), and [yapf](https://github.com/google/yapf).
 
 ## 🥳 Used by
 
