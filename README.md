@@ -68,15 +68,15 @@ Here's an example of how to set up some pre-commit hooks: put this in your `.pre
   rev: 0.7.1
   hooks:
     - id: nbqa-black
-      additional_dependencies: [black==20.8b1]
       args: [--nbqa-mutate]
     - id: nbqa-pyupgrade
-      additional_dependencies: [pyupgrade==2.10.0]
       args: [--nbqa-mutate, --py36-plus]
     - id: nbqa-isort
-      additional_dependencies: [isort==5.7.0]
       args: [--nbqa-mutate]
 ```
+
+If you need to select specific versions of any of these linters/formatters,
+add them to [`additional_dependencies`](http://pre-commit.com/#pre-commit-configyaml---hooks).
 
 ### Command-line
 
