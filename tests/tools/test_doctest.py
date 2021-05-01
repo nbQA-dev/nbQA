@@ -42,7 +42,7 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
     expected_out = dedent(
         f"""\
         **********************************************************************
-        File "{os.path.abspath(WRONG_EXAMPLE_NOTEBOOK)}", cell_2:10, in notebook_for_testing_copy.hello
+        File "{WRONG_EXAMPLE_NOTEBOOK}", cell_2:10, in notebook_for_testing_copy.hello
         Failed example:
             hello("goodbye")
         Expected:
@@ -56,6 +56,7 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
         """
     )
     # pylint: enable=C0301
+    breakpoint()
     assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
     assert err == ""
 

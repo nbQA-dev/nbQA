@@ -18,6 +18,15 @@ class Output(NamedTuple):
     err: str
 
 
+def _get_relative_and_absolute_paths(path: Path) -> Tuple[Path, Path]:
+    absolute_path = path.resolve()
+    try:
+        relative_path = absolute_path.relative_to(Path.cwd())
+    except ValueError:
+        relative_path = absolute_path
+    return relative_path, absolute_path
+
+
 def _get_pattern(
     notebook: Path, command: str, cell_mapping: Mapping[int, str]
 ) -> Sequence[Tuple[str, Union[str, Callable[[Match[str]], str]]]]:
@@ -40,10 +49,12 @@ def _get_pattern(
     """
     standard_substitution = partial(_line_to_cell, cell_mapping=cell_mapping)
 
+    relative_path, absolute_path = _get_relative_and_absolute_paths(notebook)
+
     if command == "black":
         return [
             (
-                rf"(?<=^error: cannot format {re.escape(str(notebook))}: Cannot parse: )\d+",
+                rf"(?<=^error: cannot format {re.escape(str(relative_path))}: Cannot parse: )\d+|(?<=^error: cannot format {re.escape(str(absolute_path))}: Cannot parse: )\d+",
                 standard_substitution,
             ),
             (r"(?<=line )\d+(?=\)\nOh no! )", standard_substitution),
@@ -53,18 +64,16 @@ def _get_pattern(
     if command == "doctest":
         return [
             (
-                rf'(?<=^File "{re.escape(os.path.abspath(str(notebook)))}", line )\d+',
+                rf'(?<=^File "{re.escape(os.path.abspath(str(relative_path)))}", line )\d+|(?<=^File "{re.escape(os.path.abspath(str(absolute_path)))}", line )\d+',
                 standard_substitution,
             ),
-            (rf'(?<=^File "{re.escape(os.path.abspath(str(notebook)))}",) line', ""),
+            (
+                rf'(?<=^File "{re.escape(os.path.abspath(str(relative_path)))}",) line|(?<=^File "{re.escape(os.path.abspath(str(absolute_path)))}",) line',
+                "",
+            ),
         ]
 
     # This is the most common one and is used by flake, pylint, mypy, and more.
-    absolute_path = notebook.resolve()
-    try:
-        relative_path = absolute_path.relative_to(Path.cwd())
-    except ValueError:
-        relative_path = absolute_path
     return [
         (
             rf"(?<=^{re.escape(str(absolute_path))}:)\d+|(?<=^{re.escape(str(relative_path))}:)\d+",

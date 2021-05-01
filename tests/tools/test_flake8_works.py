@@ -51,21 +51,21 @@ def test_flake8_works(
     out, err = capsys.readouterr()
     expected_out = dedent(
         f"""\
-        {os.path.abspath(path_0)}:cell_1:1:1: F401 'os' imported but unused
-        {os.path.abspath(path_0)}:cell_1:3:1: F401 'glob' imported but unused
-        {os.path.abspath(path_0)}:cell_1:5:1: F401 'nbqa' imported but unused
-        {os.path.abspath(path_0)}:cell_2:19:9: W291 trailing whitespace
-        {os.path.abspath(path_0)}:cell_4:1:1: E402 module level import not at top of file
-        {os.path.abspath(path_0)}:cell_4:4:18: E231 missing whitespace after ','
-        {os.path.abspath(path_0)}:cell_5:1:1: E402 module level import not at top of file
-        {os.path.abspath(path_0)}:cell_5:2:1: E402 module level import not at top of file
-        {os.path.abspath(path_1)}:cell_1:1:1: F401 'os' imported but unused
-        {os.path.abspath(path_1)}:cell_1:3:1: F401 'glob' imported but unused
-        {os.path.abspath(path_1)}:cell_1:5:1: F401 'nbqa' imported but unused
-        {os.path.abspath(path_2)}:cell_1:1:1: F401 'os' imported but unused
-        {os.path.abspath(path_2)}:cell_1:3:1: F401 'glob' imported but unused
-        {os.path.abspath(path_2)}:cell_1:5:1: F401 'nbqa' imported but unused
-        {os.path.abspath(path_2)}:cell_3:2:1: E302 expected 2 blank lines, found 0
+        {path_0}:cell_1:1:1: F401 'os' imported but unused
+        {path_0}:cell_1:3:1: F401 'glob' imported but unused
+        {path_0}:cell_1:5:1: F401 'nbqa' imported but unused
+        {path_0}:cell_2:19:9: W291 trailing whitespace
+        {path_0}:cell_4:1:1: E402 module level import not at top of file
+        {path_0}:cell_4:4:18: E231 missing whitespace after ','
+        {path_0}:cell_5:1:1: E402 module level import not at top of file
+        {path_0}:cell_5:2:1: E402 module level import not at top of file
+        {path_1}:cell_1:1:1: F401 'os' imported but unused
+        {path_1}:cell_1:3:1: F401 'glob' imported but unused
+        {path_1}:cell_1:5:1: F401 'nbqa' imported but unused
+        {path_2}:cell_1:1:1: F401 'os' imported but unused
+        {path_2}:cell_1:3:1: F401 'glob' imported but unused
+        {path_2}:cell_1:5:1: F401 'nbqa' imported but unused
+        {path_2}:cell_3:2:1: E302 expected 2 blank lines, found 0
         """
     )
     expected_err = ""

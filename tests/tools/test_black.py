@@ -35,7 +35,7 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     # check diff
     with open(tmp_notebook_for_testing) as handle:
         before = handle.readlines()
-    path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
+    path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
 
     Path("setup.cfg").write_text(
         dedent(
@@ -45,7 +45,7 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
             """
         )
     )
-    main(["black", path])
+    main(["black", os.path.abspath(path)])
     Path("setup.cfg").unlink()
     with open(tmp_notebook_for_testing) as handle:
         after = handle.readlines()
@@ -102,9 +102,7 @@ def test_black_works_with_trailing_semicolons(
     # check diff
     with open(tmp_notebook_with_trailing_semicolon) as handle:
         before = handle.readlines()
-    path = os.path.abspath(
-        os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
-    )
+    path = os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
 
     Path("setup.cfg").write_text(
         dedent(
@@ -114,7 +112,7 @@ def test_black_works_with_trailing_semicolons(
             """
         )
     )
-    main(["black", path, "--line-length=10"])
+    main(["black", os.path.abspath(path), "--line-length=10"])
     Path("setup.cfg").unlink()
     with open(tmp_notebook_with_trailing_semicolon) as handle:
         after = handle.readlines()
@@ -174,9 +172,7 @@ def test_black_works_with_multiline(
     # check diff
     with open(tmp_notebook_with_multiline) as handle:
         before = handle.readlines()
-    path = os.path.abspath(
-        os.path.join("tests", "data", "clean_notebook_with_multiline.ipynb")
-    )
+    path = os.path.join("tests", "data", "clean_notebook_with_multiline.ipynb")
 
     Path("setup.cfg").write_text(
         dedent(
@@ -186,7 +182,7 @@ def test_black_works_with_multiline(
             """
         )
     )
-    main(["black", path])
+    main(["black", os.path.abspath(path)])
     Path("setup.cfg").unlink()
     with open(tmp_notebook_with_multiline) as handle:
         after = handle.readlines()
@@ -285,9 +281,9 @@ def test_black_works_with_commented_magics(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    path = os.path.abspath(os.path.join("tests", "data", "commented_out_magic.ipynb"))
+    path = os.path.join("tests", "data", "commented_out_magic.ipynb")
 
-    main(["black", path, "--nbqa-diff"])
+    main(["black", os.path.abspath(path), "--nbqa-diff"])
 
     out, err = capsys.readouterr()
     err = err.encode("ascii", "backslashreplace").decode()
@@ -306,7 +302,7 @@ To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
     expected_err = (
         dedent(
             f"""\
-            reformatted {path}
+            reformatted {os.path.abspath(path)}
             All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
             1 file reformatted.
             """
@@ -327,9 +323,9 @@ def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    path = os.path.abspath(os.path.join("tests", "data", "starting_with_comment.ipynb"))
+    path = os.path.join("tests", "data", "starting_with_comment.ipynb")
 
-    main(["black", path, "--nbqa-diff"])
+    main(["black", os.path.abspath(path), "--nbqa-diff"])
 
     out, err = capsys.readouterr()
     err = err.encode("ascii", "backslashreplace").decode()
@@ -370,11 +366,9 @@ def test_black_works_with_literal_assignment(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    path = os.path.abspath(
-        os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
-    )
+    path = os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
 
-    main(["black", path])
+    main(["black", os.path.abspath(path)])
 
     out, err = capsys.readouterr()
     expected_out = ""
@@ -463,11 +457,9 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    path = os.path.abspath(
-        os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
-    )
+    path = os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
 
-    main(["black", path, "--nbqa-diff"])
+    main(["black", os.path.abspath(path), "--nbqa-diff"])
 
     out, err = capsys.readouterr()
     expected_out = ""
@@ -498,11 +490,9 @@ def test_comment_after_trailing_comma(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    path = os.path.abspath(
-        os.path.join("tests", "data", "comment_after_trailing_semicolon.ipynb")
-    )
+    path = os.path.join("tests", "data", "comment_after_trailing_semicolon.ipynb")
 
-    main(["black", path, "--nbqa-diff"])
+    main(["black", os.path.abspath(path), "--nbqa-diff"])
 
     out, _ = capsys.readouterr()
     expected_out = (

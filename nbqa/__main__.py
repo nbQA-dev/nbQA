@@ -12,6 +12,7 @@ from typing import (
     Iterator,
     Mapping,
     MutableMapping,
+    NamedTuple,
     Optional,
     Sequence,
     Set,
@@ -26,7 +27,11 @@ from nbqa.config.config import Configs
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
-from nbqa.output_parser import Output, map_python_line_to_nb_lines
+from nbqa.output_parser import (
+    Output,
+    _get_relative_and_absolute_paths,
+    map_python_line_to_nb_lines,
+)
 from nbqa.text import BOLD, RESET
 
 BASE_ERROR_MESSAGE = dedent(
@@ -50,6 +55,11 @@ REPLACE_FUNCTION = {
     True: replace_source.diff,
     False: replace_source.mutate,
 }
+
+
+class TemporaryFile(NamedTuple):
+    fd: int
+    file: str
 
 
 class UnsupportedPackageVersionError(Exception):
@@ -348,10 +358,18 @@ def _get_nb_to_py_mapping(
                 f"{BOLD}No such file or directory: {str(notebook)}{RESET}\n"
             )
 
-        nb_to_py_mapping[notebook] = tempfile.mkstemp(
-            dir=str(notebook.parent),
-            prefix=notebook.stem,
-            suffix=".py",
+        nb_to_py_mapping[notebook] = TemporaryFile(
+            *tempfile.mkstemp(
+                dir=str(notebook.parent),
+                prefix=notebook.stem,
+                suffix=".py",
+            )
+        )
+        relative_path, _ = _get_relative_and_absolute_paths(
+            Path(nb_to_py_mapping[notebook][1])
+        )
+        nb_to_py_mapping[notebook] = nb_to_py_mapping[notebook]._replace(
+            file=str(relative_path)
         )
     return nb_to_py_mapping
 
