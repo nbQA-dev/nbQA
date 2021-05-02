@@ -84,7 +84,6 @@ class Configs:
     CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.ADDOPTS] = (
         lambda arg: split(arg) if isinstance(arg, str) else arg
     )
-    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.CONFIG] = str
     CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.PROCESS_CELLS] = (
         lambda arg: arg.split(",") if isinstance(arg, str) else arg
     )
@@ -196,9 +195,6 @@ class Configs:
         defaults: Configs = Configs()
         defaults.set_config(
             CONFIG_SECTIONS.ADDOPTS, DEFAULT_CONFIG["addopts"].get(command)
-        )
-        defaults.set_config(
-            CONFIG_SECTIONS.CONFIG, DEFAULT_CONFIG["config"].get(command)
         )
         defaults.set_config(
             CONFIG_SECTIONS.PROCESS_CELLS, DEFAULT_CONFIG["process_cells"].get(command)
