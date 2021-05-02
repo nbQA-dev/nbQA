@@ -4,7 +4,6 @@ from functools import partial
 from pathlib import Path
 from typing import Callable, Mapping, Match, NamedTuple, Sequence, Tuple, Union
 
-from nbqa.find_root import CWD
 
 
 def _line_to_cell(match: Match[str], cell_mapping: Mapping[int, str]) -> str:
@@ -21,9 +20,9 @@ class Output(NamedTuple):
 
 def get_relative_and_absolute_paths(path: Path) -> Tuple[str, str]:
     """Get relative (if possible) and absolute versions of path."""
-    absolute_path = path.resolve()
+    absolute_path = Path(path).resolve()
     try:
-        relative_path = absolute_path.relative_to(CWD)
+        relative_path = absolute_path.relative_to(Path.cwd())
     except ValueError:
         relative_path = absolute_path
     return str(relative_path), str(absolute_path)

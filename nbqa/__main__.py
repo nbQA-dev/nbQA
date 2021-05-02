@@ -103,7 +103,7 @@ def _filter_by_include_exclude(
     notebooks: Iterator[Path],
     include: Optional[str],
     exclude: Optional[str],
-) -> Iterator[Path]:
+) -> Iterator[str]:
     """
     Include files which match include, exclude those matching exclude.
 
@@ -123,7 +123,7 @@ def _filter_by_include_exclude(
     exclude = exclude or "^$"
     include_re, exclude_re = re.compile(include), re.compile(exclude)
     return (
-        notebook
+        str(notebook)
         for notebook in notebooks
         if include_re.search(str(notebook.as_posix()))
         if not exclude_re.search(str(notebook.as_posix()))
@@ -132,7 +132,7 @@ def _filter_by_include_exclude(
 
 def _get_all_notebooks(
     root_dirs: Sequence[str], files: Optional[str], exclude: Optional[str]
-) -> Iterator[Path]:
+) -> Iterator[str]:
     """
     Get generator with all notebooks passed in via the command-line, applying exclusions.
 
@@ -157,7 +157,7 @@ def _get_all_notebooks(
 
 def _replace_temp_python_file_references_in_out_err(
     temp_python_file: str,
-    notebook: Path,
+    notebook: str,
     out: str,
     err: str,
 ) -> Output:
@@ -181,12 +181,12 @@ def _replace_temp_python_file_references_in_out_err(
         Stdout, stderr with temporary directory replaced by current working directory.
     """
     basename = os.path.basename(temp_python_file)
-    out = out.replace(basename, str(notebook.stem) + ".ipynb")
-    err = err.replace(basename, str(notebook.stem) + ".ipynb")
+    out = out.replace(basename, notebook)  # is this right?
+    err = err.replace(basename, notebook)
 
     suffix = ".py"
-    out = out.replace(basename[: -len(suffix)], notebook.stem)
-    err = err.replace(basename[: -len(suffix)], notebook.stem)
+    out = out.replace(basename[: -len(suffix)], notebook[:-len('.ipynb')])
+    err = err.replace(basename[: -len(suffix)], notebook[:-len('.ipynb')])
 
     return Output(out, err)
 
@@ -354,21 +354,21 @@ def _get_nb_to_py_mapping(
     """
     nb_to_py_mapping: Dict[Path, TemporaryFile] = {}
     for notebook in _get_all_notebooks(root_dirs, files, exclude):
-        if not notebook.exists():
+        if not os.path.exists(notebook):
             _clean_up_tmp_files(nb_to_py_mapping)
             raise FileNotFoundError(
-                f"{BOLD}No such file or directory: {str(notebook)}{RESET}\n"
+                f"{BOLD}No such file or directory: {notebook}{RESET}\n"
             )
 
         nb_to_py_mapping[notebook] = TemporaryFile(
             *tempfile.mkstemp(
-                dir=str(notebook.parent),
-                prefix=notebook.stem,
+                dir=os.path.dirname(notebook),
+                prefix=os.path.basename(notebook)[:-len('.ipynb')],
                 suffix=".py",
             )
         )
         relative_path, _ = get_relative_and_absolute_paths(
-            Path(nb_to_py_mapping[notebook][1])
+            Path(nb_to_py_mapping[notebook].file)
         )
         nb_to_py_mapping[notebook] = nb_to_py_mapping[notebook]._replace(
             file=relative_path
@@ -423,14 +423,14 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                 )
             except Exception:  # pylint: disable=W0703
                 sys.stderr.write(
-                    BASE_ERROR_MESSAGE.format(f"Error parsing {str(notebook)}")
+                    BASE_ERROR_MESSAGE.format(f"Error parsing {notebook}")
                 )
                 return 1
 
         output, output_code, mutated = _run_command(
             cli_args.command,
             configs.nbqa_addopts,
-            [i[1] for i in nb_to_py_mapping.values()],
+            [i.file for i in nb_to_py_mapping.values()],
         )
 
         actually_mutated = False
@@ -449,7 +449,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
             except Exception as exc:  # pylint: disable=W0703
                 msg = (
                     f"{repr(exc)} while parsing output "
-                    f"from applying {cli_args.command} to {str(notebook)}"
+                    f"from applying {cli_args.command} to {notebook}"
                 )
                 sys.stderr.write(BASE_ERROR_MESSAGE.format(msg))
                 return 1
@@ -484,7 +484,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                 except Exception:  # pylint: disable=W0703
                     sys.stderr.write(
                         BASE_ERROR_MESSAGE.format(
-                            f"Error reconstructing {str(notebook)}"
+                            f"Error reconstructing {notebook}"
                         )
                     )
                     return 1
