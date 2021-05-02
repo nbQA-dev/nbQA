@@ -17,7 +17,7 @@ class Output(NamedTuple):
     err: str
 
 
-def _get_relative_and_absolute_paths(path: Path) -> Tuple[Path, Path]:
+def get_relative_and_absolute_paths(path: Path) -> Tuple[Path, Path]:
     """Get relative (if possible) and absolute versions of path."""
     absolute_path = path.resolve()
     try:
@@ -49,7 +49,7 @@ def _get_pattern(
     """
     standard_substitution = partial(_line_to_cell, cell_mapping=cell_mapping)
 
-    relative_path, absolute_path = _get_relative_and_absolute_paths(notebook)
+    relative_path, absolute_path = get_relative_and_absolute_paths(notebook)
 
     if command == "black":
         return [
