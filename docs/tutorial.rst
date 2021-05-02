@@ -60,9 +60,6 @@ Open up your ``pyproject.toml`` file (or create one if you don't have one alread
     [tool.black]
     line-length = 96
 
-    [tool.nbqa.config]
-    black = "pyproject.toml"
-
     [tool.nbqa.mutate]
     black = 1
 

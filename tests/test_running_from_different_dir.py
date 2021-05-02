@@ -1,9 +1,15 @@
 """Check configs are picked up when running in different directory."""
-import subprocess
+import os
 from pathlib import Path
 from textwrap import dedent
+from typing import TYPE_CHECKING
 
 import pytest
+
+from nbqa.__main__ import main
+
+if TYPE_CHECKING:
+    from _pytest.capture import CaptureFixture
 
 
 @pytest.mark.parametrize(
@@ -15,7 +21,9 @@ import pytest
         (Path.cwd() / "tests/data/notebook_for_testing.ipynb", Path.cwd().parent),
     ],
 )
-def test_running_in_different_dir_works(arg: Path, cwd: Path) -> None:
+def test_running_in_different_dir_works(
+    arg: Path, cwd: Path, capsys: "CaptureFixture"
+) -> None:
     """
     Check .nbqa.ini config is picked up when running from non-root directory.
 
@@ -35,16 +43,13 @@ def test_running_in_different_dir_works(arg: Path, cwd: Path) -> None:
             """
         )
     )
-
-    output = subprocess.run(
-        ["nbqa", "flake8", str(arg)],
-        stderr=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        cwd=str(cwd),
-    )
-
-    Path(".nbqa.ini").unlink()
-
-    out = output.stdout.decode()
-    assert "W291" in out
-    assert "F401" not in out
+    original_cwd = os.getcwd()
+    try:
+        os.chdir(str(cwd))
+        main(["flake8", str(arg)])
+        out, _ = capsys.readouterr()
+        assert "W291" in out
+        assert "F401" not in out
+    finally:
+        os.chdir(original_cwd)
+        Path(".nbqa.ini").unlink()

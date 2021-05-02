@@ -23,23 +23,6 @@ or you can put the following in your :code:`pyproject.toml` file
         "--extend-ignore=E203"
     ]
 
-Config file
-~~~~~~~~~~~
-
-By default, :code:`nbQA` will look up the configuration of the third party tool in the following files :code:`setup.cfg`, :code:`tox.ini` and :code:`pyproject.toml`.
-If you want to use a different config file for your third-party tool (e.g. :code:`.mypy.ini` for :code:`mypy`), you can run
-
-.. code-block:: bash
-
-    nbqa mypy my_notebook.ipynb --nbqa-config .mypy.ini
-
-or you can put the following in your :code:`pyproject.toml` file
-
-.. code-block:: toml
-
-    [tool.nbqa.config]
-    mypy = ".mypy.ini"
-
 Allow mutations
 ~~~~~~~~~~~~~~~
 
