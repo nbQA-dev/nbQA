@@ -45,8 +45,8 @@ def _get_pattern(
     if command == "black":
         return [
             (
-                rf"(?<=^error: cannot format {re.escape(relative_path)}: Cannot parse: )\d+|"
-                rf"(?<=^error: cannot format {re.escape(absolute_path)}: Cannot parse: )\d+",
+                rf"(?<=^error: cannot format {re.escape(relative_path)}: Cannot parse: )\d+"
+                rf"|(?<=^error: cannot format {re.escape(absolute_path)}: Cannot parse: )\d+",
                 standard_substitution,
             ),
             (r"(?<=line )\d+(?=\)\nOh no! )", standard_substitution),
@@ -61,8 +61,8 @@ def _get_pattern(
                 standard_substitution,
             ),
             (
-                rf'(?<=^File "{re.escape(relative_path)}",) line|'
-                rf'(?<=^File "{re.escape(absolute_path)}",) line',
+                rf'(?<=^File "{re.escape(relative_path)}",) line'
+                rf'|(?<=^File "{re.escape(absolute_path)}",) line',
                 "",
             ),
         ]

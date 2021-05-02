@@ -10,16 +10,7 @@ import os
 import sys
 from difflib import unified_diff
 from shutil import move
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Iterator,
-    List,
-    Mapping,
-    MutableMapping,
-    Sequence,
-    Set,
-)
+from typing import Any, Iterator, List, Mapping, MutableMapping, Sequence, Set
 
 import tokenize_rt
 
@@ -27,9 +18,6 @@ from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
 from nbqa.save_source import CODE_SEPARATOR
 from nbqa.text import BOLD, GREEN, RED, RESET
-
-if TYPE_CHECKING:
-    pass
 
 
 def _restore_semicolon(
