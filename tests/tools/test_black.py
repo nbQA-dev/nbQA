@@ -290,8 +290,8 @@ def test_black_works_with_commented_magics(capsys: "CaptureFixture") -> None:
     expected_out = f"""\
 \x1b[1mCell 1\x1b[0m
 ------
---- {path}
-+++ {path}
+--- {os.path.abspath(path)}
++++ {os.path.abspath(path)}
 @@ -1,2 +1 @@
 \x1b[31m-[1, 2,
 \x1b[0m\x1b[31m-3, 4]
@@ -302,7 +302,7 @@ To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
     expected_err = (
         dedent(
             f"""\
-            reformatted {os.path.abspath(path)}
+            reformatted {path}
             All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
             1 file reformatted.
             """
@@ -332,8 +332,8 @@ def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
     expected_out = f"""\
 \x1b[1mCell 3\x1b[0m
 ------
---- {path}
-+++ {path}
+--- {os.path.abspath(path)}
++++ {os.path.abspath(path)}
 @@ -1,3 +1,3 @@
  # export
 \x1b[31m-def example_func(hi = "yo"):
@@ -498,8 +498,8 @@ def test_comment_after_trailing_comma(capsys: "CaptureFixture") -> None:
     expected_out = (
         "\x1b[1mCell 1\x1b[0m\n"
         "------\n"
-        f"--- {path}\n"
-        f"+++ {path}\n"
+        f"--- {os.path.abspath(path)}\n"
+        f"+++ {os.path.abspath(path)}\n"
         "@@ -1,4 +1,5 @@\n"
         "\x1b[31m-import glob;\n"
         "\x1b[0m\x1b[32m+import glob\n"
@@ -510,8 +510,8 @@ def test_comment_after_trailing_comma(capsys: "CaptureFixture") -> None:
         "\n"
         "\x1b[1mCell 2\x1b[0m\n"
         "------\n"
-        f"--- {path}\n"
-        f"+++ {path}\n"
+        f"--- {os.path.abspath(path)}\n"
+        f"+++ {os.path.abspath(path)}\n"
         "@@ -1,3 +1,2 @@\n"
         " def func(a, b):\n"
         "     pass;\n"

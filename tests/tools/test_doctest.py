@@ -56,7 +56,6 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
         """
     )
     # pylint: enable=C0301
-    breakpoint()
     assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
     assert err == ""
 

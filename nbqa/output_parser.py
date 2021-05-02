@@ -1,5 +1,4 @@
 """Parse output from code quality tools."""
-import os
 import re
 from functools import partial
 from pathlib import Path
@@ -19,6 +18,7 @@ class Output(NamedTuple):
 
 
 def _get_relative_and_absolute_paths(path: Path) -> Tuple[Path, Path]:
+    """Get relative (if possible) and absolute versions of path."""
     absolute_path = path.resolve()
     try:
         relative_path = absolute_path.relative_to(Path.cwd())
@@ -54,7 +54,8 @@ def _get_pattern(
     if command == "black":
         return [
             (
-                rf"(?<=^error: cannot format {re.escape(str(relative_path))}: Cannot parse: )\d+|(?<=^error: cannot format {re.escape(str(absolute_path))}: Cannot parse: )\d+",
+                rf"(?<=^error: cannot format {re.escape(str(relative_path))}: Cannot parse: )\d+|"
+                rf"(?<=^error: cannot format {re.escape(str(absolute_path))}: Cannot parse: )\d+",
                 standard_substitution,
             ),
             (r"(?<=line )\d+(?=\)\nOh no! )", standard_substitution),
@@ -64,11 +65,13 @@ def _get_pattern(
     if command == "doctest":
         return [
             (
-                rf'(?<=^File "{re.escape(os.path.abspath(str(relative_path)))}", line )\d+|(?<=^File "{re.escape(os.path.abspath(str(absolute_path)))}", line )\d+',
+                rf'(?<=^File "{re.escape(str(relative_path))}", line )\d+'
+                rf'|(?<=^File "{re.escape(str(absolute_path))}", line )\d+',
                 standard_substitution,
             ),
             (
-                rf'(?<=^File "{re.escape(os.path.abspath(str(relative_path)))}",) line|(?<=^File "{re.escape(os.path.abspath(str(absolute_path)))}",) line',
+                rf'(?<=^File "{re.escape(str(relative_path))}",) line|'
+                rf'(?<=^File "{re.escape(str(absolute_path))}",) line',
                 "",
             ),
         ]
@@ -76,7 +79,8 @@ def _get_pattern(
     # This is the most common one and is used by flake, pylint, mypy, and more.
     return [
         (
-            rf"(?<=^{re.escape(str(absolute_path))}:)\d+|(?<=^{re.escape(str(relative_path))}:)\d+",
+            rf"(?<=^{re.escape(str(absolute_path))}:)\d+"
+            rf"|(?<=^{re.escape(str(relative_path))}:)\d+",
             standard_substitution,
         )
     ]

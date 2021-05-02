@@ -58,6 +58,8 @@ REPLACE_FUNCTION = {
 
 
 class TemporaryFile(NamedTuple):
+    """Temporary file and file descriptor."""
+
     fd: int
     file: str
 
@@ -327,7 +329,7 @@ def _clean_up_tmp_files(nb_to_py_mapping: Mapping[Path, Tuple[int, str]]) -> Non
 
 def _get_nb_to_py_mapping(
     root_dirs: Sequence[str], files: Optional[str], exclude: Optional[str]
-) -> Dict[Path, Tuple[int, str]]:
+) -> Dict[Path, TemporaryFile]:
     """
     Get mapping between notebooks and temporary Python files.
 
@@ -350,7 +352,7 @@ def _get_nb_to_py_mapping(
     FileNotFoundError
         If notebook isn't found.
     """
-    nb_to_py_mapping: Dict[Path, Tuple[int, str]] = {}
+    nb_to_py_mapping: Dict[Path, TemporaryFile] = {}
     for notebook in _get_all_notebooks(root_dirs, files, exclude):
         if not notebook.exists():
             _clean_up_tmp_files(nb_to_py_mapping)
