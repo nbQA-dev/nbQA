@@ -94,6 +94,7 @@ def test_configs_work_in_nbqaini(capsys: "CaptureFixture") -> None:
     )
 
     main(["flake8", "tests", "--ignore", "E302"])
+    Path(".flake8").unlink()
 
     # check out and err
     out, _ = capsys.readouterr()

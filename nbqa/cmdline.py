@@ -123,20 +123,6 @@ class CLIArgs:  # pylint: disable=R0902,R0903
             help="Show diff which would result from running --nbqa-mutate.",
         )
         parser.add_argument(
-            "--nbqa-config",
-            required=False,
-            help="Deprecated, do not use.",
-        )
-        parser.add_argument(
-            "--nbqa-ignore-cells",
-            required=False,
-            help=dedent(
-                r"""
-                Deprecated, do not use.
-                """
-            ),
-        )
-        parser.add_argument(
             "--nbqa-process-cells",
             required=False,
             help=dedent(
