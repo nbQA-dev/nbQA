@@ -93,7 +93,6 @@ class Configs:
     CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.EXCLUDE] = str
 
     _mutate: bool = False
-    _config: Optional[str] = None
     _process_cells: Sequence[str] = []
     _addopts: Sequence[str] = []
     _diff: bool = False
