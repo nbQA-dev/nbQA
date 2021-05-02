@@ -29,7 +29,7 @@ from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
 from nbqa.output_parser import (
     Output,
-    _get_relative_and_absolute_paths,
+    get_relative_and_absolute_paths,
     map_python_line_to_nb_lines,
 )
 from nbqa.text import BOLD, RESET
@@ -367,7 +367,7 @@ def _get_nb_to_py_mapping(
                 suffix=".py",
             )
         )
-        relative_path, _ = _get_relative_and_absolute_paths(
+        relative_path, _ = get_relative_and_absolute_paths(
             Path(nb_to_py_mapping[notebook][1])
         )
         nb_to_py_mapping[notebook] = nb_to_py_mapping[notebook]._replace(
