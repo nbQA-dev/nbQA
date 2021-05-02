@@ -10,16 +10,7 @@ import os
 import sys
 from difflib import unified_diff
 from shutil import move
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Iterator,
-    List,
-    Mapping,
-    MutableMapping,
-    Sequence,
-    Set,
-)
+from typing import Any, Iterator, List, Mapping, MutableMapping, Sequence, Set
 
 import tokenize_rt
 
@@ -27,9 +18,6 @@ from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
 from nbqa.save_source import CODE_SEPARATOR
 from nbqa.text import BOLD, GREEN, RED, RESET
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 def _restore_semicolon(
@@ -174,7 +162,7 @@ def _notebook_code_cells(
             yield cell
 
 
-def mutate(python_file: str, notebook: "Path", notebook_info: NotebookInfo) -> bool:
+def mutate(python_file: str, notebook: str, notebook_info: NotebookInfo) -> bool:
     """
     Replace :code:`source` code cells of original notebook.
 
@@ -192,7 +180,8 @@ def mutate(python_file: str, notebook: "Path", notebook_info: NotebookInfo) -> b
     bool
         Whether mutation actually happened.
     """
-    notebook_json = json.loads(notebook.read_text(encoding="utf-8"))
+    with open(notebook, encoding="utf-8") as handle:
+        notebook_json = json.loads(handle.read())
     original_notebook_json = copy.deepcopy(notebook_json)
 
     pycells = _get_pycells(python_file)
@@ -206,10 +195,12 @@ def mutate(python_file: str, notebook: "Path", notebook_info: NotebookInfo) -> b
     if original_notebook_json == notebook_json:
         return False
 
-    temp_notebook = os.path.join(os.path.dirname(python_file), notebook.name)
+    temp_notebook = os.path.join(
+        os.path.dirname(python_file), os.path.basename(notebook)
+    )
     with open(temp_notebook, "w", encoding="utf-8") as handle:
         handle.write(f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n")
-    move(str(temp_notebook), str(notebook))
+    move(temp_notebook, notebook)
     return True
 
 
@@ -248,7 +239,7 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> bool:
     return False
 
 
-def diff(python_file: str, notebook: "Path", notebook_info: NotebookInfo) -> bool:
+def diff(python_file: str, notebook: str, notebook_info: NotebookInfo) -> bool:
     """
     View diff between new source of code cells and original sources.
 
@@ -266,7 +257,8 @@ def diff(python_file: str, notebook: "Path", notebook_info: NotebookInfo) -> boo
     bool
         Whether non-null diff was produced.
     """
-    notebook_json = json.loads(notebook.read_text(encoding="utf-8"))
+    with open(notebook, encoding="utf-8") as handle:
+        notebook_json = json.loads(handle.read())
 
     pycells = _get_pycells(python_file)
 
@@ -283,8 +275,8 @@ def diff(python_file: str, notebook: "Path", notebook_info: NotebookInfo) -> boo
         cell_diff = unified_diff(
             cell["source"],
             new_source,
-            fromfile=str(notebook),
-            tofile=str(notebook),
+            fromfile=notebook,
+            tofile=notebook,
         )
         actually_mutated = _print_diff(code_cell_number, cell_diff) or actually_mutated
     return actually_mutated

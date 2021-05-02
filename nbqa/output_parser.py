@@ -1,9 +1,9 @@
 """Parse output from code quality tools."""
-import os
 import re
 from functools import partial
-from pathlib import Path
 from typing import Callable, Mapping, Match, NamedTuple, Sequence, Tuple, Union
+
+from nbqa.path_utils import get_relative_and_absolute_paths
 
 
 def _line_to_cell(match: Match[str], cell_mapping: Mapping[int, str]) -> str:
@@ -19,7 +19,7 @@ class Output(NamedTuple):
 
 
 def _get_pattern(
-    notebook: Path, command: str, cell_mapping: Mapping[int, str]
+    notebook: str, command: str, cell_mapping: Mapping[int, str]
 ) -> Sequence[Tuple[str, Union[str, Callable[[Match[str]], str]]]]:
     """
     Get pattern and substitutions with which to process code quality tool's output.
@@ -40,10 +40,13 @@ def _get_pattern(
     """
     standard_substitution = partial(_line_to_cell, cell_mapping=cell_mapping)
 
+    relative_path, absolute_path = get_relative_and_absolute_paths(notebook)
+
     if command == "black":
         return [
             (
-                rf"(?<=^error: cannot format {re.escape(str(notebook))}: Cannot parse: )\d+",
+                rf"(?<=^error: cannot format {re.escape(relative_path)}: Cannot parse: )\d+"
+                rf"|(?<=^error: cannot format {re.escape(absolute_path)}: Cannot parse: )\d+",
                 standard_substitution,
             ),
             (r"(?<=line )\d+(?=\)\nOh no! )", standard_substitution),
@@ -53,28 +56,29 @@ def _get_pattern(
     if command == "doctest":
         return [
             (
-                rf'(?<=^File "{re.escape(os.path.abspath(str(notebook)))}", line )\d+',
+                rf'(?<=^File "{re.escape(relative_path)}", line )\d+'
+                rf'|(?<=^File "{re.escape(absolute_path)}", line )\d+',
                 standard_substitution,
             ),
-            (rf'(?<=^File "{re.escape(os.path.abspath(str(notebook)))}",) line', ""),
+            (
+                rf'(?<=^File "{re.escape(relative_path)}",) line'
+                rf'|(?<=^File "{re.escape(absolute_path)}",) line',
+                "",
+            ),
         ]
 
     # This is the most common one and is used by flake, pylint, mypy, and more.
-    absolute_path = notebook.resolve()
-    try:
-        relative_path = absolute_path.relative_to(Path.cwd())
-    except ValueError:
-        relative_path = absolute_path
     return [
         (
-            rf"(?<=^{re.escape(str(absolute_path))}:)\d+|(?<=^{re.escape(str(relative_path))}:)\d+",
+            rf"(?<=^{re.escape(absolute_path)}:)\d+"
+            rf"|(?<=^{re.escape(relative_path)}:)\d+",
             standard_substitution,
         )
     ]
 
 
 def map_python_line_to_nb_lines(
-    command: str, out: str, err: str, notebook: Path, cell_mapping: Mapping[int, str]
+    command: str, out: str, err: str, notebook: str, cell_mapping: Mapping[int, str]
 ) -> Output:
     """
     Make sure stdout and stderr make reference to Jupyter Notebook cells and lines.

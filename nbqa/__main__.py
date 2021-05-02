@@ -12,6 +12,7 @@ from typing import (
     Iterator,
     Mapping,
     MutableMapping,
+    NamedTuple,
     Optional,
     Sequence,
     Set,
@@ -27,6 +28,7 @@ from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
 from nbqa.output_parser import Output, map_python_line_to_nb_lines
+from nbqa.path_utils import get_relative_and_absolute_paths, remove_suffix
 from nbqa.text import BOLD, RESET
 
 BASE_ERROR_MESSAGE = dedent(
@@ -50,6 +52,13 @@ REPLACE_FUNCTION = {
     True: replace_source.diff,
     False: replace_source.mutate,
 }
+
+
+class TemporaryFile(NamedTuple):
+    """Temporary file and file descriptor."""
+
+    fd: int
+    file: str
 
 
 class UnsupportedPackageVersionError(Exception):
@@ -78,7 +87,7 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
     notebooks
         All Jupyter Notebooks found in directory.
     """
-    if not Path(root_dir).is_dir():
+    if not os.path.isdir(root_dir):
         return iter((Path(root_dir),))
     return (
         i
@@ -91,7 +100,7 @@ def _filter_by_include_exclude(
     notebooks: Iterator[Path],
     include: Optional[str],
     exclude: Optional[str],
-) -> Iterator[Path]:
+) -> Iterator[str]:
     """
     Include files which match include, exclude those matching exclude.
 
@@ -111,7 +120,7 @@ def _filter_by_include_exclude(
     exclude = exclude or "^$"
     include_re, exclude_re = re.compile(include), re.compile(exclude)
     return (
-        notebook
+        str(notebook)
         for notebook in notebooks
         if include_re.search(str(notebook.as_posix()))
         if not exclude_re.search(str(notebook.as_posix()))
@@ -120,7 +129,7 @@ def _filter_by_include_exclude(
 
 def _get_all_notebooks(
     root_dirs: Sequence[str], files: Optional[str], exclude: Optional[str]
-) -> Iterator[Path]:
+) -> Iterator[str]:
     """
     Get generator with all notebooks passed in via the command-line, applying exclusions.
 
@@ -145,7 +154,7 @@ def _get_all_notebooks(
 
 def _replace_temp_python_file_references_in_out_err(
     temp_python_file: str,
-    notebook: Path,
+    notebook: str,
     out: str,
     err: str,
 ) -> Output:
@@ -168,13 +177,17 @@ def _replace_temp_python_file_references_in_out_err(
     Output
         Stdout, stderr with temporary directory replaced by current working directory.
     """
-    basename = os.path.basename(temp_python_file)
-    out = out.replace(basename, str(notebook.stem) + ".ipynb")
-    err = err.replace(basename, str(notebook.stem) + ".ipynb")
+    py_basename = os.path.basename(temp_python_file)
+    nb_basename = os.path.basename(notebook)
+    out = out.replace(py_basename, nb_basename)
+    err = err.replace(py_basename, nb_basename)
 
-    suffix = ".py"
-    out = out.replace(basename[: -len(suffix)], notebook.stem)
-    err = err.replace(basename[: -len(suffix)], notebook.stem)
+    out = out.replace(
+        remove_suffix(py_basename, ".py"), remove_suffix(nb_basename, ".ipynb")
+    )
+    err = err.replace(
+        remove_suffix(py_basename, ".py"), remove_suffix(nb_basename, ".ipynb")
+    )
 
     return Output(out, err)
 
@@ -304,7 +317,7 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     return cli_config.merge(Configs.get_default_config(cli_args.command))
 
 
-def _clean_up_tmp_files(nb_to_py_mapping: Mapping[Path, Tuple[int, str]]) -> None:
+def _clean_up_tmp_files(nb_to_py_mapping: Mapping[str, Tuple[int, str]]) -> None:
     """Remove temporary files."""
     for file_descriptor, tmp_path in nb_to_py_mapping.values():
         try:
@@ -317,7 +330,7 @@ def _clean_up_tmp_files(nb_to_py_mapping: Mapping[Path, Tuple[int, str]]) -> Non
 
 def _get_nb_to_py_mapping(
     root_dirs: Sequence[str], files: Optional[str], exclude: Optional[str]
-) -> Dict[Path, Tuple[int, str]]:
+) -> Dict[str, TemporaryFile]:
     """
     Get mapping between notebooks and temporary Python files.
 
@@ -332,7 +345,7 @@ def _get_nb_to_py_mapping(
 
     Returns
     -------
-    Dict[Path, Tuple[int, str]]
+    Dict[str, Tuple[int, str]]
         Mapping between notebooks and temporary Python files.
 
     Raises
@@ -340,18 +353,26 @@ def _get_nb_to_py_mapping(
     FileNotFoundError
         If notebook isn't found.
     """
-    nb_to_py_mapping: Dict[Path, Tuple[int, str]] = {}
+    nb_to_py_mapping: Dict[str, TemporaryFile] = {}
     for notebook in _get_all_notebooks(root_dirs, files, exclude):
-        if not notebook.exists():
+        if not os.path.exists(notebook):
             _clean_up_tmp_files(nb_to_py_mapping)
             raise FileNotFoundError(
-                f"{BOLD}No such file or directory: {str(notebook)}{RESET}\n"
+                f"{BOLD}No such file or directory: {notebook}{RESET}\n"
             )
 
-        nb_to_py_mapping[notebook] = tempfile.mkstemp(
-            dir=str(notebook.parent),
-            prefix=notebook.stem,
-            suffix=".py",
+        nb_to_py_mapping[notebook] = TemporaryFile(
+            *tempfile.mkstemp(
+                dir=os.path.dirname(notebook),
+                prefix=remove_suffix(os.path.basename(notebook), ".ipynb"),
+                suffix=".py",
+            )
+        )
+        relative_path, _ = get_relative_and_absolute_paths(
+            nb_to_py_mapping[notebook].file
+        )
+        nb_to_py_mapping[notebook] = nb_to_py_mapping[notebook]._replace(
+            file=relative_path
         )
     return nb_to_py_mapping
 
@@ -387,11 +408,11 @@ def _main(  # pylint: disable=R0912,R0914,R0911
         if not nb_to_py_mapping:
             sys.stderr.write(
                 "No .ipynb notebooks found in given directories: "
-                f"{' '.join(i for i in cli_args.root_dirs if Path(i).is_dir())}\n"
+                f"{' '.join(i for i in cli_args.root_dirs if os.path.isdir(i))}\n"
             )
             return 0
 
-        nb_info_mapping: MutableMapping[Path, NotebookInfo] = {}
+        nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
 
         for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
             try:
@@ -402,15 +423,13 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     cli_args.command,
                 )
             except Exception:  # pylint: disable=W0703
-                sys.stderr.write(
-                    BASE_ERROR_MESSAGE.format(f"Error parsing {str(notebook)}")
-                )
+                sys.stderr.write(BASE_ERROR_MESSAGE.format(f"Error parsing {notebook}"))
                 return 1
 
         output, output_code, mutated = _run_command(
             cli_args.command,
             configs.nbqa_addopts,
-            [i[1] for i in nb_to_py_mapping.values()],
+            [i.file for i in nb_to_py_mapping.values()],
         )
 
         actually_mutated = False
@@ -429,7 +448,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
             except Exception as exc:  # pylint: disable=W0703
                 msg = (
                     f"{repr(exc)} while parsing output "
-                    f"from applying {cli_args.command} to {str(notebook)}"
+                    f"from applying {cli_args.command} to {notebook}"
                 )
                 sys.stderr.write(BASE_ERROR_MESSAGE.format(msg))
                 return 1
@@ -463,9 +482,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     )
                 except Exception:  # pylint: disable=W0703
                     sys.stderr.write(
-                        BASE_ERROR_MESSAGE.format(
-                            f"Error reconstructing {str(notebook)}"
-                        )
+                        BASE_ERROR_MESSAGE.format(f"Error reconstructing {notebook}")
                     )
                     return 1
 

@@ -63,7 +63,7 @@ To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
     expected_err = (
         dedent(
             f"""\
-            reformatted {os.path.abspath(str(DIRTY_NOTEBOOK))}
+            reformatted {str(DIRTY_NOTEBOOK)}
             All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
             1 file reformatted.
             """
@@ -98,11 +98,9 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    path = os.path.abspath(
-        os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
-    )
+    path = os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
 
-    main(["black", path, "--nbqa-diff"])
+    main(["black", os.path.abspath(path), "--nbqa-diff"])
 
     out, err = capsys.readouterr()
     expected_out = ""

@@ -27,7 +27,7 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
     # check diff
     with open(tmp_notebook_for_testing) as handle:
         before = handle.readlines()
-    path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
+    path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
 
     Path("setup.cfg").write_text(
         dedent(
@@ -40,7 +40,7 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
             """
         )
     )
-    main(["pyupgrade", path])
+    main(["pyupgrade", os.path.abspath(path)])
     Path("setup.cfg").unlink()
     with open(tmp_notebook_for_testing) as handle:
         after = handle.readlines()
