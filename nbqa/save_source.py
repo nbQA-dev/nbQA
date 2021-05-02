@@ -11,7 +11,6 @@ from collections import defaultdict
 from itertools import takewhile
 from textwrap import indent
 from typing import (
-    TYPE_CHECKING,
     DefaultDict,
     Iterator,
     List,
@@ -26,9 +25,6 @@ import tokenize_rt
 
 from nbqa.handle_magics import INPUT_SPLITTER, IPythonMagicType, MagicHandler
 from nbqa.notebook_info import NotebookInfo
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 CODE_SEPARATOR = "# %%NBQA-CELL-SEP\n"
 MAGIC = ["time", "timeit", "capture", "pypy", "python", "python3"]
@@ -342,7 +338,7 @@ def _has_trailing_semicolon(src: str) -> Tuple[str, bool]:
 
 
 def main(  # pylint: disable=R0914
-    notebook: "Path",
+    notebook: str,
     file_descriptor: int,
     process_cells: Sequence[str],
     command: str,

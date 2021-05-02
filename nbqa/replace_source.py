@@ -29,7 +29,7 @@ from nbqa.save_source import CODE_SEPARATOR
 from nbqa.text import BOLD, GREEN, RED, RESET
 
 if TYPE_CHECKING:
-    from pathlib import Path
+    pass
 
 
 def _restore_semicolon(
@@ -174,7 +174,7 @@ def _notebook_code_cells(
             yield cell
 
 
-def mutate(python_file: str, notebook: "Path", notebook_info: NotebookInfo) -> bool:
+def mutate(python_file: str, notebook: str, notebook_info: NotebookInfo) -> bool:
     """
     Replace :code:`source` code cells of original notebook.
 
@@ -192,7 +192,7 @@ def mutate(python_file: str, notebook: "Path", notebook_info: NotebookInfo) -> b
     bool
         Whether mutation actually happened.
     """
-    with open(notebook, encoding='utf-8') as handle:
+    with open(notebook, encoding="utf-8") as handle:
         notebook_json = json.loads(handle.read())
     original_notebook_json = copy.deepcopy(notebook_json)
 
@@ -207,7 +207,9 @@ def mutate(python_file: str, notebook: "Path", notebook_info: NotebookInfo) -> b
     if original_notebook_json == notebook_json:
         return False
 
-    temp_notebook = os.path.join(os.path.dirname(python_file), os.path.basename(notebook))
+    temp_notebook = os.path.join(
+        os.path.dirname(python_file), os.path.basename(notebook)
+    )
     with open(temp_notebook, "w", encoding="utf-8") as handle:
         handle.write(f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n")
     move(temp_notebook, notebook)
@@ -249,7 +251,7 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> bool:
     return False
 
 
-def diff(python_file: str, notebook: "Path", notebook_info: NotebookInfo) -> bool:
+def diff(python_file: str, notebook: str, notebook_info: NotebookInfo) -> bool:
     """
     View diff between new source of code cells and original sources.
 
@@ -267,7 +269,7 @@ def diff(python_file: str, notebook: "Path", notebook_info: NotebookInfo) -> boo
     bool
         Whether non-null diff was produced.
     """
-    with open(notebook, encoding='utf-8') as handle:
+    with open(notebook, encoding="utf-8") as handle:
         notebook_json = json.loads(handle.read())
 
     pycells = _get_pycells(python_file)
