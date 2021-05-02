@@ -1,7 +1,7 @@
 """Module responsible for storing and handling nbqa configuration."""
 
 import collections
-from pathlib import Path
+import os
 from shlex import split
 from textwrap import dedent
 from typing import Any, Callable, ClassVar, Dict, Mapping, Optional, Sequence, Union
@@ -263,7 +263,7 @@ class Configs:
                     """
                 )
             )
-        if self.nbqa_config and not Path(self.nbqa_config).exists():
+        if self.nbqa_config and not os.path.exists(self.nbqa_config):
             raise FileNotFoundError(f"{self.nbqa_config} not found.")
         if self.nbqa_ignore_cells:
             raise ValueError(

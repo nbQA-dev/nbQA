@@ -1,6 +1,5 @@
 """Check output from third-party tool is correctly parsed."""
 
-from pathlib import Path
 from textwrap import dedent
 
 from nbqa.output_parser import map_python_line_to_nb_lines
@@ -10,7 +9,7 @@ def test_map_python_line_to_nb_lines() -> None:
     """Check that the output is correctly parsed if there is a warning about line 0."""
     out = "notebook.ipynb:0:1: WPS102 Found incorrect module name pattern"
     err = ""
-    notebook = Path("notebook.ipynb")
+    notebook = "notebook.ipynb"
     cell_mapping = {0: "cell_0:0"}
     result, _ = map_python_line_to_nb_lines("flake8", out, err, notebook, cell_mapping)
     expected = "notebook.ipynb:cell_0:0:1: WPS102 Found incorrect module name pattern"
@@ -27,7 +26,7 @@ def test_black_unparseable_output() -> None:
         1 file failed to reformat.
         """
     )
-    notebook = Path("notebook.ipynb")
+    notebook = "notebook.ipynb"
     cell_mapping = {38: "cell_10:1"}
     _, result = map_python_line_to_nb_lines("black", out, err, notebook, cell_mapping)
     expected = dedent(

@@ -87,7 +87,7 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
     notebooks
         All Jupyter Notebooks found in directory.
     """
-    if not Path(root_dir).is_dir():
+    if not os.path.isdir(root_dir):
         return iter((Path(root_dir),))
     return (
         i
