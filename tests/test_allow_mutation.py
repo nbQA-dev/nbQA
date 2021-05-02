@@ -33,7 +33,3 @@ def test_allow_mutation(capsys: "CaptureFixture") -> None:
     main(["black", path, "--line-length", "96"])
     _, err = capsys.readouterr()
     assert msg == err
-
-    main(["black", path, "--nbqa-config=tox.ini"])
-    _, err = capsys.readouterr()
-    assert msg == err

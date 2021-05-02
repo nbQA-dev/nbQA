@@ -30,7 +30,7 @@ def test_configs_work(capsys: "CaptureFixture") -> None:
         )
     )
 
-    main(["flake8", "tests", "--ignore", "E302", "--nbqa-config", ".flake8"])
+    main(["flake8", "tests", "--ignore", "E302"])
 
     Path(".flake8").unlink()
 
@@ -60,19 +60,9 @@ def test_configs_work_in_setupcfg(capsys: "CaptureFixture") -> None:
         )
     )
 
-    Path("setup.cfg").write_text(
-        dedent(
-            """\
-            [nbqa.config]
-            flake8=.flake8
-            """
-        )
-    )
-
     main(["flake8", "tests", "--ignore", "E302"])
 
     Path(".flake8").unlink()
-    Path("setup.cfg").unlink()
 
     # check out and err
     out, _ = capsys.readouterr()
@@ -103,19 +93,7 @@ def test_configs_work_in_nbqaini(capsys: "CaptureFixture") -> None:
         )
     )
 
-    Path(".nbqa.ini").write_text(
-        dedent(
-            """\
-            [flake8]
-            config=.flake8
-            """
-        )
-    )
-
     main(["flake8", "tests", "--ignore", "E302"])
-
-    Path(".flake8").unlink()
-    Path(".nbqa.ini").unlink()
 
     # check out and err
     out, _ = capsys.readouterr()

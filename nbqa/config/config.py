@@ -18,7 +18,6 @@ class _ConfigSections(
         "_ConfigSections",
         (
             "ADDOPTS",
-            "CONFIG",
             "PROCESS_CELLS",
             "MUTATE",
             "DIFF",
@@ -34,7 +33,6 @@ class _ConfigSections(
     def __new__(  # pylint: disable=R0913
         cls,
         ADDOPTS: str = "addopts",
-        CONFIG: str = "config",
         PROCESS_CELLS: str = "process_cells",
         MUTATE: str = "mutate",
         DIFF: str = "diff",
@@ -45,7 +43,6 @@ class _ConfigSections(
         return super().__new__(
             cls,
             ADDOPTS,
-            CONFIG,
             PROCESS_CELLS,
             MUTATE,
             DIFF,
