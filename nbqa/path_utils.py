@@ -4,9 +4,25 @@ from typing import Tuple
 
 
 def remove_suffix(string: str, suffix: str) -> str:
-    """Remove suffix from string."""
+    """
+    Remove suffix from string.
+
+    Parameters
+    ----------
+    string
+        Given string to remove suffix from.
+    suffix
+        Suffix to remove.
+
+    Raises
+    ------
+    AssertionError
+        If string doesn't end with given suffix.
+    """
     if string.endswith(suffix):
         string = string[: -len(suffix)]
+    else:  # pragma: nocover
+        raise AssertionError(f"{string} doesn't end with suffix {suffix}")
     return string
 
 
