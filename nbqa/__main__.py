@@ -7,7 +7,16 @@ import tempfile
 from importlib import import_module
 from pathlib import Path
 from textwrap import dedent
-from typing import Iterator, MutableMapping, Optional, Sequence, Set, Tuple
+from typing import (
+    Dict,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+)
 
 from pkg_resources import parse_version
 
@@ -119,6 +128,10 @@ def _get_all_notebooks(
     ----------
     root_dirs
         All the notebooks/directories passed in via the command-line.
+    files
+        Pattern of files to include.
+    exclude
+        Pattern of files to exclude.
 
     Returns
     -------
@@ -291,6 +304,58 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     return cli_config.merge(Configs.get_default_config(cli_args.command))
 
 
+def _clean_up_tmp_files(nb_to_py_mapping: Mapping[Path, Tuple[int, str]]) -> None:
+    """Remove temporary files."""
+    for file_descriptor, tmp_path in nb_to_py_mapping.values():
+        try:
+            os.close(file_descriptor)
+        except OSError:
+            # was already closed
+            pass
+        os.remove(tmp_path)
+
+
+def _get_nb_to_py_mapping(
+    root_dirs: Sequence[str], files: Optional[str], exclude: Optional[str]
+) -> Dict[Path, Tuple[int, str]]:
+    """
+    Get mapping between notebooks and temporary Python files.
+
+    Parameters
+    ----------
+    root_dirs
+        All the notebooks/directories passed in via the command-line.
+    files
+        Pattern of files to include.
+    exclude
+        Pattern of files to exclude.
+
+    Returns
+    -------
+    Dict[Path, Tuple[int, str]]
+        Mapping between notebooks and temporary Python files.
+
+    Raises
+    ------
+    FileNotFoundError
+        If notebook isn't found.
+    """
+    nb_to_py_mapping: Dict[Path, Tuple[int, str]] = {}
+    for notebook in _get_all_notebooks(root_dirs, files, exclude):
+        if not notebook.exists():
+            _clean_up_tmp_files(nb_to_py_mapping)
+            raise FileNotFoundError(
+                f"{BOLD}No such file or directory: {str(notebook)}{RESET}\n"
+            )
+
+        nb_to_py_mapping[notebook] = tempfile.mkstemp(
+            dir=str(notebook.parent),
+            prefix=notebook.stem,
+            suffix=".py",
+        )
+    return nb_to_py_mapping
+
+
 def _main(  # pylint: disable=R0912,R0914,R0911
     cli_args: CLIArgs, configs: Configs
 ) -> int:
@@ -309,19 +374,13 @@ def _main(  # pylint: disable=R0912,R0914,R0911
     int
         Output code from third-party tool.
     """
-    nb_to_py_mapping = {}
-    for notebook in _get_all_notebooks(
-        cli_args.root_dirs, configs.nbqa_files, configs.nbqa_exclude
-    ):
-        if not notebook.exists():
-            sys.stderr.write(f"{BOLD}No such file or directory: {str(notebook)}{RESET}")
-            return 1
-
-        nb_to_py_mapping[notebook] = tempfile.mkstemp(
-            dir=str(notebook.parent),
-            prefix=notebook.stem,
-            suffix=".py",
+    try:
+        nb_to_py_mapping = _get_nb_to_py_mapping(
+            cli_args.root_dirs, configs.nbqa_files, configs.nbqa_exclude
         )
+    except FileNotFoundError as exc:
+        sys.stderr.write(str(exc))
+        return 1
 
     try:  # pylint disable=R0912
 
@@ -425,14 +484,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
             return output_code
 
     finally:
-        for file_descriptor, tmp_path in nb_to_py_mapping.values():
-            try:
-                os.close(file_descriptor)
-            except OSError:
-                # was already closed
-                pass
-            os.remove(tmp_path)
-
+        _clean_up_tmp_files(nb_to_py_mapping)
     return output_code
 
 
