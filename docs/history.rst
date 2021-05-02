@@ -2,6 +2,16 @@
 Changelog
 =========
 
+0.8.0 (2021-05-02)
+------------------
+
+Output from linters will now typically display relative paths where possible,
+else absolute ones.
+Flags ``--nbqa-ignore`` and ``--nbqa-config`` have been removed.
+Fixed regression (introduced in 0.7.1) whereby if a series of notebooks
+was passed and one of them did not exist, then the temporary files associated
+with the first ones would not get cleaned up.
+
 0.7.1 (2021-04-28)
 ------------------
 
