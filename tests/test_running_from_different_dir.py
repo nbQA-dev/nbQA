@@ -2,10 +2,14 @@
 import os
 from pathlib import Path
 from textwrap import dedent
+from typing import TYPE_CHECKING
 
 import pytest
 
 from nbqa.__main__ import main
+
+if TYPE_CHECKING:
+    from _pytest.capture import CaptureFixture
 
 
 @pytest.mark.parametrize(
@@ -17,7 +21,9 @@ from nbqa.__main__ import main
         (Path.cwd() / "tests/data/notebook_for_testing.ipynb", Path.cwd().parent),
     ],
 )
-def test_running_in_different_dir_works(arg: Path, cwd: Path, capsys) -> None:
+def test_running_in_different_dir_works(
+    arg: Path, cwd: Path, capsys: "CaptureFixture"
+) -> None:
     """
     Check .nbqa.ini config is picked up when running from non-root directory.
 
