@@ -371,7 +371,7 @@ def _get_nb_to_py_mapping(
             Path(nb_to_py_mapping[notebook][1])
         )
         nb_to_py_mapping[notebook] = nb_to_py_mapping[notebook]._replace(
-            file=str(relative_path)
+            file=relative_path
         )
     return nb_to_py_mapping
 

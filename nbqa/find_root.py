@@ -8,6 +8,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Iterable
 
+CWD = Path.cwd()
+
 # files and folders known to indicate a project root
 KNOWN_PROJECT_ROOT_DIRS = [".git", ".hg"]
 KNOW_PROJECT_ROOT_FILES = [
@@ -45,7 +47,7 @@ def find_project_root(
     Path
         Project root.
     """
-    path_srcs = [Path(Path.cwd(), src).resolve() for src in srcs]
+    path_srcs = [Path(CWD, src).resolve() for src in srcs]
 
     # A list of lists of parents for each 'src'. 'src' is included as a
     # "parent" of itself if it is a directory
