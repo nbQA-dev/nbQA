@@ -1,7 +1,6 @@
 """Check that running :code:`doctest` works."""
 
 import os
-from textwrap import dedent
 from typing import TYPE_CHECKING
 
 from nbqa.__main__ import main
@@ -38,25 +37,29 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
     # check out and err
     out, err = capsys.readouterr()
 
-    # pylint: disable=C0301
-    expected_out = dedent(
-        f"""\
-        **********************************************************************
-        File "{WRONG_EXAMPLE_NOTEBOOK}", cell_2:10, in notebook_for_testing_copy.hello
-        Failed example:
-            hello("goodbye")
-        Expected:
-            'hello goodby'
-        Got:
-            'hello goodbye'
-        **********************************************************************
-        1 items had failures:
-           1 of   2 in notebook_for_testing_copy.hello
-        ***Test Failed*** 1 failures.
-        """
+    expected_out = (
+        "**********************************************************************\n"
+        f'File "{WRONG_EXAMPLE_NOTEBOOK}", cell_2:10, in notebook_for_testing_copy.hello\n'
+        "Failed example:\n"
+        '    hello("goodbye")\n'
+        "Expected:\n"
+        "    'hello goodby'\n"
+        "Got:\n"
+        "    'hello goodbye'\n"
+        "**********************************************************************\n"
+        "1 items had failures:\n"
+        "   1 of   2 in notebook_for_testing_copy.hello\n"
+        "***Test Failed*** 1 failures.\n"
     )
-    # pylint: enable=C0301
-    assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
+
+    try:
+        assert out == expected_out
+    except AssertionError:
+        # observed this in CI, some jobs pass with absolute path,
+        # others with relative...
+        assert out == expected_out.replace(
+            WRONG_EXAMPLE_NOTEBOOK, os.path.abspath(WRONG_EXAMPLE_NOTEBOOK)
+        )
     assert err == ""
 
 
