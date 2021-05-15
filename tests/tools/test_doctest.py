@@ -51,7 +51,15 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
         "   1 of   2 in notebook_for_testing_copy.hello\n"
         "***Test Failed*** 1 failures.\n"
     )
-    assert out == expected_out
+
+    try:
+        assert out == expected_out
+    except AssertionError:
+        # observed this in CI, some jobs pass with absolute path,
+        # others with relative...
+        assert out == expected_out.replace(
+            WRONG_EXAMPLE_NOTEBOOK, os.path.abspath(WRONG_EXAMPLE_NOTEBOOK)
+        )
     assert err == ""
 
 
