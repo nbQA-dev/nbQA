@@ -437,21 +437,13 @@ def _main(  # pylint: disable=R0912,R0914,R0911
             output = _replace_temp_python_file_references_in_out_err(
                 temp_python_file, notebook, output.out, output.err
             )
-            try:
-                output = map_python_line_to_nb_lines(
-                    cli_args.command,
-                    output.out,
-                    output.err,
-                    notebook,
-                    nb_info_mapping[notebook].cell_mappings,
-                )
-            except Exception as exc:  # pylint: disable=W0703
-                msg = (
-                    f"{repr(exc)} while parsing output "
-                    f"from applying {cli_args.command} to {notebook}"
-                )
-                sys.stderr.write(BASE_ERROR_MESSAGE.format(msg))
-                return 1
+            output = map_python_line_to_nb_lines(
+                cli_args.command,
+                output.out,
+                output.err,
+                notebook,
+                nb_info_mapping[notebook].cell_mappings,
+            )
 
             if mutated:
                 if not configs.nbqa_mutate and not configs.nbqa_diff:

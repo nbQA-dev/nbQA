@@ -119,23 +119,18 @@ def test_unable_to_parse(capsys: "CaptureFixture") -> None:
 @pytest.mark.usefixtures("tmp_print_6174")
 def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
     """
-    Check user is encouraged to report bug if we're unable to parse tool's output.
+    Check that nbQA doesn't crash when output can't be parsed.
+
     Parameters
     ----------
     capsys
         Pytest fixture to capture stdout and stderr.
     """
     path = Path("tests") / "data/notebook_for_testing.ipynb"
-    expected_err = dedent(
-        """\
-        \x1b\\[1mKeyError(.*) while parsing output from applying print_6174 to \
-tests.data.notebook_for_testing\\.ipynb
-        Please report a bug at https://github\\.com/nbQA\\-dev/nbQA/issues \x1b\\[0m
-        """
-    )
     main(["print_6174", str(path), "--nbqa-mutate"])
-    _, err = capsys.readouterr()
-    assert re.match(expected_err, err)
+    out, _ = capsys.readouterr()
+    expected_out = f"{str(path)}:6174:0 some silly warning\n"
+    assert out == expected_out
 
 
 def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
