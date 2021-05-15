@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.8.1 (2021-05-15)
+------------------
+If output from tool cannot be parsed from Python lines to notebook
+code cells, then a ``KeError`` is no longer thrown and the original output
+is printed (thanks Tony Hirst for the bug report!).
+
 0.8.0 (2021-05-02)
 ------------------
 
