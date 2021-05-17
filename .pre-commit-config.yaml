@@ -3,7 +3,7 @@ default_language_version:
   python: python3
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.0.1
     hooks:
       - id: end-of-file-fixer
       - id: requirements-txt-fixer
@@ -43,7 +43,7 @@ repos:
       - id: pydocstyle
         files: ^nbqa/
   - repo: https://github.com/econchick/interrogate
-    rev: 1.3.2
+    rev: 1.4.0
     hooks:
       - id: interrogate
         args: [-v, --fail-under=100]
@@ -54,7 +54,7 @@ repos:
       - id: mypy
         exclude: ^docs/
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.15.0
+    rev: v2.16.0
     hooks:
       - id: pyupgrade
         args: [--py36-plus]
