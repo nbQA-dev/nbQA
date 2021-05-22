@@ -422,8 +422,10 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     configs.nbqa_process_cells,
                     cli_args.command,
                 )
-            except Exception:  # pylint: disable=W0703
-                sys.stderr.write(BASE_ERROR_MESSAGE.format(f"Error parsing {notebook}"))
+            except Exception as exp:  # pylint: disable=W0703
+                sys.stderr.write(
+                    BASE_ERROR_MESSAGE.format(f"Error parsing {notebook}, {repr(exp)}")
+                )
                 return 1
 
         output, output_code, mutated = _run_command(
@@ -472,9 +474,11 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                         )
                         or actually_mutated
                     )
-                except Exception:  # pylint: disable=W0703
+                except Exception as exp:  # pylint: disable=W0703
                     sys.stderr.write(
-                        BASE_ERROR_MESSAGE.format(f"Error reconstructing {notebook}")
+                        BASE_ERROR_MESSAGE.format(
+                            f"Error reconstructing {notebook}, {repr(exp)}"
+                        )
                     )
                     return 1
 
