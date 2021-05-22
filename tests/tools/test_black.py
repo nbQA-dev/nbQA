@@ -62,7 +62,26 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
         +    "    %time randint(5, 10)"
         """
     )
-    breakpoint()
+    expected = (
+        '-    "    return \'hello {}\'.format(name)\\n",\n'
+        '+    "    return \\"hello {}\\".format(name)\\n",\n'
+        '-    "hello(3)   "\n'
+        '+    "hello(3)"\n'
+        '-    "    %time randint(5,10)"\n'
+        '+    "    %timerandint(5,10)"\n'
+        '-    "    %time pretty_print_object = pprint.PrettyPrinter(\\\\\\n",\n'
+        '-    "              indent=4, width=80, stream=sys.stdout, compact=True, depth=5\\\\\\n",\n'
+        '-    "          )\\n",\n'
+        '+    "    %timepretty_print_object = pprint.PrettyPrinter(              indent=4, width=80, stream=sys.stdout, compact=True, depth=5          )\\n",\n'
+    )
+    expected = (
+        '-    "    return \'hello {}\'.format(name)\\n",\n'
+        '+    "    return \\"hello {}\\".format(name)\\n",\n'
+        '-    "hello(3)   "\n'
+        '+    "hello(3)"\n'
+        '-    "    %time randint(5,10)"\n'
+        '+    "    %timerandint(5,10)"\n'
+    )
     assert result == expected
 
     # check out and err

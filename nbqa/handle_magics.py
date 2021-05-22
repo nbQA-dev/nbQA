@@ -33,7 +33,7 @@ class IPythonMagicType(Enum):
 
 
 class NewMagicHandler:
-    def __init__(self, ipython, src, command):
+    def __init__(self, ipython, src, command, magic_type):
         self.src = src
         self.ipython = ipython
         token = secrets.token_hex(4)
@@ -41,7 +41,10 @@ class NewMagicHandler:
             self.token = f'"{token}"'
         else:
             self.token = f"0x{int(token, base=16):X}"
-        self.replacement = f"type({self.token})  # foo"
+        if magic_type == 'cell':
+            self.replacement = f'# CELL MAGIC {self.token}'
+        else:
+            self.replacement = f"type({self.token})"
 
 
 class MagicHandler(ABC):

@@ -183,10 +183,12 @@ class Visitor(ast.NodeVisitor):
             and node.func.value.func.id == 'get_ipython'
         ):
             args = [i.value for i in node.args]
+            magic_type = None
             if node.func.attr == 'run_cell_magic':
                 src = f'%%{args[0]}'
                 if args[1]:
-                    src += args[1]
+                    src += f' {args[1]}'
+                magic_type = 'cell'
             elif node.func.attr == 'run_line_magic':
                 if args[0] == 'pinfo':
                     src = f'?{args[1]}'
@@ -195,15 +197,18 @@ class Visitor(ast.NodeVisitor):
                 else:
                     src = f'%{args[0]}'
                     if args[1]:
-                        src += args[1]
+                        src += f' {args[1]}'
+                magic_type = 'line'
             elif node.func.attr == 'system':
                 src = f'!{args[0]}'
+                magic_type = 'line'
             elif node.func.attr == 'getoutput':
                 src = f'!!{args[0]}'
+                magic_type = 'line'
             else:
                 src = None
             assert node.lineno == node.end_lineno
-            self.magics[(node.lineno, node.col_offset, node.end_col_offset)] = src
+            self.magics[(node.lineno, node.col_offset, node.end_col_offset)] = (src, magic_type)
         self.generic_visit(node)
 
 
@@ -236,13 +241,13 @@ def _replace_magics(
         visitor.visit(tree)
         newlines = []
         for n, line in enumerate(body.splitlines(), start=1):
-            for magics, src in visitor.magics.items():
+            for magics, (src, magic_type) in visitor.magics.items():
                 if n == magics[0]:
                     if src is None:
-                        handler = NewMagicHandler('foo', source, command)
+                        handler = NewMagicHandler('foo', source, command, magic_type=magic_type)
                         return handler.replacement
                     else:
-                        handler = NewMagicHandler(line[magics[1]:magics[2]], src, command)
+                        handler = NewMagicHandler(line[magics[1]:magics[2]], src, command, magic_type=magic_type)
                     magic_substitutions.append(handler)
                     line = line[:magics[1]] + handler.replacement + line[magics[2]:]
                     break
