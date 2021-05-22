@@ -169,6 +169,23 @@ def _extract_ipython_magic(magic: str, cell_source: Iterator[Tuple[int, str]]) -
     return magic
 
 
+import ast
+
+class Visitor(ast.NodeVisitor):
+    def __init__(self):
+        self.magics = {}
+
+    def visit_Call(self, node: ast.Call) -> None:
+        if isinstance(node.func, ast.Attribute):
+            if isinstance(node.func.value, ast.Call):
+                if isinstance(node.func.value.func, ast.Name):
+                    if node.func.value.func.id == 'get_ipython':
+                        import secrets
+                        assert node.lineno == node.end_lineno
+                        self.magics[(node.lineno, node.col_offset, node.end_col_offset)] = secrets.token_hex(3)
+        self.generic_visit(node)
+
+
 def _replace_magics(
     source: Sequence[str], magic_substitutions: List[MagicHandler], command: str
 ) -> Iterator[str]:
@@ -187,19 +204,28 @@ def _replace_magics(
     str
         Line from cell, with line magics replaced with python code
     """
-    source_itr = enumerate(source)
-    for line_no, line in source_itr:
-        if MagicHandler.is_ipython_magic(line):
-            # always pass the source starting from the current line
-            ipython_magic = _extract_ipython_magic(line, source_itr)
-            magic_handler = MagicHandler.get_magic_handler(ipython_magic, command)
-            magic_substitutions.append(magic_handler)
-            line = _handle_magic_indentation(
-                source[:line_no], ipython_magic, magic_handler.replace_magic()
-            )
+    def thing(body):
+        tree = ast.parse(body)
+        visitor = Visitor()
+        visitor.visit(tree)
+        breakpoint()
+        newlines = []
+        for n, line in enumerate(body.splitlines(), start=1):
+            for magics in visitor.magics:
+                if n == magics[0]:
+                    sub = f'type({visitor.magics[magics]})'
+                    line = line[:magics[1]] + sub + line[magics[2]:]
+                    magic_substitutions[sub] = line[magics[1]:magics[2]] 
+                    break
+            newlines.append(line)
+        newsrc = '\n'.join(newlines)
+        return newsrc
 
-        yield line
+    header = INPUT_SPLITTER.transform_cell(''.join(source[0]))
+    yield thing(header)
 
+    body = INPUT_SPLITTER.transform_cell(''.join(source[1:]))
+    yield thing(body)
 
 def _parse_cell(
     source: Sequence[str],
@@ -226,11 +252,12 @@ def _parse_cell(
     str
         Parsed cell.
     """
-    substituted_magics: List[MagicHandler] = []
+    substituted_magics: List[MagicHandler] = {}
     parsed_cell = CODE_SEPARATOR
 
     for parsed_line in _replace_magics(source, substituted_magics, command):
         parsed_cell += parsed_line
+    breakpoint()
 
     if substituted_magics:
         temporary_lines[cell_number] = substituted_magics

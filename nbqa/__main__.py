@@ -415,16 +415,12 @@ def _main(  # pylint: disable=R0912,R0914,R0911
         nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
 
         for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
-            try:
-                nb_info_mapping[notebook] = save_source.main(
-                    notebook,
-                    file_descriptor,
-                    configs.nbqa_process_cells,
-                    cli_args.command,
-                )
-            except Exception:  # pylint: disable=W0703
-                sys.stderr.write(BASE_ERROR_MESSAGE.format(f"Error parsing {notebook}"))
-                return 1
+            nb_info_mapping[notebook] = save_source.main(
+                notebook,
+                file_descriptor,
+                configs.nbqa_process_cells,
+                cli_args.command,
+            )
 
         output, output_code, mutated = _run_command(
             cli_args.command,

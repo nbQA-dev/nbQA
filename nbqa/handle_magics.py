@@ -429,6 +429,7 @@ class LineMagicHandler(MagicHandler):
             pattern = MagicHandler._get_regex_pattern(
                 self._MAGIC_WITH_CODE_REGEX_TEMPLATE, self._token
             )
+            breakpoint()
             return self._restore_magic_with_modified_code(pattern, cell_source)
 
         return super().restore_magic(cell_source)
