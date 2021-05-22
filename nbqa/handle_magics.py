@@ -3,7 +3,6 @@ import secrets
 import warnings
 from abc import ABC
 from enum import Enum
-from textwrap import dedent
 from typing import ClassVar, Mapping, Optional, Sequence
 
 with warnings.catch_warnings():
@@ -58,7 +57,7 @@ class NewMagicHandler:  # pylint: disable=R0903
             self.replacement = f"str({self.token})"
 
 
-class MagicHandler(ABC):
+class MagicHandler(ABC):  # pylint: disable=R0903
     """Base class of different types of magic handlers."""
 
     # Here token is placed at the beginning and at the end so that
@@ -109,30 +108,3 @@ class MagicHandler(ABC):
             magic_type = IPythonMagicType.NO_MAGIC
 
         return magic_type
-
-    @staticmethod
-    def preprocess_ipython_magic(ipython_magic: str) -> str:
-        r"""
-        Remove leading and trailing spaces, trailing slashes from ipython magic.
-
-        If the trailing slashes are present in ipython magic(its an incomplete magic),
-        then we would have issues with ``re.sub`` when replacing the ipython magic back
-        to the cell source. ``re.compile("something ending with slash\\")`` will fail to
-        compile. By stripping trailing slashes, the regex would compile fine during
-        substitution.
-
-        Parameters
-        ----------
-        ipython_magic : str
-            IPython magic
-
-        Returns
-        -------
-        str
-            IPython magic stripped of spaces and trailing slashes
-        """
-        ipython_magic = dedent(ipython_magic).strip()
-        if INPUT_SPLITTER.check_complete(ipython_magic)[0] == "incomplete":
-            ipython_magic = ipython_magic.rstrip("\\")
-
-        return ipython_magic

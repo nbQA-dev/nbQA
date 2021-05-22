@@ -49,11 +49,23 @@ class Visitor(ast.NodeVisitor):
     def __init__(self) -> None:
         """Magics will record where magics occur."""
         self.magics: MutableMapping[
-            Tuple[int, int, Optional[int]], Tuple[Optional[str], Optional[str]]
+            Tuple[int, int], Tuple[Optional[str], Optional[str]]
         ] = {}
 
     def visit_Call(self, node: ast.Call) -> None:  # pylint: disable=C0103,R0912
-        """Get source to replace ipython magic with."""
+        """
+        Get source to replace ipython magic with.
+
+        Parameters
+        ----------
+        node
+            Function call.
+
+        Raises
+        ------
+        AssertionError
+            Defensive check.
+        """
         if (
             isinstance(node.func, ast.Attribute)
             and isinstance(node.func.value, ast.Call)
@@ -62,15 +74,19 @@ class Visitor(ast.NodeVisitor):
         ):
             args = []
             for arg in node.args:
-                if isinstance(arg, ast.Constant):
-                    args.append(arg.value)
+                if isinstance(arg, ast.Str):
+                    args.append(arg.s)
+                else:
+                    raise AssertionError(
+                        "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
+                    )
             assert args
             magic_type: Optional[str] = None
             if node.func.attr == "run_cell_magic":
                 src: Optional[str] = f"%%{args[0]}"
                 if args[1]:
                     assert src is not None
-                    src = f" {args[1]}"
+                    src += f" {args[1]}"
                 magic_type = "cell"
             elif node.func.attr == "run_line_magic":
                 if args[0] == "pinfo":
@@ -91,8 +107,7 @@ class Visitor(ast.NodeVisitor):
                 magic_type = "line"
             else:
                 src = None
-            assert node.lineno == node.end_lineno
-            self.magics[(node.lineno, node.col_offset, node.end_col_offset)] = (
+            self.magics[(node.lineno, node.col_offset)] = (
                 src,
                 magic_type,
             )
@@ -138,13 +153,13 @@ def _replace_magics(
                         magic_substitutions.append(handler)
                         return handler.replacement
                     handler = NewMagicHandler(
-                        line[magics[1] : magics[2]],
+                        line[magics[1] :],
                         src,
                         command,
                         magic_type=magic_type,
                     )
                     magic_substitutions.append(handler)
-                    line = line[: magics[1]] + handler.replacement + line[magics[2] :]
+                    line = line[: magics[1]] + handler.replacement
                     break
             newlines.append(line)
         return "\n".join(newlines)
