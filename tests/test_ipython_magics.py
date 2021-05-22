@@ -2,7 +2,6 @@
 import difflib
 from pathlib import Path
 from shutil import copyfile
-from textwrap import dedent
 from typing import TYPE_CHECKING, Callable, Optional, Sequence
 
 import pytest
@@ -44,24 +43,28 @@ def _validate_magics_with_black(before: Sequence[str], after: Sequence[str]) -> 
     """
     diff = difflib.unified_diff(before, after)
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
-    expected = dedent(
-        """\
-        -    "def compute(operand1,operand2, bin_op):\\n",
-        +    "def compute(operand1, operand2, bin_op):\\n",
-        -    "compute(5,1, operator.add)"
-        +    "compute(5, 1, operator.add)"
-        -    "    ?str.splitlines"
-        +    "?str.splitlines"
-        -    "    !grep -r '%%HTML' . | wc -l"
-        +    "!grep -r '%%HTML' . | wc -l"
-        -    "   %time randint(5,10)"
-        +    "%time randint(5, 10)"
-        -    "    %time compute(5,1, operator.mul)"
-        +    "    %time compute(5, 1, operator.mul)"
-        -    "!pip list 2>&1 |\\\\"
-        +    "!pip list 2>&1 |"
-        """
+    # pylint: disable=C0301
+    expected = (
+        '-    "def compute(operand1,operand2, bin_op):\\n'
+        '",\n'
+        '+    "def compute(operand1, operand2, bin_op):\\n'
+        '",\n'
+        '-    "compute(5,1, operator.add)"\n'
+        '+    "compute(5, 1, operator.add)"\n'
+        '-    "    ?str.splitlines"\n'
+        '+    "str.splitlines?"\n'
+        '-    "flake8_version = !pip list 2>&1 | grep flake8\\n",\n'
+        '+    "flake8_version = !!pip list 2>&1 | grep flake8\\n",\n'
+        '-    "   %time randint(5,10)"\n'
+        '+    "%time randint(5,10)"\n'
+        '-    "%time pretty_print_object = pprint.PrettyPrinter(\\\\\\n",\n'
+        '-    "          indent=4, width=80, stream=sys.stdout, compact=True, depth=5\\\\\\n",\n'
+        '-    "      )"\n'
+        '+    "%time pretty_print_object = pprint.PrettyPrinter(          indent=4, width=80, stream=sys.stdout, compact=True, depth=5      )"\n'  # noqa: E501
+        '-    "!pip list 2>&1 |\\\\"\n'
+        '+    "!pip list 2>&1 |"\n'
     )
+    # pylint: enable=C0301
     return result == expected
 
 
@@ -103,12 +106,14 @@ def test_indented_magics(
 def _validate_magics_flake8_warnings(actual: str, test_nb_path: Path) -> bool:
     """Validate the results of notebooks with warnings."""
     expected_out = [
+        f"{str(test_nb_path)}:cell_1:1:1: F401 'random.randint' imported but unused",
+        f"{str(test_nb_path)}:cell_1:2:1: F401 'IPython.get_ipython' imported but unused",
         f"{str(test_nb_path)}:cell_3:6:21: E231 missing whitespace after ','",
         f"{str(test_nb_path)}:cell_3:11:10: E231 missing whitespace after ','",
-        f"{str(test_nb_path)}:cell_9:1:14: E231 missing whitespace after ','",
-        f"{str(test_nb_path)}:cell_10:2:18: E231 missing whitespace after ','",
         f"{str(test_nb_path)}:cell_12:1:1: E402 module level import not at top of file",
+        f"{str(test_nb_path)}:cell_12:1:1: F401 'pprint' imported but unused",
         f"{str(test_nb_path)}:cell_12:2:1: E402 module level import not at top of file",
+        f"{str(test_nb_path)}:cell_12:2:1: F401 'sys' imported but unused",
     ]
     return sorted(expected_out) == sorted(actual.splitlines())
 

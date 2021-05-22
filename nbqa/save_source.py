@@ -6,10 +6,7 @@ Markdown cells, output, and metadata are ignored.
 
 import ast
 import json
-import re
 from collections import defaultdict
-from itertools import takewhile
-from textwrap import indent
 from typing import (
     DefaultDict,
     Iterator,
@@ -17,13 +14,19 @@ from typing import (
     Mapping,
     MutableMapping,
     NamedTuple,
+    Optional,
     Sequence,
     Tuple,
 )
 
 import tokenize_rt
 
-from nbqa.handle_magics import INPUT_SPLITTER, IPythonMagicType, MagicHandler
+from nbqa.handle_magics import (
+    INPUT_SPLITTER,
+    IPythonMagicType,
+    MagicHandler,
+    NewMagicHandler,
+)
 from nbqa.notebook_info import NotebookInfo
 
 CODE_SEPARATOR = "# %%NBQA-CELL-SEP\n"
@@ -40,180 +43,63 @@ class Index(NamedTuple):
     cell_number: int
 
 
-def _is_src_code_indentation_valid(source: str) -> bool:
-    """
-    Return True is the indentation of the input source code is valid.
-
-    Parameters
-    ----------
-    source : str
-        Source code present in the notebook cell
-
-    Returns
-    -------
-    bool
-        True if the source indentation is valid otherwise False
-    """
-    valid: bool = True
-    try:
-        ast.parse(source)
-    except IndentationError:
-        valid = False
-    except SyntaxError:
-        # Ignore any other exceptions. Let the syntax issues
-        # be reported by the third party tool.
-        pass
-
-    return valid
-
-
-def _handle_magic_indentation(
-    source: Sequence[str], line_magic: str, magic_replacement: str
-) -> str:
-    """
-    Handle the indentation of line magics. Remove unnecessary indentation.
-
-    Parameters
-    ----------
-    source
-        Source code of the notebook cell
-    line_magic
-        Line magic present in the notebook cell
-    magic_replacement
-        Python code replacing ipython magic
-    Returns
-    -------
-    str
-        Replacement line for the original line magic statement.
-    """
-    leading_space = "".join(takewhile(lambda c: c == " ", line_magic))
-
-    # preserve the leading spaces and check if the syntax is valid
-    replacement = indent(magic_replacement, leading_space)
-    cell_source = "".join([*source, replacement])
-
-    # If the cell contains multiple line magics `ast.parse` will raise
-    # `SyntaxError`. Since we are interested in only checking the indentation
-    # of the current line magic, previous line magics should be replaced with
-    # some valid python token.
-    # `%time print("hello")` will become `magic; print("hello")`
-    cell_source = re.sub(r"%\w+", "magic;", cell_source)
-
-    if leading_space and not _is_src_code_indentation_valid(cell_source):
-        # Remove the line magic indentation assuming these leading spaces
-        # lead the source to have invalid indentation
-        # Currently we don't check if the original source
-        # code itself had IndentationError
-        replacement = magic_replacement
-
-    if line_magic.endswith(NEWLINE):
-        replacement += NEWLINE
-
-    return replacement
-
-
-def _extract_ipython_magic(magic: str, cell_source: Iterator[Tuple[int, str]]) -> str:
-    r"""Extract the ipython magic from the notebook cell source.
-
-    To extract ipython magic, we use `nbconvert.get_lines` because it can extract
-    the ipython magic statement that can span multiple lines.
-
-    .. code:: python
-
-        # example of ipython magic spanning multiple lines
-        %time result_pymc3 = eval_lda(\
-        transform_pymc3, beta_pymc3, docs_te.toarray(), np.arange(100)\
-        )
-
-    `nbconvert.filters.get_lines` has the capability to parse such line magics and
-    return the result as a single line with trailing backslash removed. `get_lines`
-    would return `%time result_pymc3 = eval_lda(        transform_pymc3, beta_pymc3,
-     docs_te.toarray(), np.arange(100)    )`
-
-    If the magic was spanning multiple lines, then we need to remove all trailing
-    backslashes introduced by previous runs of nbqa. Also we do need to preserve the
-    newline characters, otherwise tools like black will format the code again. Linters
-    like flake8, pylint will complain about line length. After we extract the code, we
-    should have string like below
-
-    .. code:: python
-
-        %time result_pymc3 =eval_lda(
-            transform_pymc3, beta_pymc3, docs_te.toarray(), np.arange(100)
-        )
-
-    Parameters
-    ----------
-    magic : str
-        First line of the ipython magic
-
-    cell_source: Iterator[Tuple[int, str]]
-        Iterator to the notebook cell source
-
-    Returns
-    -------
-    str
-        IPython line magic statement
-    """
-    magic_type = MagicHandler.get_ipython_magic_type(magic)
-    if magic_type and magic_type not in [IPythonMagicType.CELL, IPythonMagicType.HELP]:
-        # Here we look for ipython magics spanning across multiple lines.
-        while INPUT_SPLITTER.check_complete(magic)[0] == "incomplete":
-            try:
-                magic += next(cell_source)[1]
-            except StopIteration:
-                # This scenario is a syntax error where a line magic
-                # ends with a backslash and does not have a next line.
-                break
-
-    return magic
-
-
-import ast
-
 class Visitor(ast.NodeVisitor):
-    def __init__(self):
-        self.magics = {}
+    """Visit cell to look for get_ipython calls."""
 
-    def visit_Call(self, node: ast.Call) -> None:
+    def __init__(self) -> None:
+        """Magics will record where magics occur."""
+        self.magics: MutableMapping[
+            Tuple[int, int, Optional[int]], Tuple[Optional[str], Optional[str]]
+        ] = {}
+
+    def visit_Call(self, node: ast.Call) -> None:  # pylint: disable=C0103,R0912
+        """Get source to replace ipython magic with."""
         if (
             isinstance(node.func, ast.Attribute)
             and isinstance(node.func.value, ast.Call)
             and isinstance(node.func.value.func, ast.Name)
-            and node.func.value.func.id == 'get_ipython'
+            and node.func.value.func.id == "get_ipython"
         ):
-            args = [i.value for i in node.args]
-            magic_type = None
-            if node.func.attr == 'run_cell_magic':
-                src = f'%%{args[0]}'
+            args = []
+            for arg in node.args:
+                if isinstance(arg, ast.Constant):
+                    args.append(arg.value)
+            magic_type: Optional[str] = None
+            if node.func.attr == "run_cell_magic":
+                src: Optional[str] = f"%%{args[0]}"
                 if args[1]:
-                    src += f' {args[1]}'
-                magic_type = 'cell'
-            elif node.func.attr == 'run_line_magic':
-                if args[0] == 'pinfo':
-                    src = f'?{args[1]}'
-                elif args[0] == 'pinfo2':
-                    src = f'??{args[1]}'
+                    assert src is not None
+                    src = f" {args[1]}"
+                magic_type = "cell"
+            elif node.func.attr == "run_line_magic":
+                if args[0] == "pinfo":
+                    src = f"{args[1]}?"
+                elif args[0] == "pinfo2":
+                    src = f"{args[1]}??"
                 else:
-                    src = f'%{args[0]}'
+                    src = f"%{args[0]}"
                     if args[1]:
-                        src += f' {args[1]}'
-                magic_type = 'line'
-            elif node.func.attr == 'system':
-                src = f'!{args[0]}'
-                magic_type = 'line'
-            elif node.func.attr == 'getoutput':
-                src = f'!!{args[0]}'
-                magic_type = 'line'
+                        assert src is not None
+                        src += f" {args[1]}"
+                magic_type = "line"
+            elif node.func.attr == "system":
+                src = f"!{args[0]}"
+                magic_type = "line"
+            elif node.func.attr == "getoutput":
+                src = f"!!{args[0]}"
+                magic_type = "line"
             else:
                 src = None
             assert node.lineno == node.end_lineno
-            self.magics[(node.lineno, node.col_offset, node.end_col_offset)] = (src, magic_type)
+            self.magics[(node.lineno, node.col_offset, node.end_col_offset)] = (
+                src,
+                magic_type,
+            )
         self.generic_visit(node)
 
 
 def _replace_magics(
-    source: Sequence[str], magic_substitutions: List[MagicHandler], command: str
+    source: Sequence[str], magic_substitutions: List[NewMagicHandler], command: str
 ) -> Iterator[str]:
     """
     Replace IPython line magics with valid python code.
@@ -230,8 +116,9 @@ def _replace_magics(
     str
         Line from cell, with line magics replaced with python code
     """
-    from nbqa.handle_magics import NewMagicHandler
-    def thing(source):
+
+    def _process_source(source: str) -> str:
+        """Temporarily replace ipython magics - don't process if can't."""
         body = INPUT_SPLITTER.transform_cell(source)
         try:
             tree = ast.parse(body)
@@ -240,36 +127,43 @@ def _replace_magics(
         visitor = Visitor()
         visitor.visit(tree)
         newlines = []
-        for n, line in enumerate(body.splitlines(), start=1):
+        for i, line in enumerate(body.splitlines(), start=1):
             for magics, (src, magic_type) in visitor.magics.items():
-                if n == magics[0]:
+                if i == magics[0]:
                     if src is None:
-                        handler = NewMagicHandler('foo', source, command, magic_type=magic_type)
+                        handler = NewMagicHandler(
+                            "foo", source, command, magic_type=magic_type
+                        )
+                        magic_substitutions.append(handler)
                         return handler.replacement
-                    else:
-                        handler = NewMagicHandler(line[magics[1]:magics[2]], src, command, magic_type=magic_type)
+                    handler = NewMagicHandler(
+                        line[magics[1] : magics[2]],
+                        src,
+                        command,
+                        magic_type=magic_type,
+                    )
                     magic_substitutions.append(handler)
-                    line = line[:magics[1]] + handler.replacement + line[magics[2]:]
+                    line = line[: magics[1]] + handler.replacement + line[magics[2] :]
                     break
             newlines.append(line)
-        newsrc = '\n'.join(newlines) + '\n'
-        return newsrc
+        return "\n".join(newlines)
 
     # maybe, only process header differently if this is a cell magic?
     # check what happens if cell starts with multiline magic. detect,
     # ignore cell, too complicated
     # if first line is cell magic, process it separately
     if MagicHandler.get_ipython_magic_type(source[0]) == IPythonMagicType.CELL:
-        yield thing(source[0])
-        yield thing(''.join(source[1:]))
+        header = _process_source(source[0])
+        cell = _process_source("".join(source[1:]))
+        yield "\n".join([header, cell])
     else:
-        yield thing(''.join(source))
+        yield _process_source("".join(source))
 
 
 def _parse_cell(
     source: Sequence[str],
     cell_number: int,
-    temporary_lines: MutableMapping[int, Sequence[MagicHandler]],
+    temporary_lines: MutableMapping[int, Sequence[NewMagicHandler]],
     command: str,
 ) -> str:
     """
@@ -291,7 +185,7 @@ def _parse_cell(
     str
         Parsed cell.
     """
-    substituted_magics: List[MagicHandler] = []
+    substituted_magics: List[NewMagicHandler] = []
     parsed_cell = CODE_SEPARATOR
 
     for parsed_line in _replace_magics(source, substituted_magics, command):
@@ -304,7 +198,7 @@ def _parse_cell(
 
 
 def _get_line_numbers_for_mapping(
-    cell_source: str, magic_substitutions: Sequence[MagicHandler]
+    cell_source: str, magic_substitutions: Sequence[NewMagicHandler]
 ) -> Mapping[int, int]:
     """Get the line number mapping from python file to notebook cell.
 
@@ -326,16 +220,9 @@ def _get_line_numbers_for_mapping(
     if not magic_substitutions:
         line_mapping.update({i: i for i in range(len(lines_in_cell))})
     else:
-        ignore_previous_line = False
         line_number = -1
 
-        for line_no, line in enumerate(lines_in_cell):
-            if ignore_previous_line:
-                line_mapping[line_no] = line_number
-                ignore_previous_line = False
-                continue
-
-
+        for line_no, _ in enumerate(lines_in_cell):
             line_number += 1
             line_mapping[line_no] = line_number
 
@@ -430,7 +317,7 @@ def main(  # pylint: disable=R0914
     cell_mapping = {0: "cell_0:0"}
     index = Index(line_number=0, cell_number=0)
     trailing_semicolons = set()
-    temporary_lines: DefaultDict[int, Sequence[MagicHandler]] = defaultdict(list)
+    temporary_lines: DefaultDict[int, Sequence[NewMagicHandler]] = defaultdict(list)
     code_cells_to_ignore = set()
 
     for cell in cells:

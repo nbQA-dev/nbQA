@@ -2,7 +2,7 @@
 
 from typing import Mapping, Sequence, Set
 
-from nbqa.handle_magics import MagicHandler
+from nbqa.handle_magics import NewMagicHandler
 
 
 class NotebookInfo:
@@ -23,14 +23,14 @@ class NotebookInfo:
 
     _cell_mappings: Mapping[int, str] = {}
     _trailing_semicolons: Set[int] = set()
-    _temporary_lines: Mapping[int, Sequence[MagicHandler]] = {}
+    _temporary_lines: Mapping[int, Sequence[NewMagicHandler]] = {}
     _code_cells_to_ignore: Set[int] = set()
 
     def __init__(
         self,
         cell_mappings: Mapping[int, str],
         trailing_semicolons: Set[int],
-        temporary_lines: Mapping[int, Sequence[MagicHandler]],
+        temporary_lines: Mapping[int, Sequence[NewMagicHandler]],
         code_cells_to_ignore: Set[int],
     ) -> None:
         """
@@ -63,7 +63,7 @@ class NotebookInfo:
         return self._trailing_semicolons
 
     @property
-    def temporary_lines(self) -> Mapping[int, Sequence[MagicHandler]]:
+    def temporary_lines(self) -> Mapping[int, Sequence[NewMagicHandler]]:
         """Return mapping from cell number to all the magics substituted."""
         return self._temporary_lines
 

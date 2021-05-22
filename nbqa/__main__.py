@@ -242,7 +242,6 @@ def _run_command(
     """
     before = [_get_mtimes(i) for i in args]
 
-    breakpoint()
     output = subprocess.run(
         [sys.executable, "-m", command, *args, *cmd_args],
         stderr=subprocess.PIPE,
@@ -416,12 +415,16 @@ def _main(  # pylint: disable=R0912,R0914,R0911
         nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
 
         for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
-            nb_info_mapping[notebook] = save_source.main(
-                notebook,
-                file_descriptor,
-                configs.nbqa_process_cells,
-                cli_args.command,
-            )
+            try:
+                nb_info_mapping[notebook] = save_source.main(
+                    notebook,
+                    file_descriptor,
+                    configs.nbqa_process_cells,
+                    cli_args.command,
+                )
+            except Exception:  # pylint: disable=W0703
+                sys.stderr.write(BASE_ERROR_MESSAGE.format(f"Error parsing {notebook}"))
+                return 1
 
         output, output_code, mutated = _run_command(
             cli_args.command,
@@ -460,14 +463,20 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     sys.stderr.write(msg)
                     return 1
 
-                actually_mutated = (
-                    REPLACE_FUNCTION[configs.nbqa_diff](
-                        temp_python_file,
-                        notebook,
-                        nb_info_mapping[notebook],
+                try:
+                    actually_mutated = (
+                        REPLACE_FUNCTION[configs.nbqa_diff](
+                            temp_python_file,
+                            notebook,
+                            nb_info_mapping[notebook],
+                        )
+                        or actually_mutated
                     )
-                    or actually_mutated
-                )
+                except Exception:  # pylint: disable=W0703
+                    sys.stderr.write(
+                        BASE_ERROR_MESSAGE.format(f"Error reconstructing {notebook}")
+                    )
+                    return 1
 
         sys.stdout.write(output.out)
         sys.stderr.write(output.err)

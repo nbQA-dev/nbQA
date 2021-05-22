@@ -42,5 +42,4 @@ def test_pyproject_toml_works(
     # check out and err
     out, _ = capsys.readouterr()
     expected_out = ""
-    breakpoint()
     assert out == expected_out
