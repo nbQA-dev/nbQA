@@ -64,6 +64,7 @@ class Visitor(ast.NodeVisitor):
             for arg in node.args:
                 if isinstance(arg, ast.Constant):
                     args.append(arg.value)
+            assert args
             magic_type: Optional[str] = None
             if node.func.attr == "run_cell_magic":
                 src: Optional[str] = f"%%{args[0]}"
@@ -148,9 +149,6 @@ def _replace_magics(
             newlines.append(line)
         return "\n".join(newlines)
 
-    # maybe, only process header differently if this is a cell magic?
-    # check what happens if cell starts with multiline magic. detect,
-    # ignore cell, too complicated
     # if first line is cell magic, process it separately
     if MagicHandler.get_ipython_magic_type(source[0]) == IPythonMagicType.CELL:
         header = _process_source(source[0])

@@ -33,8 +33,8 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
     expected_out = (
         "\x1b[1mCell 2\x1b[0m\n"
         "------\n"
-        "--- tests/data/notebook_for_testing.ipynb\n"
-        "+++ tests/data/notebook_for_testing.ipynb\n"
+        f"--- {str(DIRTY_NOTEBOOK)}\n"
+        f"+++ {str(DIRTY_NOTEBOOK)}\n"
         "@@ -12,8 +12,8 @@\n"
         "     'hello goodbye'\n"
         '     """\n'
