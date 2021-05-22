@@ -242,6 +242,7 @@ def _run_command(
     """
     before = [_get_mtimes(i) for i in args]
 
+    breakpoint()
     output = subprocess.run(
         [sys.executable, "-m", command, *args, *cmd_args],
         stderr=subprocess.PIPE,
@@ -459,20 +460,14 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     sys.stderr.write(msg)
                     return 1
 
-                try:
-                    actually_mutated = (
-                        REPLACE_FUNCTION[configs.nbqa_diff](
-                            temp_python_file,
-                            notebook,
-                            nb_info_mapping[notebook],
-                        )
-                        or actually_mutated
+                actually_mutated = (
+                    REPLACE_FUNCTION[configs.nbqa_diff](
+                        temp_python_file,
+                        notebook,
+                        nb_info_mapping[notebook],
                     )
-                except Exception:  # pylint: disable=W0703
-                    sys.stderr.write(
-                        BASE_ERROR_MESSAGE.format(f"Error reconstructing {notebook}")
-                    )
-                    return 1
+                    or actually_mutated
+                )
 
         sys.stdout.write(output.out)
         sys.stderr.write(output.err)

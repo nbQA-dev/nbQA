@@ -85,7 +85,7 @@ def _reinstate_magics(
         New source that can be saved into Jupyter Notebook.
     """
     for magic_substitution in temporary_lines:
-        source = magic_substitution.restore_magic(source)
+        source = source.replace(magic_substitution.replacement, magic_substitution.src)
     return source.strip("\n").splitlines(True)
 
 

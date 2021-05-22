@@ -62,6 +62,7 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
         +    "    %time randint(5, 10)"
         """
     )
+    breakpoint()
     assert result == expected
 
     # check out and err

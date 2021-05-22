@@ -32,6 +32,18 @@ class IPythonMagicType(Enum):
     NO_MAGIC = 4
 
 
+class NewMagicHandler:
+    def __init__(self, ipython, src, command):
+        self.src = src
+        self.ipython = ipython
+        token = secrets.token_hex(4)
+        if command in COMMANDS_WITH_STRING_TOKEN:
+            self.token = f'"{token}"'
+        else:
+            self.token = f"0x{int(token, base=16):X}"
+        self.replacement = f"type({self.token})  # foo"
+
+
 class MagicHandler(ABC):
     """Base class of different types of magic handlers."""
 
@@ -56,7 +68,7 @@ class MagicHandler(ABC):
         IPythonMagicType.CELL: ["get_ipython().run_cell_magic"],
     }
 
-    def __init__(self, ipython_magic: str, command: str) -> None:
+    def __init__(self, src, ipython_magic: str, command: str) -> None:
         """Initialize this instance.
 
         Parameters
@@ -64,6 +76,7 @@ class MagicHandler(ABC):
         ipython_magic : str
             Ipython magic statement present in the notebook cell
         """
+        self._src = src
         self._ipython_magic = ipython_magic
         self._command = command
         self._token: str = MagicHandler._get_unique_token(command)
@@ -431,7 +444,6 @@ class LineMagicHandler(MagicHandler):
             pattern = MagicHandler._get_regex_pattern(
                 self._MAGIC_WITH_CODE_REGEX_TEMPLATE, self._token
             )
-            breakpoint()
             return self._restore_magic_with_modified_code(pattern, cell_source)
 
         return super().restore_magic(cell_source)
