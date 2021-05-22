@@ -208,11 +208,11 @@ def _replace_magics(
         tree = ast.parse(body)
         visitor = Visitor()
         visitor.visit(tree)
-        breakpoint()
         newlines = []
         for n, line in enumerate(body.splitlines(), start=1):
             for magics in visitor.magics:
                 if n == magics[0]:
+                    breakpoint()
                     sub = f'type({visitor.magics[magics]})'
                     line = line[:magics[1]] + sub + line[magics[2]:]
                     magic_substitutions[sub] = line[magics[1]:magics[2]] 
@@ -221,6 +221,7 @@ def _replace_magics(
         newsrc = '\n'.join(newlines)
         return newsrc
 
+    # maybe, only process header differently if this is a cell magic?
     header = INPUT_SPLITTER.transform_cell(''.join(source[0]))
     yield thing(header)
 

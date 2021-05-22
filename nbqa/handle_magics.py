@@ -77,6 +77,8 @@ class MagicHandler(ABC):
         str
             Python code to be substituted for the ipython magic
         """
+        # oh, this is good...we should be able to just use this, right?
+        # right...shouldn't be too baad.
         return self._MAGIC_TEMPLATE.format(magic=self._ipython_magic, token=self._token)
 
     def restore_magic(self, cell_source: str) -> str:
