@@ -58,4 +58,5 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
         "\n"
     )
     # pylint: enable=C0301
-    assert out == expected_out
+    horizontal_bar = "-----------------------------------"
+    assert out.split(horizontal_bar)[0] == expected_out.split(horizontal_bar)[0]
