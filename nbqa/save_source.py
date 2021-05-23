@@ -76,7 +76,9 @@ class Visitor(ast.NodeVisitor):
                     raise AssertionError(
                         "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
                     )
-            assert args
+            assert (
+                args
+            ), "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
             magic_type: Optional[str] = None
             if node.func.attr == "run_cell_magic":
                 src: Optional[str] = f"%%{args[0]}"
@@ -158,13 +160,10 @@ def _replace_magics(
                     or len(visitor.magics[i]) > 1
                 ):
                     # unusual case - skip cell completely for now
-                    handler = NewMagicHandler(
-                        "foo", source, command, magic_type=magic_type
-                    )
+                    handler = NewMagicHandler(source, command, magic_type=magic_type)
                     magic_substitutions.append(handler)
                     return handler.replacement
                 handler = NewMagicHandler(
-                    line[col_offset:],
                     src,
                     command,
                     magic_type=magic_type,

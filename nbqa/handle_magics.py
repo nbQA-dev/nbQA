@@ -22,14 +22,12 @@ class IPythonMagicType(Enum):
 class NewMagicHandler:  # pylint: disable=R0903
     """Handle different types of magics."""
 
-    def __init__(self, ipython: str, src: str, command: str, magic_type: Optional[str]):
+    def __init__(self, src: str, command: str, magic_type: Optional[str]):
         """
         Handle magic.
 
         Parameters
         ----------
-        ipython
-            Code as transformed by ipython
         src
             Original code
         command
@@ -38,7 +36,6 @@ class NewMagicHandler:  # pylint: disable=R0903
             E.g. cell, line, ...
         """
         self.src = src
-        self.ipython = ipython
         token = secrets.token_hex(4)
         if command in COMMANDS_WITH_STRING_TOKEN:
             self.token = f'"{token}"'
@@ -52,17 +49,6 @@ class NewMagicHandler:  # pylint: disable=R0903
 
 class MagicHandler(ABC):  # pylint: disable=R0903
     """Base class of different types of magic handlers."""
-
-    # Here token is placed at the beginning and at the end so that
-    # the start and end of the code can be identified even if the code
-    # is split across multiple lines.
-    # `{token}` is not used as `String` because with different formatters (e.g: yapf)
-    # we would run in to formatting issues like single quotes formatted
-    # to double quotes or vice versa. `{token}` is used as hexadecimal number.
-    _MAGIC_TEMPLATE: str = "type({token})  # {magic:10.10} {token}"
-    _MAGIC_REGEX_TEMPLATE: str = r"type\s*\(\s*{token}\s*\).*{token}"
-    _token: str
-    _ipython_magic: str
 
     # To Developers: Its better to preserve the order in which
     # this dictionary is populated. For instance, if HELP is inserted
