@@ -45,24 +45,20 @@ def _validate_magics_with_black(before: Sequence[str], after: Sequence[str]) -> 
     result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
     # pylint: disable=C0301
     expected = (
-        '-    "def compute(operand1,operand2, bin_op):\\n'
-        '",\n'
-        '+    "def compute(operand1, operand2, bin_op):\\n'
-        '",\n'
+        '-    "def compute(operand1,operand2, bin_op):\\n",\n'
+        '+    "def compute(operand1, operand2, bin_op):\\n",\n'
         '-    "compute(5,1, operator.add)"\n'
         '+    "compute(5, 1, operator.add)"\n'
         '-    "    ?str.splitlines"\n'
         '+    "str.splitlines?"\n'
-        '-    "flake8_version = !pip list 2>&1 | grep flake8\\n",\n'
-        '+    "flake8_version = !!pip list 2>&1 | grep flake8\\n",\n'
         '-    "   %time randint(5,10)"\n'
         '+    "%time randint(5,10)"\n'
         '-    "%time pretty_print_object = pprint.PrettyPrinter(\\\\\\n",\n'
         '-    "          indent=4, width=80, stream=sys.stdout, compact=True, depth=5\\\\\\n",\n'
         '-    "      )"\n'
-        '+    "%time pretty_print_object = pprint.PrettyPrinter(          indent=4, width=80, stream=sys.stdout, compact=True, depth=5      )"\n'  # noqa: E501
-        '-    "!pip list 2>&1 |\\\\"\n'
-        '+    "!pip list 2>&1 |"\n'
+        '+    "%time pretty_print_object = pprint.PrettyPrinter(           indent=4, width=80, stream=sys.stdout, compact=True, depth=5       )"\n'  # noqa: E501
+        '-    "result = str.split??"\n'
+        '+    "str.split??"\n'
     )
     # pylint: enable=C0301
     return result == expected

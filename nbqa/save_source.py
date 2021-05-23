@@ -20,13 +20,9 @@ from typing import (
 )
 
 import tokenize_rt
+from IPython.core.inputtransformer2 import TransformerManager
 
-from nbqa.handle_magics import (
-    INPUT_SPLITTER,
-    IPythonMagicType,
-    MagicHandler,
-    NewMagicHandler,
-)
+from nbqa.handle_magics import IPythonMagicType, MagicHandler, NewMagicHandler
 from nbqa.notebook_info import NotebookInfo
 
 CODE_SEPARATOR = "# %%NBQA-CELL-SEP\n"
@@ -49,8 +45,8 @@ class Visitor(ast.NodeVisitor):
     def __init__(self) -> None:
         """Magics will record where magics occur."""
         self.magics: MutableMapping[
-            Tuple[int, int], Tuple[Optional[str], Optional[str]]
-        ] = {}
+            int, List[Tuple[int, Optional[str], Optional[str]]]
+        ] = defaultdict(list)
 
     def visit_Call(self, node: ast.Call) -> None:  # pylint: disable=C0103,R0912
         """
@@ -107,9 +103,12 @@ class Visitor(ast.NodeVisitor):
                 magic_type = "line"
             else:
                 src = None
-            self.magics[(node.lineno, node.col_offset)] = (
-                src,
-                magic_type,
+            self.magics[node.lineno].append(
+                (
+                    node.col_offset,
+                    src,
+                    magic_type,
+                )
             )
         self.generic_visit(node)
 
@@ -135,34 +134,46 @@ def _replace_magics(
 
     def _process_source(source: str) -> str:
         """Temporarily replace ipython magics - don't process if can't."""
-        body = INPUT_SPLITTER.transform_cell(source)
+        try:
+            ast.parse(source)
+        except SyntaxError:
+            pass
+        else:
+            # Source has no IPython magic, return it directly
+            return source
+        body = TransformerManager().transform_cell(source)
         try:
             tree = ast.parse(body)
         except SyntaxError:
             return source
         visitor = Visitor()
         visitor.visit(tree)
-        newlines = []
+        new_src = []
         for i, line in enumerate(body.splitlines(), start=1):
-            for magics, (src, magic_type) in visitor.magics.items():
-                if i == magics[0]:
-                    if src is None:
-                        handler = NewMagicHandler(
-                            "foo", source, command, magic_type=magic_type
-                        )
-                        magic_substitutions.append(handler)
-                        return handler.replacement
+            if i in visitor.magics:
+                col_offset, src, magic_type = visitor.magics[i][0]
+                if (
+                    src is None
+                    or line[:col_offset].strip()
+                    or len(visitor.magics[i]) > 1
+                ):
+                    # unusual case - skip cell completely for now
                     handler = NewMagicHandler(
-                        line[magics[1] :],
-                        src,
-                        command,
-                        magic_type=magic_type,
+                        "foo", source, command, magic_type=magic_type
                     )
                     magic_substitutions.append(handler)
-                    line = line[: magics[1]] + handler.replacement
-                    break
-            newlines.append(line)
-        return "\n".join(newlines)
+                    return handler.replacement
+                handler = NewMagicHandler(
+                    line[col_offset:],
+                    src,
+                    command,
+                    magic_type=magic_type,
+                )
+                magic_substitutions.append(handler)
+                line = line[:col_offset] + handler.replacement
+            new_src.append(line)
+        leading_newlines = len(source) - len(source.lstrip("\n"))
+        return "\n" * leading_newlines + "\n".join(new_src)
 
     # if first line is cell magic, process it separately
     if MagicHandler.get_ipython_magic_type(source[0]) == IPythonMagicType.CELL:

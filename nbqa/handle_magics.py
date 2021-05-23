@@ -1,17 +1,10 @@
 """Detect ipython magics and provide python code replacements for those magics."""
 import secrets
-import warnings
 from abc import ABC
 from enum import Enum
 from typing import ClassVar, Mapping, Optional, Sequence
 
-with warnings.catch_warnings():
-    # see https://github.com/nbQA-dev/nbQA/issues/459
-    warnings.filterwarnings("ignore", category=DeprecationWarning)
-    from IPython.core.inputsplitter import IPythonInputSplitter
-
-
-INPUT_SPLITTER = IPythonInputSplitter(line_input_checker=False)
+from IPython.core.inputtransformer2 import TransformerManager
 
 COMMANDS_WITH_STRING_TOKEN = {"flake8"}
 
@@ -98,7 +91,7 @@ class MagicHandler(ABC):  # pylint: disable=R0903
         Optional[IPythonMagicType]
             Type of the IPython magic
         """
-        python_code = INPUT_SPLITTER.transform_cell(ipython_magic)
+        python_code = TransformerManager().transform_cell(ipython_magic)
         magic_type: Optional[IPythonMagicType] = None
         for magic, prefixes in MagicHandler._MAGIC_PREFIXES.items():
             if any(prefix in python_code for prefix in prefixes):

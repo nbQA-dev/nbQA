@@ -42,7 +42,6 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
         f'{notebook1}:cell_5:1:0: C0411: standard import "import pprint" should be placed before "import nbqa" (wrong-import-order)\n'  # noqa: E501
         f'{notebook1}:cell_5:2:0: C0411: standard import "import sys" should be placed before "import nbqa" (wrong-import-order)\n'  # noqa: E501
         "************* Module tests.data.notebook_with_indented_magics\n"  # noqa: E501
-        f'{notebook2}:cell_8:1:0: C0103: Constant name "flake8_version" doesn\'t conform to UPPER_CASE naming style (invalid-name)\n'  # noqa: E501
         f'{notebook2}:cell_12:1:0: C0413: Import "import pprint" should be placed at the top of the module (wrong-import-position)\n'  # noqa: E501
         f'{notebook2}:cell_12:2:0: C0413: Import "import sys" should be placed at the top of the module (wrong-import-position)\n'  # noqa: E501
         f"{notebook2}:cell_1:1:0: W0611: Unused randint imported from random (unused-import)\n"  # noqa: E501

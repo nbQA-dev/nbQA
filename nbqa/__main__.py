@@ -424,7 +424,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                 )
             except Exception as exp:  # pylint: disable=W0703
                 sys.stderr.write(
-                    BASE_ERROR_MESSAGE.format(f"Error parsing {notebook}, {repr(exp)}")
+                    BASE_ERROR_MESSAGE.format(f"Error parsing {notebook}: {repr(exp)}")
                 )
                 return 1
 
@@ -477,7 +477,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                 except Exception as exp:  # pylint: disable=W0703
                     sys.stderr.write(
                         BASE_ERROR_MESSAGE.format(
-                            f"Error reconstructing {notebook}, {repr(exp)}"
+                            f"Error reconstructing {notebook}: {repr(exp)}"
                         )
                     )
                     return 1
