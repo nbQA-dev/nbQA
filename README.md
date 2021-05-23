@@ -44,7 +44,7 @@
 - [Table of contents](#table-of-contents)
   - [🎉 Installation](#-installation)
   - [🚀 Examples](#-examples)
-    - [Pre-commit (recommended)](#pre-commit-recommended)
+    - [Pre-commit](#pre-commit)
     - [Command-line](#command-line)
   - [🥳 Used by](#-used-by)
   - [💬 Testimonials](#-testimonials)
@@ -59,7 +59,7 @@ In your [virtual environment](https://realpython.com/python-virtual-environments
 
 ## 🚀 Examples
 
-### Pre-commit (recommended)
+### Pre-commit
 
 Here's an example of how to set up some pre-commit hooks: put this in your `.pre-commit-config.yaml` file (see [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html))
 
