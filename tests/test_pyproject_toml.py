@@ -30,7 +30,6 @@ def test_pyproject_toml_works(
             flake8 = [
                 "--ignore=F401",
                 "--select=E303",
-                "--quiet"
             ]
             """
         )

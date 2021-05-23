@@ -14,7 +14,7 @@ from typing import Any, Iterator, List, Mapping, MutableMapping, Sequence, Set
 
 import tokenize_rt
 
-from nbqa.handle_magics import MagicHandler
+from nbqa.handle_magics import NewMagicHandler
 from nbqa.notebook_info import NotebookInfo
 from nbqa.save_source import CODE_SEPARATOR
 from nbqa.text import BOLD, GREEN, RED, RESET
@@ -67,7 +67,7 @@ def _restore_semicolon(
 
 def _reinstate_magics(
     source: str,
-    temporary_lines: Sequence[MagicHandler],
+    temporary_lines: Sequence[NewMagicHandler],
 ) -> List[str]:
     """
     Put (preprocessed) line magics back in.
@@ -85,7 +85,7 @@ def _reinstate_magics(
         New source that can be saved into Jupyter Notebook.
     """
     for magic_substitution in temporary_lines:
-        source = magic_substitution.restore_magic(source)
+        source = source.replace(magic_substitution.replacement, magic_substitution.src)
     return source.strip("\n").splitlines(True)
 
 

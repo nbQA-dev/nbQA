@@ -30,35 +30,25 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
     main(["black", str(DIRTY_NOTEBOOK), "--nbqa-diff"])
     out, err = capsys.readouterr()
     err = err.encode("ascii", "backslashreplace").decode()
-    expected_out = f"""\x1b[1mCell 2\x1b[0m
-------
---- {str(DIRTY_NOTEBOOK)}
-+++ {str(DIRTY_NOTEBOOK)}
-@@ -12,8 +12,8 @@
-     'hello goodbye'
-     \"\"\"
- \n\
-\x1b[31m-    return 'hello {{}}'.format(name)
-\x1b[0m\x1b[32m+    return "hello {{}}".format(name)
-\x1b[0m \n\
- \n\
- !ls
-\x1b[31m-hello(3)   \n\
-\x1b[0m\x1b[32m+hello(3)
-\x1b[0m
-\x1b[1mCell 4\x1b[0m
-------
---- {str(DIRTY_NOTEBOOK)}
-+++ {str(DIRTY_NOTEBOOK)}
-@@ -1,4 +1,4 @@
- from random import randint
- \n\
- if __debug__:
-\x1b[31m-    %time randint(5,10)
-\x1b[0m\x1b[32m+    %time randint(5, 10)
-\x1b[0m
-To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
-"""
+    expected_out = (
+        "\x1b[1mCell 2\x1b[0m\n"
+        "------\n"
+        f"--- {str(DIRTY_NOTEBOOK)}\n"
+        f"+++ {str(DIRTY_NOTEBOOK)}\n"
+        "@@ -12,8 +12,8 @@\n"
+        "     'hello goodbye'\n"
+        '     """\n'
+        " \n"
+        "\x1b[31m-    return 'hello {}'.format(name)\n"
+        '\x1b[0m\x1b[32m+    return "hello {}".format(name)\n'
+        "\x1b[0m \n"
+        " \n"
+        " !ls\n"
+        "\x1b[31m-hello(3)   \n"
+        "\x1b[0m\x1b[32m+hello(3)\n"
+        "\x1b[0m\n"
+        "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+    )
     assert out == expected_out
     expected_err = (
         dedent(

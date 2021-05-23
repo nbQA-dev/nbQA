@@ -15,6 +15,7 @@ exclude_lines = [
   "raise NotImplementedError",
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
+  "raise AssertionError",
 ]
 ignore_errors = true
 omit = [
