@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.9.0 (2021-05-23)
+------------------
+Fixed bug whereby percent format sign was being mistaken for a line
+IPython magic. ``nbQA`` is now intentionally more timid about processing
+magics, and cells with unusual magics will be ignored.
+
 0.8.1 (2021-05-15)
 ------------------
 If output from tool cannot be parsed from Python lines to notebook
