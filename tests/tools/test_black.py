@@ -51,7 +51,7 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
         after = handle.readlines()
 
     diff = difflib.unified_diff(before, after)
-    result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
+    result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
     expected = (
         "-    \"    return 'hello {}'.format(name)\\n\",\n"
         '+    "    return \\"hello {}\\".format(name)\\n",\n'
@@ -114,7 +114,7 @@ def test_black_works_with_trailing_semicolons(
         after = handle.readlines()
 
     diff = difflib.unified_diff(before, after)
-    result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
+    result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
     expected = dedent(
         """\
         -    "import glob;\\n",
@@ -184,7 +184,7 @@ def test_black_works_with_multiline(
         after = handle.readlines()
 
     diff = difflib.unified_diff(before, after)
-    result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
+    result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
     expected = dedent(
         """\
         -    "assert 1 + 1 == 2;  assert 1 + 1 == 2;"
