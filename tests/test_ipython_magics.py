@@ -42,7 +42,7 @@ def _validate_magics_with_black(before: Sequence[str], after: Sequence[str]) -> 
         True if validation succeeded else False
     """
     diff = difflib.unified_diff(before, after)
-    result = "".join([i for i in diff if any([i.startswith("+ "), i.startswith("- ")])])
+    result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
     # pylint: disable=C0301
     expected = (
         '-    "def compute(operand1,operand2, bin_op):\\n",\n'
