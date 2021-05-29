@@ -171,6 +171,10 @@ Everyone using Jupyter notebooks should be doing this.
 
 > today I learned about `nbqa`, a command-line tool to run linters like `flake8` over #Python code in @ProjectJupyter notebooks. Thanks to @jayyqi for pointing me to it. So far, I really really like it.
 
+**Lars Yencken**, [Tech Lead @ Our World In Data](https://twitter.com/larsyencken/status/1398171287974039553)
+
+> Super useful! I only wish it was built-in to Jupyterlab.
+
 ## 👥 Contributing
 
 I will give write-access to anyone who makes a useful pull request - see the
