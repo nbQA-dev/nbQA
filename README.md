@@ -157,6 +157,7 @@ Take some inspiration from their config files 😉
 - https://github.com/henryiii/python-compiled-minicourse
 - https://github.com/intake/intake-esm
 - https://github.com/jameslamb/lightgbm-dask-testing
+- https://github.com/jdb78/pytorch-forecasting
 - https://github.com/jhrcook/advent-of-code_2020
 - https://github.com/julian-west/asset_price_correlations
 - https://github.com/kratsg/drstorage
