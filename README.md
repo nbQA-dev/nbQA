@@ -114,22 +114,75 @@ See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html)
 
 ## 🥳 Used by
 
-Take some inspiration from their config files 😉
+<details>
+<summary>Click here for (non-exhaustive) list of repos</summary>
 
-- **alibi** [.pre-commit-config.yaml](https://github.com/SeldonIO/alibi/blob/master/.pre-commit-config.yaml)
-- **GoogleCloudPlatform/ai-platform-samples** [pyproject.toml](https://github.com/GoogleCloudPlatform/ai-platform-samples/blob/master/pyproject.toml)
-- **intake-esm** [pyproject.toml](https://github.com/intake/intake-esm/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/intake/intake-esm/blob/master/.pre-commit-config.yaml)
-- **LiuAlgoTrader**: [requirements/dev.txt](https://github.com/amor71/LiuAlgoTrader/blob/master/liualgotrader/requirements/dev.txt)
-- **mplhep**: [pyproject.toml](https://github.com/scikit-hep/mplhep/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/scikit-hep/mplhep/blob/master/.pre-commit-config.yaml)
-- **NLP Profiler**: [pyproject.toml](https://github.com/neomatrix369/nlp_profiler/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/neomatrix369/nlp_profiler/blob/master/.pre-commit-config.yaml)
-- **pandas-profiling** [.pre-commit-config.yaml](https://github.com/pandas-profiling/pandas-profiling/blob/develop/.pre-commit-config.yaml)
-- **PlasmaPy** [.pre-commit-config.yaml](https://github.com/PlasmaPy/PlasmaPy/blob/master/.pre-commit-config.yaml)
-- **pyhf** [pyproject.toml](https://github.com/scikit-hep/pyhf/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/scikit-hep/pyhf/blob/master/.pre-commit-config.yaml)
-- **PyMC3**: [pyproject.toml](https://github.com/pymc-devs/pymc-examples/blob/main/pyproject.toml) [.pre-commit-config.yaml](https://github.com/pymc-devs/pymc-examples/blob/main/.pre-commit-config.yaml)
-- **pytorch-forecasting**: [pyproject.toml](https://github.com/jdb78/pytorch-forecasting/blob/master/pyproject.toml) [.pre-commit-config.yaml](https://github.com/jdb78/pytorch-forecasting/blob/master/.pre-commit-config.yaml)
-- **Python compiled microcourse**: [.pre-commit-config.yaml](https://github.com/henryiii/python-compiled-minicourse/blob/master/.pre-commit-config.yaml)
-- **ruptures**: [.pre-commit-config.yaml](https://github.com/deepcharles/ruptures/blob/master/.pre-commit-config.yaml)
-- **sktime**: [.pre-commit-config.yaml](https://github.com/alan-turing-institute/sktime/blob/master/.pre-commit-config.yaml)
+- https://github.com/ComPWA/ampform
+- https://github.com/ComPWA/tensorwaves
+- https://github.com/DataS-DHSC/os-maps-example
+- https://github.com/Eazhi/World-Happiness-Analysis
+- https://github.com/GoogleCloudPlatform/ai-platform-samples
+- https://github.com/MRCIEU/epigraphdb
+- https://github.com/OpenMined/PyDP
+- https://github.com/PlasmaPy/PlasmaPy
+- https://github.com/ProjectPythia/pythia-foundations
+- https://github.com/SeldonIO/alibi
+- https://github.com/TeoZosa/deep-learning-v2-pytorch
+- https://github.com/WM-SEMERU/mlproj_template
+- https://github.com/alan-turing-institute/sktime
+- https://github.com/amor71/LiuAlgoTrader
+- https://github.com/bbernst/base_envs
+- https://github.com/cheginit/HyRiver-examples
+- https://github.com/cheginit/pygeohydro
+- https://github.com/cheginit/pynhd
+- https://github.com/covid-19-impact-lab/sid-germany
+- https://github.com/covid-19-impact-lab/sid
+- https://github.com/dapperfu/Python-Simulink
+- https://github.com/deepcharles/ruptures
+- https://github.com/dhassault/cyclegan_pytorch
+- https://github.com/gboeing/osmnx
+- https://github.com/glotzerlab/freud-examples
+- https://github.com/glotzerlab/hoomd-examples
+- https://github.com/glotzerlab/signac-docs
+- https://github.com/glotzerlab/signac-examples
+- https://github.com/grapl-security/grapl
+- https://github.com/hainegroup/oceanspy
+- https://github.com/henryiii/python-compiled-minicourse
+- https://github.com/intake/intake-esm
+- https://github.com/jameslamb/lightgbm-dask-testing
+- https://github.com/jdb78/pytorch-forecasting
+- https://github.com/jhrcook/advent-of-code_2020
+- https://github.com/julian-west/asset_price_correlations
+- https://github.com/kratsg/drstorage
+- https://github.com/madebr/pyOpt
+- https://github.com/matthewfeickert/heputils
+- https://github.com/matyama/deep-rl-hands-on
+- https://github.com/mayou36/raredecay
+- https://github.com/neomatrix369/nlp_profiler
+- https://github.com/openforcefield/openff-system
+- https://github.com/pandas-profiling/pandas-profiling
+- https://github.com/paw-lu/dotfiles
+- https://github.com/pawamoy/wps-light
+- https://github.com/phinate/clarinet
+- https://github.com/pik-primap/climate_categories
+- https://github.com/pik-primap/primap2
+- https://github.com/pik-primap/unfccc_di_api
+- https://github.com/pymc-devs/pymc-examples
+- https://github.com/pymc-devs/resources
+- https://github.com/saturncloud/examples
+- https://github.com/scikit-hep/boost-histogram
+- https://github.com/scikit-hep/iminuit
+- https://github.com/scikit-hep/mplhep
+- https://github.com/scikit-hep/pyhf
+- https://github.com/scikit-hep/pylhe
+- https://github.com/v-goncharenko/data-science-template
+- https://github.com/wemake-services/wemake-python-styleguide
+- https://github.com/zfit/phasespace
+- https://github.com/zfit/zfit
+- https://github.com/zfit/zfit-physics
+- https://github.com/zfit/zfit-tutorials
+
+</details>
 
 Is your project missing? Let us know, or open a pull request!
 
