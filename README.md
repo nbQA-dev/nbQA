@@ -116,16 +116,10 @@ See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html)
 
 Take some inspiration from their config files 😉
 
-- https://github.com/BenMoon/Desy_TPX-FlashSep20
 - https://github.com/ComPWA/ampform
-- https://github.com/ComPWA/expertsystem
-- https://github.com/ComPWA/qrules
 - https://github.com/ComPWA/tensorwaves
-- https://github.com/DanielMaestre/Pandas_profiling
 - https://github.com/DataS-DHSC/os-maps-example
 - https://github.com/Eazhi/World-Happiness-Analysis
-- https://github.com/ElmaSanz/Pandas-profiling
-- https://github.com/ErikBjare/thesis
 - https://github.com/GoogleCloudPlatform/ai-platform-samples
 - https://github.com/MRCIEU/epigraphdb
 - https://github.com/OpenMined/PyDP
@@ -134,7 +128,6 @@ Take some inspiration from their config files 😉
 - https://github.com/SeldonIO/alibi
 - https://github.com/TeoZosa/deep-learning-v2-pytorch
 - https://github.com/WM-SEMERU/mlproj_template
-- https://github.com/alan-turing-institute/anomaly_with_experts
 - https://github.com/alan-turing-institute/sktime
 - https://github.com/amor71/LiuAlgoTrader
 - https://github.com/bbernst/base_envs
@@ -147,7 +140,6 @@ Take some inspiration from their config files 😉
 - https://github.com/deepcharles/ruptures
 - https://github.com/dhassault/cyclegan_pytorch
 - https://github.com/gboeing/osmnx
-- https://github.com/girip11/ml_problems
 - https://github.com/glotzerlab/freud-examples
 - https://github.com/glotzerlab/hoomd-examples
 - https://github.com/glotzerlab/signac-docs
