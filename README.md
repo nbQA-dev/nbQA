@@ -116,7 +116,7 @@ See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html)
 
 <details>
 <summary>Click here for (non-exhaustive) list of repos</summary>
-	
+
 - https://github.com/ComPWA/ampform
 - https://github.com/ComPWA/tensorwaves
 - https://github.com/DataS-DHSC/os-maps-example
