@@ -34,6 +34,12 @@
 </p>
 
 <p align="center">
+	<a href="https://pepy.tech/project/nbqa"><img
+		alt="downloads"
+		src="https://pepy.tech/badge/nbqa"></a>
+</p>
+
+<p align="center">
     <a href="#readme">
         <img alt="demo" src="https://raw.githubusercontent.com/nbQA-dev/nbQA-demo/master/demo.gif">
     </a>
