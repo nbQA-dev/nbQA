@@ -112,3 +112,9 @@ add the following to your :code:`pyproject.toml` file:
 
         [tool.nbqa.skip_bad_cells]
         black = 1
+
+or, from the command-line:
+
+.. code-block:: bash
+
+    nbqa black notebook.ipynb --nbqa-skip-bad-cells
