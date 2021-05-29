@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-def test_diff_present(capsys: "CaptureFixture") -> None:
+def test_cmdline(capsys: "CaptureFixture") -> None:
     """Test the results on --nbqa-diff on a dirty notebook."""
     file = os.path.join("tests", "invalid_data", "automagic.ipynb")
     main(["black", file, "--nbqa-diff", "--nbqa-skip-bad-cells"])
