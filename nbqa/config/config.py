@@ -3,12 +3,10 @@
 import collections
 from shlex import split
 from textwrap import dedent
-from typing import Any, Callable, ClassVar, Dict, Mapping, Optional, Sequence, Union
-
-import toml
-from pkg_resources import resource_filename
+from typing import Any, Callable, ClassVar, Dict, Optional, Sequence, Union
 
 from nbqa.cmdline import CLIArgs
+from nbqa.config.default_config import DEFAULT_CONFIG
 
 ConfigParser = Callable[[str], Union[str, bool, Sequence[str]]]
 
@@ -23,6 +21,7 @@ class _ConfigSections(
             "DIFF",
             "FILES",
             "EXCLUDE",
+            "SKIP_BAD_CELLS",
         ),
     )
 ):
@@ -38,44 +37,19 @@ class _ConfigSections(
         DIFF: str = "diff",
         FILES: str = "files",
         EXCLUDE: str = "exclude",
+        SKIP_BAD_CELLS: str = "skip_bad_cells",
     ) -> "_ConfigSections":
         """Python3.6.0 doesn't support defaults for namedtuples."""
         return super().__new__(
-            cls,
-            ADDOPTS,
-            PROCESS_CELLS,
-            MUTATE,
-            DIFF,
-            FILES,
-            EXCLUDE,
+            cls, ADDOPTS, PROCESS_CELLS, MUTATE, DIFF, FILES, EXCLUDE, SKIP_BAD_CELLS
         )
 
 
 CONFIG_SECTIONS = _ConfigSections()
 
 
-DEFAULT_CONFIG: Mapping[str, Mapping[str, Sequence[str]]] = toml.load(
-    resource_filename("nbqa.config", "default_config.toml")
-)
-
-
 class Configs:
-    """
-    Nbqa configuration.
-
-    Attributes
-    ----------
-    nbqa_mutate
-        Whether to allow nbqa to modify notebooks.
-    nbqa_process_cells
-        Process code within cells with these cell magics.
-    nbqa_addopts
-        Additional arguments passed to the third party tool
-    nbqa_files
-        Global file include pattern.
-    nbqa_exclude
-        Global file exclude pattern.
-    """
+    """Nbqa configuration."""
 
     CONFIG_SECTION_PARSERS: ClassVar[Dict[str, ConfigParser]] = {}
     CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.ADDOPTS] = (
@@ -88,6 +62,7 @@ class Configs:
     CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.DIFF] = bool
     CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.FILES] = str
     CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.EXCLUDE] = str
+    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.SKIP_BAD_CELLS] = bool
 
     _mutate: bool = False
     _process_cells: Sequence[str] = []
@@ -95,6 +70,7 @@ class Configs:
     _diff: bool = False
     _files: Optional[str] = None
     _exclude: Optional[str] = None
+    _skip_bad_cells: bool = False
 
     def set_config(self, config: str, value: Any) -> None:
         """
@@ -140,6 +116,11 @@ class Configs:
         """Additional cells which nbqa should ignore."""
         return self._exclude
 
+    @property
+    def nbqa_skip_cells(self) -> bool:
+        """Skip cells with syntax errors."""
+        return self._skip_bad_cells
+
     def merge(self, other: "Configs") -> "Configs":
         """
         Merge another Config instance with this instance.
@@ -162,6 +143,10 @@ class Configs:
         config.set_config(CONFIG_SECTIONS.DIFF, self._diff or other.nbqa_diff)
         config.set_config(CONFIG_SECTIONS.FILES, self._files or other.nbqa_files)
         config.set_config(CONFIG_SECTIONS.EXCLUDE, self._exclude or other.nbqa_exclude)
+        config.set_config(
+            CONFIG_SECTIONS.SKIP_BAD_CELLS,
+            self._skip_bad_cells or other.nbqa_skip_cells,
+        )
         return config
 
     @staticmethod
@@ -182,6 +167,7 @@ class Configs:
         config.set_config(CONFIG_SECTIONS.DIFF, cli_args.nbqa_diff)
         config.set_config(CONFIG_SECTIONS.FILES, cli_args.nbqa_files)
         config.set_config(CONFIG_SECTIONS.EXCLUDE, cli_args.nbqa_exclude)
+        config.set_config(CONFIG_SECTIONS.SKIP_BAD_CELLS, cli_args.nbqa_skip_bad_cells)
 
         return config
 
@@ -202,6 +188,10 @@ class Configs:
         defaults.set_config(CONFIG_SECTIONS.FILES, DEFAULT_CONFIG["files"].get(command))
         defaults.set_config(
             CONFIG_SECTIONS.EXCLUDE, DEFAULT_CONFIG["exclude"].get(command)
+        )
+        defaults.set_config(
+            CONFIG_SECTIONS.SKIP_BAD_CELLS,
+            DEFAULT_CONFIG["skip_bad_cells"].get(command),
         )
 
         return defaults

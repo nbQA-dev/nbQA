@@ -116,7 +116,11 @@ class Visitor(ast.NodeVisitor):
 
 
 def _replace_magics(
-    source: Sequence[str], magic_substitutions: List[NewMagicHandler], command: str
+    source: Sequence[str],
+    magic_substitutions: List[NewMagicHandler],
+    command: str,
+    *,
+    skip_bad_cells: bool,
 ) -> Iterator[str]:
     """
     Replace IPython line magics with valid python code.
@@ -147,6 +151,10 @@ def _replace_magics(
         try:
             tree = ast.parse(body)
         except SyntaxError:
+            if skip_bad_cells:
+                handler = NewMagicHandler(source, command, magic_type=None)
+                magic_substitutions.append(handler)
+                return handler.replacement
             return source
         visitor = Visitor()
         visitor.visit(tree)
@@ -188,6 +196,7 @@ def _parse_cell(
     cell_number: int,
     temporary_lines: MutableMapping[int, Sequence[NewMagicHandler]],
     command: str,
+    skip_bad_cells: bool,
 ) -> str:
     """
     Parse cell, replacing line magics with python code as placeholder.
@@ -211,7 +220,9 @@ def _parse_cell(
     substituted_magics: List[NewMagicHandler] = []
     parsed_cell = CODE_SEPARATOR
 
-    for parsed_line in _replace_magics(source, substituted_magics, command):
+    for parsed_line in _replace_magics(
+        source, substituted_magics, command, skip_bad_cells=skip_bad_cells
+    ):
         parsed_cell += parsed_line
 
     if substituted_magics:
@@ -313,6 +324,8 @@ def main(  # pylint: disable=R0914
     file_descriptor: int,
     process_cells: Sequence[str],
     command: str,
+    *,
+    skip_bad_cells: bool,
 ) -> NotebookInfo:
     """
     Extract code cells from notebook and save them in temporary Python file.
@@ -352,7 +365,11 @@ def main(  # pylint: disable=R0914
                 continue
 
             parsed_cell = _parse_cell(
-                cell["source"], index.cell_number, temporary_lines, command
+                cell["source"],
+                index.cell_number,
+                temporary_lines,
+                command,
+                skip_bad_cells=skip_bad_cells,
             )
 
             cell_mapping.update(

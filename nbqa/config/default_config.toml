@@ -12,3 +12,5 @@ isort = ["--treat-comment-as-code", "# %%NBQA-CELL-SEP"]
 [files]
 
 [exclude]
+
+[skip_bad_cells]
