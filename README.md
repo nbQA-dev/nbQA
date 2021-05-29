@@ -116,6 +116,8 @@ See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html)
 
 Take some inspiration from their config files 😉
 
+<details>
+
 - https://github.com/ComPWA/ampform
 - https://github.com/ComPWA/tensorwaves
 - https://github.com/DataS-DHSC/os-maps-example
@@ -170,7 +172,6 @@ Take some inspiration from their config files 😉
 - https://github.com/pymc-devs/resources
 - https://github.com/saturncloud/examples
 - https://github.com/scikit-hep/boost-histogram
-- https://github.com/scikit-hep/hist
 - https://github.com/scikit-hep/iminuit
 - https://github.com/scikit-hep/mplhep
 - https://github.com/scikit-hep/pyhf
@@ -181,6 +182,8 @@ Take some inspiration from their config files 😉
 - https://github.com/zfit/zfit
 - https://github.com/zfit/zfit-physics
 - https://github.com/zfit/zfit-tutorials
+
+</details>
 
 Is your project missing? Let us know, or open a pull request!
 
