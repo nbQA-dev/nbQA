@@ -196,6 +196,7 @@ def _parse_cell(
     cell_number: int,
     temporary_lines: MutableMapping[int, Sequence[NewMagicHandler]],
     command: str,
+    *,
     skip_bad_cells: bool,
 ) -> str:
     """
