@@ -126,6 +126,7 @@ Take some inspiration from their config files 😉
 - https://github.com/Eazhi/World-Happiness-Analysis
 - https://github.com/ElmaSanz/Pandas-profiling
 - https://github.com/ErikBjare/thesis
+- https://github.com/GoogleCloudPlatform/ai-platform-samples
 - https://github.com/MRCIEU/epigraphdb
 - https://github.com/OpenMined/PyDP
 - https://github.com/PlasmaPy/PlasmaPy
