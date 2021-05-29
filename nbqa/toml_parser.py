@@ -4,7 +4,7 @@ from typing import Any, Mapping, Optional
 
 import toml
 
-from nbqa.config.config import CONFIG_SECTIONS, Configs
+from nbqa.config.config import Configs
 
 _ROOT_CONFIG_KEY: str = "tool"
 _NBQA_CONFIG_KEY: str = "nbqa"
@@ -35,7 +35,7 @@ def parse_from_pyproject_toml(command: str, file_path: Path) -> Optional[Configs
     if nbqa_toml_config is not None:
         config = Configs()
 
-        for section in CONFIG_SECTIONS:
+        for section in Configs.CONFIG_SECTION_PARSERS:
             if section in nbqa_toml_config:
                 config.set_config(section, nbqa_toml_config[section].get(command, None))
 

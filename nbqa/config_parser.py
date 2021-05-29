@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Callable, Optional, Sequence, Tuple
 
 from nbqa.cmdline import CLIArgs
-from nbqa.config.config import CONFIG_SECTIONS, Configs
+from nbqa.config.config import Configs
 from nbqa.toml_parser import parse_from_pyproject_toml
 
 
@@ -62,14 +62,14 @@ def _parse_setupcfg_or_toxini_config(
     option: str = command
 
     # Check if this file contains the nbqa configuration
-    for section in CONFIG_SECTIONS:
+    for section in Configs.CONFIG_SECTION_PARSERS:
         section_name = f"{CONFIG_PREFIX}{section}"
         if config_parser.has_section(section_name):
             config = Configs()
             break
 
     if config is not None:
-        for section in CONFIG_SECTIONS:
+        for section in Configs.CONFIG_SECTION_PARSERS:
             section_name = f"{CONFIG_PREFIX}{section}"
 
             # We might not find the setting for a particular tool in any of the sections
