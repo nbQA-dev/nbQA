@@ -6,6 +6,7 @@ Markdown cells, output, and metadata are ignored.
 
 import ast
 import json
+import secrets
 from collections import defaultdict
 from typing import (
     DefaultDict,
@@ -25,7 +26,7 @@ from IPython.core.inputtransformer2 import TransformerManager
 from nbqa.handle_magics import IPythonMagicType, MagicHandler, NewMagicHandler
 from nbqa.notebook_info import NotebookInfo
 
-CODE_SEPARATOR = "# %%NBQA-CELL-SEP\n"
+CODE_SEPARATOR = f"# %%NBQA-CELL-SEP{secrets.token_hex(3)}\n"
 MAGIC = ["time", "timeit", "capture", "pypy", "python", "python3"]
 NEWLINE = "\n"
 NEWLINES = defaultdict(lambda: NEWLINE * 3)
