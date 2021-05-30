@@ -10,4 +10,4 @@ will be processed. What won't be processed will be:
 - cells with multiple magics per line.
 
 Automagics will also not be processed, and will likely throw syntax errors. You can get around this by using
-the ``--skip-bad-cells`` flag (see :ref:`configuration`<configuration>).
+the ``--skip-bad-cells`` flag (see :ref:`configuration<configuration>`).
