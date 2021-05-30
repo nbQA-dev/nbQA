@@ -115,6 +115,57 @@ class Visitor(ast.NodeVisitor):
         self.generic_visit(node)
 
 
+def _process_source(
+    source: str,
+    command: str,
+    magic_substitutions: List[NewMagicHandler],
+    *,
+    skip_bad_cells: bool,
+) -> str:
+    """Temporarily replace ipython magics - don't process if can't."""
+    try:
+        ast.parse(source)
+    except SyntaxError:
+        pass
+    else:
+        # Source has no IPython magic, return it directly
+        return source
+    body = TransformerManager().transform_cell(source)
+    if len(body.splitlines()) != len(source.splitlines()):
+        handler = NewMagicHandler(source, command, magic_type=None)
+        magic_substitutions.append(handler)
+        return handler.replacement
+    try:
+        tree = ast.parse(body)
+    except SyntaxError:
+        if skip_bad_cells:
+            handler = NewMagicHandler(source, command, magic_type=None)
+            magic_substitutions.append(handler)
+            return handler.replacement
+        return source
+    visitor = Visitor()
+    visitor.visit(tree)
+    new_src = []
+    for i, line in enumerate(body.splitlines(), start=1):
+        if i in visitor.magics:
+            col_offset, src, magic_type = visitor.magics[i][0]
+            if src is None or line[:col_offset].strip() or len(visitor.magics[i]) > 1:
+                # unusual case - skip cell completely for now
+                handler = NewMagicHandler(source, command, magic_type=magic_type)
+                magic_substitutions.append(handler)
+                return handler.replacement
+            handler = NewMagicHandler(
+                src,
+                command,
+                magic_type=magic_type,
+            )
+            magic_substitutions.append(handler)
+            line = line[:col_offset] + handler.replacement
+        new_src.append(line)
+    leading_newlines = len(source) - len(source.lstrip("\n"))
+    return "\n" * leading_newlines + "\n".join(new_src)
+
+
 def _replace_magics(
     source: Sequence[str],
     magic_substitutions: List[NewMagicHandler],
@@ -137,58 +188,22 @@ def _replace_magics(
     str
         Line from cell, with line magics replaced with python code
     """
-
-    def _process_source(source: str) -> str:
-        """Temporarily replace ipython magics - don't process if can't."""
-        try:
-            ast.parse(source)
-        except SyntaxError:
-            pass
-        else:
-            # Source has no IPython magic, return it directly
-            return source
-        body = TransformerManager().transform_cell(source)
-        try:
-            tree = ast.parse(body)
-        except SyntaxError:
-            if skip_bad_cells:
-                handler = NewMagicHandler(source, command, magic_type=None)
-                magic_substitutions.append(handler)
-                return handler.replacement
-            return source
-        visitor = Visitor()
-        visitor.visit(tree)
-        new_src = []
-        for i, line in enumerate(body.splitlines(), start=1):
-            if i in visitor.magics:
-                col_offset, src, magic_type = visitor.magics[i][0]
-                if (
-                    src is None
-                    or line[:col_offset].strip()
-                    or len(visitor.magics[i]) > 1
-                ):
-                    # unusual case - skip cell completely for now
-                    handler = NewMagicHandler(source, command, magic_type=magic_type)
-                    magic_substitutions.append(handler)
-                    return handler.replacement
-                handler = NewMagicHandler(
-                    src,
-                    command,
-                    magic_type=magic_type,
-                )
-                magic_substitutions.append(handler)
-                line = line[:col_offset] + handler.replacement
-            new_src.append(line)
-        leading_newlines = len(source) - len(source.lstrip("\n"))
-        return "\n" * leading_newlines + "\n".join(new_src)
-
     # if first line is cell magic, process it separately
     if MagicHandler.get_ipython_magic_type(source[0]) == IPythonMagicType.CELL:
-        header = _process_source(source[0])
-        cell = _process_source("".join(source[1:]))
+        header = _process_source(
+            source[0], command, magic_substitutions, skip_bad_cells=skip_bad_cells
+        )
+        cell = _process_source(
+            "".join(source[1:]),
+            command,
+            magic_substitutions,
+            skip_bad_cells=skip_bad_cells,
+        )
         yield "\n".join([header, cell])
     else:
-        yield _process_source("".join(source))
+        yield _process_source(
+            "".join(source), command, magic_substitutions, skip_bad_cells=skip_bad_cells
+        )
 
 
 def _parse_cell(
