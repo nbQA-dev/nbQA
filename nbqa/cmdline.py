@@ -51,6 +51,8 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         Global file include pattern.
     nbqa_exclude
         Global file exclude pattern.
+    nbqa_skip_bad_cells
+        Skip cells with syntax errors.
     """
 
     command: str
@@ -61,6 +63,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
     nbqa_diff: bool
     nbqa_files: Optional[str]
     nbqa_exclude: Optional[str]
+    nbqa_skip_bad_cells: bool
 
     def __init__(self, args: argparse.Namespace, cmd_args: Sequence[str]) -> None:
         """
@@ -81,6 +84,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         self.nbqa_diff = args.nbqa_diff or False
         self.nbqa_files = args.nbqa_files or None
         self.nbqa_exclude = args.nbqa_exclude or None
+        self.nbqa_skip_bad_cells = args.nbqa_skip_bad_cells or False
 
     @staticmethod
     def parse_args(argv: Optional[Sequence[str]]) -> "CLIArgs":
@@ -135,6 +139,11 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         )
         parser.add_argument(
             "--version", action="version", version=f"nbqa {__version__}"
+        )
+        parser.add_argument(
+            "--nbqa-skip-bad-cells",
+            action="store_true",
+            help="Skip cells with invalid syntax.",
         )
         args, cmd_args = parser.parse_known_args(argv)
         return CLIArgs(args, cmd_args)

@@ -1,93 +1,30 @@
 """Module responsible for storing and handling nbqa configuration."""
 
-import collections
 from shlex import split
 from textwrap import dedent
-from typing import Any, Callable, ClassVar, Dict, Mapping, Optional, Sequence, Union
-
-import toml
-from pkg_resources import resource_filename
+from typing import Any, Callable, ClassVar, Dict, Optional, Sequence, Union
 
 from nbqa.cmdline import CLIArgs
+from nbqa.config.default_config import DEFAULT_CONFIG
 
 ConfigParser = Callable[[str], Union[str, bool, Sequence[str]]]
 
 
-class _ConfigSections(
-    collections.namedtuple(
-        "_ConfigSections",
-        (
-            "ADDOPTS",
-            "PROCESS_CELLS",
-            "MUTATE",
-            "DIFF",
-            "FILES",
-            "EXCLUDE",
-        ),
-    )
-):
-    """Config sections."""
-
-    __slots__ = ()
-
-    def __new__(  # pylint: disable=R0913
-        cls,
-        ADDOPTS: str = "addopts",
-        PROCESS_CELLS: str = "process_cells",
-        MUTATE: str = "mutate",
-        DIFF: str = "diff",
-        FILES: str = "files",
-        EXCLUDE: str = "exclude",
-    ) -> "_ConfigSections":
-        """Python3.6.0 doesn't support defaults for namedtuples."""
-        return super().__new__(
-            cls,
-            ADDOPTS,
-            PROCESS_CELLS,
-            MUTATE,
-            DIFF,
-            FILES,
-            EXCLUDE,
-        )
-
-
-CONFIG_SECTIONS = _ConfigSections()
-
-
-DEFAULT_CONFIG: Mapping[str, Mapping[str, Sequence[str]]] = toml.load(
-    resource_filename("nbqa.config", "default_config.toml")
-)
-
-
 class Configs:
-    """
-    Nbqa configuration.
-
-    Attributes
-    ----------
-    nbqa_mutate
-        Whether to allow nbqa to modify notebooks.
-    nbqa_process_cells
-        Process code within cells with these cell magics.
-    nbqa_addopts
-        Additional arguments passed to the third party tool
-    nbqa_files
-        Global file include pattern.
-    nbqa_exclude
-        Global file exclude pattern.
-    """
+    """Nbqa configuration."""
 
     CONFIG_SECTION_PARSERS: ClassVar[Dict[str, ConfigParser]] = {}
-    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.ADDOPTS] = (
+    CONFIG_SECTION_PARSERS["addopts"] = (
         lambda arg: split(arg) if isinstance(arg, str) else arg
     )
-    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.PROCESS_CELLS] = (
+    CONFIG_SECTION_PARSERS["process_cells"] = (
         lambda arg: arg.split(",") if isinstance(arg, str) else arg
     )
-    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.MUTATE] = bool
-    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.DIFF] = bool
-    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.FILES] = str
-    CONFIG_SECTION_PARSERS[CONFIG_SECTIONS.EXCLUDE] = str
+    CONFIG_SECTION_PARSERS["mutate"] = bool
+    CONFIG_SECTION_PARSERS["diff"] = bool
+    CONFIG_SECTION_PARSERS["files"] = str
+    CONFIG_SECTION_PARSERS["exclude"] = str
+    CONFIG_SECTION_PARSERS["skip_bad_cells"] = bool
 
     _mutate: bool = False
     _process_cells: Sequence[str] = []
@@ -95,6 +32,7 @@ class Configs:
     _diff: bool = False
     _files: Optional[str] = None
     _exclude: Optional[str] = None
+    _skip_bad_cells: bool = False
 
     def set_config(self, config: str, value: Any) -> None:
         """
@@ -140,6 +78,11 @@ class Configs:
         """Additional cells which nbqa should ignore."""
         return self._exclude
 
+    @property
+    def nbqa_skip_cells(self) -> bool:
+        """Skip cells with syntax errors."""
+        return self._skip_bad_cells
+
     def merge(self, other: "Configs") -> "Configs":
         """
         Merge another Config instance with this instance.
@@ -151,17 +94,19 @@ class Configs:
         """
         config: Configs = Configs()
 
+        config.set_config("addopts", [*self._addopts, *other.nbqa_addopts])
         config.set_config(
-            CONFIG_SECTIONS.ADDOPTS, [*self._addopts, *other.nbqa_addopts]
-        )
-        config.set_config(
-            CONFIG_SECTIONS.PROCESS_CELLS,
+            "process_cells",
             self._process_cells or other.nbqa_process_cells,
         )
-        config.set_config(CONFIG_SECTIONS.MUTATE, self._mutate or other.nbqa_mutate)
-        config.set_config(CONFIG_SECTIONS.DIFF, self._diff or other.nbqa_diff)
-        config.set_config(CONFIG_SECTIONS.FILES, self._files or other.nbqa_files)
-        config.set_config(CONFIG_SECTIONS.EXCLUDE, self._exclude or other.nbqa_exclude)
+        config.set_config("mutate", self._mutate or other.nbqa_mutate)
+        config.set_config("diff", self._diff or other.nbqa_diff)
+        config.set_config("files", self._files or other.nbqa_files)
+        config.set_config("exclude", self._exclude or other.nbqa_exclude)
+        config.set_config(
+            "skip_bad_cells",
+            self._skip_bad_cells or other.nbqa_skip_cells,
+        )
         return config
 
     @staticmethod
@@ -176,12 +121,13 @@ class Configs:
         """
         config: Configs = Configs()
 
-        config.set_config(CONFIG_SECTIONS.ADDOPTS, cli_args.nbqa_addopts)
-        config.set_config(CONFIG_SECTIONS.PROCESS_CELLS, cli_args.nbqa_process_cells)
-        config.set_config(CONFIG_SECTIONS.MUTATE, cli_args.nbqa_mutate)
-        config.set_config(CONFIG_SECTIONS.DIFF, cli_args.nbqa_diff)
-        config.set_config(CONFIG_SECTIONS.FILES, cli_args.nbqa_files)
-        config.set_config(CONFIG_SECTIONS.EXCLUDE, cli_args.nbqa_exclude)
+        config.set_config("addopts", cli_args.nbqa_addopts)
+        config.set_config("process_cells", cli_args.nbqa_process_cells)
+        config.set_config("mutate", cli_args.nbqa_mutate)
+        config.set_config("diff", cli_args.nbqa_diff)
+        config.set_config("files", cli_args.nbqa_files)
+        config.set_config("exclude", cli_args.nbqa_exclude)
+        config.set_config("skip_bad_cells", cli_args.nbqa_skip_bad_cells)
 
         return config
 
@@ -189,19 +135,17 @@ class Configs:
     def get_default_config(command: str) -> "Configs":
         """Merge defaults."""
         defaults: Configs = Configs()
+        defaults.set_config("addopts", DEFAULT_CONFIG["addopts"].get(command))
         defaults.set_config(
-            CONFIG_SECTIONS.ADDOPTS, DEFAULT_CONFIG["addopts"].get(command)
+            "process_cells", DEFAULT_CONFIG["process_cells"].get(command)
         )
+        defaults.set_config("mutate", DEFAULT_CONFIG["mutate"].get(command))
+        defaults.set_config("diff", DEFAULT_CONFIG["diff"].get(command))
+        defaults.set_config("files", DEFAULT_CONFIG["files"].get(command))
+        defaults.set_config("exclude", DEFAULT_CONFIG["exclude"].get(command))
         defaults.set_config(
-            CONFIG_SECTIONS.PROCESS_CELLS, DEFAULT_CONFIG["process_cells"].get(command)
-        )
-        defaults.set_config(
-            CONFIG_SECTIONS.MUTATE, DEFAULT_CONFIG["mutate"].get(command)
-        )
-        defaults.set_config(CONFIG_SECTIONS.DIFF, DEFAULT_CONFIG["diff"].get(command))
-        defaults.set_config(CONFIG_SECTIONS.FILES, DEFAULT_CONFIG["files"].get(command))
-        defaults.set_config(
-            CONFIG_SECTIONS.EXCLUDE, DEFAULT_CONFIG["exclude"].get(command)
+            "skip_bad_cells",
+            DEFAULT_CONFIG["skip_bad_cells"].get(command),
         )
 
         return defaults

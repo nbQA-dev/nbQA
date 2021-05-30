@@ -421,6 +421,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     file_descriptor,
                     configs.nbqa_process_cells,
                     cli_args.command,
+                    skip_bad_cells=configs.nbqa_skip_cells,
                 )
             except Exception as exp:  # pylint: disable=W0703
                 sys.stderr.write(
