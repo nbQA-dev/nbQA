@@ -2,6 +2,11 @@
 Changelog
 =========
 
+0.10.0 (2021-05-30)
+~~~~~~~~~~~~~~~~~~~
+Introduced ``--nbqa-skip-bad-cells`` flag.
+Cells with multi-line magics are no longer processed.
+
 0.9.0 (2021-05-23)
 ------------------
 Fixed bug whereby percent format sign was being mistaken for a line
