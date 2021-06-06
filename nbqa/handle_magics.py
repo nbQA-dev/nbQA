@@ -44,7 +44,7 @@ class NewMagicHandler:  # pylint: disable=R0903
         if magic_type == "cell":
             self.replacement = f"# CELL MAGIC {self.token}"
         else:
-            self.replacement = f"str({self.token})"
+            self.replacement = f"hash({self.token})"
 
 
 class MagicHandler(ABC):  # pylint: disable=R0903

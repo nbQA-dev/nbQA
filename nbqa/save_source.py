@@ -17,6 +17,7 @@ from typing import (
     NamedTuple,
     Optional,
     Sequence,
+    Set,
     Tuple,
 )
 
@@ -40,14 +41,40 @@ class Index(NamedTuple):
     cell_number: int
 
 
+def _is_ipython_magic(node: ast.expr) -> bool:
+    """Check if attribute is IPython magic."""
+    return (
+        isinstance(node, ast.Attribute)
+        and isinstance(node.value, ast.Call)
+        and isinstance(node.value.func, ast.Name)
+        and node.value.func.id == "get_ipython"
+    )
+
+
+class SystemAssignsFinder(ast.NodeVisitor):
+    """Find assignments of system commands."""
+
+    def __init__(self) -> None:
+        """Record where system assigns occur."""
+        self.system_assigns: Set[Tuple[int, int]] = set()
+
+    def visit_Assign(self, node: ast.Assign) -> None:  # pylint: disable=C0103
+        """Find assignments of ipython magic."""
+        if isinstance(node.value, ast.Call) and _is_ipython_magic(node.value.func):
+            self.system_assigns.add((node.value.lineno, node.value.col_offset))
+
+        self.generic_visit(node)
+
+
 class Visitor(ast.NodeVisitor):
     """Visit cell to look for get_ipython calls."""
 
-    def __init__(self) -> None:
+    def __init__(self, system_assigns: Set[Tuple[int, int]]) -> None:
         """Magics will record where magics occur."""
         self.magics: MutableMapping[
             int, List[Tuple[int, Optional[str], Optional[str]]]
         ] = defaultdict(list)
+        self.system_assigns = system_assigns
 
     def visit_Call(self, node: ast.Call) -> None:  # pylint: disable=C0103,R0912
         """
@@ -63,12 +90,8 @@ class Visitor(ast.NodeVisitor):
         AssertionError
             Defensive check.
         """
-        if (
-            isinstance(node.func, ast.Attribute)
-            and isinstance(node.func.value, ast.Call)
-            and isinstance(node.func.value.func, ast.Name)
-            and node.func.value.func.id == "get_ipython"
-        ):
+        if _is_ipython_magic(node.func):
+            assert isinstance(node.func, ast.Attribute)  # help mypy
             args = []
             for arg in node.args:
                 if isinstance(arg, ast.Str):
@@ -102,7 +125,10 @@ class Visitor(ast.NodeVisitor):
                 src = f"!{args[0]}"
                 magic_type = "line"
             elif node.func.attr == "getoutput":
-                src = f"!!{args[0]}"
+                if (node.lineno, node.col_offset) in self.system_assigns:
+                    src = f"!{args[0]}"
+                else:
+                    src = f"!!{args[0]}"
                 magic_type = "line"
             else:
                 src = None
@@ -144,13 +170,15 @@ def _process_source(
             magic_substitutions.append(handler)
             return handler.replacement
         return source
-    visitor = Visitor()
+    system_assigns_finder = SystemAssignsFinder()
+    system_assigns_finder.visit(tree)
+    visitor = Visitor(system_assigns_finder.system_assigns)
     visitor.visit(tree)
     new_src = []
     for i, line in enumerate(body.splitlines(), start=1):
         if i in visitor.magics:
             col_offset, src, magic_type = visitor.magics[i][0]
-            if src is None or line[:col_offset].strip() or len(visitor.magics[i]) > 1:
+            if src is None:
                 # unusual case - skip cell completely for now
                 handler = NewMagicHandler(source, command, magic_type=magic_type)
                 magic_substitutions.append(handler)
@@ -163,8 +191,7 @@ def _process_source(
             magic_substitutions.append(handler)
             line = line[:col_offset] + handler.replacement
         new_src.append(line)
-    leading_newlines = len(source) - len(source.lstrip("\n"))
-    return "\n" * leading_newlines + "\n".join(new_src)
+    return "\n" * (len(source) - len(source.lstrip("\n"))) + "\n".join(new_src)
 
 
 def _replace_magics(
