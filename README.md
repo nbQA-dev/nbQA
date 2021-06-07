@@ -71,7 +71,7 @@ Here's an example of how to set up some pre-commit hooks: put this in your `.pre
 
 ```yaml
 - repo: https://github.com/nbQA-dev/nbQA
-  rev: 0.11.0
+  rev: 0.11.1
   hooks:
     - id: nbqa-black
       args: [--nbqa-mutate]

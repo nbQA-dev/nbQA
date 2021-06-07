@@ -2,7 +2,7 @@
 Changelog
 =========
 
-0.11.0 (2021-06-07)
+0.11.1 (2021-06-07)
 ~~~~~~~~~~~~~~~~~~~
 Fixed historic limitation whereby cells with assignment to line magics or
 to system outputs were being ignored.
