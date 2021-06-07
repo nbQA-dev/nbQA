@@ -2,6 +2,13 @@
 Changelog
 =========
 
+0.11.0 (2021-06-07)
+~~~~~~~~~~~~~~~~~~~
+Fixed historic limitation whereby cells with assignment to line magics or
+to system outputs were being ignored.
+Removed ``autoflake`` hook (at least until I am confident that magics are
+fully supported).
+
 0.10.0 (2021-05-30)
 ~~~~~~~~~~~~~~~~~~~
 Introduced ``--nbqa-skip-bad-cells`` flag.

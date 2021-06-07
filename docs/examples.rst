@@ -1,12 +1,6 @@
 =====================
 Command-line examples
 =====================
-Cleanup unused imports and unused variables with `autoflake`_:
-
-.. code:: console
-
-   $ nbqa autoflake my_notebook.ipynb -i --remove-unused-variables --remove-all-unused-imports --nbqa-mutate
-
 Reformat your notebooks with `black`_:
 
 .. code:: console
@@ -81,9 +75,7 @@ Format code with `yapf`_:
 
    $ nbqa yapf --in-place my_notebook.ipynb --nbqa-mutate
 
-.. _autoflake: https://github.com/myint/autoflake
 .. _black: https://black.readthedocs.io/en/stable/
-.. _check-ast: https://github.com/pre-commit/pre-commit-hooks#check-ast
 .. _doctest: https://docs.python.org/3/library/doctest.html
 .. _flake8: https://flake8.pycqa.org/en/latest/
 .. _isort: https://timothycrosley.github.io/isort/
