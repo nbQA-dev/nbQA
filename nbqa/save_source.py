@@ -149,14 +149,7 @@ def _process_source(
     *,
     skip_bad_cells: bool,
 ) -> str:
-    """
-    Temporarily replace ipython magics - don't process if can't.
-
-    Raises
-    ------
-    AssertionError
-        If multiple magics are found on the same line.
-    """
+    """Temporarily replace ipython magics - don't process if can't."""
     try:
         ast.parse(source)
     except SyntaxError:
@@ -185,11 +178,7 @@ def _process_source(
     for i, line in enumerate(body.splitlines(), start=1):
         if i in visitor.magics:
             col_offset, src, magic_type = visitor.magics[i][0]
-            if len(visitor.magics[i]) > 1:
-                raise AssertionError(
-                    "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
-                )
-            if src is None:
+            if src is None or len(visitor.magics[i]) > 1:
                 # unusual case - skip cell completely for now
                 handler = NewMagicHandler(source, command, magic_type=magic_type)
                 magic_substitutions.append(handler)
