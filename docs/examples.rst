@@ -10,12 +10,6 @@ Reformat your notebooks with `black`_:
    All done! ✨ 🍰 ✨
    1 files reformatted.
 
-Check whether your notebooks parse as valid Python code with `check-ast`_:
-
-.. code:: console
-
-   $ nbqa check-ast my_notebook.ipynb
-
 Run your docstring tests with `doctest`_:
 
 .. code:: console
