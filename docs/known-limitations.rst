@@ -6,8 +6,7 @@ Known limitations
 will be processed. What won't be processed will be:
 
 - cells with cell magic where the cell magic isn't in the first line;
-- cells with assignments to magic, e.g. ``flake8_version = !flake8 --version``;
-- cells with multiple magics per line.
+- cells with multi-line magics.
 
 Automagics will also not be processed, and will likely throw syntax errors. You can get around this by using
 the ``--skip-bad-cells`` flag (see :ref:`configuration<configuration>`).
