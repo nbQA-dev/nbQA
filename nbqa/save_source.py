@@ -193,6 +193,32 @@ def _process_source(
         new_src.append(line)
     return "\n" * (len(source) - len(source.lstrip("\n"))) + "\n".join(new_src)
 
+class CellMagicFinder(ast.NodeVisitor):
+    """Find assignments of system commands."""
+
+    def __init__(self) -> None:
+        """Record where system assigns occur."""
+        self.header = None
+        self.src = None
+
+    def visit_Call(self, node: ast.Call):
+        if _is_ipython_magic(node.func):
+            assert isinstance(node.func, ast.Attribute)  # help mypy
+            if node.func.attr == 'run_cell_magic':
+                args = []
+                for arg in node.args:
+                    if isinstance(arg, ast.Str):
+                        args.append(arg.s)
+                    else:
+                        raise AssertionError(
+                            "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
+                        )
+                header: Optional[str] = f"%%{args[0]}"
+                if args[1]:
+                    assert header is not None
+                    header += f" {args[1]}"
+                self.header = header
+                self.body = args[2].rstrip('\n')
 
 def _replace_magics(
     source: Sequence[str],
@@ -216,13 +242,30 @@ def _replace_magics(
     str
         Line from cell, with line magics replaced with python code
     """
-    # if first line is cell magic, process it separately
-    if MagicHandler.get_ipython_magic_type(source[0]) == IPythonMagicType.CELL:
+    try:
+        ast.parse(''.join(source))
+    except SyntaxError:
+        pass
+    else:
+        # Source has no IPython magic, return it directly
+        return source
+    cell_magic_finder = CellMagicFinder()
+
+    try:
+        tree = ast.parse(TransformerManager().transform_cell(''.join(source)))
+    except SyntaxError:
+        if skip_bad_cells:
+            handler = NewMagicHandler(source, command, magic_type=None)
+            magic_substitutions.append(handler)
+            return handler.replacement
+        return source
+    cell_magic_finder.visit(tree)
+    if cell_magic_finder.header is not None:
         header = _process_source(
-            source[0], command, magic_substitutions, skip_bad_cells=skip_bad_cells
+            cell_magic_finder.header, command, magic_substitutions, skip_bad_cells=skip_bad_cells
         )
         cell = _process_source(
-            "".join(source[1:]),
+            cell_magic_finder.body,
             command,
             magic_substitutions,
             skip_bad_cells=skip_bad_cells,
