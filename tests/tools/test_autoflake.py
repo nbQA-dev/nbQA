@@ -88,7 +88,6 @@ def _validate(before: Sequence[str], after: Sequence[str]) -> bool:
         -    "import pandas as pd\\n",
         """
     )
-    breakpoint()
     return result == expected
 
 
