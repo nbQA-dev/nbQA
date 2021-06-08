@@ -10,7 +10,6 @@ import secrets
 from collections import defaultdict
 from typing import (
     DefaultDict,
-    Iterator,
     List,
     Mapping,
     MutableMapping,
