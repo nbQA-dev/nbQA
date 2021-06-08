@@ -1,14 +1,24 @@
 """Detect ipython magics and provide python code replacements for those magics."""
+import ast
 import secrets
 from abc import ABC
-from enum import Enum
-from typing import *
-import ast
 from collections import defaultdict
+from enum import Enum
+from typing import (
+    ClassVar,
+    List,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+)
 
 from IPython.core.inputtransformer2 import TransformerManager
 
 COMMANDS_WITH_STRING_TOKEN = {"flake8"}
+
 
 class SystemAssignsFinder(ast.NodeVisitor):
     """Find assignments of system commands."""
@@ -23,6 +33,7 @@ class SystemAssignsFinder(ast.NodeVisitor):
             self.system_assigns.add((node.value.lineno, node.value.col_offset))
 
         self.generic_visit(node)
+
 
 def _is_ipython_magic(node: ast.expr) -> bool:
     """Check if attribute is IPython magic."""
@@ -111,17 +122,25 @@ class Visitor(ast.NodeVisitor):
 
 
 class CellMagicFinder(ast.NodeVisitor):
-    """Find assignments of system commands."""
+    """Find cell magics."""
 
     def __init__(self) -> None:
-        """Record where system assigns occur."""
-        self.header = None
-        self.body = None
+        """Record where cell magics occur."""
+        self.header: Optional[str] = None
+        self.body: Optional[str] = None
 
-    def visit_Call(self, node: ast.Call):
+    def visit_Call(self, node: ast.Call) -> None:  # pylint: disable=C0103
+        """
+        Find cell magic, extract header and body.
+
+        Raises
+        ------
+        AssertionError
+            Defensive check.
+        """
         if _is_ipython_magic(node.func):
             assert isinstance(node.func, ast.Attribute)  # help mypy
-            if node.func.attr == 'run_cell_magic':
+            if node.func.attr == "run_cell_magic":
                 args = []
                 for arg in node.args:
                     if isinstance(arg, ast.Str):
@@ -135,7 +154,7 @@ class CellMagicFinder(ast.NodeVisitor):
                     assert header is not None
                     header += f" {args[1]}"
                 self.header = header
-                self.body = args[2].rstrip('\n')
+                self.body = args[2].rstrip("\n")
 
 
 class IPythonMagicType(Enum):

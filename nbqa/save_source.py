@@ -15,16 +15,21 @@ from typing import (
     Mapping,
     MutableMapping,
     NamedTuple,
-    Optional,
     Sequence,
-    Set,
     Tuple,
 )
 
 import tokenize_rt
 from IPython.core.inputtransformer2 import TransformerManager
 
-from nbqa.handle_magics import IPythonMagicType, MagicHandler, NewMagicHandler, CellMagicFinder, SystemAssignsFinder, Visitor, _is_ipython_magic
+from nbqa.handle_magics import (
+    CellMagicFinder,
+    IPythonMagicType,
+    MagicHandler,
+    NewMagicHandler,
+    SystemAssignsFinder,
+    Visitor,
+)
 from nbqa.notebook_info import NotebookInfo
 
 CODE_SEPARATOR = f"# %%NBQA-CELL-SEP{secrets.token_hex(3)}\n"
@@ -99,7 +104,7 @@ def _replace_magics(
     command: str,
     *,
     skip_bad_cells: bool,
-) -> Iterator[str]:
+) -> str:
     """
     Replace IPython line magics with valid python code.
 
@@ -116,32 +121,33 @@ def _replace_magics(
         Line from cell, with line magics replaced with python code
     """
     try:
-        ast.parse(''.join(source))
+        ast.parse("".join(source))
     except SyntaxError:
         pass
     else:
         # Source has no IPython magic, return it directly
-        yield ''.join(source)
-        return
+        return "".join(source)
 
     cell_magic_finder = CellMagicFinder()
-    body = TransformerManager().transform_cell(''.join(source))
+    body = TransformerManager().transform_cell("".join(source))
     try:
         tree = ast.parse(body)
     except SyntaxError:
         if skip_bad_cells:
-            handler = NewMagicHandler(''.join(source), command, magic_type=None)
+            handler = NewMagicHandler("".join(source), command, magic_type=None)
             magic_substitutions.append(handler)
-            yield handler.replacement
-            return
-        yield ''.join(source)
-        return
+            return handler.replacement
+        return "".join(source)
     cell_magic_finder.visit(tree)
 
     # if first line is cell magic, process it separately
     if cell_magic_finder.header is not None:
+        assert cell_magic_finder.body is not None
         header = _process_source(
-            cell_magic_finder.header, command, magic_substitutions, skip_bad_cells=skip_bad_cells
+            cell_magic_finder.header,
+            command,
+            magic_substitutions,
+            skip_bad_cells=skip_bad_cells,
         )
         cell = _process_source(
             cell_magic_finder.body,
@@ -149,9 +155,9 @@ def _replace_magics(
             magic_substitutions,
             skip_bad_cells=skip_bad_cells,
         )
-        yield "\n".join([header, cell])
+        return "\n".join([header, cell])
     else:
-        yield _process_source(
+        return _process_source(
             "".join(source), command, magic_substitutions, skip_bad_cells=skip_bad_cells
         )
 
@@ -186,10 +192,9 @@ def _parse_cell(
     substituted_magics: List[NewMagicHandler] = []
     parsed_cell = CODE_SEPARATOR
 
-    for parsed_line in _replace_magics(
+    parsed_cell += _replace_magics(
         source, substituted_magics, command, skip_bad_cells=skip_bad_cells
-    ):
-        parsed_cell += parsed_line
+    )
 
     if substituted_magics:
         temporary_lines[cell_number] = substituted_magics
