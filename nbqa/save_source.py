@@ -28,9 +28,10 @@ from nbqa.handle_magics import (
     Visitor,
 )
 from nbqa.notebook_info import NotebookInfo
+from nbqa.path_utils import remove_prefix
 
 CODE_SEPARATOR = f"# %%NBQA-CELL-SEP{secrets.token_hex(3)}\n"
-MAGIC = ["time", "timeit", "capture", "pypy", "python", "python3"]
+MAGIC = frozenset(("time", "timeit", "capture", "pypy", "python", "python3"))
 NEWLINE = "\n"
 NEWLINES = defaultdict(lambda: NEWLINE * 3)
 NEWLINES["isort"] = NEWLINE * 2
@@ -273,9 +274,9 @@ def _should_ignore_code_cell(
     if cell_magic_finder.header is None:
         # If there's no cell magic, don't ignore.
         return False
-    process = MAGIC + [i.strip() for i in process_cells]
-    return cell_magic_finder.header.split()[0] not in {
-        f"%%{magic}" for magic in process
+    magic_name = remove_prefix(cell_magic_finder.header.split()[0], "%%")
+    return magic_name not in MAGIC and magic_name not in {
+        i.strip() for i in process_cells
     }
 
 

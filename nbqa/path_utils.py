@@ -3,6 +3,29 @@ from pathlib import Path
 from typing import Tuple
 
 
+def remove_prefix(string: str, prefix: str) -> str:
+    """
+    Remove prefix from string.
+
+    Parameters
+    ----------
+    string
+        Given string to remove prefix from.
+    prefix
+        Prefix to remove.
+
+    Raises
+    ------
+    AssertionError
+        If string doesn't start with given prefix.
+    """
+    if string.startswith(prefix):
+        string = string[len(prefix) :]
+    else:  # pragma: nocover
+        raise AssertionError(f"{string} doesn't start with prefix {prefix}")
+    return string
+
+
 def remove_suffix(string: str, suffix: str) -> str:
     """
     Remove suffix from string.
