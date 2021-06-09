@@ -31,11 +31,8 @@ from nbqa.output_parser import Output, map_python_line_to_nb_lines
 from nbqa.path_utils import get_relative_and_absolute_paths, remove_suffix
 from nbqa.text import BOLD, RESET
 
-BASE_ERROR_MESSAGE = dedent(
-    f"""\
-    {BOLD}{{}}
-    Please report a bug at https://github.com/nbQA-dev/nbQA/issues {RESET}
-    """
+BASE_ERROR_MESSAGE = (
+    f'{BOLD}nbQA to process {{notebook}} with exception "{{exp}}"{RESET}\n'
 )
 MIN_VERSIONS = {"isort": "5.3.0"}
 VIRTUAL_ENVIRONMENTS_URL = (
@@ -403,6 +400,8 @@ def _main(  # pylint: disable=R0912,R0914,R0911
         sys.stderr.write(str(exc))
         return 1
 
+    failed_notebooks = {}
+
     try:  # pylint disable=R0912
 
         if not nb_to_py_mapping:
@@ -423,20 +422,23 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     cli_args.command,
                     skip_bad_cells=configs.nbqa_skip_cells,
                 )
-            except Exception as exp:  # pylint: disable=W0703
-                sys.stderr.write(
-                    BASE_ERROR_MESSAGE.format(f"Error parsing {notebook}: {repr(exp)}")
-                )
-                return 1
+            except Exception as exp_repr:  # pylint: disable=W0703
+                failed_notebooks[notebook] = repr(exp_repr)
 
         output, output_code, mutated = _run_command(
             cli_args.command,
             configs.nbqa_addopts,
-            [i.file for i in nb_to_py_mapping.values()],
+            [
+                i.file
+                for key, i in nb_to_py_mapping.items()
+                if key not in failed_notebooks
+            ],
         )
 
         actually_mutated = False
         for notebook, (_, temp_python_file) in nb_to_py_mapping.items():
+            if notebook in failed_notebooks:
+                continue
             output = _replace_temp_python_file_references_in_out_err(
                 temp_python_file, notebook, output.out, output.err
             )
@@ -475,13 +477,8 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                         )
                         or actually_mutated
                     )
-                except Exception as exp:  # pylint: disable=W0703
-                    sys.stderr.write(
-                        BASE_ERROR_MESSAGE.format(
-                            f"Error reconstructing {notebook}: {repr(exp)}"
-                        )
-                    )
-                    return 1
+                except Exception as exp_repr:  # pylint: disable=W0703
+                    failed_notebooks[notebook] = repr(exp_repr)
 
         sys.stdout.write(output.out)
         sys.stderr.write(output.err)
@@ -489,6 +486,20 @@ def _main(  # pylint: disable=R0912,R0914,R0911
         if mutated and not actually_mutated:
             output_code = 0
             mutated = False
+
+        if failed_notebooks:
+            output_code = 123
+            sys.stderr.write("\n")
+            for failure, exp_repr in failed_notebooks.items():
+                sys.stderr.write(
+                    BASE_ERROR_MESSAGE.format(notebook=failure, exp=exp_repr)
+                )
+            sys.stderr.write(
+                f"{BOLD}\n"
+                "If you believe the notebook(s) to be valid, please "
+                f"report a bug at https://github.com/nbQA-dev/nbQA/issues {RESET}\n"
+            )
+            sys.stderr.write("\n")
 
         if configs.nbqa_diff:
             if mutated:

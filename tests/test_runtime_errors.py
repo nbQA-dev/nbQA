@@ -102,7 +102,13 @@ def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") ->
         env=os.environ,
         universal_newlines=True,  # from Python3.7 this can be replaced with `text`
     )
-    assert "Error reconstructing" in output.stderr
+    expected_stderr = (
+        f'nbQA failed while processing {path} with exception "StopIteration()"\n'
+        "\x1b[1m\nIf you believe the notebook(s) to be valid, please report a bug at https://github.com/nbQA-dev/nbQA/issues \x1b[0m\n"  # pylint: disable=C0301  # noqa: E501
+    )
+    expected_returncode = 123
+    assert expected_stderr == output.stderr
+    assert output.returncode == expected_returncode
 
 
 def test_unable_to_parse(capsys: "CaptureFixture") -> None:
