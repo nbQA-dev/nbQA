@@ -467,6 +467,30 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
     assert expected_err in err
 
 
+def test_invalid_syntax_with_nbqa_skip_bad_cells(capsys: "CaptureFixture") -> None:
+    """
+    Check that using nbqa-diff when there's invalid syntax doesn't have empty output.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    path = os.path.join("tests", "invalid_data", "invalid_syntax.ipynb")
+
+    main(["black", os.path.abspath(path), "--nbqa-skip-bad-cells"])
+
+    out, err = capsys.readouterr()
+    expected_out = ""
+    expected_err = "All done! \\u2728 \\U0001f370 \\u2728\n1 file left unchanged.\n"
+    # This is required because linux supports emojis
+    # so both should have \\ for comparison
+    err = err.encode("ascii", "backslashreplace").decode()
+
+    assert expected_out == out
+    assert expected_err == err
+
+
 def test_comment_after_trailing_comma(capsys: "CaptureFixture") -> None:
     """
     Check trailing semicolon is still preserved if comment is after it.

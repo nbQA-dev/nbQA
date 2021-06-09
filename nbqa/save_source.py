@@ -10,25 +10,28 @@ import secrets
 from collections import defaultdict
 from typing import (
     DefaultDict,
-    Iterator,
     List,
     Mapping,
     MutableMapping,
     NamedTuple,
-    Optional,
     Sequence,
-    Set,
     Tuple,
 )
 
 import tokenize_rt
 from IPython.core.inputtransformer2 import TransformerManager
 
-from nbqa.handle_magics import IPythonMagicType, MagicHandler, NewMagicHandler
+from nbqa.handle_magics import (
+    CellMagicFinder,
+    MagicHandler,
+    SystemAssignsFinder,
+    Visitor,
+)
 from nbqa.notebook_info import NotebookInfo
+from nbqa.path_utils import remove_prefix
 
 CODE_SEPARATOR = f"# %%NBQA-CELL-SEP{secrets.token_hex(3)}\n"
-MAGIC = ["time", "timeit", "capture", "pypy", "python", "python3"]
+MAGIC = frozenset(("time", "timeit", "capture", "pypy", "python", "python3"))
 NEWLINE = "\n"
 NEWLINES = defaultdict(lambda: NEWLINE * 3)
 NEWLINES["isort"] = NEWLINE * 2
@@ -41,111 +44,10 @@ class Index(NamedTuple):
     cell_number: int
 
 
-def _is_ipython_magic(node: ast.expr) -> bool:
-    """Check if attribute is IPython magic."""
-    return (
-        isinstance(node, ast.Attribute)
-        and isinstance(node.value, ast.Call)
-        and isinstance(node.value.func, ast.Name)
-        and node.value.func.id == "get_ipython"
-    )
-
-
-class SystemAssignsFinder(ast.NodeVisitor):
-    """Find assignments of system commands."""
-
-    def __init__(self) -> None:
-        """Record where system assigns occur."""
-        self.system_assigns: Set[Tuple[int, int]] = set()
-
-    def visit_Assign(self, node: ast.Assign) -> None:  # pylint: disable=C0103
-        """Find assignments of ipython magic."""
-        if isinstance(node.value, ast.Call) and _is_ipython_magic(node.value.func):
-            self.system_assigns.add((node.value.lineno, node.value.col_offset))
-
-        self.generic_visit(node)
-
-
-class Visitor(ast.NodeVisitor):
-    """Visit cell to look for get_ipython calls."""
-
-    def __init__(self, system_assigns: Set[Tuple[int, int]]) -> None:
-        """Magics will record where magics occur."""
-        self.magics: MutableMapping[
-            int, List[Tuple[int, Optional[str], Optional[str]]]
-        ] = defaultdict(list)
-        self.system_assigns = system_assigns
-
-    def visit_Call(self, node: ast.Call) -> None:  # pylint: disable=C0103,R0912
-        """
-        Get source to replace ipython magic with.
-
-        Parameters
-        ----------
-        node
-            Function call.
-
-        Raises
-        ------
-        AssertionError
-            Defensive check.
-        """
-        if _is_ipython_magic(node.func):
-            assert isinstance(node.func, ast.Attribute)  # help mypy
-            args = []
-            for arg in node.args:
-                if isinstance(arg, ast.Str):
-                    args.append(arg.s)
-                else:
-                    raise AssertionError(
-                        "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
-                    )
-            assert (
-                args
-            ), "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
-            magic_type: Optional[str] = None
-            if node.func.attr == "run_cell_magic":
-                src: Optional[str] = f"%%{args[0]}"
-                if args[1]:
-                    assert src is not None
-                    src += f" {args[1]}"
-                magic_type = "cell"
-            elif node.func.attr == "run_line_magic":
-                if args[0] == "pinfo":
-                    src = f"{args[1]}?"
-                elif args[0] == "pinfo2":
-                    src = f"{args[1]}??"
-                else:
-                    src = f"%{args[0]}"
-                    if args[1]:
-                        assert src is not None
-                        src += f" {args[1]}"
-                magic_type = "line"
-            elif node.func.attr == "system":
-                src = f"!{args[0]}"
-                magic_type = "line"
-            elif node.func.attr == "getoutput":
-                if (node.lineno, node.col_offset) in self.system_assigns:
-                    src = f"!{args[0]}"
-                else:
-                    src = f"!!{args[0]}"
-                magic_type = "line"
-            else:
-                src = None
-            self.magics[node.lineno].append(
-                (
-                    node.col_offset,
-                    src,
-                    magic_type,
-                )
-            )
-        self.generic_visit(node)
-
-
 def _process_source(
     source: str,
     command: str,
-    magic_substitutions: List[NewMagicHandler],
+    magic_substitutions: List[MagicHandler],
     *,
     skip_bad_cells: bool,
 ) -> str:
@@ -159,14 +61,14 @@ def _process_source(
         return source
     body = TransformerManager().transform_cell(source)
     if len(body.splitlines()) != len(source.splitlines()):
-        handler = NewMagicHandler(source, command, magic_type=None)
+        handler = MagicHandler(source, command, magic_type=None)
         magic_substitutions.append(handler)
         return handler.replacement
     try:
         tree = ast.parse(body)
     except SyntaxError:
         if skip_bad_cells:
-            handler = NewMagicHandler(source, command, magic_type=None)
+            handler = MagicHandler(source, command, magic_type=None)
             magic_substitutions.append(handler)
             return handler.replacement
         return source
@@ -180,10 +82,10 @@ def _process_source(
             col_offset, src, magic_type = visitor.magics[i][0]
             if src is None or len(visitor.magics[i]) > 1:
                 # unusual case - skip cell completely for now
-                handler = NewMagicHandler(source, command, magic_type=magic_type)
+                handler = MagicHandler(source, command, magic_type=magic_type)
                 magic_substitutions.append(handler)
                 return handler.replacement
-            handler = NewMagicHandler(
+            handler = MagicHandler(
                 src,
                 command,
                 magic_type=magic_type,
@@ -196,11 +98,11 @@ def _process_source(
 
 def _replace_magics(
     source: Sequence[str],
-    magic_substitutions: List[NewMagicHandler],
+    magic_substitutions: List[MagicHandler],
     command: str,
     *,
     skip_bad_cells: bool,
-) -> Iterator[str]:
+) -> str:
     """
     Replace IPython line magics with valid python code.
 
@@ -211,33 +113,57 @@ def _replace_magics(
     magic_substitutions
         List to store all the ipython magics substitutions
 
-    Yields
-    ------
+    Returns
+    -------
     str
         Line from cell, with line magics replaced with python code
     """
+    try:
+        ast.parse("".join(source))
+    except SyntaxError:
+        pass
+    else:
+        # Source has no IPython magic, return it directly
+        return "".join(source)
+
+    cell_magic_finder = CellMagicFinder()
+    body = TransformerManager().transform_cell("".join(source))
+    try:
+        tree = ast.parse(body)
+    except SyntaxError:
+        if skip_bad_cells:
+            handler = MagicHandler("".join(source), command, magic_type=None)
+            magic_substitutions.append(handler)
+            return handler.replacement
+        return "".join(source)
+    cell_magic_finder.visit(tree)
+
     # if first line is cell magic, process it separately
-    if MagicHandler.get_ipython_magic_type(source[0]) == IPythonMagicType.CELL:
+    if cell_magic_finder.header is not None:
+        assert cell_magic_finder.body is not None
         header = _process_source(
-            source[0], command, magic_substitutions, skip_bad_cells=skip_bad_cells
-        )
-        cell = _process_source(
-            "".join(source[1:]),
+            cell_magic_finder.header,
             command,
             magic_substitutions,
             skip_bad_cells=skip_bad_cells,
         )
-        yield "\n".join([header, cell])
-    else:
-        yield _process_source(
-            "".join(source), command, magic_substitutions, skip_bad_cells=skip_bad_cells
+        cell = _process_source(
+            cell_magic_finder.body,
+            command,
+            magic_substitutions,
+            skip_bad_cells=skip_bad_cells,
         )
+        return "\n".join([header, cell])
+
+    return _process_source(
+        "".join(source), command, magic_substitutions, skip_bad_cells=skip_bad_cells
+    )
 
 
 def _parse_cell(
     source: Sequence[str],
     cell_number: int,
-    temporary_lines: MutableMapping[int, Sequence[NewMagicHandler]],
+    temporary_lines: MutableMapping[int, Sequence[MagicHandler]],
     command: str,
     *,
     skip_bad_cells: bool,
@@ -261,13 +187,12 @@ def _parse_cell(
     str
         Parsed cell.
     """
-    substituted_magics: List[NewMagicHandler] = []
+    substituted_magics: List[MagicHandler] = []
     parsed_cell = CODE_SEPARATOR
 
-    for parsed_line in _replace_magics(
+    parsed_cell += _replace_magics(
         source, substituted_magics, command, skip_bad_cells=skip_bad_cells
-    ):
-        parsed_cell += parsed_line
+    )
 
     if substituted_magics:
         temporary_lines[cell_number] = substituted_magics
@@ -276,7 +201,7 @@ def _parse_cell(
 
 
 def _get_line_numbers_for_mapping(
-    cell_source: str, magic_substitutions: Sequence[NewMagicHandler]
+    cell_source: str, magic_substitutions: Sequence[MagicHandler]
 ) -> Mapping[int, int]:
     """Get the line number mapping from python file to notebook cell.
 
@@ -327,12 +252,32 @@ def _should_ignore_code_cell(
     """
     if not source:
         return True
-    process = MAGIC + [i.strip() for i in process_cells]
-    magic_type = MagicHandler.get_ipython_magic_type(source[0])
-    if magic_type != IPythonMagicType.CELL:
+
+    try:
+        ast.parse("".join(source))
+    except SyntaxError:
+        # Deal with this below
+        pass
+    else:
+        # No need to ignore
         return False
-    first_line = source[0].lstrip()
-    return first_line.split()[0] not in {f"%%{magic}" for magic in process}
+
+    cell_magic_finder = CellMagicFinder()
+    body = TransformerManager().transform_cell("".join(source))
+    try:
+        tree = ast.parse(body)
+    except SyntaxError:
+        # Don't ignore, let tool deal with syntax error
+        return False
+    cell_magic_finder.visit(tree)
+
+    if cell_magic_finder.header is None:
+        # If there's no cell magic, don't ignore.
+        return False
+    magic_name = remove_prefix(cell_magic_finder.header.split()[0], "%%")
+    return magic_name not in MAGIC and magic_name not in {
+        i.strip() for i in process_cells
+    }
 
 
 def _has_trailing_semicolon(src: str) -> Tuple[str, bool]:
@@ -397,7 +342,7 @@ def main(  # pylint: disable=R0914
     cell_mapping = {0: "cell_0:0"}
     index = Index(line_number=0, cell_number=0)
     trailing_semicolons = set()
-    temporary_lines: DefaultDict[int, Sequence[NewMagicHandler]] = defaultdict(list)
+    temporary_lines: DefaultDict[int, Sequence[MagicHandler]] = defaultdict(list)
     code_cells_to_ignore = set()
 
     for cell in cells:
