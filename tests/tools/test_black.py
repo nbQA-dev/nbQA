@@ -369,12 +369,7 @@ def test_black_works_with_literal_assignment(capsys: "CaptureFixture") -> None:
     out, err = capsys.readouterr()
     expected_out = ""
     expected_err = (
-        (
-            f"error: cannot format {path}: "
-            "cannot use --safe with this file; failed to parse source file.  AST error message: "
-            "can't assign to literal (<unknown>, cell_1:1)\nOh no! "
-            f"{COLLISION} {BROKEN_HEART} {COLLISION}\n1 file failed to reformat.\n"
-        )
+        (f"{COLLISION} {BROKEN_HEART} {COLLISION}\n1 file failed to reformat.\n")
         .encode("ascii", "backslashreplace")
         .decode()
     )
@@ -383,7 +378,7 @@ def test_black_works_with_literal_assignment(capsys: "CaptureFixture") -> None:
     err = err.encode("ascii", "backslashreplace").decode()
 
     assert expected_out == out
-    assert expected_err == err
+    assert expected_err in err
 
 
 def test_not_allowlisted_magic(capsys: "CaptureFixture") -> None:
@@ -460,12 +455,7 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
     out, err = capsys.readouterr()
     expected_out = ""
     expected_err = (
-        (
-            f"error: cannot format {path}: "
-            "cannot use --safe with this file; failed to parse source file.  AST error message: "
-            "can't assign to literal (<unknown>, cell_1:1)\nOh no! "
-            f"{COLLISION} {BROKEN_HEART} {COLLISION}\n1 file failed to reformat.\n"
-        )
+        (f"{COLLISION} {BROKEN_HEART} {COLLISION}\n1 file failed to reformat.\n")
         .encode("ascii", "backslashreplace")
         .decode()
     )
@@ -474,7 +464,7 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
     err = err.encode("ascii", "backslashreplace").decode()
 
     assert expected_out == out
-    assert expected_err == err
+    assert expected_err in err
 
 
 def test_comment_after_trailing_comma(capsys: "CaptureFixture") -> None:
