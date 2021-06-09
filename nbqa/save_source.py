@@ -23,8 +23,6 @@ from IPython.core.inputtransformer2 import TransformerManager
 
 from nbqa.handle_magics import (
     CellMagicFinder,
-    IPythonMagicType,
-    MagicHandler,
     NewMagicHandler,
     SystemAssignsFinder,
     Visitor,
@@ -114,8 +112,8 @@ def _replace_magics(
     magic_substitutions
         List to store all the ipython magics substitutions
 
-    Yields
-    ------
+    Returns
+    -------
     str
         Line from cell, with line magics replaced with python code
     """
@@ -155,10 +153,10 @@ def _replace_magics(
             skip_bad_cells=skip_bad_cells,
         )
         return "\n".join([header, cell])
-    else:
-        return _process_source(
-            "".join(source), command, magic_substitutions, skip_bad_cells=skip_bad_cells
-        )
+
+    return _process_source(
+        "".join(source), command, magic_substitutions, skip_bad_cells=skip_bad_cells
+    )
 
 
 def _parse_cell(
@@ -253,12 +251,32 @@ def _should_ignore_code_cell(
     """
     if not source:
         return True
-    process = MAGIC + [i.strip() for i in process_cells]
-    magic_type = MagicHandler.get_ipython_magic_type(source[0])
-    if magic_type != IPythonMagicType.CELL:
+
+    try:
+        ast.parse("".join(source))
+    except SyntaxError:
+        # Deal with this below
+        pass
+    else:
+        # No need to ignore
         return False
-    first_line = source[0].lstrip()
-    return first_line.split()[0] not in {f"%%{magic}" for magic in process}
+
+    cell_magic_finder = CellMagicFinder()
+    body = TransformerManager().transform_cell("".join(source))
+    try:
+        tree = ast.parse(body)
+    except SyntaxError:
+        # Don't ignore, let tool deal with syntax error
+        return False
+    cell_magic_finder.visit(tree)
+
+    if cell_magic_finder.header is None:
+        # If there's no cell magic, don't ignore.
+        return False
+    process = MAGIC + [i.strip() for i in process_cells]
+    return cell_magic_finder.header.split()[0] not in {
+        f"%%{magic}" for magic in process
+    }
 
 
 def _has_trailing_semicolon(src: str) -> Tuple[str, bool]:
