@@ -23,7 +23,7 @@ from IPython.core.inputtransformer2 import TransformerManager
 
 from nbqa.handle_magics import (
     CellMagicFinder,
-    NewMagicHandler,
+    MagicHandler,
     SystemAssignsFinder,
     Visitor,
 )
@@ -46,7 +46,7 @@ class Index(NamedTuple):
 def _process_source(
     source: str,
     command: str,
-    magic_substitutions: List[NewMagicHandler],
+    magic_substitutions: List[MagicHandler],
     *,
     skip_bad_cells: bool,
 ) -> str:
@@ -60,14 +60,14 @@ def _process_source(
         return source
     body = TransformerManager().transform_cell(source)
     if len(body.splitlines()) != len(source.splitlines()):
-        handler = NewMagicHandler(source, command, magic_type=None)
+        handler = MagicHandler(source, command, magic_type=None)
         magic_substitutions.append(handler)
         return handler.replacement
     try:
         tree = ast.parse(body)
     except SyntaxError:
         if skip_bad_cells:
-            handler = NewMagicHandler(source, command, magic_type=None)
+            handler = MagicHandler(source, command, magic_type=None)
             magic_substitutions.append(handler)
             return handler.replacement
         return source
@@ -81,10 +81,10 @@ def _process_source(
             col_offset, src, magic_type = visitor.magics[i][0]
             if src is None or len(visitor.magics[i]) > 1:
                 # unusual case - skip cell completely for now
-                handler = NewMagicHandler(source, command, magic_type=magic_type)
+                handler = MagicHandler(source, command, magic_type=magic_type)
                 magic_substitutions.append(handler)
                 return handler.replacement
-            handler = NewMagicHandler(
+            handler = MagicHandler(
                 src,
                 command,
                 magic_type=magic_type,
@@ -97,7 +97,7 @@ def _process_source(
 
 def _replace_magics(
     source: Sequence[str],
-    magic_substitutions: List[NewMagicHandler],
+    magic_substitutions: List[MagicHandler],
     command: str,
     *,
     skip_bad_cells: bool,
@@ -131,7 +131,7 @@ def _replace_magics(
         tree = ast.parse(body)
     except SyntaxError:
         if skip_bad_cells:
-            handler = NewMagicHandler("".join(source), command, magic_type=None)
+            handler = MagicHandler("".join(source), command, magic_type=None)
             magic_substitutions.append(handler)
             return handler.replacement
         return "".join(source)
@@ -162,7 +162,7 @@ def _replace_magics(
 def _parse_cell(
     source: Sequence[str],
     cell_number: int,
-    temporary_lines: MutableMapping[int, Sequence[NewMagicHandler]],
+    temporary_lines: MutableMapping[int, Sequence[MagicHandler]],
     command: str,
     *,
     skip_bad_cells: bool,
@@ -186,7 +186,7 @@ def _parse_cell(
     str
         Parsed cell.
     """
-    substituted_magics: List[NewMagicHandler] = []
+    substituted_magics: List[MagicHandler] = []
     parsed_cell = CODE_SEPARATOR
 
     parsed_cell += _replace_magics(
@@ -200,7 +200,7 @@ def _parse_cell(
 
 
 def _get_line_numbers_for_mapping(
-    cell_source: str, magic_substitutions: Sequence[NewMagicHandler]
+    cell_source: str, magic_substitutions: Sequence[MagicHandler]
 ) -> Mapping[int, int]:
     """Get the line number mapping from python file to notebook cell.
 
@@ -341,7 +341,7 @@ def main(  # pylint: disable=R0914
     cell_mapping = {0: "cell_0:0"}
     index = Index(line_number=0, cell_number=0)
     trailing_semicolons = set()
-    temporary_lines: DefaultDict[int, Sequence[NewMagicHandler]] = defaultdict(list)
+    temporary_lines: DefaultDict[int, Sequence[MagicHandler]] = defaultdict(list)
     code_cells_to_ignore = set()
 
     for cell in cells:

@@ -144,7 +144,7 @@ class CellMagicFinder(ast.NodeVisitor):
                 self.body = args[2].rstrip("\n")
 
 
-class NewMagicHandler:  # pylint: disable=R0903
+class MagicHandler:  # pylint: disable=R0903
     """Handle different types of magics."""
 
     def __init__(self, src: str, command: str, magic_type: Optional[str]):
