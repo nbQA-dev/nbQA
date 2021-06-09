@@ -476,7 +476,7 @@ def test_invalid_syntax_with_nbqa_skip_bad_cells(capsys: "CaptureFixture") -> No
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    path = os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
+    path = os.path.join("tests", "invalid_data", "invalid_syntax.ipynb")
 
     main(["black", os.path.abspath(path), "--nbqa-skip-bad-cells"])
 
