@@ -2,6 +2,16 @@
 Changelog
 =========
 
+0.12.0 (2021-06-10)
+~~~~~~~~~~~~~~~~~~~
+``nbQA`` will no longer halt execution if it encounters notebooks which it
+can't parse or which fail to reconstruct - instead, such errors will be reported
+all at once at the end. The exit code in such cases will be ``123`` (as in the ``black``
+formatter).
+Fixed bug whereby DataBricks notebooks (which are saved differently than Jupyter notebooks) with empty cells were not being reconstructed properly
+when using ``nbqa-diff``.
+Cell magics are now parsed more robustly.
+
 0.11.1 (2021-06-07)
 ~~~~~~~~~~~~~~~~~~~
 Fixed historic limitation whereby cells with assignment to line magics or
