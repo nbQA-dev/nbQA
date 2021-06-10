@@ -239,6 +239,7 @@ def _run_command(
     """
     before = [_get_mtimes(i) for i in args]
 
+    breakpoint()
     output = subprocess.run(
         [sys.executable, "-m", command, *args, *cmd_args],
         stderr=subprocess.PIPE,
@@ -423,6 +424,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     skip_bad_cells=configs.nbqa_skip_cells,
                 )
             except Exception as exp_repr:  # pylint: disable=W0703
+                print(repr(exp_repr))
                 failed_notebooks[notebook] = repr(exp_repr)
 
         output, output_code, mutated = _run_command(
@@ -468,6 +470,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     sys.stderr.write(msg)
                     return 1
 
+                breakpoint()
                 try:
                     actually_mutated = (
                         REPLACE_FUNCTION[configs.nbqa_diff](
