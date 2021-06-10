@@ -32,7 +32,7 @@ from nbqa.path_utils import get_relative_and_absolute_paths, remove_suffix
 from nbqa.text import BOLD, RESET
 
 BASE_ERROR_MESSAGE = (
-    f'{BOLD}nbQA to process {{notebook}} with exception "{{exp}}"{RESET}\n'
+    f'{BOLD}nbQA failed to process {{notebook}} with exception "{{exp}}"{RESET}\n'
 )
 MIN_VERSIONS = {"isort": "5.3.0"}
 VIRTUAL_ENVIRONMENTS_URL = (
@@ -239,7 +239,6 @@ def _run_command(
     """
     before = [_get_mtimes(i) for i in args]
 
-    breakpoint()
     output = subprocess.run(
         [sys.executable, "-m", command, *args, *cmd_args],
         stderr=subprocess.PIPE,
@@ -402,7 +401,6 @@ def _main(  # pylint: disable=R0912,R0914,R0911
         return 1
 
     failed_notebooks = {}
-
     try:  # pylint disable=R0912
 
         if not nb_to_py_mapping:
@@ -424,8 +422,11 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     skip_bad_cells=configs.nbqa_skip_cells,
                 )
             except Exception as exp_repr:  # pylint: disable=W0703
-                print(repr(exp_repr))
                 failed_notebooks[notebook] = repr(exp_repr)
+
+        if len(failed_notebooks) == len(nb_to_py_mapping):
+            sys.stderr.write("No valid .ipynb notebooks found\n")
+            return 123
 
         output, output_code, mutated = _run_command(
             cli_args.command,
@@ -470,7 +471,6 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     sys.stderr.write(msg)
                     return 1
 
-                breakpoint()
                 try:
                     actually_mutated = (
                         REPLACE_FUNCTION[configs.nbqa_diff](
@@ -493,9 +493,10 @@ def _main(  # pylint: disable=R0912,R0914,R0911
         if failed_notebooks:
             output_code = 123
             sys.stderr.write("\n")
-            for failure, exp_repr in failed_notebooks.items():
+            # https://github.com/python/mypy/issues/5080
+            for failure, exp_repr in failed_notebooks.items():  # type: ignore
                 sys.stderr.write(
-                    BASE_ERROR_MESSAGE.format(notebook=failure, exp=exp_repr)
+                    BASE_ERROR_MESSAGE.format(notebook=failure, exp=exp_repr)  # type: ignore
                 )
             sys.stderr.write(
                 f"{BOLD}\n"

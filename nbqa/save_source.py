@@ -250,7 +250,7 @@ def _should_ignore_code_cell(
     bool
         True if the cell should ignored else False
     """
-    if not source:
+    if not "".join(source):
         return True
 
     try:
