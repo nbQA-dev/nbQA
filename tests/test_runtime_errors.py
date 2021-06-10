@@ -78,10 +78,10 @@ how to run `nbqa`.\
 def test_unable_to_reconstruct_message(capsys: "CaptureFixture") -> None:
     """Check error message shows if we're unable to reconstruct notebook."""
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
-    message = f"Error reconstructing {path}"
     main(["remove_comments", path, "--nbqa-mutate"])
     _, err = capsys.readouterr()
-    assert message in err
+    expected_stderr = f"\n\x1b[1mnbQA failed to process {path} with exception "
+    assert expected_stderr in err
 
 
 def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") -> None:
@@ -102,7 +102,10 @@ def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") ->
         env=os.environ,
         universal_newlines=True,  # from Python3.7 this can be replaced with `text`
     )
-    assert "Error reconstructing" in output.stderr
+    expected_stderr = f"\n\x1b[1mnbQA failed to process {path} with exception "
+    expected_returncode = 123
+    assert expected_stderr in output.stderr
+    assert output.returncode == expected_returncode
 
 
 def test_unable_to_parse(capsys: "CaptureFixture") -> None:
@@ -111,9 +114,27 @@ def test_unable_to_parse(capsys: "CaptureFixture") -> None:
     path.write_text("foo")
     main(["flake8", str(path), "--nbqa-mutate"])
     path.unlink()
-    message = f"Error parsing {str(path)}"
+    message = "No valid .ipynb notebooks found"
     _, err = capsys.readouterr()
     assert message in err
+
+
+def test_unable_to_parse_with_valid_notebook(capsys: "CaptureFixture") -> None:
+    """Check error message shows if we're unable to parse notebook."""
+    path_0 = Path("tests") / "data/invalid_notebook.ipynb"
+    path_0.write_text("foo")
+    path_1 = Path("tests") / "data/notebook_for_testing.ipynb"
+    main(["flake8", str(path_0), str(path_1), "--select", "E402"])
+    path_0.unlink()
+    out, err = capsys.readouterr()
+    expected_out = (
+        f"{str(path_1)}:cell_4:1:1: E402 module level import not at top of file\n"
+        f"{str(path_1)}:cell_5:1:1: E402 module level import not at top of file\n"
+        f"{str(path_1)}:cell_5:2:1: E402 module level import not at top of file\n"
+    )
+    expected_err = f"\n\x1b[1mnbQA failed to process {str(path_0)} with exception "
+    assert expected_out == out
+    assert expected_err in err
 
 
 @pytest.mark.usefixtures("tmp_print_6174")

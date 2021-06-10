@@ -79,3 +79,29 @@ def test_pyupgrade_works_with_empty_file(capsys: "CaptureFixture") -> None:
     out, err = capsys.readouterr()
     assert out == ""
     assert err == ""
+
+
+def test_pyupgrade_works_with_weird_databricks_file(capsys: "CaptureFixture") -> None:
+    """
+    Check pyupgrade works with unusual databricks notebooks.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    path = os.path.join("tests", "data", "databricks_notebook.ipynb")
+    main(["pyupgrade", path, "--nbqa-diff"])
+    out, err = capsys.readouterr()
+    expected_out = (
+        f"\x1b[1mCell 2\x1b[0m\n------\n--- {path}\n"
+        f"+++ {path}\n"
+        "@@ -1 +1 @@\n"
+        "\x1b[31m-set(())\n"
+        "\x1b[0m\x1b[32m+set()\n"
+        "\x1b[0m\n"
+        "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+    )
+    expected_err = f"Rewriting {path}\n"
+    assert out == expected_out
+    assert err == expected_err

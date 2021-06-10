@@ -90,3 +90,4 @@ repos:
     rev: 0.4.0
     hooks:
       - id: nbstripout
+        exclude: ^tests/data/databricks_notebook\.ipynb$
