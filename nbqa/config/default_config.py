@@ -1,9 +1,9 @@
 """Default configurations."""
-from typing import Iterable, Mapping
+from typing import Mapping, Sequence
 
 from nbqa.save_source import CODE_SEPARATOR
 
-DEFAULT_CONFIG: Mapping[str, Mapping[str, Iterable[str]]] = {
+DEFAULT_CONFIG: Mapping[str, Mapping[str, Sequence[str]]] = {
     "addopts": {"isort": ("--treat-comment-as-code", CODE_SEPARATOR.rstrip("\n"))},
     "config": {},
     "mutate": {},

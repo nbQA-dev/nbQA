@@ -59,7 +59,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
     root_dirs: Sequence[str]
     nbqa_addopts: Sequence[str]
     nbqa_mutate: bool
-    nbqa_process_cells: Optional[str]
+    nbqa_process_cells: Sequence[str]
     nbqa_diff: bool
     nbqa_files: Optional[str]
     nbqa_exclude: Optional[str]
@@ -80,7 +80,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         self.root_dirs = args.root_dirs
         self.nbqa_addopts = cmd_args
         self.nbqa_mutate = args.nbqa_mutate or False
-        self.nbqa_process_cells = args.nbqa_process_cells or None
+        self.nbqa_process_cells: Sequence[str] = args.nbqa_process_cells or []
         self.nbqa_diff = args.nbqa_diff or False
         self.nbqa_files = args.nbqa_files or None
         self.nbqa_exclude = args.nbqa_exclude or None
