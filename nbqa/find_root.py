@@ -11,7 +11,6 @@ from typing import Iterable
 # files and folders known to indicate a project root
 KNOWN_PROJECT_ROOT_DIRS = [".git", ".hg"]
 KNOW_PROJECT_ROOT_FILES = [
-    ".nbqa.ini",
     "setup.py",
     "setup.cfg",
     "pyproject.toml",

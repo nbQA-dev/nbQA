@@ -1,8 +1,10 @@
 """Check user can check for other magics."""
 import difflib
+import os
 from pathlib import Path
 from shutil import copyfile
-from typing import TYPE_CHECKING, Callable, Optional, Sequence
+from textwrap import dedent
+from typing import TYPE_CHECKING, Callable, Sequence
 
 import pytest
 
@@ -58,39 +60,30 @@ def _validate_magics_with_black(before: Sequence[str], after: Sequence[str]) -> 
     return result == expected
 
 
-@pytest.mark.parametrize(
-    "config, validate, config_file",
-    [
-        (
-            "[tool.nbqa.mutate]\nblack=1",
-            _validate_magics_with_black,
-            "pyproject.toml",
-        )
-    ],
-)
 def test_indented_magics(
-    config: str,
-    validate: Callable[..., bool],
-    config_file: Optional[str],
-    tmpdir: "LocalPath",
+    tmp_notebook_with_indented_magics: "LocalPath",
 ) -> None:
     """Check if the indented line magics are retained properly after mutating."""
-    test_nb_path = _copy_notebook(
-        Path("tests/data/notebook_with_indented_magics.ipynb"), Path(tmpdir)
-    )
-
-    if config_file:
-        _create_ignore_cell_config(Path(tmpdir) / config_file, config)
-
-    with open(str(test_nb_path)) as handle:
+    with open(str(tmp_notebook_with_indented_magics)) as handle:
         before = handle.readlines()
 
-    main(["black", str(test_nb_path)])
+    Path("pyproject.toml").write_text(
+        dedent(
+            """\
+            [tool.nbqa.mutate]
+            black=1
+            """
+        )
+    )
+    main(
+        ["black", os.path.join("tests", "data", "notebook_with_indented_magics.ipynb")]
+    )
+    os.remove("pyproject.toml")
 
-    with open(str(test_nb_path)) as handle:
+    with open(str(tmp_notebook_with_indented_magics)) as handle:
         after = handle.readlines()
 
-    assert validate(before, after)
+    assert _validate_magics_with_black(before, after)
 
 
 def _validate_magics_flake8_warnings(actual: str, test_nb_path: Path) -> bool:

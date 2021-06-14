@@ -10,20 +10,16 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-def test_pyproject_toml_works(
-    tmp_pyprojecttoml: Path, capsys: "CaptureFixture"
-) -> None:
+def test_pyproject_toml_works(capsys: "CaptureFixture") -> None:
     """
     Check if config is picked up from pyproject.toml works.
 
     Parameters
     ----------
-    tmp_pyprojecttoml
-        Temporary pyproject.toml file.
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    tmp_pyprojecttoml.write_text(
+    Path("pyproject.toml").write_text(
         dedent(
             """
             [tool.nbqa.addopts]
@@ -36,8 +32,7 @@ def test_pyproject_toml_works(
     )
 
     main(["flake8", "tests", "--ignore", "E302"])
-
-    tmp_pyprojecttoml.unlink()
+    Path("pyproject.toml").unlink()
 
     # check out and err
     out, _ = capsys.readouterr()

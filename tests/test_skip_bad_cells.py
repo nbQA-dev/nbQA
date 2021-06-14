@@ -31,8 +31,8 @@ def test_config_file(capsys: "CaptureFixture") -> None:
     """Test setting in config file."""
     file = os.path.join("tests", "invalid_data", "automagic.ipynb")
     try:
-        with open("setup.cfg", "w") as handle:
-            handle.write("[nbqa.skip_bad_cells]\n" "black = 1\n")
+        with open("pyproject.toml", "w") as handle:
+            handle.write("[tool.nbqa.skip_bad_cells]\n" "black = 1\n")
         main(["black", file, "--nbqa-diff", "--nbqa-skip-bad-cells"])
         out, _ = capsys.readouterr()
         expected_out = (
@@ -48,4 +48,4 @@ def test_config_file(capsys: "CaptureFixture") -> None:
         )
         assert out == expected_out
     finally:
-        os.remove("setup.cfg")
+        os.remove("pyproject.toml")

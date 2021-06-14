@@ -115,19 +115,18 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    Path("setup.cfg").write_text(
+    Path("pyproject.toml").write_text(
         dedent(
             """\
-            [nbqa.isort]
-            addopts = --treat-comment-as-code "# %%%%NBQA-CELL-SEP"
+            [tool.nbqa.isort]
+            addopts = ["--treat-comment-as-code=# %%NBQA-CELL-SEP"]
             """
         )
     )
 
     path = os.path.abspath(os.path.join("tests", "data", notebook))
     main(["isort", path, "--nbqa-mutate"])
-
-    Path("setup.cfg").unlink()
+    Path("pyproject.toml").unlink()
 
     # check out and err
     out, err = capsys.readouterr()
