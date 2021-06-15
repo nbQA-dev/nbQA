@@ -121,3 +121,22 @@ or, from the command-line:
 .. code-block:: bash
 
     nbqa black notebook.ipynb --nbqa-dont-skip-bad-cells
+
+Skip cells based on celltags
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can skip cells based on the celltags in their metadata using the :code:`--nbqa-dont-skip-bad-cells` CLI argument.
+
+For example, to skip cells which contain either the ``skip-flake8`` or ``flake8-skip`` tags, you could
+add the following to your :code:`pyproject.toml` file:
+
+    .. code-block:: toml
+
+        [tool.nbqa.skip_celltags]
+        black = ["skip-flake8", "flake8-skip"]
+
+or, from the command-line:
+
+.. code-block:: bash
+
+    nbqa black notebook.ipynb --nbqa-skip-celltags=skip-flake8,flake8-skip

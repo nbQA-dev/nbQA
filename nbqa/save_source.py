@@ -236,7 +236,10 @@ def _get_line_numbers_for_mapping(
 
 
 def _should_ignore_code_cell(
-    source: Sequence[str], process_cells: Sequence[str]
+    source: Sequence[str],
+    process_cells: Sequence[str],
+    skip_celltags: Sequence[str],
+    tags: Sequence[str],
 ) -> bool:
     """
     Return True if the current cell should be ignored from processing.
@@ -254,6 +257,8 @@ def _should_ignore_code_cell(
         True if the cell should ignored else False
     """
     if not "".join(source):
+        return True
+    if set(tags).intersection(skip_celltags):
         return True
 
     try:
@@ -316,6 +321,7 @@ def main(  # pylint: disable=R0914
     file_descriptor: int,
     process_cells: Sequence[str],
     command: str,
+    skip_celltags: Sequence[str],
     *,
     dont_skip_bad_cells: bool,
 ) -> NotebookInfo:
@@ -352,7 +358,12 @@ def main(  # pylint: disable=R0914
         if cell["cell_type"] == "code":
             index = index._replace(cell_number=index.cell_number + 1)
 
-            if _should_ignore_code_cell(cell["source"], process_cells):
+            if _should_ignore_code_cell(
+                cell["source"],
+                process_cells,
+                skip_celltags,
+                cell.get("metadata", {}).get("tags", []),
+            ):
                 code_cells_to_ignore.add(index.cell_number)
                 continue
 

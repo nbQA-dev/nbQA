@@ -73,11 +73,18 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         self.root_dirs = args.root_dirs
         self.addopts = cmd_args or None
         self.mutate = args.nbqa_mutate or None
-        self.process_cells = args.nbqa_process_cells
+        if args.nbqa_process_cells is not None:
+            self.process_cells = args.nbqa_process_cells.split(",")
+        else:
+            self.process_cells = None
         self.diff = args.nbqa_diff or None
         self.files = args.nbqa_files
         self.exclude = args.nbqa_exclude
         self.dont_skip_bad_cells = args.nbqa_dont_skip_bad_cells or None
+        if args.nbqa_skip_celltags is not None:
+            self.skip_celltags = args.nbqa_skip_celltags.split(",")
+        else:
+            self.skip_celltags = None
 
     @staticmethod
     def parse_args(argv: Optional[Sequence[str]]) -> "CLIArgs":
@@ -122,7 +129,6 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         parser.add_argument(
             "--nbqa-process-cells",
             required=False,
-            nargs="*",
             help=dedent(
                 r"""
                 Process code within these cell magics. You can pass multiple options,
@@ -138,6 +144,15 @@ class CLIArgs:  # pylint: disable=R0902,R0903
             "--nbqa-dont-skip-bad-cells",
             action="store_true",
             help="Don't skip cells with invalid syntax.",
+        )
+        parser.add_argument(
+            "--nbqa-skip-celltags",
+            required=False,
+            help=dedent(
+                r"""
+                Skip cells with have any of the given celltags.
+                """
+            ),
         )
         args, cmd_args = parser.parse_known_args(argv)
         return CLIArgs(args, cmd_args)

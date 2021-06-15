@@ -21,6 +21,7 @@ class Configs(TypedDict):
     mutate: bool
     process_cells: Sequence[str]
     dont_skip_bad_cells: bool
+    skip_celltags: Sequence[str]
 
 
 def get_default_config() -> Configs:
@@ -33,6 +34,7 @@ def get_default_config() -> Configs:
         mutate=False,
         process_cells=[],
         dont_skip_bad_cells=False,
+        skip_celltags=[],
     )
 
 
