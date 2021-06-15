@@ -79,4 +79,7 @@ def test_check_ast_return_code() -> None:
     check_ast_runner = partial(_run_nbqa_with, "pre_commit_hooks.check_ast")
 
     assert check_ast_runner([DIRTY_NOTEBOOK]) == PASSED
-    assert check_ast_runner([INVALID_SYNTAX_NOTEBOOK]) != PASSED
+    assert (
+        check_ast_runner([INVALID_SYNTAX_NOTEBOOK], "--nbqa-dont-skip-bad-cells")
+        != PASSED
+    )

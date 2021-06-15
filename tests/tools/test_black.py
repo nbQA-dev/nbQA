@@ -364,7 +364,7 @@ def test_black_works_with_literal_assignment(capsys: "CaptureFixture") -> None:
     """
     path = os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
 
-    main(["black", os.path.abspath(path)])
+    main(["black", os.path.abspath(path), "--nbqa-dont-skip-bad-cells"])
 
     out, err = capsys.readouterr()
     expected_out = ""
@@ -450,7 +450,7 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
     """
     path = os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
 
-    main(["black", os.path.abspath(path), "--nbqa-diff"])
+    main(["black", os.path.abspath(path), "--nbqa-diff", "--nbqa-dont-skip-bad-cells"])
 
     out, err = capsys.readouterr()
     expected_out = ""
@@ -467,7 +467,7 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
     assert expected_err in err
 
 
-def test_invalid_syntax_with_nbqa_skip_bad_cells(capsys: "CaptureFixture") -> None:
+def test_invalid_syntax_with_nbqa_dont_skip_bad_cells(capsys: "CaptureFixture") -> None:
     """
     Check that using nbqa-diff when there's invalid syntax doesn't have empty output.
 
@@ -478,7 +478,7 @@ def test_invalid_syntax_with_nbqa_skip_bad_cells(capsys: "CaptureFixture") -> No
     """
     path = os.path.join("tests", "invalid_data", "invalid_syntax.ipynb")
 
-    main(["black", os.path.abspath(path), "--nbqa-skip-bad-cells"])
+    main(["black", os.path.abspath(path)])
 
     out, err = capsys.readouterr()
     expected_out = ""
