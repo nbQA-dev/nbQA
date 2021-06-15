@@ -397,6 +397,19 @@ def _get_nb_to_py_mapping(
     return nb_to_py_mapping
 
 
+def _print_failed_notebook_errors(failed_notebooks: Mapping[str, str]) -> None:
+    """Print exceptions from failed notebooks."""
+    sys.stderr.write("\n")
+    for failure, exp_repr in failed_notebooks.items():
+        sys.stderr.write(BASE_ERROR_MESSAGE.format(notebook=failure, exp=exp_repr))
+    sys.stderr.write(
+        f"{BOLD}\n"
+        "If you believe the notebook(s) to be valid, please "
+        f"report a bug at https://github.com/nbQA-dev/nbQA/issues {RESET}\n"
+    )
+    sys.stderr.write("\n")
+
+
 def _main(  # pylint: disable=R0912,R0914,R0911
     cli_args: CLIArgs, configs: Configs
 ) -> int:
@@ -450,18 +463,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
 
         if len(failed_notebooks) == len(nb_to_py_mapping):
             sys.stderr.write("No valid .ipynb notebooks found\n")
-            sys.stderr.write("\n")
-            # https://github.com/python/mypy/issues/5080
-            for failure, exp_repr in failed_notebooks.items():  # type: ignore
-                sys.stderr.write(
-                    BASE_ERROR_MESSAGE.format(notebook=failure, exp=exp_repr)  # type: ignore
-                )
-            sys.stderr.write(
-                f"{BOLD}\n"
-                "If you believe the notebook(s) to be valid, please "
-                f"report a bug at https://github.com/nbQA-dev/nbQA/issues {RESET}\n"
-            )
-            sys.stderr.write("\n")
+            _print_failed_notebook_errors(failed_notebooks)
             return 123
 
         output, output_code, mutated = _run_command(
@@ -528,18 +530,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
 
         if failed_notebooks:
             output_code = 123
-            sys.stderr.write("\n")
-            # https://github.com/python/mypy/issues/5080
-            for failure, exp_repr in failed_notebooks.items():  # type: ignore
-                sys.stderr.write(
-                    BASE_ERROR_MESSAGE.format(notebook=failure, exp=exp_repr)  # type: ignore
-                )
-            sys.stderr.write(
-                f"{BOLD}\n"
-                "If you believe the notebook(s) to be valid, please "
-                f"report a bug at https://github.com/nbQA-dev/nbQA/issues {RESET}\n"
-            )
-            sys.stderr.write("\n")
+            _print_failed_notebook_errors(failed_notebooks)
 
         if configs["diff"]:
             if mutated:
