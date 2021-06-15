@@ -28,6 +28,7 @@ disable = [
   "R0801", # Unfortunately I do need some duplication, e.g. with imports
   "W1510", # I need to run subprocess.run without check because it's OK if it fails
   "E0401", # Unable to import '_pytest.capture' (this is just for typing anyway)
+  "E0611", # No name 'TypedDict' in module 'typing'
   "E1136", # Value 'Optional' is unsubscriptable (bug? https://github.com/PyCQA/pylint/issues/3882)
   "E0239", # Inheriting 'NamedTuple', which is not a class. (bug? https://github.com/PyCQA/pylint/issues/2570)
 ]

@@ -29,19 +29,19 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
         before = handle.readlines()
     path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
 
-    Path("setup.cfg").write_text(
+    Path("pyproject.toml").write_text(
         dedent(
             """\
-            [nbqa.mutate]
-            pyupgrade = 1
+            [tool.nbqa.mutate]
+            pyupgrade = true
 
-            [nbqa.addopts]
-            pyupgrade = '--py36-plus'
+            [tool.nbqa.addopts]
+            pyupgrade = ['--py36-plus']
             """
         )
     )
     main(["pyupgrade", os.path.abspath(path)])
-    Path("setup.cfg").unlink()
+    Path("pyproject.toml").unlink()
     with open(tmp_notebook_for_testing) as handle:
         after = handle.readlines()
 

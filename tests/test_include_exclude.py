@@ -54,17 +54,16 @@ def test_config_files(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    Path("setup.cfg").write_text(
+    Path("pyproject.toml").write_text(
         dedent(
             """\
-        [nbqa.files]
-        flake8 = ^tests/data/notebook_for
+        [tool.nbqa.files]
+        flake8 = "^tests/data/notebook_for"
         """
         )
     )
-
     main(["flake8", "tests"])
-    Path("setup.cfg").unlink()
+    Path("pyproject.toml").unlink()
 
     out, _ = capsys.readouterr()
     assert out and all(
@@ -81,17 +80,17 @@ def test_config_exclude(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    Path("setup.cfg").write_text(
+    Path("pyproject.toml").write_text(
         dedent(
             """\
-        [nbqa.exclude]
-        flake8 = ^tests/data/notebook_for
+        [tool.nbqa.exclude]
+        flake8 = "^tests/data/notebook_for"
         """
         )
     )
 
     main(["flake8", "tests"])
-    Path("setup.cfg").unlink()
+    Path("pyproject.toml").unlink()
 
     out, _ = capsys.readouterr()
     assert out and all(

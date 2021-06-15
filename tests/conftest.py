@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from py._path.local import LocalPath
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def tmp_pyprojecttoml(tmpdir: "LocalPath") -> Iterator[Path]:
     """
     Temporarily delete pyproject.toml so it can be recreated during tests.
@@ -174,6 +174,28 @@ def tmp_notebook_with_indented_magics(tmpdir: "LocalPath") -> Iterator[Path]:
         Temporary copy of notebook.
     """
     filename = Path("tests/data") / "notebook_with_indented_magics.ipynb"
+    temp_file = Path(tmpdir) / "tmp.ipynb"
+    shutil.copy(str(filename), str(temp_file))
+    yield filename
+    shutil.copy(str(temp_file), str(filename))
+
+
+@pytest.fixture
+def tmp_notebook_for_autoflake(tmpdir: "LocalPath") -> Iterator[Path]:
+    """
+    Make temporary copy of test notebook before it's operated on, then revert it.
+
+    Parameters
+    ----------
+    tmpdir
+        Pytest fixture, gives us a temporary directory.
+
+    Yields
+    ------
+    Path
+        Temporary copy of notebook.
+    """
+    filename = Path("tests/data") / "notebook_for_autoflake.ipynb"
     temp_file = Path(tmpdir) / "tmp.ipynb"
     shutil.copy(str(filename), str(temp_file))
     yield filename

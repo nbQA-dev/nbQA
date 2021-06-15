@@ -5,6 +5,9 @@ Configuration
 
 You can configure :code:`nbQA` either at the command line, or by using a :code:`pyproject.toml` file. We'll see some examples below.
 
+.. note::
+    Please note that if you pass the same option via both the :code:`pyproject.toml` file and via the command-line, the command-line will take precedence.
+
 Extra flags
 ~~~~~~~~~~~
 
@@ -38,7 +41,7 @@ or you can put the following in your :code:`pyproject.toml` file
 .. code-block:: toml
 
     [tool.nbqa.mutate]
-    black = 1
+    black = true
 
 .. note::
     If you let :code:`nbQA` mutate your notebook, then trailing newlines will be removed from cells.
@@ -58,7 +61,7 @@ or use the :code:`process_cells` option in your :code:`pyproject.toml` file:
 .. code-block:: toml
 
     [tool.nbqa.process_cells]
-    black = add_to
+    black = ["add_to"]
 
 Include / exclude
 ~~~~~~~~~~~~~~~~~
@@ -111,7 +114,7 @@ add the following to your :code:`pyproject.toml` file:
     .. code-block:: toml
 
         [tool.nbqa.skip_bad_cells]
-        black = 1
+        black = true
 
 or, from the command-line:
 

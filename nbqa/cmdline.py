@@ -32,38 +32,17 @@ USAGE_MSG = dedent(
 
 
 class CLIArgs:  # pylint: disable=R0902,R0903
-    """
-    Stores the command line arguments passed.
-
-    Attributes
-    ----------
-    command
-        The third-party tool to run (e.g. :code:`mypy`).
-    root_dirs
-        The notebooks or directories to run third-party tool on.
-    nbqa_mutate
-        Whether to allow 3rd party tools to modify notebooks.
-    nbqa_process_cells
-        Process code within these cell magics.
-    nbqa_addopts
-        Any additional flags passed to third-party tool (e.g. :code:`--quiet`).
-    nbqa_files
-        Global file include pattern.
-    nbqa_exclude
-        Global file exclude pattern.
-    nbqa_skip_bad_cells
-        Skip cells with syntax errors.
-    """
+    """Stores the command line arguments passed."""
 
     command: str
     root_dirs: Sequence[str]
-    nbqa_addopts: Sequence[str]
-    nbqa_mutate: bool
-    nbqa_process_cells: Optional[str]
-    nbqa_diff: bool
-    nbqa_files: Optional[str]
-    nbqa_exclude: Optional[str]
-    nbqa_skip_bad_cells: bool
+    addopts: Optional[Sequence[str]]
+    mutate: Optional[bool]
+    process_cells: Optional[Sequence[str]]
+    diff: Optional[bool]
+    files: Optional[str]
+    exclude: Optional[str]
+    skip_bad_cells: Optional[bool]
 
     def __init__(self, args: argparse.Namespace, cmd_args: Sequence[str]) -> None:
         """
@@ -78,13 +57,13 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         """
         self.command = args.command
         self.root_dirs = args.root_dirs
-        self.nbqa_addopts = cmd_args
-        self.nbqa_mutate = args.nbqa_mutate or False
-        self.nbqa_process_cells = args.nbqa_process_cells or None
-        self.nbqa_diff = args.nbqa_diff or False
-        self.nbqa_files = args.nbqa_files or None
-        self.nbqa_exclude = args.nbqa_exclude or None
-        self.nbqa_skip_bad_cells = args.nbqa_skip_bad_cells or False
+        self.addopts = cmd_args or None
+        self.mutate = args.nbqa_mutate or None
+        self.process_cells = args.nbqa_process_cells
+        self.diff = args.nbqa_diff or None
+        self.files = args.nbqa_files
+        self.exclude = args.nbqa_exclude
+        self.skip_bad_cells = args.nbqa_skip_bad_cells or None
 
     @staticmethod
     def parse_args(argv: Optional[Sequence[str]]) -> "CLIArgs":
@@ -129,6 +108,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         parser.add_argument(
             "--nbqa-process-cells",
             required=False,
+            nargs="*",
             help=dedent(
                 r"""
                 Process code within these cell magics. You can pass multiple options,

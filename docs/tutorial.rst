@@ -61,7 +61,7 @@ Open up your ``pyproject.toml`` file (or create one if you don't have one alread
     line-length = 96
 
     [tool.nbqa.mutate]
-    black = 1
+    black = true
 
 Now, you'll be able to run the command from the previous section with just ::
 

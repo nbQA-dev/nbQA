@@ -19,16 +19,18 @@ from typing import (
     Tuple,
 )
 
+import toml
 from pkg_resources import parse_version
 
-from nbqa import config_parser, replace_source, save_source
+from nbqa import replace_source, save_source
 from nbqa.cmdline import CLIArgs
-from nbqa.config.config import Configs
+from nbqa.config.config import Configs, get_default_config, validate
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
 from nbqa.output_parser import Output, map_python_line_to_nb_lines
 from nbqa.path_utils import get_relative_and_absolute_paths, remove_suffix
+from nbqa.save_source import CODE_SEPARATOR
 from nbqa.text import BOLD, RESET
 
 BASE_ERROR_MESSAGE = (
@@ -303,15 +305,36 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     Configs
         Taken from CLI (if given), else from .nbqa.ini.
     """
-    cli_config: Configs = Configs.parse_from_cli_args(cli_args)
-    file_config: Optional[Configs] = config_parser.parse_config_from_file(
-        cli_args, project_root
-    )
+    # start with default config.
+    config = get_default_config()
 
-    if file_config is not None:
-        cli_config = cli_config.merge(file_config)
+    # If a section is in pyproject.toml, use that.
+    if (project_root / "pyproject.toml").is_file():
 
-    return cli_config.merge(Configs.get_default_config(cli_args.command))
+        config_file = toml.load(str(project_root / "pyproject.toml"))
+        if "tool" in config_file and "nbqa" in config_file["tool"]:
+            file_config = config_file["tool"]["nbqa"]
+            for section in config:
+                if section in file_config and cli_args.command in file_config[section]:
+                    # TypedDict key must be a string literal
+                    config[section] = file_config[section][cli_args.command]  # type: ignore
+
+    # If a section was passed via CLI, use that.
+    for section in config:
+        if getattr(cli_args, section) is not None:
+            # TypedDict key must be a string literal
+            config[section] = getattr(cli_args, section)  # type: ignore
+
+    # add default options
+    if cli_args.command == "isort":
+        # TypedDict key must be a string literal
+        config["addopts"] = (
+            *config["addopts"],
+            "--treat-comment-as-code",
+            CODE_SEPARATOR.rstrip("\n"),
+        )
+
+    return config
 
 
 def _clean_up_tmp_files(nb_to_py_mapping: Mapping[str, Tuple[int, str]]) -> None:
@@ -394,7 +417,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
     """
     try:
         nb_to_py_mapping = _get_nb_to_py_mapping(
-            cli_args.root_dirs, configs.nbqa_files, configs.nbqa_exclude
+            cli_args.root_dirs, configs["files"], configs["exclude"]
         )
     except FileNotFoundError as exc:
         sys.stderr.write(str(exc))
@@ -417,9 +440,9 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                 nb_info_mapping[notebook] = save_source.main(
                     notebook,
                     file_descriptor,
-                    configs.nbqa_process_cells,
+                    configs["process_cells"],
                     cli_args.command,
-                    skip_bad_cells=configs.nbqa_skip_cells,
+                    skip_bad_cells=configs["skip_bad_cells"],
                 )
             except Exception as exp_repr:  # pylint: disable=W0703
                 failed_notebooks[notebook] = repr(exp_repr)
@@ -430,7 +453,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
 
         output, output_code, mutated = _run_command(
             cli_args.command,
-            configs.nbqa_addopts,
+            configs["addopts"],
             [
                 i.file
                 for key, i in nb_to_py_mapping.items()
@@ -454,7 +477,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
             )
 
             if mutated:
-                if not configs.nbqa_mutate and not configs.nbqa_diff:
+                if not configs["mutate"] and not configs["diff"]:
                     # pylint: disable=C0301
                     msg = dedent(
                         f"""\
@@ -473,7 +496,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
 
                 try:
                     actually_mutated = (
-                        REPLACE_FUNCTION[configs.nbqa_diff](
+                        REPLACE_FUNCTION[configs["diff"]](
                             temp_python_file,
                             notebook,
                             nb_info_mapping[notebook],
@@ -505,7 +528,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
             )
             sys.stderr.write("\n")
 
-        if configs.nbqa_diff:
+        if configs["diff"]:
             if mutated:
                 sys.stdout.write(
                     "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
@@ -563,7 +586,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     _check_command_is_installed(cli_args.command)
     project_root: Path = find_project_root(tuple(cli_args.root_dirs))
     configs: Configs = _get_configs(cli_args, project_root)
-    configs.validate()
+    validate(configs)
 
     return _main(cli_args, configs)
 

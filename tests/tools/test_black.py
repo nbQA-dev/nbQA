@@ -37,16 +37,16 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
         before = handle.readlines()
     path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
 
-    Path("setup.cfg").write_text(
+    Path("pyproject.toml").write_text(
         dedent(
             """\
-            [nbqa.mutate]
-            black=1
+            [tool.nbqa.mutate]
+            black=true
             """
         )
     )
     main(["black", os.path.abspath(path)])
-    Path("setup.cfg").unlink()
+    Path("pyproject.toml").unlink()
     with open(tmp_notebook_for_testing) as handle:
         after = handle.readlines()
 
@@ -100,16 +100,16 @@ def test_black_works_with_trailing_semicolons(
         before = handle.readlines()
     path = os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
 
-    Path("setup.cfg").write_text(
+    Path("pyproject.toml").write_text(
         dedent(
             """\
-            [nbqa.mutate]
-            black=1
+            [tool.nbqa.mutate]
+            black=true
             """
         )
     )
     main(["black", os.path.abspath(path), "--line-length=10"])
-    Path("setup.cfg").unlink()
+    Path("pyproject.toml").unlink()
     with open(tmp_notebook_with_trailing_semicolon) as handle:
         after = handle.readlines()
 
@@ -170,16 +170,16 @@ def test_black_works_with_multiline(
         before = handle.readlines()
     path = os.path.join("tests", "data", "clean_notebook_with_multiline.ipynb")
 
-    Path("setup.cfg").write_text(
+    Path("pyproject.toml").write_text(
         dedent(
             """\
-            [nbqa.mutate]
-            black=1
+            [tool.nbqa.mutate]
+            black=true
             """
         )
     )
     main(["black", os.path.abspath(path)])
-    Path("setup.cfg").unlink()
+    Path("pyproject.toml").unlink()
     with open(tmp_notebook_with_multiline) as handle:
         after = handle.readlines()
 
@@ -230,16 +230,16 @@ def test_black_multiple_files(tmp_test_data: Path) -> None:
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data"))
 
-    Path("setup.cfg").write_text(
+    Path("pyproject.toml").write_text(
         dedent(
             """\
-            [nbqa.mutate]
-            black=1
+            [tool.nbqa.mutate]
+            black=true
             """
         )
     )
     main(["black", path])
-    Path("setup.cfg").unlink()
+    Path("pyproject.toml").unlink()
     with open(str(tmp_test_data / "notebook_for_testing.ipynb")) as handle:
         after = handle.readlines()
 

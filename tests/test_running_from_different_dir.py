@@ -34,12 +34,12 @@ def test_running_in_different_dir_works(
     cwd
         Directory from which to run command.
     """
-    config_path = Path(".nbqa.ini")
+    config_path = Path("pyproject.toml")
     config_path.write_text(
         dedent(
             """\
-            [flake8]
-            addopts = --ignore=F401 \
+            [tool.nbqa.addopts]
+            flake8 = ["--ignore=F401"] \
             """
         )
     )
@@ -52,4 +52,4 @@ def test_running_in_different_dir_works(
         assert "F401" not in out
     finally:
         os.chdir(original_cwd)
-        Path(".nbqa.ini").unlink()
+        Path("pyproject.toml").unlink()
