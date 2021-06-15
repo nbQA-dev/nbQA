@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.13.0 (2021-06-15)
+~~~~~~~~~~~~~~~~~~~
+BREAKING CHANGE: by default, cells with invalid syntax will now be skipped. To retain the old
+behaviour, use ``--nbqa-dont-skip-bad-cells`` (see documentation for details / examples).
+Added ability to skip cells based on celltags.
+
 0.12.0 (2021-06-10)
 ~~~~~~~~~~~~~~~~~~~
 ``nbQA`` will no longer halt execution if it encounters notebooks which it
