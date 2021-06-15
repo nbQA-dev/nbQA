@@ -41,7 +41,7 @@ or you can put the following in your :code:`pyproject.toml` file
 .. code-block:: toml
 
     [tool.nbqa.mutate]
-    black = 1
+    black = true
 
 .. note::
     If you let :code:`nbQA` mutate your notebook, then trailing newlines will be removed from cells.
@@ -114,7 +114,7 @@ add the following to your :code:`pyproject.toml` file:
     .. code-block:: toml
 
         [tool.nbqa.skip_bad_cells]
-        black = 1
+        black = true
 
 or, from the command-line:
 

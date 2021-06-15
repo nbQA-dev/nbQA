@@ -97,7 +97,7 @@ def _create_toml_config(config_file: Path) -> None:
         dedent(
             """
             [tool.nbqa.mutate]
-            autoflake = 1
+            autoflake = true
 
             [tool.nbqa.addopts]
             autoflake = [

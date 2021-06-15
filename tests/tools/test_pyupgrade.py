@@ -33,7 +33,7 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
         dedent(
             """\
             [tool.nbqa.mutate]
-            pyupgrade = 1
+            pyupgrade = true
 
             [tool.nbqa.addopts]
             pyupgrade = ['--py36-plus']
