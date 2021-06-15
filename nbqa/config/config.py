@@ -1,15 +1,19 @@
 """Module responsible for storing and handling nbqa configuration."""
 
 from textwrap import dedent
-from typing import Callable, NamedTuple, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Callable, Optional, Sequence, Union
 
 from nbqa.cmdline import CLIArgs
-from nbqa.save_source import CODE_SEPARATOR
 
 ConfigParser = Callable[[str], Union[str, bool, Sequence[str]]]
 
+if TYPE_CHECKING:
+    from typing import TypedDict
+else:
+    TypedDict = dict
 
-class Configs(NamedTuple):
+
+class Configs(TypedDict):
     """nbQA-specific configs."""
 
     addopts: Sequence[str]
@@ -30,13 +34,13 @@ def merge(this: Configs, other: Configs) -> Configs:
     Configs
         Merged configuration object
     """
-    addopts = [*this.addopts, *other.addopts]
-    process_cells = this.process_cells or other.process_cells
-    mutate = this.mutate or other.mutate
-    diff = this.diff or other.diff
-    files = this.files or other.files
-    exclude = this.exclude or other.exclude
-    skip_bad_cells = this.skip_bad_cells or other.skip_bad_cells
+    addopts = [*this["addopts"], *other["addopts"]]
+    process_cells = this["process_cells"] or other["process_cells"]
+    mutate = this["mutate"] or other["mutate"]
+    diff = this["diff"] or other["diff"]
+    files = this["files"] or other["files"]
+    exclude = this["exclude"] or other["exclude"]
+    skip_bad_cells = this["skip_bad_cells"] or other["skip_bad_cells"]
     return Configs(
         addopts=addopts,
         diff=diff,
@@ -68,20 +72,10 @@ def parse_from_cli_args(cli_args: CLIArgs) -> Configs:
     )
 
 
-def get_default_config(command: str) -> Configs:
-    """Merge defaults."""
-    if command == "isort":
-        return Configs(
-            addopts=("--treat-comment-as-code", CODE_SEPARATOR.rstrip("\n")),
-            diff=False,
-            exclude=None,
-            files=None,
-            mutate=False,
-            process_cells=[],
-            skip_bad_cells=False,
-        )
+def get_default_config() -> Configs:
+    """Get defaults."""
     return Configs(
-        addopts=(),
+        addopts=[],
         diff=False,
         exclude=None,
         files=None,
@@ -100,7 +94,7 @@ def validate(configs: Configs) -> None:
     ValueError
         If both --nbqa-diff and --nbqa-mutate are used together.
     """
-    if configs.diff and configs.mutate:
+    if configs["diff"] and configs["mutate"]:
         raise ValueError(
             dedent(
                 """\

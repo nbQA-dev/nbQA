@@ -129,6 +129,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         parser.add_argument(
             "--nbqa-process-cells",
             required=False,
+            nargs="*",
             help=dedent(
                 r"""
                 Process code within these cell magics. You can pass multiple options,

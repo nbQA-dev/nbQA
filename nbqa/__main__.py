@@ -23,12 +23,19 @@ from pkg_resources import parse_version
 
 from nbqa import config_parser, replace_source, save_source
 from nbqa.cmdline import CLIArgs
-from nbqa.config.config import Configs, parse_from_cli_args, merge, get_default_config, validate
+from nbqa.config.config import (
+    Configs,
+    get_default_config,
+    merge,
+    parse_from_cli_args,
+    validate,
+)
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
 from nbqa.output_parser import Output, map_python_line_to_nb_lines
 from nbqa.path_utils import get_relative_and_absolute_paths, remove_suffix
+from nbqa.save_source import CODE_SEPARATOR
 from nbqa.text import BOLD, RESET
 
 BASE_ERROR_MESSAGE = (
@@ -310,7 +317,14 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     if file_config is not None:
         cli_config = merge(cli_config, file_config)
 
-    return merge(cli_config, get_default_config(cli_args.command))
+    config = merge(cli_config, get_default_config())
+    if cli_args.command == "isort":
+        config["addopts"] = (
+            *config["addopts"],
+            "--treat-comment-as-code",
+            CODE_SEPARATOR.rstrip("\n"),
+        )
+    return config
 
 
 def _clean_up_tmp_files(nb_to_py_mapping: Mapping[str, Tuple[int, str]]) -> None:
@@ -393,7 +407,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
     """
     try:
         nb_to_py_mapping = _get_nb_to_py_mapping(
-            cli_args.root_dirs, configs.files, configs.exclude
+            cli_args.root_dirs, configs["files"], configs["exclude"]
         )
     except FileNotFoundError as exc:
         sys.stderr.write(str(exc))
@@ -416,9 +430,9 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                 nb_info_mapping[notebook] = save_source.main(
                     notebook,
                     file_descriptor,
-                    configs.process_cells,
+                    configs["process_cells"],
                     cli_args.command,
-                    skip_bad_cells=configs.skip_bad_cells,
+                    skip_bad_cells=configs["skip_bad_cells"],
                 )
             except Exception as exp_repr:  # pylint: disable=W0703
                 failed_notebooks[notebook] = repr(exp_repr)
@@ -429,7 +443,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
 
         output, output_code, mutated = _run_command(
             cli_args.command,
-            configs.addopts,
+            configs["addopts"],
             [
                 i.file
                 for key, i in nb_to_py_mapping.items()
@@ -453,7 +467,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
             )
 
             if mutated:
-                if not configs.mutate and not configs.diff:
+                if not configs["mutate"] and not configs["diff"]:
                     # pylint: disable=C0301
                     msg = dedent(
                         f"""\
@@ -472,7 +486,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
 
                 try:
                     actually_mutated = (
-                        REPLACE_FUNCTION[configs.diff](
+                        REPLACE_FUNCTION[configs["diff"]](
                             temp_python_file,
                             notebook,
                             nb_info_mapping[notebook],
@@ -504,7 +518,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
             )
             sys.stderr.write("\n")
 
-        if configs.diff:
+        if configs["diff"]:
             if mutated:
                 sys.stdout.write(
                     "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"

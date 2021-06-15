@@ -58,7 +58,7 @@ or use the :code:`process_cells` option in your :code:`pyproject.toml` file:
 .. code-block:: toml
 
     [tool.nbqa.process_cells]
-    black = add_to
+    black = ["add_to"]
 
 Include / exclude
 ~~~~~~~~~~~~~~~~~

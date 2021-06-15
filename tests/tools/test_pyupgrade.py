@@ -36,7 +36,7 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
             pyupgrade = 1
 
             [tool.nbqa.addopts]
-            pyupgrade = '--py36-plus'
+            pyupgrade = ['--py36-plus']
             """
         )
     )

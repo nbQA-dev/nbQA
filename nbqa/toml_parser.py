@@ -33,11 +33,12 @@ def parse_from_pyproject_toml(command: str, file_path: Path) -> Optional[Configs
     ).get(_NBQA_CONFIG_KEY, None)
 
     if nbqa_toml_config is not None:
-        config = get_default_config(command)
+        config = get_default_config()
 
-        breakpoint()
-        for section in config._asdict():
+        for section in config.keys():
             if section in nbqa_toml_config:
-                config = config._replace(section=nbqa_toml_config[section].get(command, None))
+                # TypedDict key must be a string literal;
+                # expected one of ('addopts', 'diff', 'exclude', 'files', 'mutate', ...)
+                config[section] = nbqa_toml_config[section].get(command, None)  # type: ignore
 
     return config
