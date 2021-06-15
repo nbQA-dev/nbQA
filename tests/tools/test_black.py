@@ -467,7 +467,9 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
     assert expected_err in err
 
 
-def test_invalid_syntax_with_nbqa_dont_skip_bad_cells(capsys: "CaptureFixture") -> None:
+def test_invalid_syntax_without_nbqa_dont_skip_bad_cells(
+    capsys: "CaptureFixture",
+) -> None:
     """
     Check that using nbqa-diff when there's invalid syntax doesn't have empty output.
 
@@ -483,6 +485,34 @@ def test_invalid_syntax_with_nbqa_dont_skip_bad_cells(capsys: "CaptureFixture") 
     out, err = capsys.readouterr()
     expected_out = ""
     expected_err = "All done! \\u2728 \\U0001f370 \\u2728\n1 file left unchanged.\n"
+    # This is required because linux supports emojis
+    # so both should have \\ for comparison
+    err = err.encode("ascii", "backslashreplace").decode()
+
+    assert expected_out == out
+    assert expected_err == err
+
+
+def test_invalid_syntax_with_nbqa_dont_skip_bad_cells(capsys: "CaptureFixture") -> None:
+    """
+    Check that using nbqa-diff when there's invalid syntax doesn't have empty output.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    path = os.path.join("tests", "invalid_data", "invalid_syntax.ipynb")
+
+    main(["black", os.path.abspath(path), "--nbqa-dont-skip-bad-cells"])
+
+    out, err = capsys.readouterr()
+    expected_out = ""
+    expected_err = (
+        "error: cannot format tests/invalid_data/invalid_syntax.ipynb: Cannot parse: cell_1:2:7: if True\n"  # pylint: disable=C0301  # noqa: E501
+        "Oh no! \\U0001f4a5 \\U0001f494 \\U0001f4a5\n"
+        "1 file failed to reformat.\n"
+    )
     # This is required because linux supports emojis
     # so both should have \\ for comparison
     err = err.encode("ascii", "backslashreplace").decode()
