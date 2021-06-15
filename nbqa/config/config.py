@@ -20,7 +20,7 @@ class Configs(TypedDict):
     files: Optional[str]
     mutate: bool
     process_cells: Sequence[str]
-    skip_bad_cells: bool
+    dont_skip_bad_cells: bool
 
 
 def get_default_config() -> Configs:
@@ -32,7 +32,7 @@ def get_default_config() -> Configs:
         files=None,
         mutate=False,
         process_cells=[],
-        skip_bad_cells=False,
+        dont_skip_bad_cells=False,
     )
 
 

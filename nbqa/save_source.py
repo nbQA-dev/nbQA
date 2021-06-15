@@ -49,7 +49,7 @@ def _process_source(
     command: str,
     magic_substitutions: List[MagicHandler],
     *,
-    skip_bad_cells: bool,
+    dont_skip_bad_cells: bool,
 ) -> str:
     """Temporarily replace ipython magics - don't process if can't."""
     try:
@@ -67,11 +67,11 @@ def _process_source(
     try:
         tree = ast.parse(body)
     except SyntaxError:
-        if skip_bad_cells:
-            handler = MagicHandler(source, command, magic_type=None)
-            magic_substitutions.append(handler)
-            return handler.replacement
-        return source
+        if dont_skip_bad_cells:
+            return source
+        handler = MagicHandler(source, command, magic_type=None)
+        magic_substitutions.append(handler)
+        return handler.replacement
     system_assigns_finder = SystemAssignsFinder()
     system_assigns_finder.visit(tree)
     visitor = Visitor(system_assigns_finder.system_assigns)
@@ -101,7 +101,7 @@ def _replace_magics(
     magic_substitutions: List[MagicHandler],
     command: str,
     *,
-    skip_bad_cells: bool,
+    dont_skip_bad_cells: bool,
 ) -> str:
     """
     Replace IPython line magics with valid python code.
@@ -131,11 +131,11 @@ def _replace_magics(
     try:
         tree = ast.parse(body)
     except SyntaxError:
-        if skip_bad_cells:
-            handler = MagicHandler("".join(source), command, magic_type=None)
-            magic_substitutions.append(handler)
-            return handler.replacement
-        return "".join(source)
+        if dont_skip_bad_cells:
+            return "".join(source)
+        handler = MagicHandler("".join(source), command, magic_type=None)
+        magic_substitutions.append(handler)
+        return handler.replacement
     cell_magic_finder.visit(tree)
 
     # if first line is cell magic, process it separately
@@ -145,18 +145,21 @@ def _replace_magics(
             cell_magic_finder.header,
             command,
             magic_substitutions,
-            skip_bad_cells=skip_bad_cells,
+            dont_skip_bad_cells=dont_skip_bad_cells,
         )
         cell = _process_source(
             cell_magic_finder.body,
             command,
             magic_substitutions,
-            skip_bad_cells=skip_bad_cells,
+            dont_skip_bad_cells=dont_skip_bad_cells,
         )
         return "\n".join([header, cell])
 
     return _process_source(
-        "".join(source), command, magic_substitutions, skip_bad_cells=skip_bad_cells
+        "".join(source),
+        command,
+        magic_substitutions,
+        dont_skip_bad_cells=dont_skip_bad_cells,
     )
 
 
@@ -166,7 +169,7 @@ def _parse_cell(
     temporary_lines: MutableMapping[int, Sequence[MagicHandler]],
     command: str,
     *,
-    skip_bad_cells: bool,
+    dont_skip_bad_cells: bool,
 ) -> str:
     """
     Parse cell, replacing line magics with python code as placeholder.
@@ -191,7 +194,7 @@ def _parse_cell(
     parsed_cell = CODE_SEPARATOR
 
     parsed_cell += _replace_magics(
-        source, substituted_magics, command, skip_bad_cells=skip_bad_cells
+        source, substituted_magics, command, dont_skip_bad_cells=dont_skip_bad_cells
     )
 
     if substituted_magics:
@@ -314,7 +317,7 @@ def main(  # pylint: disable=R0914
     process_cells: Sequence[str],
     command: str,
     *,
-    skip_bad_cells: bool,
+    dont_skip_bad_cells: bool,
 ) -> NotebookInfo:
     """
     Extract code cells from notebook and save them in temporary Python file.
@@ -358,7 +361,7 @@ def main(  # pylint: disable=R0914
                 index.cell_number,
                 temporary_lines,
                 command,
-                skip_bad_cells=skip_bad_cells,
+                dont_skip_bad_cells=dont_skip_bad_cells,
             )
 
             cell_mapping.update(

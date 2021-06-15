@@ -100,24 +100,24 @@ All the above examples can equivalently be run from the command-line, e.g. as
 
     nbqa isort my_directory --nbqa-exclude ^my_directory/poc_
 
-Skip bad cells
-~~~~~~~~~~~~~~
+Don't skip bad cells
+~~~~~~~~~~~~~~~~~~~~
 
-To skip processing cells with syntax errors, you can use the :code:`--nbqa-skip-bad-cells` CLI argument.
+By default, ``nbQA`` will skip cells with invalid syntax. To process cells with syntax errors, you can use the :code:`--nbqa-dont-skip-bad-cells` CLI argument.
 
-This can be set from the command-line with the ``--nbqa-skip-bad-cells`` flag, or in your ``.pyproject.toml`` file in the
-``[tool.nbqa.skip_bad_cells]`` section.
+This can be set from the command-line with the ``--nbqa-dont-skip-bad-cells`` flag, or in your ``.pyproject.toml`` file in the
+``[tool.nbqa.dont_skip_bad_cells]`` section.
 
-For example, to skip processing bad cells when running ``black`` on ``notebook.ipynb``, you could
+For example, to process "bad" cells when running ``black`` on ``notebook.ipynb``, you could
 add the following to your :code:`pyproject.toml` file:
 
     .. code-block:: toml
 
-        [tool.nbqa.skip_bad_cells]
+        [tool.nbqa.dont_skip_bad_cells]
         black = true
 
 or, from the command-line:
 
 .. code-block:: bash
 
-    nbqa black notebook.ipynb --nbqa-skip-bad-cells
+    nbqa black notebook.ipynb --nbqa-dont-skip-bad-cells

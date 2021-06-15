@@ -90,7 +90,7 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
     """
     path = os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
 
-    main(["black", os.path.abspath(path), "--nbqa-diff"])
+    main(["black", os.path.abspath(path), "--nbqa-diff", "--nbqa-dont-skip-bad-cells"])
 
     out, err = capsys.readouterr()
     expected_out = ""

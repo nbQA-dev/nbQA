@@ -42,7 +42,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
     diff: Optional[bool]
     files: Optional[str]
     exclude: Optional[str]
-    skip_bad_cells: Optional[bool]
+    dont_skip_bad_cells: Optional[bool]
 
     def __init__(self, args: argparse.Namespace, cmd_args: Sequence[str]) -> None:
         """
@@ -63,7 +63,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         self.diff = args.nbqa_diff or None
         self.files = args.nbqa_files
         self.exclude = args.nbqa_exclude
-        self.skip_bad_cells = args.nbqa_skip_bad_cells or None
+        self.dont_skip_bad_cells = args.nbqa_dont_skip_bad_cells or None
 
     @staticmethod
     def parse_args(argv: Optional[Sequence[str]]) -> "CLIArgs":
@@ -121,9 +121,9 @@ class CLIArgs:  # pylint: disable=R0902,R0903
             "--version", action="version", version=f"nbqa {__version__}"
         )
         parser.add_argument(
-            "--nbqa-skip-bad-cells",
+            "--nbqa-dont-skip-bad-cells",
             action="store_true",
-            help="Skip cells with invalid syntax.",
+            help="Don't skip cells with invalid syntax.",
         )
         args, cmd_args = parser.parse_known_args(argv)
         return CLIArgs(args, cmd_args)
