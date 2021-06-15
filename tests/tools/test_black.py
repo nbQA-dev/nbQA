@@ -41,7 +41,7 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
         dedent(
             """\
             [tool.nbqa.mutate]
-            black=1
+            black=true
             """
         )
     )
@@ -104,7 +104,7 @@ def test_black_works_with_trailing_semicolons(
         dedent(
             """\
             [tool.nbqa.mutate]
-            black=1
+            black=true
             """
         )
     )
@@ -174,7 +174,7 @@ def test_black_works_with_multiline(
         dedent(
             """\
             [tool.nbqa.mutate]
-            black=1
+            black=true
             """
         )
     )
@@ -234,7 +234,7 @@ def test_black_multiple_files(tmp_test_data: Path) -> None:
         dedent(
             """\
             [tool.nbqa.mutate]
-            black=1
+            black=true
             """
         )
     )

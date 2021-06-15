@@ -71,7 +71,7 @@ def test_indented_magics(
         dedent(
             """\
             [tool.nbqa.mutate]
-            black=1
+            black=true
             """
         )
     )
