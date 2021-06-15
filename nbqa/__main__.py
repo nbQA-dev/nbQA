@@ -19,17 +19,12 @@ from typing import (
     Tuple,
 )
 
+import toml
 from pkg_resources import parse_version
 
-from nbqa import config_parser, replace_source, save_source
+from nbqa import replace_source, save_source
 from nbqa.cmdline import CLIArgs
-from nbqa.config.config import (
-    Configs,
-    get_default_config,
-    merge,
-    parse_from_cli_args,
-    validate,
-)
+from nbqa.config.config import Configs, get_default_config, validate
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
@@ -310,20 +305,45 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     Configs
         Taken from CLI (if given), else from .nbqa.ini.
     """
-    cli_config: Configs = parse_from_cli_args(cli_args)
-    file_config: Optional[Configs] = config_parser.parse_config_from_file(
-        cli_args, project_root
-    )
-    if file_config is not None:
-        cli_config = merge(cli_config, file_config)
+    # start with default config.
+    config = get_default_config()
 
-    config = merge(cli_config, get_default_config())
+    # If a section is in pyproject.toml, use that.
+    if (project_root / "pyproject.toml").is_file():
+
+        config_file = toml.load(str(project_root / "pyproject.toml"))
+        if "tool" in config_file and "nbqa" in config_file["tool"]:
+            file_config = config_file["tool"]["nbqa"]
+            for section in config:
+                if section in file_config and cli_args.command in file_config[section]:
+                    if section == "addopts":
+                        # TypedDict key must be a string literal
+                        config[section] = (  # type: ignore
+                            *config[section],  # type: ignore
+                            *file_config[section][cli_args.command],
+                        )
+                    else:
+                        # TypedDict key must be a string literal
+                        config[section] = file_config[section][cli_args.command]  # type: ignore
+
+    # If a section was passed via CLI, use that.
+    for section in config:
+        if section == "addopts":
+            # TypedDict key must be a string literal
+            config[section] = (*config[section], *getattr(cli_args, section))  # type: ignore
+        elif getattr(cli_args, section) is not None:
+            # TypedDict key must be a string literal
+            config[section] = getattr(cli_args, section)  # type: ignore
+
+    # add default options
     if cli_args.command == "isort":
+        # TypedDict key must be a string literal
         config["addopts"] = (
             *config["addopts"],
             "--treat-comment-as-code",
             CODE_SEPARATOR.rstrip("\n"),
         )
+
     return config
 
 
