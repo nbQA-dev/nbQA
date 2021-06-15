@@ -362,7 +362,7 @@ def main(  # pylint: disable=R0914
                 cell["source"],
                 process_cells,
                 skip_celltags,
-                cell["metadata"].get("tags", []),
+                cell.get("metadata", {}).get("tags", []),
             ):
                 code_cells_to_ignore.add(index.cell_number)
                 continue

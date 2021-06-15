@@ -450,6 +450,18 @@ def _main(  # pylint: disable=R0912,R0914,R0911
 
         if len(failed_notebooks) == len(nb_to_py_mapping):
             sys.stderr.write("No valid .ipynb notebooks found\n")
+            sys.stderr.write("\n")
+            # https://github.com/python/mypy/issues/5080
+            for failure, exp_repr in failed_notebooks.items():  # type: ignore
+                sys.stderr.write(
+                    BASE_ERROR_MESSAGE.format(notebook=failure, exp=exp_repr)  # type: ignore
+                )
+            sys.stderr.write(
+                f"{BOLD}\n"
+                "If you believe the notebook(s) to be valid, please "
+                f"report a bug at https://github.com/nbQA-dev/nbQA/issues {RESET}\n"
+            )
+            sys.stderr.write("\n")
             return 123
 
         output, output_code, mutated = _run_command(
