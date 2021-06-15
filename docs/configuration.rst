@@ -5,7 +5,8 @@ Configuration
 
 You can configure :code:`nbQA` either at the command line, or by using a :code:`pyproject.toml` file. We'll see some examples below.
 
-Please note that if you pass the same option via both the :code:`pyproject.toml` file and via the command-line, the command-line will take precedence.
+.. note::
+    Please note that if you pass the same option via both the :code:`pyproject.toml` file and via the command-line, the command-line will take precedence.
 
 Extra flags
 ~~~~~~~~~~~
