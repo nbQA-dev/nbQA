@@ -316,22 +316,12 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
             file_config = config_file["tool"]["nbqa"]
             for section in config:
                 if section in file_config and cli_args.command in file_config[section]:
-                    if section == "addopts":
-                        # TypedDict key must be a string literal
-                        config[section] = (  # type: ignore
-                            *config[section],  # type: ignore
-                            *file_config[section][cli_args.command],
-                        )
-                    else:
-                        # TypedDict key must be a string literal
-                        config[section] = file_config[section][cli_args.command]  # type: ignore
+                    # TypedDict key must be a string literal
+                    config[section] = file_config[section][cli_args.command]  # type: ignore
 
     # If a section was passed via CLI, use that.
     for section in config:
-        if section == "addopts":
-            # TypedDict key must be a string literal
-            config[section] = (*config[section], *getattr(cli_args, section))  # type: ignore
-        elif getattr(cli_args, section) is not None:
+        if getattr(cli_args, section) is not None:
             # TypedDict key must be a string literal
             config[section] = getattr(cli_args, section)  # type: ignore
 

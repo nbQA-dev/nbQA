@@ -36,7 +36,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
 
     command: str
     root_dirs: Sequence[str]
-    addopts: Sequence[str]
+    addopts: Optional[Sequence[str]]
     mutate: Optional[bool]
     process_cells: Optional[Sequence[str]]
     diff: Optional[bool]
@@ -57,7 +57,7 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         """
         self.command = args.command
         self.root_dirs = args.root_dirs
-        self.addopts = cmd_args
+        self.addopts = cmd_args or None
         self.mutate = args.nbqa_mutate or None
         self.process_cells = args.nbqa_process_cells
         self.diff = args.nbqa_diff or None
