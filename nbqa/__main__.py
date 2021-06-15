@@ -442,6 +442,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                     file_descriptor,
                     configs["process_cells"],
                     cli_args.command,
+                    configs["skip_celltags"],
                     dont_skip_bad_cells=configs["dont_skip_bad_cells"],
                 )
             except Exception as exp_repr:  # pylint: disable=W0703

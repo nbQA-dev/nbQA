@@ -420,7 +420,33 @@ def test_process_cells_magic(capsys: "CaptureFixture") -> None:
     Notebook contains non-allowlist magic, but it's in process_cells.
     """
     path = os.path.abspath(os.path.join("tests", "data", "non_default_magic.ipynb"))
-    main(["black", path, "--nbqa-diff", "--nbqa-process-cells", "javascript"])
+    main(["black", path, "--nbqa-diff", "--nbqa-process-cells", "javascript,foo"])
+
+    out, _ = capsys.readouterr()
+    expected = (
+        "\x1b[1mCell 1\x1b[0m\n"
+        "------\n"
+        f"--- {path}\n"
+        f"+++ {path}\n"
+        "@@ -1,3 +1,3 @@\n"
+        " %%javascript\n"
+        " \n"
+        "\x1b[31m-a = 2 \n"
+        "\x1b[0m\x1b[32m+a = 2\n"
+        "\x1b[0m\n"
+        "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+    )
+    assert out == expected
+
+
+def test_process_cells_magic_pyprojecttoml(capsys: "CaptureFixture") -> None:
+    """
+    Notebook contains non-allowlist magic, but it's in process_cells.
+    """
+    with open("pyproject.toml", "w") as handle:
+        handle.write("[tool.nbqa.process_cells]\n" 'black = ["javascript", "foo"]\n')
+    path = os.path.abspath(os.path.join("tests", "data", "non_default_magic.ipynb"))
+    main(["black", path, "--nbqa-diff"])
 
     out, _ = capsys.readouterr()
     expected = (
