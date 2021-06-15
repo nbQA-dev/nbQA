@@ -1,5 +1,6 @@
 """Parses the command line arguments provided."""
 import argparse
+import sys
 from textwrap import dedent
 from typing import Optional, Sequence
 
@@ -29,6 +30,14 @@ USAGE_MSG = dedent(
     See {DOCS_URL} for more details on how to run `nbqa`.
     """
 )
+DEPRECATED = {
+    "--nbqa-skip-bad-cells": (
+        "was deprecated in 0.13.0\n"
+        "Cells with invalid syntax are now skipped by default"
+    ),
+    "--nbqa-ignore-cells": "was deprecated in 0.8.0 and is now unnecessary",
+    "--nbqa-config": "was deprecated in 0.8.0 and is now unnecessary",
+}
 
 
 class CLIArgs:  # pylint: disable=R0902,R0903
@@ -55,6 +64,11 @@ class CLIArgs:  # pylint: disable=R0902,R0903
         cmd_args
             Additional options to pass to the tool
         """
+        if cmd_args:
+            for deprecated in DEPRECATED:
+                if deprecated in cmd_args:
+                    sys.stderr.write(f"Flag {deprecated} {DEPRECATED[deprecated]}\n")
+                    sys.exit(1)
         self.command = args.command
         self.root_dirs = args.root_dirs
         self.addopts = cmd_args or None
