@@ -2,6 +2,10 @@
 Changelog
 =========
 
+0.13.1 (2021-06-25)
+~~~~~~~~~~~~~~~~~~~
+Fixed bug whereby local scripts / modules could not be run by ``nbQA`` due to incorrect ``ModuleNotFoundError``.
+
 0.13.0 (2021-06-15)
 ~~~~~~~~~~~~~~~~~~~
 BREAKING CHANGE: by default, cells with invalid syntax will now be skipped. To retain the old
