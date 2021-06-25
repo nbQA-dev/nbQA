@@ -566,7 +566,8 @@ def _check_command_is_installed(command: str) -> None:
         try:
             import_module(command)
         except ImportError as exc:
-            raise ModuleNotFoundError(_get_command_not_found_msg(command)) from exc
+            if not os.path.isdir(command) and not os.path.isfile(f"{command}.py"):
+                raise ModuleNotFoundError(_get_command_not_found_msg(command)) from exc
     else:
         if command in MIN_VERSIONS:
             min_version = MIN_VERSIONS[command]
