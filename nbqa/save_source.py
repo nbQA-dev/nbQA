@@ -21,12 +21,7 @@ from typing import (
 import tokenize_rt
 from IPython.core.inputtransformer2 import TransformerManager
 
-from nbqa.handle_magics import (
-    CellMagicFinder,
-    MagicHandler,
-    SystemAssignsFinder,
-    Visitor,
-)
+from nbqa.handle_magics import CellMagicFinder, MagicHandler, Visitor
 from nbqa.notebook_info import NotebookInfo
 from nbqa.path_utils import remove_prefix
 
@@ -72,9 +67,7 @@ def _process_source(
         handler = MagicHandler(source, command, magic_type=None)
         magic_substitutions.append(handler)
         return handler.replacement
-    system_assigns_finder = SystemAssignsFinder()
-    system_assigns_finder.visit(tree)
-    visitor = Visitor(system_assigns_finder.system_assigns)
+    visitor = Visitor()
     visitor.visit(tree)
     new_src = []
     for i, line in enumerate(body.splitlines(), start=1):
@@ -267,7 +260,7 @@ def _should_ignore_code_cell(
         # Deal with this below
         pass
     else:
-        # No need to ignore
+        # Syntax is fine, no need to ignore
         return False
 
     cell_magic_finder = CellMagicFinder()
