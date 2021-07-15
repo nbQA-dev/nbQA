@@ -271,6 +271,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://bradleydice.com"><img src="https://avatars.githubusercontent.com/u/3943761?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Bradley Dice</b></sub></a><br /><a href="#ideas-bdice" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/nbQA-dev/nbQA/commits?author=bdice" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/ivanmkc"><img src="https://avatars.githubusercontent.com/u/1586049?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ivan Cheung</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Aivanmkc" title="Bug reports">🐛</a></td>
     <td align="center"><a href="http://blog.ouseful.info"><img src="https://avatars.githubusercontent.com/u/82988?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tony Hirst</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Apsychemedia" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/hukkin"><img src="https://avatars.githubusercontent.com/u/3275109?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Taneli Hukkinen</b></sub></a><br /><a href="#maintenance-hukkin" title="Maintenance">🚧</a></td>
   </tr>
 </table>
 
