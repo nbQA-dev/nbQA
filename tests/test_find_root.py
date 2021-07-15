@@ -1,6 +1,6 @@
 """Check project root is round correctly."""
 from pathlib import Path
-from typing import Iterable
+from typing import Sequence
 
 import pytest
 
@@ -14,7 +14,7 @@ from nbqa.find_root import find_project_root
         (Path.cwd() / "tests", Path.cwd() / "tests/data"),
     ],
 )
-def test_find_project_root(src: Iterable[str]) -> None:
+def test_find_project_root(src: Sequence[str]) -> None:
     """
     Check project root is found correctly.
 
