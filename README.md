@@ -45,6 +45,10 @@
     </a>
 </p>
 
+- ✅ handles IPython magics robustly
+- ✅ respects your config files
+- ✅ preserves "quiet mode" trailing semicolons
+
 # Table of contents
 
 - [Table of contents](#table-of-contents)
