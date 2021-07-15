@@ -106,7 +106,7 @@ Fixed bug whereby ``pyupgrade`` wasn't working with empty notebook due to
 0.5.6 (2020-12-29)
 ------------------
 
-Fixed bug whereby ``flake8`` with the ``wemake-python-styleguide`` pluging
+Fixed bug whereby ``flake8`` with the ``wemake-python-styleguide`` plugin
 was throwing false-positives about magic number being present when they weren't.
 
 0.5.5 (2020-12-10)
