@@ -65,9 +65,9 @@ class CLIArgs:  # pylint: disable=R0902,R0903
             Additional options to pass to the tool
         """
         if cmd_args:
-            for deprecated in DEPRECATED:
-                if deprecated in cmd_args:
-                    sys.stderr.write(f"Flag {deprecated} {DEPRECATED[deprecated]}\n")
+            for flag, msg in DEPRECATED.items():
+                if flag in cmd_args:
+                    sys.stderr.write(f"Flag {flag} {msg}\n")
                     sys.exit(1)
         self.command = args.command
         self.root_dirs = args.root_dirs
