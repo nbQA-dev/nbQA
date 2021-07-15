@@ -19,7 +19,7 @@ from typing import (
     Tuple,
 )
 
-import toml
+import tomli
 from pkg_resources import parse_version
 
 from nbqa import replace_source, save_source
@@ -309,9 +309,10 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     config = get_default_config()
 
     # If a section is in pyproject.toml, use that.
-    if (project_root / "pyproject.toml").is_file():
+    pyproject_path = project_root / "pyproject.toml"
+    if pyproject_path.is_file():
 
-        config_file = toml.load(str(project_root / "pyproject.toml"))
+        config_file = tomli.loads(pyproject_path.read_text("utf-8"))
         if "tool" in config_file and "nbqa" in config_file["tool"]:
             file_config = config_file["tool"]["nbqa"]
             for section in config:
