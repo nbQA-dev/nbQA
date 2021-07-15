@@ -238,6 +238,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "hukkin",
+      "name": "Taneli Hukkinen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3275109?v=4",
+      "profile": "https://github.com/hukkin",
+      "contributions": [
+        "maintenance"
+      ]
     }
   ],
   "contributorsPerLine": 7,
