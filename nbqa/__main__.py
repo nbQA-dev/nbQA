@@ -323,8 +323,13 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     # If a section was passed via CLI, use that.
     for section in config:
         if getattr(cli_args, section) is not None:
-            # TypedDict key must be a string literal
-            config[section] = getattr(cli_args, section)  # type: ignore
+            if section == "addopts":
+                # addopts are added to / overridden rather than replaced outright
+                # Sequence[str] has no attribute extend. Should this be typed as List[str]?
+                config["addopts"].extend(getattr(cli_args, section))  # type: ignore
+            else:
+                # TypedDict key must be a string literal
+                config[section] = getattr(cli_args, section)  # type: ignore
 
     # add default options
     if cli_args.command == "isort":
