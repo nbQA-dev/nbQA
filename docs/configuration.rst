@@ -26,6 +26,11 @@ or you can put the following in your :code:`pyproject.toml` file
         "--extend-ignore=E203"
     ]
 
+.. note::
+    If you specify extra flags via both the :code:`pyproject.toml` file and the command-line, both will be passed on to the underlying command-line tool,
+    with the options specified in :code:`pyproject.toml` passed first. In this case the exact behaviour will depend on the tool and the option in question.
+    It's common that subsequent flags override earlier ones, but check the documentation for the tool and option in question to be sure.
+
 Allow mutations
 ~~~~~~~~~~~~~~~
 
