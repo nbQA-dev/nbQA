@@ -49,17 +49,13 @@ usage: nbqa <code quality tool> <notebook or directory> <nbqa options> \
 {prefix}Please specify:{suffix}
 - 1) a code quality tool (e.g. `black`, `pyupgrade`, `flake`, ...)
 - 2) some notebooks (or, if supported by the tool, directories)
-- 3) (optional) flags for nbqa (e.g. `--nbqa-mutate`)
+- 3) (optional) flags for nbqa (e.g. `--nbqa-diff`)
 - 4) (optional) flags for code quality tool (e.g. `--line-length` for `black`)
 
 {prefix}Examples:{suffix}
     nbqa flake8 notebook.ipynb
     nbqa black notebook.ipynb --line-length=96
     nbqa pyupgrade notebook_1.ipynb notebook_2.ipynb
-
-{prefix}Mutation:{suffix} to let `nbqa` modify your notebook(s), \
-also pass `--nbqa-mutate`, e.g.:
-    nbqa black notebook.ipynb --nbqa-mutate
 
 See https://nbqa.readthedocs.io/en/latest/index.html for more details on \
 how to run `nbqa`.\
@@ -78,7 +74,7 @@ how to run `nbqa`.\
 def test_unable_to_reconstruct_message(capsys: "CaptureFixture") -> None:
     """Check error message shows if we're unable to reconstruct notebook."""
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
-    main(["remove_comments", path, "--nbqa-mutate"])
+    main(["remove_comments", path])
     _, err = capsys.readouterr()
     expected_stderr = f"\n\x1b[1mnbQA failed to process {path} with exception "
     assert expected_stderr in err
@@ -97,7 +93,7 @@ def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") ->
     monkeypatch.setenv("PYTHONPATH", os.path.join(os.getcwd(), "tests"))
     # We need to run the command via subprocess, so PYTHONPATH influences python
     output = subprocess.run(
-        [sys.executable, "-m", "nbqa", "remove_comments", path, "--nbqa-mutate"],
+        [sys.executable, "-m", "nbqa", "remove_comments", path],
         stderr=subprocess.PIPE,
         env=os.environ,
         universal_newlines=True,  # from Python3.7 this can be replaced with `text`
@@ -112,7 +108,7 @@ def test_unable_to_parse(capsys: "CaptureFixture") -> None:
     """Check error message shows if we're unable to parse notebook."""
     path = Path("tests") / "data/invalid_notebook.ipynb"
     path.write_text("foo")
-    main(["flake8", str(path), "--nbqa-mutate"])
+    main(["flake8", str(path)])
     path.unlink()
     message = "No valid .ipynb notebooks found"
     _, err = capsys.readouterr()
@@ -148,7 +144,7 @@ def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     path = Path("tests") / "data/notebook_for_testing.ipynb"
-    main(["print_6174", str(path), "--nbqa-mutate"])
+    main(["print_6174", str(path)])
     out, _ = capsys.readouterr()
     expected_out = f"{str(path)}:6174:0 some silly warning\n"
     assert out == expected_out

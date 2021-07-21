@@ -78,7 +78,6 @@ def test_autoflake_cli(tmp_notebook_for_autoflake: "LocalPath") -> None:
         "--expand-star-imports",
         "--remove-all-unused-imports",
         "--remove-unused-variables",
-        "--nbqa-mutate",
     )
 
     assert _validate(before, after)

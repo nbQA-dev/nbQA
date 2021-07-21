@@ -16,16 +16,13 @@ USAGE_MSG = dedent(
     {BOLD}Please specify:{RESET}
     - 1) a code quality tool (e.g. `black`, `pyupgrade`, `flake`, ...)
     - 2) some notebooks (or, if supported by the tool, directories)
-    - 3) (optional) flags for nbqa (e.g. `--nbqa-mutate`)
+    - 3) (optional) flags for nbqa (e.g. `--nbqa-diff`)
     - 4) (optional) flags for code quality tool (e.g. `--line-length` for `black`)
 
     {BOLD}Examples:{RESET}
         nbqa flake8 notebook.ipynb
         nbqa black notebook.ipynb --line-length=96
         nbqa pyupgrade notebook_1.ipynb notebook_2.ipynb
-
-    {BOLD}Mutation:{RESET} to let `nbqa` modify your notebook(s), also pass `--nbqa-mutate`, e.g.:
-        nbqa black notebook.ipynb --nbqa-mutate
 
     See {DOCS_URL} for more details on how to run `nbqa`.
     """
@@ -37,6 +34,7 @@ DEPRECATED = {
     ),
     "--nbqa-ignore-cells": "was deprecated in 0.8.0 and is now unnecessary",
     "--nbqa-config": "was deprecated in 0.8.0 and is now unnecessary",
+    "--nbqa-mutate": "was deprecated in 1.0.0 and is now unnecessary",
 }
 
 
@@ -46,7 +44,6 @@ class CLIArgs:  # pylint: disable=R0902,R0903
     command: str
     root_dirs: Sequence[str]
     addopts: Optional[Sequence[str]]
-    mutate: Optional[bool]
     process_cells: Optional[Sequence[str]]
     diff: Optional[bool]
     files: Optional[str]
@@ -68,11 +65,10 @@ class CLIArgs:  # pylint: disable=R0902,R0903
             for flag, msg in DEPRECATED.items():
                 if flag in cmd_args:
                     sys.stderr.write(f"Flag {flag} {msg}\n")
-                    sys.exit(1)
+                    cmd_args = [arg for arg in cmd_args if arg != flag]
         self.command = args.command
         self.root_dirs = args.root_dirs
         self.addopts = cmd_args or None
-        self.mutate = args.nbqa_mutate or None
         if args.nbqa_process_cells is not None:
             self.process_cells = args.nbqa_process_cells.split(",")
         else:
@@ -117,14 +113,9 @@ class CLIArgs:  # pylint: disable=R0902,R0903
             help="Global file exclude pattern.",
         )
         parser.add_argument(
-            "--nbqa-mutate",
-            action="store_true",
-            help="Allows `nbqa` to modify notebooks.",
-        )
-        parser.add_argument(
             "--nbqa-diff",
             action="store_true",
-            help="Show diff which would result from running --nbqa-mutate.",
+            help="Show diff which would result from running tool.",
         )
         parser.add_argument(
             "--nbqa-process-cells",

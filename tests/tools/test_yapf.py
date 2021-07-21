@@ -52,11 +52,11 @@ def test_successive_runs_using_yapf(
         "\x1b[0m \n"
         ' pretty_print_object.isreadable(["Hello", "World"])\n'
         "\n"
-        "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected_out
 
-    main(["yapf", str(test_notebook), "--in-place", "--nbqa-mutate"])
+    main(["yapf", str(test_notebook), "--in-place"])
     main(["yapf", str(test_notebook), "--in-place", "--nbqa-diff"])
 
     out, _ = capsys.readouterr()

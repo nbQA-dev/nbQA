@@ -22,7 +22,7 @@ def test_cmdline(capsys: "CaptureFixture") -> None:
         " if True:\n"
         "\x1b[31m-    print('definitely valid')\n"
         '\x1b[0m\x1b[32m+    print("definitely valid")\n'
-        "\x1b[0m\nTo apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+        "\x1b[0m\nTo apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected_out
 
@@ -41,6 +41,6 @@ def test_config_file(capsys: "CaptureFixture") -> None:
         " if True:\n"
         "\x1b[31m-    print('definitely valid')\n"
         '\x1b[0m\x1b[32m+    print("definitely valid")\n'
-        "\x1b[0m\nTo apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+        "\x1b[0m\nTo apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected_out

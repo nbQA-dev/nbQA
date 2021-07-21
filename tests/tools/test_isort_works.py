@@ -30,7 +30,7 @@ def test_isort_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     with open(tmp_notebook_for_testing) as handle:
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
-    main(["isort", path, "--nbqa-mutate"])
+    main(["isort", path])
 
     with open(tmp_notebook_for_testing) as handle:
         after = handle.readlines()
@@ -71,7 +71,7 @@ def test_isort_initial_md(
     with open(tmp_notebook_starting_with_md) as handle:
         before = handle.readlines()
     path = os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
-    main(["isort", path, "--nbqa-mutate"])
+    main(["isort", path])
 
     with open(tmp_notebook_starting_with_md) as handle:
         after = handle.readlines()
@@ -125,7 +125,7 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
     )
 
     path = os.path.abspath(os.path.join("tests", "data", notebook))
-    main(["isort", path, "--nbqa-mutate"])
+    main(["isort", path])
     Path("pyproject.toml").unlink()
 
     # check out and err
@@ -151,7 +151,7 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: Path) ->
     path = os.path.abspath(
         os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
     )
-    main(["isort", path, "--nbqa-mutate"])
+    main(["isort", path])
 
     with open(tmp_notebook_with_trailing_semicolon) as handle:
         after = handle.readlines()
@@ -176,12 +176,12 @@ def test_old_isort_separated_imports(tmp_test_data: Path) -> None:
     notebook = tmp_test_data / "notebook_with_separated_imports_other.ipynb"
 
     before_mtime = os.path.getmtime(str(notebook))
-    main(["isort", str(notebook), "--nbqa-mutate"])
+    main(["isort", str(notebook)])
     assert os.path.getmtime(str(notebook)) == before_mtime
 
     # check that adding extra command-line arguments doesn't interfere with
     # --treat-comment-as-code
-    main(["isort", str(notebook), "--profile=black", "--nbqa-mutate"])
+    main(["isort", str(notebook), "--profile=black"])
     assert os.path.getmtime(str(notebook)) == before_mtime
 
 
@@ -226,6 +226,6 @@ def test_comment_after_trailing_semicolons(capsys: "CaptureFixture") -> None:
         "\x1b[0m # this is a comment\n"
         "\n"
         f"Fixing {path}\n"
-        "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected_out
