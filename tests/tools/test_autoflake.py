@@ -78,7 +78,6 @@ def test_autoflake_cli(tmp_notebook_for_autoflake: "LocalPath") -> None:
         "--expand-star-imports",
         "--remove-all-unused-imports",
         "--remove-unused-variables",
-        "--nbqa-mutate",
     )
 
     assert _validate(before, after)
@@ -96,9 +95,6 @@ def _create_toml_config(config_file: Path) -> None:
     config_file.write_text(
         dedent(
             """
-            [tool.nbqa.mutate]
-            autoflake = true
-
             [tool.nbqa.addopts]
             autoflake = [
                 "--in-place",

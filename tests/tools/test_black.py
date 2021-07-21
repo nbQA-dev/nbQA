@@ -37,16 +37,7 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
         before = handle.readlines()
     path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
 
-    Path("pyproject.toml").write_text(
-        dedent(
-            """\
-            [tool.nbqa.mutate]
-            black=true
-            """
-        )
-    )
     main(["black", os.path.abspath(path)])
-    Path("pyproject.toml").unlink()
     with open(tmp_notebook_for_testing) as handle:
         after = handle.readlines()
 
@@ -100,16 +91,7 @@ def test_black_works_with_trailing_semicolons(
         before = handle.readlines()
     path = os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
 
-    Path("pyproject.toml").write_text(
-        dedent(
-            """\
-            [tool.nbqa.mutate]
-            black=true
-            """
-        )
-    )
     main(["black", os.path.abspath(path), "--line-length=10"])
-    Path("pyproject.toml").unlink()
     with open(tmp_notebook_with_trailing_semicolon) as handle:
         after = handle.readlines()
 
@@ -170,16 +152,7 @@ def test_black_works_with_multiline(
         before = handle.readlines()
     path = os.path.join("tests", "data", "clean_notebook_with_multiline.ipynb")
 
-    Path("pyproject.toml").write_text(
-        dedent(
-            """\
-            [tool.nbqa.mutate]
-            black=true
-            """
-        )
-    )
     main(["black", os.path.abspath(path)])
-    Path("pyproject.toml").unlink()
     with open(tmp_notebook_with_multiline) as handle:
         after = handle.readlines()
 
@@ -230,16 +203,7 @@ def test_black_multiple_files(tmp_test_data: Path) -> None:
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data"))
 
-    Path("pyproject.toml").write_text(
-        dedent(
-            """\
-            [tool.nbqa.mutate]
-            black=true
-            """
-        )
-    )
     main(["black", path])
-    Path("pyproject.toml").unlink()
     with open(str(tmp_test_data / "notebook_for_testing.ipynb")) as handle:
         after = handle.readlines()
 
@@ -258,7 +222,7 @@ def test_successive_runs_using_black(tmpdir: "LocalPath") -> None:
     ) -> bool:
         """Run black using nbqa and validate the output."""
         mod_time_before: float = os.path.getmtime(test_notebook)
-        output = subprocess.run(["nbqa", "black", test_notebook, "--nbqa-mutate"])
+        output = subprocess.run(["nbqa", "black", test_notebook])
         mod_time_after: float = os.path.getmtime(test_notebook)
         return output.returncode == 0 and mod_time_compare_op(
             mod_time_after, mod_time_before
@@ -293,7 +257,7 @@ def test_black_works_with_commented_magics(capsys: "CaptureFixture") -> None:
 \x1b[0m\x1b[31m-3, 4]
 \x1b[0m\x1b[32m+[1, 2, 3, 4]
 \x1b[0m
-To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
+To apply these changes, remove the `--nbqa-diff` flag
 """
     expected_err = (
         dedent(
@@ -336,7 +300,7 @@ def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
 \x1b[0m\x1b[32m+def example_func(hi="yo"):
 \x1b[0m     pass
 
-To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`
+To apply these changes, remove the `--nbqa-diff` flag
 """
     expected_err = (
         dedent(
@@ -410,7 +374,7 @@ def test_allowlisted_magic(capsys: "CaptureFixture") -> None:
         "\x1b[31m-a = 2 \n"
         "\x1b[0m\x1b[32m+a = 2\n"
         "\x1b[0m\n"
-        "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected
 
@@ -434,7 +398,7 @@ def test_process_cells_magic(capsys: "CaptureFixture") -> None:
         "\x1b[31m-a = 2 \n"
         "\x1b[0m\x1b[32m+a = 2\n"
         "\x1b[0m\n"
-        "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected
 
@@ -460,7 +424,7 @@ def test_process_cells_magic_pyprojecttoml(capsys: "CaptureFixture") -> None:
         "\x1b[31m-a = 2 \n"
         "\x1b[0m\x1b[32m+a = 2\n"
         "\x1b[0m\n"
-        "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected
 
@@ -583,6 +547,6 @@ def test_comment_after_trailing_comma(capsys: "CaptureFixture") -> None:
         "     pass;\n"
         "\x1b[31m- \n"
         "\x1b[0m\n"
-        "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected_out

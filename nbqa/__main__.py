@@ -24,7 +24,7 @@ from pkg_resources import parse_version
 
 from nbqa import replace_source, save_source
 from nbqa.cmdline import CLIArgs
-from nbqa.config.config import Configs, get_default_config, validate
+from nbqa.config.config import Configs, get_default_config
 from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
@@ -497,23 +497,6 @@ def _main(  # pylint: disable=R0912,R0914,R0911
             )
 
             if mutated:
-                if not configs["mutate"] and not configs["diff"]:
-                    # pylint: disable=C0301
-                    msg = dedent(
-                        f"""\
-                        {BOLD}Mutation detected, will not reformat! Please use the `--nbqa-mutate` flag, e.g.:{RESET}
-
-                            nbqa {cli_args.command} notebook.ipynb --nbqa-mutate
-
-                        or, to only preview changes, use the `--nbqa-diff` flag, e.g.:
-
-                            nbqa {cli_args.command} notebook.ipynb --nbqa-diff
-                        """
-                    )
-                    # pylint: enable=C0301
-                    sys.stderr.write(msg)
-                    return 1
-
                 try:
                     actually_mutated = (
                         REPLACE_FUNCTION[configs["diff"]](
@@ -540,7 +523,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
         if configs["diff"]:
             if mutated:
                 sys.stdout.write(
-                    "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+                    "To apply these changes, remove the `--nbqa-diff` flag\n"
                 )
             return output_code
 
@@ -600,7 +583,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     _check_command_is_installed(cli_args.command)
     project_root: Path = find_project_root(tuple(cli_args.root_dirs))
     configs: Configs = _get_configs(cli_args, project_root)
-    validate(configs)
 
     return _main(cli_args, configs)
 

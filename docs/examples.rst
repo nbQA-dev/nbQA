@@ -5,7 +5,7 @@ Reformat your notebooks with `black`_:
 
 .. code:: console
 
-   $ nbqa black my_notebook.ipynb --nbqa-mutate
+   $ nbqa black my_notebook.ipynb
    reformatted my_notebook.ipynb
    All done! ✨ 🍰 ✨
    1 files reformatted.
@@ -39,7 +39,7 @@ Sort your imports with `isort`_:
 
 .. code:: console
 
-   $ nbqa isort my_notebook.ipynb --nbqa-mutate
+   $ nbqa isort my_notebook.ipynb
    Fixing my_notebook.ipynb
 
 Check your type annotations with `mypy`_:
@@ -60,14 +60,14 @@ Upgrade your syntax with `pyupgrade`_:
 
 .. code:: console
 
-   $ nbqa pyupgrade my_notebook.ipynb --py36-plus --nbqa-mutate
+   $ nbqa pyupgrade my_notebook.ipynb --py36-plus
    Rewriting my_notebook.ipynb
 
 Format code with `yapf`_:
 
 .. code:: console
 
-   $ nbqa yapf --in-place my_notebook.ipynb --nbqa-mutate
+   $ nbqa yapf --in-place my_notebook.ipynb
 
 .. _black: https://black.readthedocs.io/en/stable/
 .. _doctest: https://docs.python.org/3/library/doctest.html

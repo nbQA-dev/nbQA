@@ -1,12 +1,9 @@
 """Check --nbqa-diff flag."""
 
 import os
-import re
 from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING
-
-import pytest
 
 from nbqa.__main__ import main
 
@@ -47,7 +44,7 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
         "\x1b[31m-hello(3)   \n"
         "\x1b[0m\x1b[32m+hello(3)\n"
         "\x1b[0m\n"
-        "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected_out
     expected_err = (
@@ -62,21 +59,6 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
         .decode()
     )
     assert err == expected_err
-
-
-def test_diff_and_mutate() -> None:
-    """
-    Check a ValueError is raised if we use both --nbqa-mutate and --nbqa-diff.
-    """
-    msg = re.escape(
-        """\
-Cannot use both `--nbqa-diff` and `--nbqa-mutate` flags together!
-
-Use `--nbqa-diff` to preview changes, and `--nbqa-mutate` to apply them.\
-"""
-    )
-    with pytest.raises(ValueError, match=msg):
-        main(["black", str(DIRTY_NOTEBOOK), "--nbqa-mutate", "--nbqa-diff"])
 
 
 def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:

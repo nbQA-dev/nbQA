@@ -46,22 +46,19 @@ Run nbqa black
 
 2. Run the ``black`` formatter on your notebook via ``nbqa`` ::
 
-    nbqa black notebook.ipynb --nbqa-mutate --line-length=96
+    nbqa black notebook.ipynb --line-length=96
 
 3. Reload your notebook, and admire the difference!
 
 Configuring nbqa
 ----------------
 
-Rather than having to type ``--nbqa-mutate --line-length=96`` from the command-line for
+Rather than having to type ``--line-length=96`` from the command-line for
 each notebook you want to reformat, you can configure ``nbqa`` in your ``pyproject.toml`` file.
 Open up your ``pyproject.toml`` file (or create one if you don't have one already) and add in the following lines ::
 
     [tool.black]
     line-length = 96
-
-    [tool.nbqa.mutate]
-    black = true
 
 Now, you'll be able to run the command from the previous section with just ::
 

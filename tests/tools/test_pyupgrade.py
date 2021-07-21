@@ -32,9 +32,6 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
     Path("pyproject.toml").write_text(
         dedent(
             """\
-            [tool.nbqa.mutate]
-            pyupgrade = true
-
             [tool.nbqa.addopts]
             pyupgrade = ['--py36-plus']
             """
@@ -100,7 +97,7 @@ def test_pyupgrade_works_with_weird_databricks_file(capsys: "CaptureFixture") ->
         "\x1b[31m-set(())\n"
         "\x1b[0m\x1b[32m+set()\n"
         "\x1b[0m\n"
-        "To apply these changes use `--nbqa-mutate` instead of `--nbqa-diff`\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     expected_err = f"Rewriting {path}\n"
     assert out == expected_out

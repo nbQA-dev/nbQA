@@ -3,7 +3,6 @@ import difflib
 import os
 from pathlib import Path
 from shutil import copyfile
-from textwrap import dedent
 from typing import TYPE_CHECKING, Callable, Sequence
 
 import pytest
@@ -66,20 +65,9 @@ def test_indented_magics(
     """Check if the indented line magics are retained properly after mutating."""
     with open(str(tmp_notebook_with_indented_magics)) as handle:
         before = handle.readlines()
-
-    Path("pyproject.toml").write_text(
-        dedent(
-            """\
-            [tool.nbqa.mutate]
-            black=true
-            """
-        )
-    )
     main(
         ["black", os.path.join("tests", "data", "notebook_with_indented_magics.ipynb")]
     )
-    os.remove("pyproject.toml")
-
     with open(str(tmp_notebook_with_indented_magics)) as handle:
         after = handle.readlines()
 

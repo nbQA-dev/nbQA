@@ -31,26 +31,6 @@ or you can put the following in your :code:`pyproject.toml` file
     with the options specified in :code:`pyproject.toml` passed first. In this case the exact behaviour will depend on the tool and the option in question.
     It's common that subsequent flags override earlier ones, but check the documentation for the tool and option in question to be sure.
 
-Allow mutations
-~~~~~~~~~~~~~~~
-
-By default, :code:`nbQA` won't modify your notebooks. If you wish to let your third-party tool modify your notebooks, you can
-either pass the :code:`--nbqa-mutate` flag at the command-line, e.g.
-
-.. code-block:: bash
-
-    nbqa black my_notebook.ipynb --nbqa-mutate
-
-or you can put the following in your :code:`pyproject.toml` file
-
-.. code-block:: toml
-
-    [tool.nbqa.mutate]
-    black = true
-
-.. note::
-    If you let :code:`nbQA` mutate your notebook, then trailing newlines will be removed from cells.
-
 Cell magics
 ~~~~~~~~~~~
 

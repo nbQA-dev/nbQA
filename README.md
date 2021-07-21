@@ -78,11 +78,9 @@ Here's an example of how to set up some pre-commit hooks: put this in your `.pre
   rev: 0.13.1
   hooks:
     - id: nbqa-black
-      args: [--nbqa-mutate]
     - id: nbqa-pyupgrade
-      args: [--nbqa-mutate, --py36-plus]
+      args: [--py36-plus]
     - id: nbqa-isort
-      args: [--nbqa-mutate]
 ```
 
 If you need to select specific versions of any of these linters/formatters,
@@ -94,7 +92,7 @@ Reformat your notebooks with
 [black](https://black.readthedocs.io/en/stable/):
 
 ```console
-$ nbqa black my_notebook.ipynb --nbqa-mutate
+$ nbqa black my_notebook.ipynb
 reformatted my_notebook.ipynb
 All done! ✨ 🍰 ✨
 1 files reformatted.
@@ -103,14 +101,14 @@ All done! ✨ 🍰 ✨
 Sort your imports with [isort](https://timothycrosley.github.io/isort/):
 
 ```console
-$ nbqa isort my_notebook.ipynb --nbqa-mutate
+$ nbqa isort my_notebook.ipynb
 Fixing my_notebook.ipynb
 ```
 
 Upgrade your syntax with [pyupgrade](https://github.com/asottile/pyupgrade):
 
 ```console
-$ nbqa pyupgrade my_notebook.ipynb --py36-plus --nbqa-mutate
+$ nbqa pyupgrade my_notebook.ipynb --py36-plus
 Rewriting my_notebook.ipynb
 ```
 
