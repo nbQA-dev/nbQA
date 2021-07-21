@@ -5,10 +5,10 @@ Markdown cells, output, and metadata are ignored.
 """
 
 import ast
-import json
 import secrets
 from collections import defaultdict
 from typing import (
+    Any,
     DefaultDict,
     List,
     Mapping,
@@ -320,7 +320,7 @@ def _has_trailing_semicolon(src: str) -> Tuple[str, bool]:
 
 
 def main(  # pylint: disable=R0914
-    notebook: str,
+    notebook_json: MutableMapping[str, Any],
     file_descriptor: int,
     process_cells: Sequence[str],
     command: str,
@@ -333,7 +333,7 @@ def main(  # pylint: disable=R0914
 
     Parameters
     ----------
-    notebook
+    notebook_json
         Jupyter Notebook third-party tool is being run against.
     process_cells
         Extra cells which nbqa should process.
@@ -345,10 +345,7 @@ def main(  # pylint: disable=R0914
     NotebookInfo
 
     """
-    with open(str(notebook), encoding="utf-8") as handle:
-        content = handle.read()
-
-    cells = json.loads(content)["cells"]
+    cells = notebook_json["cells"]
 
     result = []
     cell_mapping = {0: "cell_0:0"}
