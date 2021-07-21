@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.0.0 (2021-07-21)
+~~~~~~~~~~~~~~~~~~
+Removed ``--nbqa-mutate`` flag, it's no longer necessary.
+Options passed to ``--nbqa-addopts`` are now combined with those in ``pyproject.toml``, as opposed
+to overriding them.
+
 0.13.1 (2021-06-25)
 ~~~~~~~~~~~~~~~~~~~
 Fixed bug whereby local scripts / modules could not be run by ``nbQA`` due to incorrect ``ModuleNotFoundError``.

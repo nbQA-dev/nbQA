@@ -1,3 +1,3 @@
 """Attributes used by docs / packaging."""
 
-__version__ = "0.13.1"
+__version__ = "1.0.0"
