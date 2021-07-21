@@ -471,11 +471,11 @@ def _main(  # pylint: disable=R0912,R0914,R0911
         for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
             with open(str(notebook), encoding="utf-8") as handle:
                 content = handle.read()
-            notebook_json = json.loads(content)
-            if _is_non_python_notebook(notebook_json):
-                non_python_notebooks.add(notebook)
-                continue
             try:
+                notebook_json = json.loads(content)
+                if _is_non_python_notebook(notebook_json):
+                    non_python_notebooks.add(notebook)
+                    continue
                 nb_info_mapping[notebook] = save_source.main(
                     notebook_json,
                     file_descriptor,
