@@ -1,4 +1,5 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
+import json
 import os
 import re
 import subprocess
@@ -8,6 +9,7 @@ from importlib import import_module
 from pathlib import Path
 from textwrap import dedent
 from typing import (
+    Any,
     Dict,
     Iterator,
     Mapping,
@@ -415,6 +417,18 @@ def _print_failed_notebook_errors(failed_notebooks: Mapping[str, str]) -> None:
     sys.stderr.write("\n")
 
 
+def _is_non_python_notebook(notebook: MutableMapping[str, Any]) -> bool:
+    """
+    If notebook is marked as non-Python, don't format it.
+
+    All notebook metadata fields are optional, see
+    https://nbformat.readthedocs.io/en/latest/format_description.html. So
+    if a notebook has empty metadata, we will try to parse it anyway.
+    """
+    language = notebook.get("metadata", {}).get("language_info", {}).get("name", None)
+    return language is not None and language != "python"
+
+
 def _main(  # pylint: disable=R0912,R0914,R0911
     cli_args: CLIArgs, configs: Configs
 ) -> int:
@@ -442,6 +456,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
         return 1
 
     failed_notebooks = {}
+    non_python_notebooks = set()
     try:  # pylint disable=R0912
 
         if not nb_to_py_mapping:
@@ -454,9 +469,15 @@ def _main(  # pylint: disable=R0912,R0914,R0911
         nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
 
         for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
+            with open(str(notebook), encoding="utf-8") as handle:
+                content = handle.read()
+            notebook_json = json.loads(content)
+            if _is_non_python_notebook(notebook_json):
+                non_python_notebooks.add(notebook)
+                continue
             try:
                 nb_info_mapping[notebook] = save_source.main(
-                    notebook,
+                    notebook_json,
                     file_descriptor,
                     configs["process_cells"],
                     cli_args.command,
@@ -483,7 +504,7 @@ def _main(  # pylint: disable=R0912,R0914,R0911
 
         actually_mutated = False
         for notebook, (_, temp_python_file) in nb_to_py_mapping.items():
-            if notebook in failed_notebooks:
+            if notebook in failed_notebooks or notebook in non_python_notebooks:
                 continue
             output = _replace_temp_python_file_references_in_out_err(
                 temp_python_file, notebook, output.out, output.err
