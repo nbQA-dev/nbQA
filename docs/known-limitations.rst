@@ -7,6 +7,7 @@ If you choose to process cells with invalid syntax via the ``--nbqa-dont-skip-ba
 then the following will still not be processed:
 
 - cells with multi-line magics;
-- automagics (ideas for how to detect them statically are welcome!).
+- automagics (ideas for how to detect them statically are welcome!);
+- cells with code which ``IPython`` would transform magics into (e.g. ``get_ipython().system('ls')``).
 
 Any other limitation is likely unintentional - if you run into any, please do report an issue.
