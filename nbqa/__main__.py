@@ -279,10 +279,9 @@ def _get_command_not_found_msg(command: str) -> str:
 
         Please make sure you have it installed in the same Python environment as nbqa. See
         e.g. {VIRTUAL_ENVIRONMENTS_URL} for how to set up
-        a virtual environment in Python.
+        a virtual environment in Python, and run:
 
-        Since nbqa is installed at {{nbqa_loc}} and uses the Python executable found at
-        {{python}}, you could fix this issue by running `{{python}} -m pip install {command}`.
+            `python -m pip install {command}`.
         """
     )
     python_executable = sys.executable

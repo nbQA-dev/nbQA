@@ -5,7 +5,6 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from textwrap import dedent
 from typing import TYPE_CHECKING
 
 import pytest
@@ -19,20 +18,17 @@ if TYPE_CHECKING:
 
 def test_missing_command() -> None:
     """Check useful error is raised if :code:`nbqa` is run with an invalid command."""
-    msg = dedent(
-        """\
-    \x1b\\[1mCommand `some\\-fictional\\-command` not found by nbqa\\.\x1b\\[0m
-
-    Please make sure you have it installed in the same Python environment as nbqa\\. \
-See
-    e\\.g\\. https://realpython\\.com/python\\-virtual\\-environments\\-a\\-primer/\
- for how to set up
-    a virtual environment in Python\\.
-
-    Since nbqa is installed at .* and uses the Python executable found at
-    .*, you could fix this issue by running `.* \\-m pip install some\\-fictional\\-command`\\.
-        """
+    # pylint: disable=C0301
+    msg = (
+        "\x1b\\[1mCommand `some-fictional-command` not found by nbqa.\x1b\\[0m\n"
+        "\n"
+        "Please make sure you have it installed in the same Python environment as nbqa. See\n"
+        "e.g. https://realpython.com/python\\-virtual\\-environments\\-a\\-primer/ for how to set up\n"
+        "a virtual environment in Python, and run:\n"
+        "\n"
+        "    `python -m pip install some-fictional-command`.\n"
     )
+    # pylint: enable=C0301
     with pytest.raises(ModuleNotFoundError, match=msg):
         main(["some-fictional-command", "tests", "--some-flag"])
 
