@@ -30,6 +30,14 @@ MAGIC = frozenset(("time", "timeit", "capture", "pypy", "python", "python3"))
 NEWLINE = "\n"
 NEWLINES = defaultdict(lambda: NEWLINE * 3)
 NEWLINES["isort"] = NEWLINE * 2
+TRANSFORMED_MAGICS = frozenset(
+    (
+        "get_ipython().run_cell_magic",
+        "get_ipython().system",
+        "get_ipython().getoutput",
+        "get_ipython().run_line_magic",
+    )
+)
 
 
 class Index(NamedTuple):
@@ -249,13 +257,15 @@ def _should_ignore_code_cell(
     bool
         True if the cell should ignored else False
     """
-    if not "".join(source):
+    joined_source = "".join(source)
+    if (
+        not joined_source
+        or set(tags).intersection(skip_celltags)
+        or any(magic in joined_source for magic in TRANSFORMED_MAGICS)
+    ):
         return True
-    if set(tags).intersection(skip_celltags):
-        return True
-
     try:
-        ast.parse("".join(source))
+        ast.parse(joined_source)
     except SyntaxError:
         # Deal with this below
         pass
@@ -264,7 +274,7 @@ def _should_ignore_code_cell(
         return False
 
     cell_magic_finder = CellMagicFinder()
-    body = TransformerManager().transform_cell("".join(source))
+    body = TransformerManager().transform_cell(joined_source)
     try:
         tree = ast.parse(body)
     except SyntaxError:
