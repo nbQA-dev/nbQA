@@ -40,7 +40,7 @@ def test_pyproject_toml_works(capsys: "CaptureFixture") -> None:
     assert out == expected_out
 
 
-def test_cli_overwrites_pyprojecttoml(capsys: "CaptureFixture") -> None:
+def test_cli_extends_pyprojecttoml(capsys: "CaptureFixture") -> None:
     """
     Check CLI args overwrite pyproject.toml
 
@@ -64,11 +64,21 @@ def test_cli_overwrites_pyprojecttoml(capsys: "CaptureFixture") -> None:
         [
             "flake8",
             os.path.join("tests", "data", "notebook_for_testing.ipynb"),
-            "--select=E303",
+            "--ignore=E402,W291",
         ]
     )
+    out, _ = capsys.readouterr()
     Path("pyproject.toml").unlink()
 
-    out, _ = capsys.readouterr()
-    expected_out = ""
+    # if arguments are specified on command line, they will take precedence
+    # over those specified in the pyproject.toml
+    notebook_path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
+    expected_out = dedent(
+        f"""\
+        {notebook_path}:cell_1:1:1: F401 'os' imported but unused
+        {notebook_path}:cell_1:3:1: F401 'glob' imported but unused
+        {notebook_path}:cell_1:5:1: F401 'nbqa' imported but unused
+        {notebook_path}:cell_4:1:1: F401 'random.randint' imported but unused
+        """
+    )
     assert out == expected_out
