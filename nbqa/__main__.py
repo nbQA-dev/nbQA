@@ -325,8 +325,7 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
         if getattr(cli_args, section) is not None:
             if section == "addopts":
                 # addopts are added to / overridden rather than replaced outright
-                # Sequence[str] has no attribute extend. Should this be typed as List[str]?
-                config["addopts"].extend(getattr(cli_args, section))  # type: ignore
+                config["addopts"] = (*config["addopts"], *getattr(cli_args, section))
             else:
                 # TypedDict key must be a string literal
                 config[section] = getattr(cli_args, section)  # type: ignore
