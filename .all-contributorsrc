@@ -247,6 +247,17 @@
       "contributions": [
         "maintenance"
       ]
+    },
+    {
+      "login": "tcbegley",
+      "name": "Tom Begley",
+      "avatar_url": "https://avatars.githubusercontent.com/u/15220906?v=4",
+      "profile": "http://tcbegley.com",
+      "contributions": [
+        "ideas",
+        "code",
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
