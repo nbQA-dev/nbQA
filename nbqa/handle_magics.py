@@ -17,6 +17,27 @@ def _is_ipython_magic(node: ast.expr) -> bool:
     )
 
 
+def _get_node_args(func: ast.Call) -> List[str]:
+    """
+    Get argument names from function def.
+
+    Raises
+    ------
+    AssertionError
+        Defensive check.
+    """
+    args = []
+    for arg in func.args:
+        if isinstance(arg, ast.Str):
+            args.append(arg.s)
+        else:
+            raise AssertionError(
+                "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
+            )
+    assert args, "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
+    return args
+
+
 class Visitor(ast.NodeVisitor):
     """Visit cell to look for get_ipython calls."""
 
@@ -26,7 +47,7 @@ class Visitor(ast.NodeVisitor):
             int, List[Tuple[int, Optional[str], Optional[str]]]
         ] = defaultdict(list)
 
-    def visit_Assign(self, node: ast.Assign) -> None:  # pylint: disable=C0103,R0912
+    def visit_Assign(self, node: ast.Assign) -> None:
         """
         Get source to replace ipython magic with.
 
@@ -35,10 +56,6 @@ class Visitor(ast.NodeVisitor):
         node
             Function call.
 
-        Raises
-        ------
-        AssertionError
-            Defensive check.
         """
         if (
             isinstance(node.value, ast.Call)
@@ -46,17 +63,7 @@ class Visitor(ast.NodeVisitor):
             and isinstance(node.value.func, ast.Attribute)
             and node.value.func.attr == "getoutput"
         ):
-            args = []
-            for arg in node.value.args:
-                if isinstance(arg, ast.Str):
-                    args.append(arg.s)
-                else:
-                    raise AssertionError(
-                        "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
-                    )
-            assert (
-                args
-            ), "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
+            args = _get_node_args(node.value)
             src = f"!{args[0]}"
             magic_type = "line"
             self.magics[node.value.lineno].append(
@@ -68,7 +75,7 @@ class Visitor(ast.NodeVisitor):
             )
         self.generic_visit(node)
 
-    def visit_Expr(self, node: ast.Expr) -> None:  # pylint: disable=C0103,R0912
+    def visit_Expr(self, node: ast.Expr) -> None:
         """
         Get source to replace ipython magic with.
 
@@ -76,25 +83,10 @@ class Visitor(ast.NodeVisitor):
         ----------
         node
             Function call.
-
-        Raises
-        ------
-        AssertionError
-            Defensive check.
         """
         if isinstance(node.value, ast.Call) and _is_ipython_magic(node.value.func):
             assert isinstance(node.value.func, ast.Attribute)  # help mypy
-            args = []
-            for arg in node.value.args:
-                if isinstance(arg, ast.Str):
-                    args.append(arg.s)
-                else:
-                    raise AssertionError(
-                        "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
-                    )
-            assert (
-                args
-            ), "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
+            args = _get_node_args(node.value)
             magic_type: Optional[str] = None
             if node.value.func.attr == "run_cell_magic":
                 src: Optional[str] = f"%%{args[0]}"
@@ -139,7 +131,7 @@ class CellMagicFinder(ast.NodeVisitor):
         self.header: Optional[str] = None
         self.body: Optional[str] = None
 
-    def visit_Call(self, node: ast.Call) -> None:  # pylint: disable=C0103
+    def visit_Call(self, node: ast.Call) -> None:
         """
         Find cell magic, extract header and body.
 
@@ -167,7 +159,7 @@ class CellMagicFinder(ast.NodeVisitor):
                 self.body = args[2].rstrip("\n")
 
 
-class MagicHandler:  # pylint: disable=R0903
+class MagicHandler:
     """Handle different types of magics."""
 
     def __init__(self, src: str, command: str, magic_type: Optional[str]):
