@@ -428,9 +428,44 @@ def _is_non_python_notebook(notebook: MutableMapping[str, Any]) -> bool:
     return language is not None and language != "python"
 
 
-def _main(  # pylint: disable=R0912,R0914,R0911
-    cli_args: CLIArgs, configs: Configs
-) -> int:
+def _save_sources(
+    nb_to_py_mapping: Dict[str, TemporaryFile],
+    process_cells: Sequence[str],
+    skip_celltags: Sequence[str],
+    dont_skip_bad_cells: bool,
+    command: str,
+) -> Tuple[Mapping[str, NotebookInfo], MutableMapping[str, str], Set[str]]:
+    """
+    Save sources of notebooks.
+
+    Record which notebooks fail to process, and which ones are non-Python ones.
+    """
+    failed_notebooks = {}
+    non_python_notebooks = set()
+    nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
+
+    for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
+        with open(str(notebook), encoding="utf-8") as handle:
+            content = handle.read()
+        try:
+            notebook_json = json.loads(content)
+            if _is_non_python_notebook(notebook_json):
+                non_python_notebooks.add(notebook)
+                continue
+            nb_info_mapping[notebook] = save_source.main(
+                notebook_json,
+                file_descriptor,
+                process_cells,
+                command,
+                skip_celltags,
+                dont_skip_bad_cells=dont_skip_bad_cells,
+            )
+        except Exception as exp_repr:  # pylint: disable=W0703
+            failed_notebooks[notebook] = repr(exp_repr)
+    return nb_info_mapping, failed_notebooks, non_python_notebooks
+
+
+def _main(cli_args: CLIArgs, configs: Configs) -> int:  # pylint: disable=R0912
     """
     Run third-party tool on a single notebook or directory.
 
@@ -454,8 +489,6 @@ def _main(  # pylint: disable=R0912,R0914,R0911
         sys.stderr.write(str(exc))
         return 1
 
-    failed_notebooks = {}
-    non_python_notebooks = set()
     try:  # pylint disable=R0912
 
         if not nb_to_py_mapping:
@@ -464,27 +497,13 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                 f"{' '.join(i for i in cli_args.root_dirs if os.path.isdir(i))}\n"
             )
             return 0
-
-        nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
-
-        for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
-            with open(str(notebook), encoding="utf-8") as handle:
-                content = handle.read()
-            try:
-                notebook_json = json.loads(content)
-                if _is_non_python_notebook(notebook_json):
-                    non_python_notebooks.add(notebook)
-                    continue
-                nb_info_mapping[notebook] = save_source.main(
-                    notebook_json,
-                    file_descriptor,
-                    configs["process_cells"],
-                    cli_args.command,
-                    configs["skip_celltags"],
-                    dont_skip_bad_cells=configs["dont_skip_bad_cells"],
-                )
-            except Exception as exp_repr:  # pylint: disable=W0703
-                failed_notebooks[notebook] = repr(exp_repr)
+        nb_info_mapping, failed_notebooks, non_python_notebooks = _save_sources(
+            nb_to_py_mapping,
+            configs["process_cells"],
+            configs["skip_celltags"],
+            configs["dont_skip_bad_cells"],
+            cli_args.command,
+        )
 
         if len(failed_notebooks) == len(nb_to_py_mapping):
             sys.stderr.write("No valid .ipynb notebooks found\n")
