@@ -120,7 +120,7 @@ def _get_new_source(
     )
 
 
-def _get_pycells(python_file: str) -> Iterator[str]:
+def _get_pycells(python_file: str, num_cells: int) -> Iterator[str]:
     """
     Parse cells from Python file.
 
@@ -133,9 +133,20 @@ def _get_pycells(python_file: str) -> Iterator[str]:
     -------
     Iterator
         Parsed cells.
+
+    Raises
+    ------
+    ValueError
+        If the third-party tool "ate" any comments.
     """
     with open(python_file, encoding="utf-8") as handle:
         txt = handle.read()
+
+    if txt.count(CODE_SEPARATOR) != num_cells:
+        raise ValueError(
+            "Tool did not preserve code separators and cannot be safely used with nbQA."
+        )
+
     if txt.startswith(CODE_SEPARATOR):
         txt = txt[len(CODE_SEPARATOR) :]
     return iter(txt.split(CODE_SEPARATOR))
@@ -184,7 +195,7 @@ def mutate(python_file: str, notebook: str, notebook_info: NotebookInfo) -> bool
         notebook_json = json.loads(handle.read())
     original_notebook_json = copy.deepcopy(notebook_json)
 
-    pycells = _get_pycells(python_file)
+    pycells = _get_pycells(python_file, len(notebook_info.temporary_lines))
     for code_cell_number, cell in enumerate(
         _notebook_code_cells(notebook_json), start=1
     ):
@@ -260,7 +271,7 @@ def diff(python_file: str, notebook: str, notebook_info: NotebookInfo) -> bool:
     with open(notebook, encoding="utf-8") as handle:
         notebook_json = json.loads(handle.read())
 
-    pycells = _get_pycells(python_file)
+    pycells = _get_pycells(python_file, len(notebook_info.temporary_lines))
 
     actually_mutated = False
 

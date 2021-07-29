@@ -70,7 +70,11 @@ def test_unable_to_reconstruct_message(capsys: "CaptureFixture") -> None:
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     main(["remove_comments", path])
     _, err = capsys.readouterr()
-    expected_stderr = f"\n\x1b[1mnbQA failed to process {path} with exception "
+    expected_stderr = (
+        f"\n\x1b[1mnbQA failed to process {path} with exception "
+        "\"ValueError('Tool did not preserve code separators and "
+        "cannot be safely used with nbQA.')\""
+    )
     assert expected_stderr in err
 
 
