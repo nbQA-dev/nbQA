@@ -359,6 +359,10 @@ def main(  # pylint: disable=R0914
     -------
     NotebookInfo
 
+    Raises
+    ------
+    AssertionError
+        If hash collision (extremely rare event!)
     """
     cells = notebook_json["cells"]
 
@@ -372,6 +376,10 @@ def main(  # pylint: disable=R0914
     whole_src = "".join(
         ["".join(cell["source"]) for cell in cells if cell["cell_type"] == "code"]
     )
+    if CODE_SEPARATOR.strip() in whole_src:
+        raise AssertionError(
+            "Extremely rare hash collision occurred - please re-run nbQA to fix this"
+        )
 
     for cell in cells:
         if cell["cell_type"] == "code":
