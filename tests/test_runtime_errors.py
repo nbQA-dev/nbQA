@@ -18,7 +18,6 @@ if TYPE_CHECKING:
 
 def test_missing_command() -> None:
     """Check useful error is raised if :code:`nbqa` is run with an invalid command."""
-    # pylint: disable=C0301
     msg = (
         "\x1b\\[1mCommand `some-fictional-command` not found by nbqa.\x1b\\[0m\n"
         "\n"
@@ -28,7 +27,6 @@ def test_missing_command() -> None:
         "\n"
         "    `python -m pip install some-fictional-command`.\n"
     )
-    # pylint: enable=C0301
     with pytest.raises(ModuleNotFoundError, match=msg):
         main(["some-fictional-command", "tests", "--some-flag"])
 

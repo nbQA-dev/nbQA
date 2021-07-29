@@ -27,7 +27,6 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
     # check out and err
     out, _ = capsys.readouterr()
 
-    # pylint: disable=C0301
     expected_out = (
         "************* Module tests.data.notebook_for_testing\n"  # noqa: E501
         f"{notebook1}:cell_2:19:8: C0303: Trailing whitespace (trailing-whitespace)\n"  # noqa: E501
@@ -50,6 +49,5 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
         "Your code has been rated at 4.32/10\n"
         "\n"
     )
-    # pylint: enable=C0301
     horizontal_bar = "-----------------------------------"
     assert out.split(horizontal_bar)[0] == expected_out.split(horizontal_bar)[0]

@@ -38,7 +38,7 @@ DEPRECATED = {
 }
 
 
-class CLIArgs:  # pylint: disable=R0902,R0903
+class CLIArgs:  # pylint: disable=R0902
     """Stores the command line arguments passed."""
 
     command: str

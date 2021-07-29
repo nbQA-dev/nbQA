@@ -62,6 +62,14 @@ class TemporaryFile(NamedTuple):
     file: str
 
 
+class SavedSources(NamedTuple):
+    """Mapping between notebooks and Python files, failed notebooks, non-Python notebooks."""
+
+    nb_info_mapping: Mapping[str, NotebookInfo]
+    failed_notebooks: MutableMapping[str, str]
+    non_python_notebooks: Set[str]
+
+
 class UnsupportedPackageVersionError(Exception):
     """Raise if installed module is older than minimum required version."""
 
@@ -428,9 +436,86 @@ def _is_non_python_notebook(notebook: MutableMapping[str, Any]) -> bool:
     return language is not None and language != "python"
 
 
-def _main(  # pylint: disable=R0912,R0914,R0911
-    cli_args: CLIArgs, configs: Configs
-) -> int:
+def _save_sources(
+    nb_to_py_mapping: Dict[str, TemporaryFile],
+    process_cells: Sequence[str],
+    skip_celltags: Sequence[str],
+    dont_skip_bad_cells: bool,
+    command: str,
+) -> SavedSources:
+    """
+    Save sources of notebooks.
+
+    Record which notebooks fail to process, and which ones are non-Python ones.
+    """
+    failed_notebooks = {}
+    non_python_notebooks = set()
+    nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
+
+    for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
+        with open(str(notebook), encoding="utf-8") as handle:
+            content = handle.read()
+        try:
+            notebook_json = json.loads(content)
+            if _is_non_python_notebook(notebook_json):
+                non_python_notebooks.add(notebook)
+                continue
+            nb_info_mapping[notebook] = save_source.main(
+                notebook_json,
+                file_descriptor,
+                process_cells,
+                command,
+                skip_celltags,
+                dont_skip_bad_cells=dont_skip_bad_cells,
+            )
+        except Exception as exp_repr:  # pylint: disable=W0703
+            failed_notebooks[notebook] = repr(exp_repr)
+    return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks)
+
+
+def _post_process_notebooks(  # pylint: disable=R0913
+    saved_sources: SavedSources,
+    nb_to_py_mapping: Mapping[str, TemporaryFile],
+    mutated: bool,
+    diff: bool,
+    command: str,
+    output: Output,
+) -> Tuple[bool, Output]:
+    """Replace source in notebooks, modify output so it refers to notebooks."""
+    actually_mutated = False
+    for notebook, (_, temp_python_file) in nb_to_py_mapping.items():
+        if (
+            notebook in saved_sources.failed_notebooks
+            or notebook in saved_sources.non_python_notebooks
+        ):
+            continue
+        output = _replace_temp_python_file_references_in_out_err(
+            temp_python_file, notebook, output.out, output.err
+        )
+        output = map_python_line_to_nb_lines(
+            command,
+            output.out,
+            output.err,
+            notebook,
+            saved_sources.nb_info_mapping[notebook].cell_mappings,
+        )
+
+        if mutated:
+            try:
+                actually_mutated = (
+                    REPLACE_FUNCTION[diff](
+                        temp_python_file,
+                        notebook,
+                        saved_sources.nb_info_mapping[notebook],
+                    )
+                    or actually_mutated
+                )
+            except Exception as exp_repr:  # pylint: disable=W0703
+                saved_sources.failed_notebooks[notebook] = repr(exp_repr)
+    return actually_mutated, output
+
+
+def _main(cli_args: CLIArgs, configs: Configs) -> int:
     """
     Run third-party tool on a single notebook or directory.
 
@@ -454,8 +539,6 @@ def _main(  # pylint: disable=R0912,R0914,R0911
         sys.stderr.write(str(exc))
         return 1
 
-    failed_notebooks = {}
-    non_python_notebooks = set()
     try:  # pylint disable=R0912
 
         if not nb_to_py_mapping:
@@ -464,31 +547,17 @@ def _main(  # pylint: disable=R0912,R0914,R0911
                 f"{' '.join(i for i in cli_args.root_dirs if os.path.isdir(i))}\n"
             )
             return 0
+        saved_sources = _save_sources(
+            nb_to_py_mapping,
+            configs["process_cells"],
+            configs["skip_celltags"],
+            configs["dont_skip_bad_cells"],
+            cli_args.command,
+        )
 
-        nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
-
-        for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
-            with open(str(notebook), encoding="utf-8") as handle:
-                content = handle.read()
-            try:
-                notebook_json = json.loads(content)
-                if _is_non_python_notebook(notebook_json):
-                    non_python_notebooks.add(notebook)
-                    continue
-                nb_info_mapping[notebook] = save_source.main(
-                    notebook_json,
-                    file_descriptor,
-                    configs["process_cells"],
-                    cli_args.command,
-                    configs["skip_celltags"],
-                    dont_skip_bad_cells=configs["dont_skip_bad_cells"],
-                )
-            except Exception as exp_repr:  # pylint: disable=W0703
-                failed_notebooks[notebook] = repr(exp_repr)
-
-        if len(failed_notebooks) == len(nb_to_py_mapping):
+        if len(saved_sources.failed_notebooks) == len(nb_to_py_mapping):
             sys.stderr.write("No valid .ipynb notebooks found\n")
-            _print_failed_notebook_errors(failed_notebooks)
+            _print_failed_notebook_errors(saved_sources.failed_notebooks)
             return 123
 
         output, output_code, mutated = _run_command(
@@ -497,37 +566,18 @@ def _main(  # pylint: disable=R0912,R0914,R0911
             [
                 i.file
                 for key, i in nb_to_py_mapping.items()
-                if key not in failed_notebooks
+                if key not in saved_sources.failed_notebooks
             ],
         )
 
-        actually_mutated = False
-        for notebook, (_, temp_python_file) in nb_to_py_mapping.items():
-            if notebook in failed_notebooks or notebook in non_python_notebooks:
-                continue
-            output = _replace_temp_python_file_references_in_out_err(
-                temp_python_file, notebook, output.out, output.err
-            )
-            output = map_python_line_to_nb_lines(
-                cli_args.command,
-                output.out,
-                output.err,
-                notebook,
-                nb_info_mapping[notebook].cell_mappings,
-            )
-
-            if mutated:
-                try:
-                    actually_mutated = (
-                        REPLACE_FUNCTION[configs["diff"]](
-                            temp_python_file,
-                            notebook,
-                            nb_info_mapping[notebook],
-                        )
-                        or actually_mutated
-                    )
-                except Exception as exp_repr:  # pylint: disable=W0703
-                    failed_notebooks[notebook] = repr(exp_repr)
+        actually_mutated, output = _post_process_notebooks(
+            saved_sources,
+            nb_to_py_mapping,
+            mutated,
+            configs["diff"],
+            cli_args.command,
+            output,
+        )
 
         sys.stdout.write(output.out)
         sys.stderr.write(output.err)
@@ -536,9 +586,9 @@ def _main(  # pylint: disable=R0912,R0914,R0911
             output_code = 0
             mutated = False
 
-        if failed_notebooks:
+        if saved_sources.failed_notebooks:
             output_code = 123
-            _print_failed_notebook_errors(failed_notebooks)
+            _print_failed_notebook_errors(saved_sources.failed_notebooks)
 
         if configs["diff"]:
             if mutated:
