@@ -162,7 +162,9 @@ class CellMagicFinder(ast.NodeVisitor):
 class MagicHandler:
     """Handle different types of magics."""
 
-    def __init__(self, src: str, command: str, magic_type: Optional[str]):
+    def __init__(
+        self, src: str, whole_src: str, command: str, magic_type: Optional[str]
+    ):
         """
         Handle magic.
 
@@ -177,6 +179,10 @@ class MagicHandler:
         """
         self.src = src
         token = secrets.token_hex(4)
+        while token in whole_src:  # pragma: nocover
+            # keep generating token til you find one
+            # not in the original source
+            token = secrets.token_hex(4)
         if command in COMMANDS_WITH_STRING_TOKEN:
             self.token = f'"{token}"'
         else:

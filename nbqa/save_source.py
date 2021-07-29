@@ -49,6 +49,7 @@ class Index(NamedTuple):
 
 def _process_source(
     source: str,
+    whole_src: str,
     command: str,
     magic_substitutions: List[MagicHandler],
     *,
@@ -64,7 +65,7 @@ def _process_source(
         return source
     body = TransformerManager().transform_cell(source)
     if len(body.splitlines()) != len(source.splitlines()):
-        handler = MagicHandler(source, command, magic_type=None)
+        handler = MagicHandler(source, whole_src, command, magic_type=None)
         magic_substitutions.append(handler)
         return handler.replacement
     try:
@@ -72,7 +73,7 @@ def _process_source(
     except SyntaxError:
         if dont_skip_bad_cells:
             return source
-        handler = MagicHandler(source, command, magic_type=None)
+        handler = MagicHandler(source, whole_src, command, magic_type=None)
         magic_substitutions.append(handler)
         return handler.replacement
     visitor = Visitor()
@@ -83,11 +84,14 @@ def _process_source(
             col_offset, src, magic_type = visitor.magics[i][0]
             if src is None or len(visitor.magics[i]) > 1:
                 # unusual case - skip cell completely for now
-                handler = MagicHandler(source, command, magic_type=magic_type)
+                handler = MagicHandler(
+                    source, whole_src, command, magic_type=magic_type
+                )
                 magic_substitutions.append(handler)
                 return handler.replacement
             handler = MagicHandler(
                 src,
+                whole_src,
                 command,
                 magic_type=magic_type,
             )
@@ -99,6 +103,7 @@ def _process_source(
 
 def _replace_magics(
     source: Sequence[str],
+    whole_src: str,
     magic_substitutions: List[MagicHandler],
     command: str,
     *,
@@ -134,7 +139,7 @@ def _replace_magics(
     except SyntaxError:
         if dont_skip_bad_cells:
             return "".join(source)
-        handler = MagicHandler("".join(source), command, magic_type=None)
+        handler = MagicHandler("".join(source), whole_src, command, magic_type=None)
         magic_substitutions.append(handler)
         return handler.replacement
     cell_magic_finder.visit(tree)
@@ -144,12 +149,14 @@ def _replace_magics(
         assert cell_magic_finder.body is not None
         header = _process_source(
             cell_magic_finder.header,
+            whole_src,
             command,
             magic_substitutions,
             dont_skip_bad_cells=dont_skip_bad_cells,
         )
         cell = _process_source(
             cell_magic_finder.body,
+            whole_src,
             command,
             magic_substitutions,
             dont_skip_bad_cells=dont_skip_bad_cells,
@@ -158,6 +165,7 @@ def _replace_magics(
 
     return _process_source(
         "".join(source),
+        whole_src,
         command,
         magic_substitutions,
         dont_skip_bad_cells=dont_skip_bad_cells,
@@ -166,6 +174,7 @@ def _replace_magics(
 
 def _parse_cell(
     source: Sequence[str],
+    whole_src: str,
     cell_number: int,
     temporary_lines: MutableMapping[int, Sequence[MagicHandler]],
     command: str,
@@ -179,6 +188,8 @@ def _parse_cell(
     ----------
     source
         Source from notebook cell.
+    whole_src
+        Source of entire notebook.
     cell_number
         Number identifying the notebook cell.
     temporary_lines
@@ -195,7 +206,11 @@ def _parse_cell(
     parsed_cell = CODE_SEPARATOR
 
     parsed_cell += _replace_magics(
-        source, substituted_magics, command, dont_skip_bad_cells=dont_skip_bad_cells
+        source,
+        whole_src,
+        substituted_magics,
+        command,
+        dont_skip_bad_cells=dont_skip_bad_cells,
     )
 
     if substituted_magics:
@@ -344,6 +359,10 @@ def main(  # pylint: disable=R0914
     -------
     NotebookInfo
 
+    Raises
+    ------
+    AssertionError
+        If hash collision (extremely rare event!)
     """
     cells = notebook_json["cells"]
 
@@ -353,6 +372,14 @@ def main(  # pylint: disable=R0914
     trailing_semicolons = set()
     temporary_lines: DefaultDict[int, Sequence[MagicHandler]] = defaultdict(list)
     code_cells_to_ignore = set()
+
+    whole_src = "".join(
+        ["".join(cell["source"]) for cell in cells if cell["cell_type"] == "code"]
+    )
+    if CODE_SEPARATOR.strip() in whole_src:
+        raise AssertionError(
+            "Extremely rare hash collision occurred - please re-run nbQA to fix this"
+        )
 
     for cell in cells:
         if cell["cell_type"] == "code":
@@ -369,6 +396,7 @@ def main(  # pylint: disable=R0914
 
             parsed_cell = _parse_cell(
                 cell["source"],
+                whole_src,
                 index.cell_number,
                 temporary_lines,
                 command,
