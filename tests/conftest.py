@@ -213,6 +213,16 @@ def tmp_remove_comments() -> Iterator[None]:
 
 
 @pytest.fixture
+def tmp_remove_all() -> Iterator[None]:
+    """Make temporary copy of ``tests/remove_all.py`` in root dir."""
+    temp_file = Path("remove_all.py")
+    shutil.copy(str(Path("tests") / temp_file), str(temp_file))
+    yield
+    temp_file.unlink()
+    del sys.modules["remove_all"]
+
+
+@pytest.fixture
 def tmp_print_6174() -> Iterator[None]:
     """Make temporary copy of ``tests/print_6174.py`` in root dir."""
     temp_file = Path("print_6174.py")

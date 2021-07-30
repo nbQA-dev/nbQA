@@ -282,7 +282,10 @@ def diff(python_file: str, notebook: str, notebook_info: NotebookInfo) -> bool:
             continue
         new_source = _get_new_source(code_cell_number, notebook_info, next(pycells))
         cell["source"][-1] += "\n"
-        new_source[-1] += "\n"
+        if new_source:
+            new_source[-1] += "\n"
+        else:
+            new_source = ["\n"]
         cell_diff = unified_diff(
             cell["source"],
             new_source,
