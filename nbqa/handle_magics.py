@@ -176,13 +176,25 @@ class MagicHandler:
             e.g. flake8
         magic_type
             E.g. cell, line, ...
+
+        Raises
+        ------
+        AssertionError
+            Defensive check.
         """
         self.src = src
         token = secrets.token_hex(4)
+        count = 0
         while token in whole_src:  # pragma: nocover
             # keep generating token til you find one
             # not in the original source
             token = secrets.token_hex(4)
+            count += 1
+            if count > 100:
+                raise AssertionError(
+                    "Unable to generate token to mask magics with, "
+                    "please report bug to https://github.com/nbQA-dev/nbQA/issues"
+                )
         if command in COMMANDS_WITH_STRING_TOKEN:
             self.token = f'"{token}"'
         else:
