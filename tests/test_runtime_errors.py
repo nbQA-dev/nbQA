@@ -77,6 +77,27 @@ def test_unable_to_reconstruct_message(capsys: "CaptureFixture") -> None:
     )
 
 
+@pytest.mark.usefixtures("tmp_remove_all")
+def test_remove_all(capsys: "CaptureFixture") -> None:
+    """Check error message shows if we're unable to reconstruct notebook."""
+    path = os.path.abspath(os.path.join("tests", "data", "t.ipynb"))
+    main(["remove_all", path, "--nbqa-diff"])
+    out, err = capsys.readouterr()
+    expected_out = (
+        "\x1b[1mCell 1\x1b[0m\n"
+        "------\n"
+        f"--- {path}\n"
+        f"+++ {path}\n"
+        "@@ -1 +1 @@\n"
+        "\x1b[31m-from t import A\n"
+        "\x1b[0m\x1b[32m+\n"
+        "\x1b[0m\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
+    )
+    assert out == expected_out
+    assert err == ""
+
+
 def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") -> None:
     """
     Same as ``test_unable_to_reconstruct_message`` but we check ``PYTHONPATH`` updates correctly.
