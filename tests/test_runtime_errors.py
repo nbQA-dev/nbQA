@@ -78,7 +78,7 @@ def test_unable_to_reconstruct_message(capsys: "CaptureFixture") -> None:
 
 
 @pytest.mark.usefixtures("tmp_remove_all")
-def test_remove_all(capsys: "CaptureFixture") -> None:
+def test_remove_all_no_trailing_sc(capsys: "CaptureFixture") -> None:
     """Check error message shows if we're unable to reconstruct notebook."""
     path = os.path.abspath(os.path.join("tests", "data", "t.ipynb"))
     main(["remove_all", path, "--nbqa-diff"])
@@ -90,6 +90,40 @@ def test_remove_all(capsys: "CaptureFixture") -> None:
         f"+++ {path}\n"
         "@@ -1 +1 @@\n"
         "\x1b[31m-from t import A\n"
+        "\x1b[0m\x1b[32m+\n"
+        "\x1b[0m\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
+    )
+    assert out == expected_out
+    assert err == ""
+
+
+@pytest.mark.usefixtures("tmp_remove_all")
+def test_remove_all_trailing_semicolon(capsys: "CaptureFixture") -> None:
+    """Check error message shows if we're unable to reconstruct notebook."""
+    path = os.path.abspath(
+        os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
+    )
+    main(["remove_all", path, "--nbqa-diff"])
+    out, err = capsys.readouterr()
+    expected_out = (
+        "\x1b[1mCell 1\x1b[0m\n"
+        "------\n"
+        f"--- {path}\n"
+        f"+++ {path}\n"
+        "@@ -1,3 +1 @@\n"
+        "\x1b[31m-import glob;\n"
+        "\x1b[0m \n"
+        "\x1b[31m-import nbqa;\n"
+        "\x1b[0m\n"
+        "\x1b[1mCell 2\x1b[0m\n"
+        "------\n"
+        f"--- {path}\n"
+        f"+++ {path}\n"
+        "@@ -1,3 +1 @@\n"
+        "\x1b[31m-def func(a, b):\n"
+        "\x1b[0m\x1b[31m-    pass;\n"
+        "\x1b[0m\x1b[31m- \n"
         "\x1b[0m\x1b[32m+\n"
         "\x1b[0m\n"
         "To apply these changes, remove the `--nbqa-diff` flag\n"

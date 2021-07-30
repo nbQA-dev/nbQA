@@ -44,11 +44,6 @@ def _restore_semicolon(
     -------
     str
         New source with removed semicolon restored.
-
-    Raises
-    ------
-    AssertionError
-        If code thought to be unreachable is reached.
     """
     if cell_number in trailing_semicolons:
         tokens = tokenize_rt.src_to_tokens(source)
@@ -57,10 +52,6 @@ def _restore_semicolon(
                 continue
             tokens[idx] = token._replace(src=token.src + ";")
             break
-        else:  # pragma: nocover
-            raise AssertionError(
-                "Unreachable code, please report bug at https://github.com/nbQA-dev/nbQA/issues"
-            )
         source = tokenize_rt.tokens_to_src(tokens)
     return source
 
