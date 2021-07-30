@@ -70,8 +70,11 @@ def test_unable_to_reconstruct_message(capsys: "CaptureFixture") -> None:
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     main(["remove_comments", path])
     _, err = capsys.readouterr()
-    expected_stderr = f"\n\x1b[1mnbQA failed to process {path} with exception "
-    assert expected_stderr in err
+    assert f"\n\x1b[1mnbQA failed to process {path} with exception " in err
+    assert (
+        "Tool did not preserve code separators and cannot be safely used with nbQA"
+        in err
+    )
 
 
 def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") -> None:
