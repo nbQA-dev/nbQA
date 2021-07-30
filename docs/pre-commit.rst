@@ -34,7 +34,7 @@ If you have your own custom tool (e.g. ``customtool``) for which we currently do
       rev: 1.0.0
       hooks:
         - id: nbqa
-          args: [customtool]
+          entry: nbqa customtool
           name: nbqa-customtool
           alias: nbqa-customtool
           additional_dependencies: [customtool==<version number>]
