@@ -1,6 +1,10 @@
 =====================
 Command-line examples
 =====================
+
+.. note::
+   Cell numbers in the output refer to code cells, enumerated starting from 1.
+
 Reformat your notebooks with `black`_:
 
 .. code:: console
