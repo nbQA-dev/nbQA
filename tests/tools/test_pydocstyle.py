@@ -9,9 +9,9 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-def test_doctest_works(capsys: "CaptureFixture") -> None:
+def test_pydocstyle_works(capsys: "CaptureFixture") -> None:
     """
-    Check doctest works.
+    Check pydocstyle works.
 
     Parameters
     ----------
