@@ -40,7 +40,7 @@ def test_mypy_works(capsys: "CaptureFixture") -> None:
         {path_1}:cell_2:18: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
         {path_0}:cell_2:19: error: Argument 1 to "hello" has incompatible type "int"; expected "str"
         Found 3 errors in 3 files (checked 26 source files)
-        """  # noqa
+        """
     )
     expected_out = (
         'tests/data/notebook_starting_with_md.ipynb:cell_3:18: \x1b[1m\x1b[31merror:\x1b(B\x1b[m Argument 1 to \x1b(B\x1b[m\x1b[1m"hello"\x1b(B\x1b[m has incompatible type \x1b(B\x1b[m\x1b[1m"int"\x1b(B\x1b[m; expected \x1b(B\x1b[m\x1b[1m"str"\x1b(B\x1b[m\x1b(B\x1b[m\n'  # noqa: E501
