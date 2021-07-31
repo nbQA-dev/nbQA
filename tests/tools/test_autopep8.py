@@ -1,4 +1,4 @@
-"""Check that :code:`yapf` works as intended."""
+"""Check that :code:`autopep8` works as intended."""
 
 import os
 from pathlib import Path
@@ -12,10 +12,10 @@ if TYPE_CHECKING:
     from py._path.local import LocalPath
 
 
-def test_successive_runs_using_yapf(
+def test_successive_runs_using_autopep8(
     tmpdir: "LocalPath", capsys: "CaptureFixture"
 ) -> None:
-    """Check yapf returns 0 on the second run given a dirty notebook."""
+    """Check autopep8 returns 0 on the second run given a dirty notebook."""
     src_notebook = Path(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     test_notebook = Path(tmpdir) / src_notebook.name
     copyfile(src_notebook, test_notebook)
