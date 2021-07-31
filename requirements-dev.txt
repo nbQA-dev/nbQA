@@ -6,6 +6,7 @@ flake8
 isort>=5.4.2
 mypy
 pre-commit-hooks
+pydocstyle
 pylint
 pytest
 pytest-randomly
