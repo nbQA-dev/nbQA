@@ -24,6 +24,7 @@
   require_serial: true
   types: [jupyter]
   additional_dependencies: [pre-commit-hooks]
+  args: [--nbqa-dont-skip-bad-cells]
 - id: nbqa-flake8
   name: nbqa-flake8
   description: "Run 'flake8' on a Jupyter Notebook"
