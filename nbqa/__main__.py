@@ -251,11 +251,16 @@ def _run_command(
     """
     before = [_get_mtimes(i) for i in args]
 
+    my_env = os.environ.copy()
+    if command == "mypy" and "MYPY_FORCE_COLOR" not in my_env:
+        my_env["MYPY_FORCE_COLOR"] = "1"
+
     output = subprocess.run(
         [sys.executable, "-m", command, *args, *cmd_args],
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         universal_newlines=True,  # from Python3.7 this can be replaced with `text`
+        env=my_env,
     )
 
     mutated = [_get_mtimes(i) for i in args] != before
