@@ -1,4 +1,5 @@
 autoflake
+autopep8
 black
 coverage[toml]
 flake8

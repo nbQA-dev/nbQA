@@ -78,3 +78,12 @@
   require_serial: true
   types: [jupyter]
   additional_dependencies: [yapf]
+- id: nbqa-autopep8
+  name: nbqa-autopep8
+  description: "Run 'autopep8' on a Jupyter Notebook"
+  entry: nbqa autopep8 -i
+  language: python
+  language_version: python3
+  require_serial: true
+  types: [jupyter]
+  additional_dependencies: [autopep8]
