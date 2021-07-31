@@ -88,3 +88,12 @@
   require_serial: true
   types: [jupyter]
   additional_dependencies: [autopep8]
+- id: nbqa-pydocstyle
+  name: nbqa-pydocstyle
+  description: "Run 'pydocstyle' on a Jupyter Notebook"
+  entry: nbqa pydocstyle -i
+  language: python
+  language_version: python3
+  require_serial: true
+  types: [jupyter]
+  additional_dependencies: [pydocstyle]

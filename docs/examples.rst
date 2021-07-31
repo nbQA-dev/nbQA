@@ -79,6 +79,12 @@ Format code with `autopep8`_:
 
    $ nbqa autopep8 -i my_notebook.ipynb
 
+Check docstring style with `pydocstyle`_:
+
+.. code:: console
+
+   $ nbqa pydocstyle my_notebook.ipynb
+
 .. _black: https://black.readthedocs.io/en/stable/
 .. _doctest: https://docs.python.org/3/library/doctest.html
 .. _flake8: https://flake8.pycqa.org/en/latest/
@@ -88,3 +94,4 @@ Format code with `autopep8`_:
 .. _pyupgrade: https://github.com/asottile/pyupgrade
 .. _yapf: https://github.com/google/yapf
 .. _autopep8: https://github.com/hhatto/autopep8
+.. _pydocstyle: http://www.pydocstyle.org/en/stable/
