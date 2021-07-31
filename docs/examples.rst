@@ -73,6 +73,12 @@ Format code with `yapf`_:
 
    $ nbqa yapf --in-place my_notebook.ipynb
 
+Format code with `autopep8`_:
+
+.. code:: console
+
+   $ nbqa autopep8 -i my_notebook.ipynb
+
 .. _black: https://black.readthedocs.io/en/stable/
 .. _doctest: https://docs.python.org/3/library/doctest.html
 .. _flake8: https://flake8.pycqa.org/en/latest/
@@ -81,3 +87,4 @@ Format code with `yapf`_:
 .. _pylint: https://www.pylint.org/
 .. _pyupgrade: https://github.com/asottile/pyupgrade
 .. _yapf: https://github.com/google/yapf
+.. _autopep8: https://github.com/hhatto/autopep8
