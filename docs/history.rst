@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.1.0 (2021-08-01)
+~~~~~~~~~~~~~~~~~~
+Added support for ``autopep8`` and ``pydocstyle``.
+Fixed bug whereby ``nbqa mypy`` wasn't showing coloured output.
+Added several extra internal robustness checks.
+
 1.0.0 (2021-07-21)
 ~~~~~~~~~~~~~~~~~~
 Removed ``--nbqa-mutate`` flag, it's no longer necessary.
