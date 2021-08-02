@@ -34,7 +34,7 @@ repos:
       - id: flake8
         additional_dependencies: [flake8-typing-imports==1.10.0]
   - repo: https://github.com/PyCQA/isort
-    rev: 5.9.2
+    rev: 5.9.3
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/pydocstyle
@@ -55,7 +55,7 @@ repos:
         exclude: ^docs/
         additional_dependencies: [types-setuptools, types-toml]
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.23.0
+    rev: v2.23.1
     hooks:
       - id: pyupgrade
         args: [--py36-plus]
