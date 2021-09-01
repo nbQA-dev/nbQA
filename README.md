@@ -6,7 +6,7 @@
 </h1>
 
 <h3 align="center">
-	Run any standard Python code quality tool on a Jupyter Notebook
+	Run isort, pyupgrade, mypy, pylint, flake8, and more on Jupyter Notebooks
 </h3>
 
 <p align="center">
