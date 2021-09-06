@@ -10,11 +10,11 @@ repos:
       - id: trailing-whitespace
       - id: debug-statements
   - repo: https://github.com/pre-commit/pre-commit
-    rev: v2.14.0
+    rev: v2.15.0
     hooks:
       - id: validate_manifest
   - repo: https://github.com/psf/black
-    rev: 21.7b0
+    rev: 21.8b0
     hooks:
       - id: black
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -23,7 +23,7 @@ repos:
       - id: prettier
         exclude: ^README\.md$
   - repo: https://github.com/PyCQA/pylint
-    rev: v2.9.5
+    rev: v2.10.2
     hooks:
       - id: pylint
         files: ^(nbqa|tests)/
@@ -55,7 +55,7 @@ repos:
         exclude: ^docs/
         additional_dependencies: [types-setuptools, types-toml]
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.23.3
+    rev: v2.25.0
     hooks:
       - id: pyupgrade
         args: [--py36-plus]
