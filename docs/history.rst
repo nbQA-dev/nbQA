@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.1.1 (2021-09-12)
+~~~~~~~~~~~~~~~~~~
+Fixed bug whereby local module wasn't being picked up correctly.
+Removed ``language_version`` from ``.pre-commit-hooks.yaml``.
+
 1.1.0 (2021-08-01)
 ~~~~~~~~~~~~~~~~~~
 Added support for ``autopep8`` and ``pydocstyle``.
