@@ -25,7 +25,7 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_for_testing) as handle:
+    with open(tmp_notebook_for_testing, encoding="utf-8") as handle:
         before = handle.readlines()
     path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
 
@@ -39,7 +39,7 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
     )
     main(["pyupgrade", os.path.abspath(path)])
     Path("pyproject.toml").unlink()
-    with open(tmp_notebook_for_testing) as handle:
+    with open(tmp_notebook_for_testing, encoding="utf-8") as handle:
         after = handle.readlines()
 
     diff = difflib.unified_diff(before, after)

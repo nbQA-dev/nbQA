@@ -28,12 +28,12 @@ def _run_nbqa(
     Tuple[Sequence[str], Sequence[str]]
         Content of the notebook before and after running nbQA
     """
-    with open(notebook) as handle:
+    with open(notebook, encoding="utf-8") as handle:
         before = handle.readlines()
 
     main([command, notebook, *args])
 
-    with open(notebook) as handle:
+    with open(notebook, encoding="utf-8") as handle:
         after = handle.readlines()
 
     return (before, after)
