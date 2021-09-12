@@ -33,12 +33,12 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_for_testing) as handle:
+    with open(tmp_notebook_for_testing, encoding="utf-8") as handle:
         before = handle.readlines()
     path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
 
     main(["black", os.path.abspath(path)])
-    with open(tmp_notebook_for_testing) as handle:
+    with open(tmp_notebook_for_testing, encoding="utf-8") as handle:
         after = handle.readlines()
 
     diff = difflib.unified_diff(before, after)
@@ -87,12 +87,12 @@ def test_black_works_with_trailing_semicolons(
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_with_trailing_semicolon) as handle:
+    with open(tmp_notebook_with_trailing_semicolon, encoding="utf-8") as handle:
         before = handle.readlines()
     path = os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
 
     main(["black", os.path.abspath(path), "--line-length=10"])
-    with open(tmp_notebook_with_trailing_semicolon) as handle:
+    with open(tmp_notebook_with_trailing_semicolon, encoding="utf-8") as handle:
         after = handle.readlines()
 
     diff = difflib.unified_diff(before, after)
@@ -148,12 +148,12 @@ def test_black_works_with_multiline(
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_with_multiline) as handle:
+    with open(tmp_notebook_with_multiline, encoding="utf-8") as handle:
         before = handle.readlines()
     path = os.path.join("tests", "data", "clean_notebook_with_multiline.ipynb")
 
     main(["black", os.path.abspath(path)])
-    with open(tmp_notebook_with_multiline) as handle:
+    with open(tmp_notebook_with_multiline, encoding="utf-8") as handle:
         after = handle.readlines()
 
     diff = difflib.unified_diff(before, after)
@@ -199,12 +199,16 @@ def test_black_multiple_files(tmp_test_data: Path) -> None:
         Temporary copy of test data.
     """
     # check diff
-    with open(str(tmp_test_data / "notebook_for_testing.ipynb")) as handle:
+    with open(
+        str(tmp_test_data / "notebook_for_testing.ipynb"), encoding="utf-8"
+    ) as handle:
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data"))
 
     main(["black", path])
-    with open(str(tmp_test_data / "notebook_for_testing.ipynb")) as handle:
+    with open(
+        str(tmp_test_data / "notebook_for_testing.ipynb"), encoding="utf-8"
+    ) as handle:
         after = handle.readlines()
 
     diff = difflib.unified_diff(before, after)
@@ -407,7 +411,7 @@ def test_process_cells_magic_pyprojecttoml(capsys: "CaptureFixture") -> None:
     """
     Notebook contains non-allowlist magic, but it's in process_cells.
     """
-    with open("pyproject.toml", "w") as handle:
+    with open("pyproject.toml", "w", encoding="utf-8") as handle:
         handle.write("[tool.nbqa.process_cells]\n" 'black = ["javascript", "foo"]\n')
     path = os.path.abspath(os.path.join("tests", "data", "non_default_magic.ipynb"))
     main(["black", path, "--nbqa-diff"])

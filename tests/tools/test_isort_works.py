@@ -27,12 +27,12 @@ def test_isort_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_for_testing) as handle:
+    with open(tmp_notebook_for_testing, encoding="utf-8") as handle:
         before = handle.readlines()
     path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
     main(["isort", path])
 
-    with open(tmp_notebook_for_testing) as handle:
+    with open(tmp_notebook_for_testing, encoding="utf-8") as handle:
         after = handle.readlines()
     diff = difflib.unified_diff(before, after)
     result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
@@ -68,12 +68,12 @@ def test_isort_initial_md(
         Pytest fixture to capture stdout and stderr.
     """
     # check diff
-    with open(tmp_notebook_starting_with_md) as handle:
+    with open(tmp_notebook_starting_with_md, encoding="utf-8") as handle:
         before = handle.readlines()
     path = os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
     main(["isort", path])
 
-    with open(tmp_notebook_starting_with_md) as handle:
+    with open(tmp_notebook_starting_with_md, encoding="utf-8") as handle:
         after = handle.readlines()
     diff = difflib.unified_diff(before, after)
     result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
@@ -146,14 +146,14 @@ def test_isort_trailing_semicolon(tmp_notebook_with_trailing_semicolon: Path) ->
         Temporary copy of :code:`notebook_with_trailing_semicolon.ipynb`.
     """
     # check diff
-    with open(tmp_notebook_with_trailing_semicolon) as handle:
+    with open(tmp_notebook_with_trailing_semicolon, encoding="utf-8") as handle:
         before = handle.readlines()
     path = os.path.abspath(
         os.path.join("tests", "data", "notebook_with_trailing_semicolon.ipynb")
     )
     main(["isort", path])
 
-    with open(tmp_notebook_with_trailing_semicolon) as handle:
+    with open(tmp_notebook_with_trailing_semicolon, encoding="utf-8") as handle:
         after = handle.readlines()
     diff = difflib.unified_diff(before, after)
     result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))

@@ -63,12 +63,12 @@ def test_indented_magics(
     tmp_notebook_with_indented_magics: "LocalPath",
 ) -> None:
     """Check if the indented line magics are retained properly after mutating."""
-    with open(str(tmp_notebook_with_indented_magics)) as handle:
+    with open(str(tmp_notebook_with_indented_magics), encoding="utf-8") as handle:
         before = handle.readlines()
     main(
         ["black", os.path.join("tests", "data", "notebook_with_indented_magics.ipynb")]
     )
-    with open(str(tmp_notebook_with_indented_magics)) as handle:
+    with open(str(tmp_notebook_with_indented_magics), encoding="utf-8") as handle:
         after = handle.readlines()
 
     assert _validate_magics_with_black(before, after)
