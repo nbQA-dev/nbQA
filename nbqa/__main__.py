@@ -630,9 +630,9 @@ def _check_command_is_installed(command: str) -> None:
             import_module(command)
         except ImportError as exc:
             if not os.path.isdir(command) and not os.path.isfile(
-                f"{command}.py"
+                f"{os.path.join(*command.split('.'))}.py"
             ):  # pragma: nocover(py<37)
-                # I presume there lack of coverage in Python3.6 here is a bug, as all
+                # I presume the lack of coverage in Python3.6 here is a bug, as all
                 # these branches are actually covered.
                 raise ModuleNotFoundError(_get_command_not_found_msg(command)) from exc
     else:
