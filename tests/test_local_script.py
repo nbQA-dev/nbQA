@@ -26,6 +26,16 @@ def test_local_module() -> None:
         os.chdir(cwd)
 
 
+def test_local_submodule() -> None:
+    """Test local submodule is picked up."""
+    cwd = os.getcwd()
+    os.chdir(os.path.join("tests", "invalid_data"))
+    try:
+        main(["mymod.mysubmod", "."])
+    finally:
+        os.chdir(cwd)
+
+
 def test_local_nonfound() -> None:
     """Test local module is picked up."""
     cwd = os.getcwd()
