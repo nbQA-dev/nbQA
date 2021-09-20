@@ -11,6 +11,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("path")
     args, _ = parser.parse_known_args()
-    file_ = Path(args.path).read_text()
+    file_ = Path(args.path).read_text(encoding="utf-8")
     file_ = file_.replace("#", "")
-    Path(args.path).write_text(file_)
+    Path(args.path).write_text(file_, encoding="utf-8")

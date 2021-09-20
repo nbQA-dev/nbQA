@@ -29,7 +29,8 @@ def test_pyproject_toml_works(capsys: "CaptureFixture") -> None:
                 "--select=E303",
             ]
             """
-        )
+        ),
+        encoding="utf-8",
     )
 
     main(["flake8", "tests"])
@@ -57,7 +58,8 @@ def test_cli_extends_pyprojecttoml(capsys: "CaptureFixture") -> None:
                 "--ignore=F401",
             ]
             """
-        )
+        ),
+        encoding="utf-8",
     )
 
     main(

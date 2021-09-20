@@ -41,7 +41,8 @@ def test_running_in_different_dir_works(
             [tool.nbqa.addopts]
             flake8 = ["--ignore=F401"] \
             """
-        )
+        ),
+        encoding="utf8",
     )
     original_cwd = os.getcwd()
     try:
