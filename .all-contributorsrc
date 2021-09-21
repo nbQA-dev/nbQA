@@ -258,6 +258,15 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "sjdemartini",
+      "name": "Steven DeMartini",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1647130?v=4",
+      "profile": "https://stevendemartini.bandcamp.com/",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
