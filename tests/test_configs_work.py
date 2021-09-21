@@ -27,7 +27,8 @@ def test_configs_work(capsys: "CaptureFixture") -> None:
             select=E303
             quiet=1
             """
-        )
+        ),
+        encoding="utf-8",
     )
 
     main(["flake8", "tests", "--ignore", "E302"])

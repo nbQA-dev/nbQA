@@ -60,7 +60,8 @@ def test_config_files(capsys: "CaptureFixture") -> None:
         [tool.nbqa.files]
         flake8 = "^tests/data/notebook_for"
         """
-        )
+        ),
+        encoding="utf-8",
     )
     main(["flake8", "tests"])
     Path("pyproject.toml").unlink()
@@ -86,7 +87,8 @@ def test_config_exclude(capsys: "CaptureFixture") -> None:
         [tool.nbqa.exclude]
         flake8 = "^tests/data/notebook_for"
         """
-        )
+        ),
+        encoding="utf-8",
     )
 
     main(["flake8", "tests"])

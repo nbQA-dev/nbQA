@@ -121,7 +121,8 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
             [tool.nbqa.isort]
             addopts = ["--treat-comment-as-code=# %%NBQA-CELL-SEP"]
             """
-        )
+        ),
+        encoding="utf-8",
     )
 
     path = os.path.abspath(os.path.join("tests", "data", notebook))

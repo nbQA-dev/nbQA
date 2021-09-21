@@ -35,7 +35,8 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
             [tool.nbqa.addopts]
             pyupgrade = ['--py36-plus']
             """
-        )
+        ),
+        encoding="utf-8",
     )
     main(["pyupgrade", os.path.abspath(path)])
     Path("pyproject.toml").unlink()

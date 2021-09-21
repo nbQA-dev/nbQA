@@ -12,6 +12,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("path")
     args, _ = parser.parse_known_args()
-    file_ = Path(args.path).read_text()
+    file_ = Path(args.path).read_text(encoding="utf-8")
     newlines = [line + "\n" for line in file_.splitlines() if line.startswith("#")]
-    Path(args.path).write_text("\n".join(newlines))
+    Path(args.path).write_text("\n".join(newlines), encoding="utf-8")
