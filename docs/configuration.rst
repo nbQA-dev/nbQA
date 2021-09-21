@@ -110,7 +110,7 @@ or, from the command-line:
 Skip cells based on celltags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can skip cells based on the celltags in their metadata using the :code:`--nbqa-dont-skip-bad-cells` CLI argument.
+You can skip cells based on the celltags in their metadata using the :code:`--nbqa-skip-celltags` CLI argument.
 
 For example, to skip cells which contain either the ``skip-flake8`` or ``flake8-skip`` tags, you could
 add the following to your :code:`pyproject.toml` file:
