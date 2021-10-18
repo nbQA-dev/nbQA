@@ -65,7 +65,7 @@ repos:
       - id: codespell
         files: \.(py|rst|md)$
   - repo: https://github.com/terrencepreilly/darglint
-    rev: v1.8.0
+    rev: v1.8.1
     hooks:
       - id: darglint
   - repo: https://github.com/pre-commit/pygrep-hooks
