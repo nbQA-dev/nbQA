@@ -280,6 +280,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/hukkin"><img src="https://avatars.githubusercontent.com/u/3275109?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Taneli Hukkinen</b></sub></a><br /><a href="#maintenance-hukkin" title="Maintenance">🚧</a></td>
     <td align="center"><a href="http://tcbegley.com"><img src="https://avatars.githubusercontent.com/u/15220906?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tom Begley</b></sub></a><br /><a href="#ideas-tcbegley" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/nbQA-dev/nbQA/commits?author=tcbegley" title="Code">💻</a> <a href="https://github.com/nbQA-dev/nbQA/commits?author=tcbegley" title="Documentation">📖</a></td>
     <td align="center"><a href="https://stevendemartini.bandcamp.com/"><img src="https://avatars.githubusercontent.com/u/1647130?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Steven DeMartini</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/commits?author=sjdemartini" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://koaning.io"><img src="https://avatars.githubusercontent.com/u/1019791?v=4?s=100" width="100px;" alt=""/><br /><sub><b>vincent d warmerdam </b></sub></a><br /><a href="#tutorial-koaning" title="Tutorials">✅</a></td>
   </tr>
 </table>
 

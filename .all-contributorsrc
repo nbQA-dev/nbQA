@@ -267,6 +267,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "koaning",
+      "name": "vincent d warmerdam ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1019791?v=4",
+      "profile": "https://koaning.io",
+      "contributions": [
+        "tutorial"
+      ]
     }
   ],
   "contributorsPerLine": 7,
