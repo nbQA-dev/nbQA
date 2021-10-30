@@ -230,6 +230,10 @@ Everyone using Jupyter notebooks should be doing this.
 
 > Super useful! I only wish it was built-in to Jupyterlab.
 
+**Vincent D. Warmerdam**, [maintainer @ calmcode.io](https://calmcode.io/shorts/nbqa.html)
+
+> Nice. nbQA looks like a great way to prevent the Untitled12.ipynb-phenomenon. I like!
+
 ## 👥 Contributing
 
 I will give write-access to anyone who makes a useful pull request - see the
