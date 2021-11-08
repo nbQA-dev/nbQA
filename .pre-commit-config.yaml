@@ -34,7 +34,7 @@ repos:
       - id: flake8
         additional_dependencies: [flake8-typing-imports==1.10.0]
   - repo: https://github.com/PyCQA/isort
-    rev: 5.9.3
+    rev: 5.10.0
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/pydocstyle
