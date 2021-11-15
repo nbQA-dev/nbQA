@@ -62,10 +62,10 @@
 
 ## 🎉 Installation
 
-In your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/), run:
+In your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/), run (note: the `$` is not part of the command):
 
 ```console
-python -m pip install -U nbqa
+$ python -m pip install -U nbqa
 ```
 
 ## 🚀 Examples
