@@ -62,29 +62,13 @@
 
 ## 🎉 Installation
 
-In your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/), run one of the following:
+In your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/), run:
 
-- `python -m pip install -U nbqa`
-- `conda install -c conda-forge nbqa`
-
-## 🚀 Examples
-
-### Pre-commit
-
-Here's an example of how to set up some pre-commit hooks: put this in your `.pre-commit-config.yaml` file (see [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html))
-
-```yaml
-- repo: https://github.com/nbQA-dev/nbQA
-  rev: 1.1.1
-  hooks:
-    - id: nbqa-black
-    - id: nbqa-pyupgrade
-      args: [--py36-plus]
-    - id: nbqa-isort
+```console
+python -m pip install -U nbqa
 ```
 
-If you need to select specific versions of any of these linters/formatters,
-add them to [`additional_dependencies`](http://pre-commit.com/#pre-commit-configyaml---hooks).
+## 🚀 Examples
 
 ### Command-line
 
@@ -113,6 +97,23 @@ Rewriting my_notebook.ipynb
 ```
 
 See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html) for examples involving [doctest](https://docs.python.org/3/library/doctest.html), [flake8](https://flake8.pycqa.org/en/latest/), [mypy](http://mypy-lang.org/), [pylint](https://www.pylint.org/), [autopep8](https://github.com/hhatto/autopep8), [pydocstyle](http://www.pydocstyle.org/en/stable/), and [yapf](https://github.com/google/yapf).
+
+### Pre-commit
+
+Here's an example of how to set up some pre-commit hooks: put this in your `.pre-commit-config.yaml` file (see [usage as pre-commit hook](https://nbqa.readthedocs.io/en/latest/pre-commit.html))
+
+```yaml
+- repo: https://github.com/nbQA-dev/nbQA
+  rev: 1.1.1
+  hooks:
+    - id: nbqa-black
+    - id: nbqa-pyupgrade
+      args: [--py36-plus]
+    - id: nbqa-isort
+```
+
+If you need to select specific versions of any of these linters/formatters,
+add them to [`additional_dependencies`](http://pre-commit.com/#pre-commit-configyaml---hooks).
 
 ## 🥳 Used by
 
