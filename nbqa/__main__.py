@@ -24,12 +24,7 @@ from typing import (
 import tomli
 from pkg_resources import parse_version
 
-from nbqa import (
-    replace_code_source,
-    replace_markdown_source,
-    save_code_source,
-    save_markdown_source,
-)
+from nbqa import replace_source, save_code_source, save_markdown_source
 from nbqa.cmdline import CLIArgs
 from nbqa.config.config import Configs, get_default_config
 from nbqa.find_root import find_project_root
@@ -54,15 +49,10 @@ EXCLUDES = (
     r")/"
 )
 
-REPLACE_CODE_FUNCTION = {
-    True: replace_code_source.diff,
-    False: replace_code_source.mutate,
+REPLACE_FUNCTION = {
+    True: replace_source.diff,
+    False: replace_source.mutate,
 }
-REPLACE_MARKDOWN_FUNCTION = {
-    True: replace_markdown_source.diff,
-    False: replace_markdown_source.mutate,
-}
-REPLACE_FUNCTION = {True: REPLACE_MARKDOWN_FUNCTION, False: REPLACE_CODE_FUNCTION}
 SUFFIX = {False: ".py", True: ".md"}
 
 
@@ -554,17 +544,18 @@ def _post_process_notebooks(  # pylint: disable=R0913
         )
 
         if mutated:
-            try:
-                actually_mutated = (
-                    REPLACE_FUNCTION[md][diff](
-                        temp_python_file,
-                        notebook,
-                        saved_sources.nb_info_mapping[notebook],
-                    )
-                    or actually_mutated
+            # try:
+            actually_mutated = (
+                REPLACE_FUNCTION[diff](
+                    temp_python_file,
+                    notebook,
+                    saved_sources.nb_info_mapping[notebook],
+                    md=md,
                 )
-            except Exception as exp_repr:  # pylint: disable=W0703
-                saved_sources.failed_notebooks[notebook] = repr(exp_repr)
+                or actually_mutated
+            )
+        # except Exception as exp_repr:  # pylint: disable=W0703
+        #     saved_sources.failed_notebooks[notebook] = repr(exp_repr)
     return actually_mutated, output
 
 
