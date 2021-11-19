@@ -16,7 +16,7 @@ import tokenize_rt
 
 from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
-from nbqa.save_source import CODE_SEPARATOR
+from nbqa.save_code_source import CODE_SEPARATOR
 from nbqa.text import BOLD, GREEN, RED, RESET
 
 

@@ -24,7 +24,7 @@ from typing import (
 import tomli
 from pkg_resources import parse_version
 
-from nbqa import replace_source, save_source
+from nbqa import replace_source, save_code_source
 from nbqa.cmdline import CLIArgs
 from nbqa.config.config import Configs, get_default_config
 from nbqa.find_root import find_project_root
@@ -32,7 +32,7 @@ from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
 from nbqa.output_parser import Output, map_python_line_to_nb_lines
 from nbqa.path_utils import get_relative_and_absolute_paths, remove_suffix
-from nbqa.save_source import CODE_SEPARATOR
+from nbqa.save_code_source import CODE_SEPARATOR
 from nbqa.text import BOLD, RESET
 
 BASE_ERROR_MESSAGE = (
@@ -465,7 +465,7 @@ def _save_sources(
             if _is_non_python_notebook(notebook_json):
                 non_python_notebooks.add(notebook)
                 continue
-            nb_info_mapping[notebook] = save_source.main(
+            nb_info_mapping[notebook] = save_code_source.main(
                 notebook_json,
                 file_descriptor,
                 process_cells,

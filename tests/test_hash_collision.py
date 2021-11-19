@@ -10,7 +10,7 @@ from nbqa.__main__ import main
 def test_hash_collision(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     """Check hash collision error message."""
     path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
-    monkeypatch.setattr("nbqa.save_source.CODE_SEPARATOR", "pprint\n")
+    monkeypatch.setattr("nbqa.save_code_source.CODE_SEPARATOR", "pprint\n")
     main(["flake8", path])
     _, err = capsys.readouterr()
     assert (
