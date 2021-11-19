@@ -5,11 +5,13 @@ Python cells, output, and metadata are ignored.
 """
 
 import secrets
-from typing import Any, Mapping, MutableMapping, NamedTuple, Sequence
+from collections import defaultdict
+from typing import Any, DefaultDict, Mapping, MutableMapping, NamedTuple, Sequence
 
+from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
 
-CODE_SEPARATOR = f"# %%NBQA-CELL-SEP{secrets.token_hex(3)}\n"
+MARKDOWN_SEPARATOR = f"# %%NBQA-MD-SEP{secrets.token_hex(3)}\n"
 
 
 class Index(NamedTuple):
@@ -35,7 +37,7 @@ def _parse_cell(
     str
         Parsed cell.
     """
-    parsed_cell = CODE_SEPARATOR
+    parsed_cell = MARKDOWN_SEPARATOR
     parsed_cell += "".join(source)
     return f"{parsed_cell}\n"
 
@@ -114,12 +116,13 @@ def main(  # pylint: disable=R0914
     result = []
     cell_mapping = {0: "cell_0:0"}
     index = Index(line_number=0, cell_number=0)
+    temporary_lines: DefaultDict[int, Sequence[MagicHandler]] = defaultdict(list)
     markdown_cells_to_ignore = set()
 
     whole_src = "".join(
         ["".join(cell["source"]) for cell in cells if cell["cell_type"] == "markdown"]
     )
-    if CODE_SEPARATOR.strip() in whole_src:
+    if MARKDOWN_SEPARATOR.strip() in whole_src:
         raise AssertionError(
             "Extremely rare hash collision occurred - please re-run nbQA to fix this"
         )
@@ -152,9 +155,10 @@ def main(  # pylint: disable=R0914
             index = index._replace(
                 line_number=index.line_number + len(parsed_cell.splitlines())
             )
+            temporary_lines[index.cell_number] = []  # compatibility
 
     result_txt = "".join(result).rstrip("\n") + "\n" if result else ""
     with open(file_descriptor, "w", encoding="utf-8") as handle:
         handle.write(result_txt)
 
-    return NotebookInfo(cell_mapping, set(), {}, markdown_cells_to_ignore)
+    return NotebookInfo(cell_mapping, set(), temporary_lines, markdown_cells_to_ignore)

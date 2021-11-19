@@ -17,9 +17,11 @@ import tokenize_rt
 from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
 from nbqa.save_code_source import CODE_SEPARATOR
+from nbqa.save_markdown_source import MARKDOWN_SEPARATOR
 from nbqa.text import BOLD, GREEN, RED, RESET
 
 SOURCE = {True: "markdown", False: "code"}
+SEPARATOR = {True: MARKDOWN_SEPARATOR, False: CODE_SEPARATOR}
 
 
 def _restore_semicolon(
@@ -113,7 +115,7 @@ def _get_new_source(
     )
 
 
-def _get_cells(tmp_file: str, num_cells: int) -> Iterator[str]:
+def _get_cells(tmp_file: str, num_cells: int, *, md: bool) -> Iterator[str]:
     """
     Parse cells from Python file.
 
@@ -134,15 +136,16 @@ def _get_cells(tmp_file: str, num_cells: int) -> Iterator[str]:
     """
     with open(tmp_file, encoding="utf-8") as handle:
         txt = handle.read()
+    separator = SEPARATOR[md]
 
-    if txt.count(CODE_SEPARATOR) != num_cells:
+    if txt.count(separator) != num_cells:
         raise ValueError(
             "Tool did not preserve code separators and cannot be safely used with nbQA."
         )
 
-    if txt.startswith(CODE_SEPARATOR):
-        txt = txt[len(CODE_SEPARATOR) :]
-    return iter(txt.split(CODE_SEPARATOR))
+    if txt.startswith(separator):
+        txt = txt[len(separator) :]
+    return iter(txt.split(separator))
 
 
 def _notebook_cells(
@@ -192,7 +195,7 @@ def mutate(
         notebook_json = json.loads(handle.read())
     original_notebook_json = copy.deepcopy(notebook_json)
 
-    cells = _get_cells(temp_file, len(notebook_info.temporary_lines))
+    cells = _get_cells(temp_file, len(notebook_info.temporary_lines), md=md)
     for code_cell_number, cell in enumerate(
         _notebook_cells(notebook_json, md=md), start=1
     ):
@@ -268,7 +271,7 @@ def diff(
     with open(notebook, encoding="utf-8") as handle:
         notebook_json = json.loads(handle.read())
 
-    cells = _get_cells(python_file, len(notebook_info.temporary_lines))
+    cells = _get_cells(python_file, len(notebook_info.temporary_lines), md=md)
 
     actually_mutated = False
 
