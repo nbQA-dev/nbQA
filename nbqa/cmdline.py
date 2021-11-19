@@ -49,6 +49,7 @@ class CLIArgs:  # pylint: disable=R0902
     files: Optional[str]
     exclude: Optional[str]
     dont_skip_bad_cells: Optional[bool]
+    md: Optional[bool]
 
     def __init__(self, args: argparse.Namespace, cmd_args: Sequence[str]) -> None:
         """
@@ -81,6 +82,7 @@ class CLIArgs:  # pylint: disable=R0902
             self.skip_celltags = args.nbqa_skip_celltags.split(",")
         else:
             self.skip_celltags = None
+        self.md = args.nbqa_md or None
 
     @staticmethod
     def parse_args(argv: Optional[Sequence[str]]) -> "CLIArgs":
@@ -142,6 +144,15 @@ class CLIArgs:  # pylint: disable=R0902
             help=dedent(
                 r"""
                 Skip cells with have any of the given celltags.
+                """
+            ),
+        )
+        parser.add_argument(
+            "--nbqa-md",
+            action="store_true",
+            help=dedent(
+                r"""
+                Process markdown cells, rather than Python ones.
                 """
             ),
         )
