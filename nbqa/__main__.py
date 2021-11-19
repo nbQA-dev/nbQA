@@ -544,18 +544,18 @@ def _post_process_notebooks(  # pylint: disable=R0913
         )
 
         if mutated:
-            # try:
-            actually_mutated = (
-                REPLACE_FUNCTION[diff](
-                    temp_python_file,
-                    notebook,
-                    saved_sources.nb_info_mapping[notebook],
-                    md=md,
+            try:
+                actually_mutated = (
+                    REPLACE_FUNCTION[diff](
+                        temp_python_file,
+                        notebook,
+                        saved_sources.nb_info_mapping[notebook],
+                        md=md,
+                    )
+                    or actually_mutated
                 )
-                or actually_mutated
-            )
-        # except Exception as exp_repr:  # pylint: disable=W0703
-        #     saved_sources.failed_notebooks[notebook] = repr(exp_repr)
+            except Exception as exp_repr:  # pylint: disable=W0703
+                saved_sources.failed_notebooks[notebook] = repr(exp_repr)
     return actually_mutated, output
 
 
