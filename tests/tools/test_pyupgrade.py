@@ -92,10 +92,12 @@ def test_pyupgrade_works_with_weird_databricks_file(capsys: "CaptureFixture") ->
     main(["pyupgrade", path, "--nbqa-diff"])
     out, err = capsys.readouterr()
     expected_out = (
-        f"\x1b[1mCell 2\x1b[0m\n------\n--- {path}\n"
-        f"+++ {path}\n"
-        "@@ -1 +1 @@\n"
-        "\x1b[31m-set(())\n"
+        "\x1b[1mCell 2\x1b[0m\n"
+        "------\n"
+        f"\x1b[1;37m--- {path}\n"
+        f"\x1b[0m\x1b[1;37m+++ {path}\n"
+        "\x1b[0m\x1b[36m@@ -1 +1 @@\n"
+        "\x1b[0m\x1b[31m-set(())\n"
         "\x1b[0m\x1b[32m+set()\n"
         "\x1b[0m\n"
         "To apply these changes, remove the `--nbqa-diff` flag\n"

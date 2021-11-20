@@ -4,6 +4,7 @@ black
 coverage[toml]
 flake8
 isort>=5.4.2
+mdformat
 mypy
 pre-commit-hooks
 pydocstyle

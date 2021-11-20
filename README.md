@@ -6,7 +6,7 @@
 </h1>
 
 <h3 align="center">
-	Run isort, pyupgrade, mypy, pylint, flake8, and more on Jupyter Notebooks
+	Run isort, pyupgrade, mypy, pylint, flake8, mdformat, and more on Jupyter Notebooks
 </h3>
 
 <p align="center">
@@ -48,14 +48,15 @@
 - ✅ handles IPython magics robustly
 - ✅ respects your config files
 - ✅ preserves "quiet mode" trailing semicolons
+- ✅ lints both code and markdown cells
 
 # Table of contents
 
 - [Table of contents](#table-of-contents)
   - [🎉 Installation](#-installation)
   - [🚀 Examples](#-examples)
-    - [Pre-commit](#pre-commit)
     - [Command-line](#command-line)
+    - [Pre-commit](#pre-commit)
   - [🥳 Used by](#-used-by)
   - [💬 Testimonials](#-testimonials)
   - [👥 Contributing](#-contributing)
@@ -94,6 +95,22 @@ Upgrade your syntax with [pyupgrade](https://github.com/asottile/pyupgrade):
 ```console
 $ nbqa pyupgrade my_notebook.ipynb --py36-plus
 Rewriting my_notebook.ipynb
+```
+
+Format your markdown cells with [mdformat](https://mdformat.readthedocs.io/en/stable/index.html):
+
+```console
+$ nbqa mdformat tests/data/notebook_for_testing.ipynb --nbqa-md --nbqa-diff
+Cell 2
+------
+--- tests/data/notebook_for_testing.ipynb
++++ tests/data/notebook_for_testing.ipynb
+@@ -1,2 +1 @@
+-First level heading
+-===
++# First level heading
+
+To apply these changes, remove the `--nbqa-diff` flag
 ```
 
 See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html) for examples involving [doctest](https://docs.python.org/3/library/doctest.html), [flake8](https://flake8.pycqa.org/en/latest/), [mypy](http://mypy-lang.org/), [pylint](https://www.pylint.org/), [autopep8](https://github.com/hhatto/autopep8), [pydocstyle](http://www.pydocstyle.org/en/stable/), and [yapf](https://github.com/google/yapf).

@@ -125,3 +125,23 @@ or, from the command-line:
 .. code-block:: bash
 
     nbqa black notebook.ipynb --nbqa-skip-celltags=skip-flake8,flake8-skip
+
+Process markdown cells
+~~~~~~~~~~~~~~~~~~~~~~~
+
+You can process markdown cells (instead of code cells) by using the :code:`--nbqa-md` CLI argument.
+
+This is useful when running tools which run on markdown files, such as ``mdformat``.
+
+For example, you could add the following to your :code:`pyproject.toml` file:
+
+    .. code-block:: toml
+
+        [tool.nbqa.md]
+        mdformat = true
+
+or, from the command-line:
+
+.. code-block:: bash
+
+    nbqa mdformat notebook.ipynb --nbqa-md

@@ -16,13 +16,13 @@ def test_cmdline(capsys: "CaptureFixture") -> None:
     expected_out = (
         "\x1b[1mCell 1\x1b[0m\n"
         "------\n"
-        f"--- {file}\n"
-        f"+++ {file}\n"
-        "@@ -1,2 +1,2 @@\n"
-        " if True:\n"
-        "\x1b[31m-    print('definitely valid')\n"
+        f"\x1b[1;37m--- {file}\n"
+        f"\x1b[0m\x1b[1;37m+++ {file}\n"
+        "\x1b[0m\x1b[36m@@ -1,2 +1,2 @@\n"
+        "\x1b[0m\x1b[31m-    print('definitely valid')\n"
         '\x1b[0m\x1b[32m+    print("definitely valid")\n'
-        "\x1b[0m\nTo apply these changes, remove the `--nbqa-diff` flag\n"
+        "\x1b[0m\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected_out
 
@@ -35,12 +35,12 @@ def test_config_file(capsys: "CaptureFixture") -> None:
     expected_out = (
         "\x1b[1mCell 1\x1b[0m\n"
         "------\n"
-        f"--- {file}\n"
-        f"+++ {file}\n"
-        "@@ -1,2 +1,2 @@\n"
-        " if True:\n"
-        "\x1b[31m-    print('definitely valid')\n"
+        f"\x1b[1;37m--- {file}\n"
+        f"\x1b[0m\x1b[1;37m+++ {file}\n"
+        "\x1b[0m\x1b[36m@@ -1,2 +1,2 @@\n"
+        "\x1b[0m\x1b[31m-    print('definitely valid')\n"
         '\x1b[0m\x1b[32m+    print("definitely valid")\n'
-        "\x1b[0m\nTo apply these changes, remove the `--nbqa-diff` flag\n"
+        "\x1b[0m\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected_out

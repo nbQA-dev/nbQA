@@ -18,7 +18,7 @@ from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
 from nbqa.save_code_source import CODE_SEPARATOR
 from nbqa.save_markdown_source import MARKDOWN_SEPARATOR
-from nbqa.text import BOLD, GREEN, RED, RESET
+from nbqa.text import BOLD, RESET
 
 SOURCE = {True: "markdown", False: "code"}
 SEPARATOR = {True: MARKDOWN_SEPARATOR, False: CODE_SEPARATOR}
@@ -229,16 +229,18 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> bool:
     bool
         Whether non-null diff was printed.
     """
+    # https://github.com/psf/black/blob/9a73bb86db59de1e12426fec81dcdb7f3bb9be7b/src/black/output.py#L79-L92
     line_changes = []
     for line in cell_diff:
+
         if line.startswith("+++") or line.startswith("---"):
-            line_changes.append(line)
+            line_changes.append("\033[1;37m" + line + "\033[0m")  # bold white, reset
+        elif line.startswith("@@"):
+            line_changes.append("\033[36m" + line + "\033[0m")  # cyan, reset
         elif line.startswith("+"):
-            line_changes.append(f"{GREEN}{line}{RESET}")
+            line_changes.append("\033[32m" + line + "\033[0m")  # green, reset
         elif line.startswith("-"):
-            line_changes.append(f"{RED}{line}{RESET}")
-        else:
-            line_changes.append(line)
+            line_changes.append("\033[31m" + line + "\033[0m")  # red, reset
 
     if line_changes:
         header = f"Cell {code_cell_number}"
