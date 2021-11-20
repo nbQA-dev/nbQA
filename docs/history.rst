@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.2.0 (2021-11-20)
+~~~~~~~~~~~~~~~~~~
+Added support for formatting markdown cells via the ``--nbqa-md`` flag.
+Changed aesthetics of ``--nbqa-diff`` to be in line with how ``black`` does it.
+
 1.1.1 (2021-09-12)
 ~~~~~~~~~~~~~~~~~~
 Fixed bug whereby local module wasn't being picked up correctly.
