@@ -16,8 +16,12 @@ import tokenize_rt
 
 from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
-from nbqa.save_source import CODE_SEPARATOR
-from nbqa.text import BOLD, GREEN, RED, RESET
+from nbqa.save_code_source import CODE_SEPARATOR
+from nbqa.save_markdown_source import MARKDOWN_SEPARATOR
+from nbqa.text import BOLD, RESET
+
+SOURCE = {True: "markdown", False: "code"}
+SEPARATOR = {True: MARKDOWN_SEPARATOR, False: CODE_SEPARATOR}
 
 
 def _restore_semicolon(
@@ -111,14 +115,14 @@ def _get_new_source(
     )
 
 
-def _get_pycells(python_file: str, num_cells: int) -> Iterator[str]:
+def _get_cells(tmp_file: str, num_cells: int, *, md: bool) -> Iterator[str]:
     """
     Parse cells from Python file.
 
     Parameters
     ----------
-    python_file
-        Temporary Python file notebook was converted to.
+    tmp_file
+        Temporary file notebook was converted to.
 
     Returns
     -------
@@ -128,26 +132,29 @@ def _get_pycells(python_file: str, num_cells: int) -> Iterator[str]:
     Raises
     ------
     ValueError
-        If the third-party tool "ate" any comments.
+        If the third-party tool "ate" any separator comments.
     """
-    with open(python_file, encoding="utf-8") as handle:
+    with open(tmp_file, encoding="utf-8") as handle:
         txt = handle.read()
+    separator = SEPARATOR[md]
 
-    if txt.count(CODE_SEPARATOR) != num_cells:
+    if txt.count(separator) != num_cells:
         raise ValueError(
             "Tool did not preserve code separators and cannot be safely used with nbQA."
         )
 
-    if txt.startswith(CODE_SEPARATOR):
-        txt = txt[len(CODE_SEPARATOR) :]
-    return iter(txt.split(CODE_SEPARATOR))
+    if txt.startswith(separator):
+        txt = txt[len(separator) :]
+    return iter(txt.split(separator))
 
 
-def _notebook_code_cells(
-    notebook_json: Mapping[str, Any]
+def _notebook_cells(
+    notebook_json: Mapping[str, Any],
+    *,
+    md: bool,
 ) -> Iterator[MutableMapping[str, Any]]:
     """
-    Iterate through notebook's code cells.
+    Iterate through notebook's cells.
 
     Parameters
     ----------
@@ -160,17 +167,19 @@ def _notebook_code_cells(
         Cell content.
     """
     for cell in notebook_json["cells"]:
-        if cell["cell_type"] == "code":
+        if cell["cell_type"] == SOURCE[md]:
             yield cell
 
 
-def mutate(python_file: str, notebook: str, notebook_info: NotebookInfo) -> bool:
+def mutate(
+    temp_file: str, notebook: str, notebook_info: NotebookInfo, *, md: bool
+) -> bool:
     """
     Replace :code:`source` code cells of original notebook.
 
     Parameters
     ----------
-    python_file
+    temp_file
         Temporary Python file notebook was converted to.
     notebook
         Jupyter Notebook third-party tool is run against (unmodified).
@@ -186,20 +195,18 @@ def mutate(python_file: str, notebook: str, notebook_info: NotebookInfo) -> bool
         notebook_json = json.loads(handle.read())
     original_notebook_json = copy.deepcopy(notebook_json)
 
-    pycells = _get_pycells(python_file, len(notebook_info.temporary_lines))
+    cells = _get_cells(temp_file, len(notebook_info.temporary_lines), md=md)
     for code_cell_number, cell in enumerate(
-        _notebook_code_cells(notebook_json), start=1
+        _notebook_cells(notebook_json, md=md), start=1
     ):
         if code_cell_number in notebook_info.code_cells_to_ignore:
             continue
-        cell["source"] = _get_new_source(code_cell_number, notebook_info, next(pycells))
+        cell["source"] = _get_new_source(code_cell_number, notebook_info, next(cells))
 
     if original_notebook_json == notebook_json:
         return False
 
-    temp_notebook = os.path.join(
-        os.path.dirname(python_file), os.path.basename(notebook)
-    )
+    temp_notebook = os.path.join(os.path.dirname(temp_file), os.path.basename(notebook))
     with open(temp_notebook, "w", encoding="utf-8") as handle:
         handle.write(f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n")
     move(temp_notebook, notebook)
@@ -222,16 +229,18 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> bool:
     bool
         Whether non-null diff was printed.
     """
+    # https://github.com/psf/black/blob/9a73bb86db59de1e12426fec81dcdb7f3bb9be7b/src/black/output.py#L79-L92
     line_changes = []
     for line in cell_diff:
+
         if line.startswith("+++") or line.startswith("---"):
-            line_changes.append(line)
+            line_changes.append("\033[1;37m" + line + "\033[0m")  # bold white, reset
+        elif line.startswith("@@"):
+            line_changes.append("\033[36m" + line + "\033[0m")  # cyan, reset
         elif line.startswith("+"):
-            line_changes.append(f"{GREEN}{line}{RESET}")
+            line_changes.append("\033[32m" + line + "\033[0m")  # green, reset
         elif line.startswith("-"):
-            line_changes.append(f"{RED}{line}{RESET}")
-        else:
-            line_changes.append(line)
+            line_changes.append("\033[31m" + line + "\033[0m")  # red, reset
 
     if line_changes:
         header = f"Cell {code_cell_number}"
@@ -241,7 +250,9 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> bool:
     return False
 
 
-def diff(python_file: str, notebook: str, notebook_info: NotebookInfo) -> bool:
+def diff(
+    python_file: str, notebook: str, notebook_info: NotebookInfo, *, md: bool
+) -> bool:
     """
     View diff between new source of code cells and original sources.
 
@@ -262,16 +273,16 @@ def diff(python_file: str, notebook: str, notebook_info: NotebookInfo) -> bool:
     with open(notebook, encoding="utf-8") as handle:
         notebook_json = json.loads(handle.read())
 
-    pycells = _get_pycells(python_file, len(notebook_info.temporary_lines))
+    cells = _get_cells(python_file, len(notebook_info.temporary_lines), md=md)
 
     actually_mutated = False
 
     for code_cell_number, cell in enumerate(
-        _notebook_code_cells(notebook_json), start=1
+        _notebook_cells(notebook_json, md=md), start=1
     ):
         if code_cell_number in notebook_info.code_cells_to_ignore:
             continue
-        new_source = _get_new_source(code_cell_number, notebook_info, next(pycells))
+        new_source = _get_new_source(code_cell_number, notebook_info, next(cells))
         cell["source"][-1] += "\n"
         if new_source:
             new_source[-1] += "\n"

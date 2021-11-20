@@ -24,7 +24,7 @@ from typing import (
 import tomli
 from pkg_resources import parse_version
 
-from nbqa import replace_source, save_source
+from nbqa import replace_source, save_code_source, save_markdown_source
 from nbqa.cmdline import CLIArgs
 from nbqa.config.config import Configs, get_default_config
 from nbqa.find_root import find_project_root
@@ -32,7 +32,7 @@ from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
 from nbqa.output_parser import Output, map_python_line_to_nb_lines
 from nbqa.path_utils import get_relative_and_absolute_paths, remove_suffix
-from nbqa.save_source import CODE_SEPARATOR
+from nbqa.save_code_source import CODE_SEPARATOR
 from nbqa.text import BOLD, RESET
 
 BASE_ERROR_MESSAGE = (
@@ -53,6 +53,7 @@ REPLACE_FUNCTION = {
     True: replace_source.diff,
     False: replace_source.mutate,
 }
+SUFFIX = {False: ".py", True: ".md"}
 
 
 class TemporaryFile(NamedTuple):
@@ -166,6 +167,8 @@ def _replace_temp_python_file_references_in_out_err(
     notebook: str,
     out: str,
     err: str,
+    *,
+    md: bool,
 ) -> Output:
     """
     Replace references to temporary Python file with references to notebook.
@@ -192,10 +195,10 @@ def _replace_temp_python_file_references_in_out_err(
     err = err.replace(py_basename, nb_basename)
 
     out = out.replace(
-        remove_suffix(py_basename, ".py"), remove_suffix(nb_basename, ".ipynb")
+        remove_suffix(py_basename, SUFFIX[md]), remove_suffix(nb_basename, ".ipynb")
     )
     err = err.replace(
-        remove_suffix(py_basename, ".py"), remove_suffix(nb_basename, ".ipynb")
+        remove_suffix(py_basename, SUFFIX[md]), remove_suffix(nb_basename, ".ipynb")
     )
 
     return Output(out, err)
@@ -367,11 +370,11 @@ def _clean_up_tmp_files(nb_to_py_mapping: Mapping[str, Tuple[int, str]]) -> None
         os.remove(tmp_path)
 
 
-def _get_nb_to_py_mapping(
-    root_dirs: Sequence[str], files: Optional[str], exclude: Optional[str]
+def _get_nb_to_tmp_mapping(
+    root_dirs: Sequence[str], files: Optional[str], exclude: Optional[str], md: bool
 ) -> Dict[str, TemporaryFile]:
     """
-    Get mapping between notebooks and temporary Python files.
+    Get mapping between notebooks and temporary files.
 
     Parameters
     ----------
@@ -385,35 +388,35 @@ def _get_nb_to_py_mapping(
     Returns
     -------
     Dict[str, Tuple[int, str]]
-        Mapping between notebooks and temporary Python files.
+        Mapping between notebooks and temporary files.
 
     Raises
     ------
     FileNotFoundError
         If notebook isn't found.
     """
-    nb_to_py_mapping: Dict[str, TemporaryFile] = {}
+    nb_to_tmp_mapping: Dict[str, TemporaryFile] = {}
     for notebook in _get_all_notebooks(root_dirs, files, exclude):
         if not os.path.exists(notebook):
-            _clean_up_tmp_files(nb_to_py_mapping)
+            _clean_up_tmp_files(nb_to_tmp_mapping)
             raise FileNotFoundError(
                 f"{BOLD}No such file or directory: {notebook}{RESET}\n"
             )
 
-        nb_to_py_mapping[notebook] = TemporaryFile(
+        nb_to_tmp_mapping[notebook] = TemporaryFile(
             *tempfile.mkstemp(
                 dir=os.path.dirname(notebook),
                 prefix=remove_suffix(os.path.basename(notebook), ".ipynb"),
-                suffix=".py",
+                suffix=SUFFIX[md],
             )
         )
         relative_path, _ = get_relative_and_absolute_paths(
-            nb_to_py_mapping[notebook].file
+            nb_to_tmp_mapping[notebook].file
         )
-        nb_to_py_mapping[notebook] = nb_to_py_mapping[notebook]._replace(
+        nb_to_tmp_mapping[notebook] = nb_to_tmp_mapping[notebook]._replace(
             file=relative_path
         )
-    return nb_to_py_mapping
+    return nb_to_tmp_mapping
 
 
 def _print_failed_notebook_errors(failed_notebooks: Mapping[str, str]) -> None:
@@ -441,7 +444,7 @@ def _is_non_python_notebook(notebook: MutableMapping[str, Any]) -> bool:
     return language is not None and language != "python"
 
 
-def _save_sources(
+def _save_code_sources(
     nb_to_py_mapping: Dict[str, TemporaryFile],
     process_cells: Sequence[str],
     skip_celltags: Sequence[str],
@@ -465,7 +468,7 @@ def _save_sources(
             if _is_non_python_notebook(notebook_json):
                 non_python_notebooks.add(notebook)
                 continue
-            nb_info_mapping[notebook] = save_source.main(
+            nb_info_mapping[notebook] = save_code_source.main(
                 notebook_json,
                 file_descriptor,
                 process_cells,
@@ -478,6 +481,39 @@ def _save_sources(
     return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks)
 
 
+def _save_markdown_sources(
+    nb_to_md_mapping: Dict[str, TemporaryFile],
+    process_cells: Sequence[str],  # pylint: disable=W0613
+    skip_celltags: Sequence[str],
+    dont_skip_bad_cells: bool,  # pylint: disable=W0613
+    command: str,  # pylint: disable=W0613
+) -> SavedSources:
+    """
+    Save markdown sources of notebooks.
+
+    Record which notebooks fail to process.
+    """
+    failed_notebooks = {}
+    nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
+
+    for notebook, (file_descriptor, _) in nb_to_md_mapping.items():
+        with open(str(notebook), encoding="utf-8") as handle:
+            content = handle.read()
+        try:
+            notebook_json = json.loads(content)
+            nb_info_mapping[notebook] = save_markdown_source.main(
+                notebook_json,
+                file_descriptor,
+                skip_celltags,
+            )
+        except Exception as exp_repr:  # pylint: disable=W0703
+            failed_notebooks[notebook] = repr(exp_repr)
+    return SavedSources(nb_info_mapping, failed_notebooks, set())
+
+
+SAVE_SOURCES = {False: _save_code_sources, True: _save_markdown_sources}
+
+
 def _post_process_notebooks(  # pylint: disable=R0913
     saved_sources: SavedSources,
     nb_to_py_mapping: Mapping[str, TemporaryFile],
@@ -485,6 +521,8 @@ def _post_process_notebooks(  # pylint: disable=R0913
     diff: bool,
     command: str,
     output: Output,
+    *,
+    md: bool,
 ) -> Tuple[bool, Output]:
     """Replace source in notebooks, modify output so it refers to notebooks."""
     actually_mutated = False
@@ -495,7 +533,7 @@ def _post_process_notebooks(  # pylint: disable=R0913
         ):
             continue
         output = _replace_temp_python_file_references_in_out_err(
-            temp_python_file, notebook, output.out, output.err
+            temp_python_file, notebook, output.out, output.err, md=md
         )
         output = map_python_line_to_nb_lines(
             command,
@@ -512,6 +550,7 @@ def _post_process_notebooks(  # pylint: disable=R0913
                         temp_python_file,
                         notebook,
                         saved_sources.nb_info_mapping[notebook],
+                        md=md,
                     )
                     or actually_mutated
                 )
@@ -537,8 +576,8 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
         Output code from third-party tool.
     """
     try:
-        nb_to_py_mapping = _get_nb_to_py_mapping(
-            cli_args.root_dirs, configs["files"], configs["exclude"]
+        nb_to_tmp_mapping = _get_nb_to_tmp_mapping(
+            cli_args.root_dirs, configs["files"], configs["exclude"], configs["md"]
         )
     except FileNotFoundError as exc:
         sys.stderr.write(str(exc))
@@ -546,21 +585,21 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
 
     try:  # pylint disable=R0912
 
-        if not nb_to_py_mapping:
+        if not nb_to_tmp_mapping:
             sys.stderr.write(
                 "No .ipynb notebooks found in given directories: "
                 f"{' '.join(i for i in cli_args.root_dirs if os.path.isdir(i))}\n"
             )
             return 0
-        saved_sources = _save_sources(
-            nb_to_py_mapping,
+        saved_sources = SAVE_SOURCES[configs["md"]](
+            nb_to_tmp_mapping,
             configs["process_cells"],
             configs["skip_celltags"],
             configs["dont_skip_bad_cells"],
             cli_args.command,
         )
 
-        if len(saved_sources.failed_notebooks) == len(nb_to_py_mapping):
+        if len(saved_sources.failed_notebooks) == len(nb_to_tmp_mapping):
             sys.stderr.write("No valid .ipynb notebooks found\n")
             _print_failed_notebook_errors(saved_sources.failed_notebooks)
             return 123
@@ -570,18 +609,19 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
             configs["addopts"],
             [
                 i.file
-                for key, i in nb_to_py_mapping.items()
+                for key, i in nb_to_tmp_mapping.items()
                 if key not in saved_sources.failed_notebooks
             ],
         )
 
         actually_mutated, output = _post_process_notebooks(
             saved_sources,
-            nb_to_py_mapping,
+            nb_to_tmp_mapping,
             mutated,
             configs["diff"],
             cli_args.command,
             output,
+            md=configs["md"],
         )
 
         sys.stdout.write(output.out)
@@ -603,7 +643,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
             return output_code
 
     finally:
-        _clean_up_tmp_files(nb_to_py_mapping)
+        _clean_up_tmp_files(nb_to_tmp_mapping)
     return output_code
 
 

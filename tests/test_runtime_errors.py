@@ -86,10 +86,10 @@ def test_remove_all_no_trailing_sc(capsys: "CaptureFixture") -> None:
     expected_out = (
         "\x1b[1mCell 1\x1b[0m\n"
         "------\n"
-        f"--- {path}\n"
-        f"+++ {path}\n"
-        "@@ -1 +1 @@\n"
-        "\x1b[31m-from t import A\n"
+        f"\x1b[1;37m--- {path}\n"
+        f"\x1b[0m\x1b[1;37m+++ {path}\n"
+        "\x1b[0m\x1b[36m@@ -1 +1 @@\n"
+        "\x1b[0m\x1b[31m-from t import A\n"
         "\x1b[0m\x1b[32m+\n"
         "\x1b[0m\n"
         "To apply these changes, remove the `--nbqa-diff` flag\n"
@@ -109,19 +109,18 @@ def test_remove_all_trailing_semicolon(capsys: "CaptureFixture") -> None:
     expected_out = (
         "\x1b[1mCell 1\x1b[0m\n"
         "------\n"
-        f"--- {path}\n"
-        f"+++ {path}\n"
-        "@@ -1,3 +1 @@\n"
-        "\x1b[31m-import glob;\n"
-        "\x1b[0m \n"
-        "\x1b[31m-import nbqa;\n"
+        f"\x1b[1;37m--- {path}\n"
+        f"\x1b[0m\x1b[1;37m+++ {path}\n"
+        "\x1b[0m\x1b[36m@@ -1,3 +1 @@\n"
+        "\x1b[0m\x1b[31m-import glob;\n"
+        "\x1b[0m\x1b[31m-import nbqa;\n"
         "\x1b[0m\n"
         "\x1b[1mCell 2\x1b[0m\n"
         "------\n"
-        f"--- {path}\n"
-        f"+++ {path}\n"
-        "@@ -1,3 +1 @@\n"
-        "\x1b[31m-def func(a, b):\n"
+        f"\x1b[1;37m--- {path}\n"
+        f"\x1b[0m\x1b[1;37m+++ {path}\n"
+        "\x1b[0m\x1b[36m@@ -1,3 +1 @@\n"
+        "\x1b[0m\x1b[31m-def func(a, b):\n"
         "\x1b[0m\x1b[31m-    pass;\n"
         "\x1b[0m\x1b[31m- \n"
         "\x1b[0m\x1b[32m+\n"
@@ -179,6 +178,31 @@ def test_unable_to_parse_with_valid_notebook(capsys: "CaptureFixture") -> None:
         f"{str(path_1)}:cell_4:1:1: E402 module level import not at top of file\n"
         f"{str(path_1)}:cell_5:1:1: E402 module level import not at top of file\n"
         f"{str(path_1)}:cell_5:2:1: E402 module level import not at top of file\n"
+    )
+    expected_err = f"\n\x1b[1mnbQA failed to process {str(path_0)} with exception "
+    assert expected_out == out
+    assert expected_err in err
+
+
+def test_unable_to_parse_with_valid_notebook_md(capsys: "CaptureFixture") -> None:
+    """Check error message shows if we're unable to parse notebook."""
+    path_0 = Path("tests") / "data/invalid_notebook.ipynb"
+    path_0.write_text("foo")
+    path_1 = Path("tests") / "data/notebook_for_testing.ipynb"
+    main(["mdformat", str(path_0), str(path_1), "--nbqa-md", "--nbqa-diff"])
+    path_0.unlink()
+    out, err = capsys.readouterr()
+    expected_out = (
+        "\x1b[1mCell 2\x1b[0m\n"
+        "------\n"
+        f"\x1b[1;37m--- {str(path_1)}\n"
+        f"\x1b[0m\x1b[1;37m+++ {str(path_1)}\n"
+        "\x1b[0m\x1b[36m@@ -1,2 +1 @@\n"
+        "\x1b[0m\x1b[31m-First level heading\n"
+        "\x1b[0m\x1b[31m-===\n"
+        "\x1b[0m\x1b[32m+# First level heading\n"
+        "\x1b[0m\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     expected_err = f"\n\x1b[1mnbQA failed to process {str(path_0)} with exception "
     assert expected_out == out

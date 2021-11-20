@@ -30,18 +30,12 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
     expected_out = (
         "\x1b[1mCell 2\x1b[0m\n"
         "------\n"
-        f"--- {str(DIRTY_NOTEBOOK)}\n"
-        f"+++ {str(DIRTY_NOTEBOOK)}\n"
-        "@@ -12,8 +12,8 @@\n"
-        "     'hello goodbye'\n"
-        '     """\n'
-        " \n"
-        "\x1b[31m-    return 'hello {}'.format(name)\n"
+        f"\x1b[1;37m--- {str(DIRTY_NOTEBOOK)}\n"
+        f"\x1b[0m\x1b[1;37m+++ {str(DIRTY_NOTEBOOK)}\n"
+        "\x1b[0m\x1b[36m@@ -12,8 +12,8 @@\n"
+        "\x1b[0m\x1b[31m-    return 'hello {}'.format(name)\n"
         '\x1b[0m\x1b[32m+    return "hello {}".format(name)\n'
-        "\x1b[0m \n"
-        " \n"
-        " !ls\n"
-        "\x1b[31m-hello(3)   \n"
+        "\x1b[0m\x1b[31m-hello(3)   \n"
         "\x1b[0m\x1b[32m+hello(3)\n"
         "\x1b[0m\n"
         "To apply these changes, remove the `--nbqa-diff` flag\n"

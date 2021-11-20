@@ -251,18 +251,18 @@ def test_black_works_with_commented_magics(capsys: "CaptureFixture") -> None:
 
     out, err = capsys.readouterr()
     err = err.encode("ascii", "backslashreplace").decode()
-    expected_out = f"""\
-\x1b[1mCell 1\x1b[0m
-------
---- {os.path.abspath(path)}
-+++ {os.path.abspath(path)}
-@@ -1,2 +1 @@
-\x1b[31m-[1, 2,
-\x1b[0m\x1b[31m-3, 4]
-\x1b[0m\x1b[32m+[1, 2, 3, 4]
-\x1b[0m
-To apply these changes, remove the `--nbqa-diff` flag
-"""
+    expected_out = (
+        "\x1b[1mCell 1\x1b[0m\n"
+        "------\n"
+        f"\x1b[1;37m--- {os.path.abspath(path)}\n"
+        f"\x1b[0m\x1b[1;37m+++ {os.path.abspath(path)}\n"
+        "\x1b[0m\x1b[36m@@ -1,2 +1 @@\n"
+        "\x1b[0m\x1b[31m-[1, 2,\n"
+        "\x1b[0m\x1b[31m-3, 4]\n"
+        "\x1b[0m\x1b[32m+[1, 2, 3, 4]\n"
+        "\x1b[0m\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
+    )
     expected_err = (
         dedent(
             f"""\
@@ -293,19 +293,17 @@ def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
 
     out, err = capsys.readouterr()
     err = err.encode("ascii", "backslashreplace").decode()
-    expected_out = f"""\
-\x1b[1mCell 3\x1b[0m
-------
---- {os.path.abspath(path)}
-+++ {os.path.abspath(path)}
-@@ -1,3 +1,3 @@
- # export
-\x1b[31m-def example_func(hi = "yo"):
-\x1b[0m\x1b[32m+def example_func(hi="yo"):
-\x1b[0m     pass
-
-To apply these changes, remove the `--nbqa-diff` flag
-"""
+    expected_out = (
+        "\x1b[1mCell 3\x1b[0m\n"
+        "------\n"
+        f"\x1b[1;37m--- {os.path.abspath(path)}\n"
+        f"\x1b[0m\x1b[1;37m+++ {os.path.abspath(path)}\n"
+        "\x1b[0m\x1b[36m@@ -1,3 +1,3 @@\n"
+        '\x1b[0m\x1b[31m-def example_func(hi = "yo"):\n'
+        '\x1b[0m\x1b[32m+def example_func(hi="yo"):\n'
+        "\x1b[0m\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
+    )
     expected_err = (
         dedent(
             f"""\
@@ -371,11 +369,10 @@ def test_allowlisted_magic(capsys: "CaptureFixture") -> None:
     expected = (
         "\x1b[1mCell 1\x1b[0m\n"
         "------\n"
-        f"--- {path}\n"
-        f"+++ {path}\n@@ -1,3 +1,3 @@\n"
-        " %%timeit\n"
-        " \n"
-        "\x1b[31m-a = 2 \n"
+        f"\x1b[1;37m--- {path}\n"
+        f"\x1b[0m\x1b[1;37m+++ {path}\n"
+        "\x1b[0m\x1b[36m@@ -1,3 +1,3 @@\n"
+        "\x1b[0m\x1b[31m-a = 2 \n"
         "\x1b[0m\x1b[32m+a = 2\n"
         "\x1b[0m\n"
         "To apply these changes, remove the `--nbqa-diff` flag\n"
@@ -394,12 +391,10 @@ def test_process_cells_magic(capsys: "CaptureFixture") -> None:
     expected = (
         "\x1b[1mCell 1\x1b[0m\n"
         "------\n"
-        f"--- {path}\n"
-        f"+++ {path}\n"
-        "@@ -1,3 +1,3 @@\n"
-        " %%javascript\n"
-        " \n"
-        "\x1b[31m-a = 2 \n"
+        f"\x1b[1;37m--- {path}\n"
+        f"\x1b[0m\x1b[1;37m+++ {path}\n"
+        "\x1b[0m\x1b[36m@@ -1,3 +1,3 @@\n"
+        "\x1b[0m\x1b[31m-a = 2 \n"
         "\x1b[0m\x1b[32m+a = 2\n"
         "\x1b[0m\n"
         "To apply these changes, remove the `--nbqa-diff` flag\n"
@@ -420,12 +415,10 @@ def test_process_cells_magic_pyprojecttoml(capsys: "CaptureFixture") -> None:
     expected = (
         "\x1b[1mCell 1\x1b[0m\n"
         "------\n"
-        f"--- {path}\n"
-        f"+++ {path}\n"
-        "@@ -1,3 +1,3 @@\n"
-        " %%javascript\n"
-        " \n"
-        "\x1b[31m-a = 2 \n"
+        f"\x1b[1;37m--- {path}\n"
+        f"\x1b[0m\x1b[1;37m+++ {path}\n"
+        "\x1b[0m\x1b[36m@@ -1,3 +1,3 @@\n"
+        "\x1b[0m\x1b[31m-a = 2 \n"
         "\x1b[0m\x1b[32m+a = 2\n"
         "\x1b[0m\n"
         "To apply these changes, remove the `--nbqa-diff` flag\n"
@@ -532,24 +525,19 @@ def test_comment_after_trailing_comma(capsys: "CaptureFixture") -> None:
     expected_out = (
         "\x1b[1mCell 1\x1b[0m\n"
         "------\n"
-        f"--- {os.path.abspath(path)}\n"
-        f"+++ {os.path.abspath(path)}\n"
-        "@@ -1,4 +1,5 @@\n"
-        "\x1b[31m-import glob;\n"
+        f"\x1b[1;37m--- {os.path.abspath(path)}\n"
+        f"\x1b[0m\x1b[1;37m+++ {os.path.abspath(path)}\n"
+        "\x1b[0m\x1b[36m@@ -1,4 +1,5 @@\n"
+        "\x1b[0m\x1b[31m-import glob;\n"
         "\x1b[0m\x1b[32m+import glob\n"
-        "\x1b[0m \n"
-        " import nbqa;\n"
-        "\x1b[32m+\n"
-        "\x1b[0m # this is a comment\n"
-        "\n"
+        "\x1b[0m\x1b[32m+\n"
+        "\x1b[0m\n"
         "\x1b[1mCell 2\x1b[0m\n"
         "------\n"
-        f"--- {os.path.abspath(path)}\n"
-        f"+++ {os.path.abspath(path)}\n"
-        "@@ -1,3 +1,2 @@\n"
-        " def func(a, b):\n"
-        "     pass;\n"
-        "\x1b[31m- \n"
+        f"\x1b[1;37m--- {os.path.abspath(path)}\n"
+        f"\x1b[0m\x1b[1;37m+++ {os.path.abspath(path)}\n"
+        "\x1b[0m\x1b[36m@@ -1,3 +1,2 @@\n"
+        "\x1b[0m\x1b[31m- \n"
         "\x1b[0m\n"
         "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
