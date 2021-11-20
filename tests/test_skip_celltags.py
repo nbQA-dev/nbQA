@@ -30,6 +30,36 @@ def test_skip_celltags_cli(capsys: "CaptureFixture") -> None:
     assert err == expected_err
 
 
+def test_skip_celltags_cli_md(capsys: "CaptureFixture") -> None:
+    """
+    Check flake8 works. Shouldn't alter the notebook content.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    # check passing both absolute and relative paths
+
+    path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
+    main(
+        [
+            "mdformat",
+            path,
+            "--nbqa-skip-celltags=skip-mdformat",
+            "--nbqa-md",
+            "--nbqa-diff",
+        ]
+    )
+
+    out, err = capsys.readouterr()
+    expected_out = ""
+    expected_err = ""
+
+    assert out == expected_out
+    assert err == expected_err
+
+
 def test_skip_celltags_pyprojecttoml(capsys: "CaptureFixture") -> None:
     """
     Check flake8 works. Shouldn't alter the notebook content.
