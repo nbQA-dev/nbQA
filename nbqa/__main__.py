@@ -54,6 +54,7 @@ REPLACE_FUNCTION = {
     False: replace_source.mutate,
 }
 SUFFIX = {False: ".py", True: ".md"}
+COMMAND_TO_PYTHON_MODULE = {"blacken-docs": "blacken_docs"}
 
 
 class TemporaryFile(NamedTuple):
@@ -258,8 +259,9 @@ def _run_command(
     if command == "mypy" and "MYPY_FORCE_COLOR" not in my_env:
         my_env["MYPY_FORCE_COLOR"] = "1"
 
+    python_module = COMMAND_TO_PYTHON_MODULE.get(command, command)
     output = subprocess.run(
-        [sys.executable, "-m", command, *args, *cmd_args],
+        [sys.executable, "-m", python_module, *args, *cmd_args],
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         universal_newlines=True,  # from Python3.7 this can be replaced with `text`
@@ -349,7 +351,6 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
 
     # add default options
     if cli_args.command == "isort":
-        # TypedDict key must be a string literal
         config["addopts"] = (
             *config["addopts"],
             "--treat-comment-as-code",
@@ -663,14 +664,15 @@ def _check_command_is_installed(command: str) -> None:
     UnsupportedPackageVersionError
         If third-party tool is of an unsupported version.
     """
+    python_module = COMMAND_TO_PYTHON_MODULE.get(command, command)
     try:
-        command_version = metadata.version(command)  # type: ignore
+        command_version = metadata.version(python_module)  # type: ignore
     except metadata.PackageNotFoundError:  # type: ignore
         try:
-            import_module(command)
+            import_module(python_module)
         except ImportError as exc:
-            if not os.path.isdir(command) and not os.path.isfile(
-                f"{os.path.join(*command.split('.'))}.py"
+            if not os.path.isdir(python_module) and not os.path.isfile(
+                f"{os.path.join(*python_module.split('.'))}.py"
             ):  # pragma: nocover(py<37)
                 # I presume the lack of coverage in Python3.6 here is a bug, as all
                 # these branches are actually covered.

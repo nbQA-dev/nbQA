@@ -6,7 +6,7 @@
 </h1>
 
 <h3 align="center">
-	Run isort, pyupgrade, mypy, pylint, flake8, mdformat, and more on Jupyter Notebooks
+	Run isort, pyupgrade, mypy, pylint, flake8, mdformat, black, blacken-docs, and more on Jupyter Notebooks
 </h3>
 
 <p align="center">
@@ -100,11 +100,11 @@ Rewriting my_notebook.ipynb
 Format your markdown cells with [mdformat](https://mdformat.readthedocs.io/en/stable/index.html):
 
 ```console
-$ nbqa mdformat tests/data/notebook_for_testing.ipynb --nbqa-md --nbqa-diff
+$ nbqa mdformat my_notebook.ipynb --nbqa-md --nbqa-diff
 Cell 2
 ------
---- tests/data/notebook_for_testing.ipynb
-+++ tests/data/notebook_for_testing.ipynb
+--- my_notebook.ipynb
++++ my_notebook.ipynb
 @@ -1,2 +1 @@
 -First level heading
 -===
