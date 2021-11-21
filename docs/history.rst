@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.2.1 (2021-11-21)
+~~~~~~~~~~~~~~~~~~
+Fixed bug whereby ``blacken-docs`` would need to be run as ``nbqa blacken_docs``,
+because the package name and the Python module of ``blacken-docs`` differ.
+Now, it can be run as ``nbqa blacken-docs``, as users would expect.
+
 1.2.0 (2021-11-20)
 ~~~~~~~~~~~~~~~~~~
 Added support for formatting markdown cells via the ``--nbqa-md`` flag.
