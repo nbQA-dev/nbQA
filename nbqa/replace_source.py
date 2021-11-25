@@ -192,7 +192,8 @@ def mutate(
         Whether mutation actually happened.
     """
     with open(notebook, encoding="utf-8") as handle:
-        notebook_json = json.loads(handle.read())
+        notebook_txt = handle.read()
+    notebook_json = json.loads(notebook_txt)
     original_notebook_json = copy.deepcopy(notebook_json)
 
     cells = _get_cells(temp_file, len(notebook_info.temporary_lines), md=md)
@@ -208,7 +209,10 @@ def mutate(
 
     temp_notebook = os.path.join(os.path.dirname(temp_file), os.path.basename(notebook))
     with open(temp_notebook, "w", encoding="utf-8") as handle:
-        handle.write(f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n")
+        if notebook_txt.endswith("\n"):
+            handle.write(f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n")
+        else:
+            handle.write(f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}")
     move(temp_notebook, notebook)
     return True
 

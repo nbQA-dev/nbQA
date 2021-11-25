@@ -6,6 +6,7 @@ repos:
     rev: v4.0.1
     hooks:
       - id: end-of-file-fixer
+        exclude: ^tests/data/
       - id: requirements-txt-fixer
       - id: trailing-whitespace
       - id: debug-statements
@@ -91,4 +92,4 @@ repos:
     rev: 0.5.0
     hooks:
       - id: nbstripout
-        exclude: ^tests/data/databricks_notebook\.ipynb$
+        exclude: ^tests/data/(databricks_notebook|notebook_for_testing)\.ipynb$
