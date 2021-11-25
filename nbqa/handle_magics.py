@@ -56,16 +56,27 @@ class Visitor(ast.NodeVisitor):
         node
             Function call.
 
+        Raises
+        ------
+        AssertionError
+            If unreachable code is found.
         """
-        if (
-            isinstance(node.value, ast.Call)
-            and _is_ipython_magic(node.value.func)
-            and isinstance(node.value.func, ast.Attribute)
-            and node.value.func.attr == "getoutput"
-        ):
+        if isinstance(node.value, ast.Call) and _is_ipython_magic(node.value.func):
+            assert isinstance(node.value.func, ast.Attribute)  # help mypy
             args = _get_node_args(node.value)
-            src = f"!{args[0]}"
-            magic_type = "line"
+            if node.value.func.attr == "getoutput":
+                src = f"!{args[0]}"
+                magic_type = "line"
+            elif node.value.func.attr == "run_line_magic":
+                src = f"%{args[0]}"
+                if args[1]:
+                    assert src is not None
+                    src += f" {args[1]}"
+                magic_type = "line"
+            else:
+                raise AssertionError(
+                    "Unreachable code: please report a bug at https://github.com/nbQA-dev/nbQA/issues"
+                )
             self.magics[node.value.lineno].append(
                 (
                     node.value.col_offset,

@@ -542,3 +542,31 @@ def test_comment_after_trailing_comma(capsys: "CaptureFixture") -> None:
         "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected_out
+
+
+def test_assignment_to_env_var(capsys: "CaptureFixture") -> None:
+    """
+    Check that assigning to %env rountrips.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    path = os.path.abspath(os.path.join("tests", "data", "env_var.ipynb"))
+
+    main(["black", path, "--nbqa-diff"])
+
+    out, _ = capsys.readouterr()
+    expected_out = (
+        "\x1b[1mCell 1\x1b[0m\n"
+        "------\n"
+        f"\x1b[1;37m--- {path}\n"
+        f"\x1b[0m\x1b[1;37m+++ {path}\n"
+        "\x1b[0m\x1b[36m@@ -1,2 +1,2 @@\n"
+        "\x1b[0m\x1b[31m-var  = %env var\n"
+        "\x1b[0m\x1b[32m+var = %env var\n"
+        "\x1b[0m\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
+    )
+    assert out == expected_out
