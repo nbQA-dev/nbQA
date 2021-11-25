@@ -563,7 +563,7 @@ def test_assignment_to_env_var(capsys: "CaptureFixture") -> None:
         "------\n"
         f"\x1b[1;37m--- {path}\n"
         f"\x1b[0m\x1b[1;37m+++ {path}\n"
-        "\x1b[0m\x1b[36m@@ -1 +1 @@\n"
+        "\x1b[0m\x1b[36m@@ -1,2 +1,2 @@\n"
         "\x1b[0m\x1b[31m-var  = %env var\n"
         "\x1b[0m\x1b[32m+var = %env var\n"
         "\x1b[0m\n"
