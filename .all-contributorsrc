@@ -276,6 +276,15 @@
       "contributions": [
         "tutorial"
       ]
+    },
+    {
+      "login": "danielsparing",
+      "name": "Daniel Sparing",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2346539?v=4",
+      "profile": "https://github.com/danielsparing",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
