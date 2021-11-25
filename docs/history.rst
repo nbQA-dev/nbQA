@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.2.2 (2021-11-25)
+~~~~~~~~~~~~~~~~~~
+Fixed bug whereby constructs like ``var = %env var`` would not round-trip (thanks Daniel Sparing for the report!).
+No longer add a trailing newline to notebooks which didn't have one originally.
+
 1.2.1 (2021-11-21)
 ~~~~~~~~~~~~~~~~~~
 Fixed bug whereby ``blacken-docs`` would need to be run as ``nbqa blacken_docs``,
