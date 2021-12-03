@@ -34,15 +34,6 @@
 </p>
 
 <p align="center">
-	<a href="https://pepy.tech/project/nbqa"><img
-		alt="downloads"
-		src="https://pepy.tech/badge/nbqa"></a>
-	<a href="https://anaconda.org/conda-forge/nbqa"><img
-		alt="conda-forge"
-		src="https://img.shields.io/conda/vn/conda-forge/nbqa.svg"></a>
-</p>
-
-<p align="center">
     <a href="#readme">
         <img alt="demo" src="https://raw.githubusercontent.com/nbQA-dev/nbQA-demo/master/demo.gif">
     </a>
@@ -72,11 +63,10 @@ In your [virtual environment](https://realpython.com/python-virtual-environments
 $ python -m pip install -U nbqa
 ```
 
-Or if you are using conda:
+Or, if you are using conda:
 ```console
 $ conda install -c conda-forge nbqa
 ```
-
 
 ## 🚀 Examples
 
