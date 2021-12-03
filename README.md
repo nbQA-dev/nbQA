@@ -69,6 +69,11 @@ In your [virtual environment](https://realpython.com/python-virtual-environments
 $ python -m pip install -U nbqa
 ```
 
+Or, if you are using conda:
+```console
+$ conda install -c conda-forge nbqa
+```
+
 ## 🚀 Examples
 
 ### Command-line
