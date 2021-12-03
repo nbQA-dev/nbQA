@@ -32,12 +32,12 @@
 		alt="docs"
 		src="https://readthedocs.org/projects/nbqa/badge/?version=latest"></a>
 </p>
+
 <p align="center">
 	<a href="https://pepy.tech/project/nbqa"><img
 		alt="downloads"
 		src="https://pepy.tech/badge/nbqa"></a>
 </p>
-
 
 <p align="center">
     <a href="#readme">
