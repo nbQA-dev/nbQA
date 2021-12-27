@@ -303,7 +303,9 @@ def _get_command_not_found_msg(command: str) -> str:
         """
     )
     python_executable = sys.executable
-    nbqa_loc = str(Path(sys.modules["nbqa"].__file__).parent)
+    nbqa_file = sys.modules["nbqa"].__file__
+    assert nbqa_file is not None
+    nbqa_loc = str(Path(nbqa_file).parent)
 
     return template.format(python=python_executable, nbqa_loc=nbqa_loc)
 
@@ -666,8 +668,8 @@ def _check_command_is_installed(command: str) -> None:
     """
     python_module = COMMAND_TO_PYTHON_MODULE.get(command, command)
     try:
-        command_version = metadata.version(python_module)  # type: ignore
-    except metadata.PackageNotFoundError:  # type: ignore
+        command_version = metadata.version(python_module)
+    except metadata.PackageNotFoundError:
         try:
             import_module(python_module)
         except ImportError as exc:
