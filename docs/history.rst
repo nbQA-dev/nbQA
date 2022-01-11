@@ -2,6 +2,10 @@
 Changelog
 =========
 
+1.2.3 (2022-01-11)
+~~~~~~~~~~~~~~~~~~
+Removed (unnecessary) upper-bound on ``tomli``.
+
 1.2.2 (2021-11-25)
 ~~~~~~~~~~~~~~~~~~
 Fixed bug whereby constructs like ``var = %env var`` would not round-trip (thanks Daniel Sparing for the report!).
