@@ -21,7 +21,6 @@ nbQA
    :maxdepth: 2
    :caption: DEVELOPER DOCS:
 
-   modules
    contributing
 
 Indices and tables

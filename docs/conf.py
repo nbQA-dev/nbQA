@@ -32,12 +32,10 @@ extensions = [
     "sphinx_copybutton",
     "myst_parser",
     "sphinx.ext.autodoc",
-    "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
 ]
 
-autosummary_generate = True
 add_module_names = False
 autodoc_member_order = "bysource"
 autodoc_typehints = "description"
