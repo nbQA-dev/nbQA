@@ -257,6 +257,10 @@ Everyone using Jupyter notebooks should be doing this.
 
 > Nice. nbQA looks like a great way to prevent the Untitled12.ipynb-phenomenon. I like!
 
+**Mani Sarkar**, [Kaggle 3x expert, contributor](https://neomatrix369.wordpress.com/about/)
+
+> nbQA is an inspiring project, and the team behind it are very knowledgeable and think of things outside the box with ideas and solutions
+
 ## 👥 Contributing
 
 I will give write-access to anyone who makes a useful pull request - see the
