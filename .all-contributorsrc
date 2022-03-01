@@ -294,6 +294,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "chrisk314",
+      "name": "Chris Knight",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2366658?v=4",
+      "profile": "https://www.linkedin.com/in/chris-knight-3728a449/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
