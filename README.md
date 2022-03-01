@@ -312,6 +312,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/danielsparing"><img src="https://avatars.githubusercontent.com/u/2346539?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Daniel Sparing</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Adanielsparing" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/asdfCYBER"><img src="https://avatars.githubusercontent.com/u/33639328?v=4?s=100" width="100px;" alt=""/><br /><sub><b>asdfCYBER</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/commits?author=asdfCYBER" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://www.linkedin.com/in/chris-knight-3728a449/"><img src="https://avatars.githubusercontent.com/u/2366658?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Chris Knight</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Achrisk314" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
