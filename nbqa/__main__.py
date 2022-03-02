@@ -643,7 +643,8 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
                 sys.stdout.write(
                     "To apply these changes, remove the `--nbqa-diff` flag\n"
                 )
-            return output_code
+            # For diff, we return 0 if no mutation would've occurred, and 1 otherwise.
+            return int(mutated)
 
     finally:
         _clean_up_tmp_files(nb_to_tmp_mapping)

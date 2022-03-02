@@ -227,3 +227,18 @@ def test_comment_after_trailing_semicolons(capsys: "CaptureFixture") -> None:
         "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected_out
+
+
+def test_return_code_false_positive() -> None:
+    """
+    Check return code is 0 when running with ``--lines-after-imports=2``.
+    """
+    notebook = os.path.join(
+        "tests", "data", "notebook_with_separated_imports_other.ipynb"
+    )
+
+    result = main(["isort", str(notebook), "--nbqa-diff", "--lines-after-imports=2"])
+    assert result == 0
+
+    result = main(["isort", str(notebook), "--nbqa-diff", "--float-to-top"])
+    assert result == 1

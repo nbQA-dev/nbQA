@@ -52,7 +52,7 @@
 
 # Table of contents
 
-- [Table of contents](#table-of-contents)
+- [Table of contents]
   - [🎉 Installation](#-installation)
   - [🚀 Examples](#-examples)
     - [Command-line](#command-line)
