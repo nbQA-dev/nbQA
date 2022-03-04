@@ -75,3 +75,20 @@ def test_flake8_works(
     expected_err = ""
     assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
     assert sorted(err.splitlines()) == sorted(expected_err.splitlines())
+
+
+def test_cell_with_all_magics(capsys: "CaptureFixture") -> None:
+    """
+    Should ignore cell with all magics.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    path = os.path.join("tests", "data", "all_magic_cell.ipynb")
+    main(["flake8", path])
+
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == ""
