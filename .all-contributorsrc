@@ -294,6 +294,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "LauraRichter",
+      "name": "Laura Richter",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5072669?v=4",
+      "profile": "https://github.com/LauraRichter",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
