@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.3.0 (2022-03-05)
+~~~~~~~~~~~~~~~~~~
+Removed support for Python 3.6.
+Exit code for ``--nbqa-diff`` is now ``1`` is file would've been modified, and ``0`` otherwise.
+Cells with just line magics will now be ignored.
+
 1.2.3 (2022-01-11)
 ~~~~~~~~~~~~~~~~~~
 Removed (unnecessary) upper-bound on ``tomli``.

@@ -262,9 +262,8 @@ def _run_command(
     python_module = COMMAND_TO_PYTHON_MODULE.get(command, command)
     output = subprocess.run(
         [sys.executable, "-m", python_module, *args, *cmd_args],
-        stderr=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        universal_newlines=True,  # from Python3.7 this can be replaced with `text`
+        capture_output=True,
+        text=True,
         env=my_env,
     )
 

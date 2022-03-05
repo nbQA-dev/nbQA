@@ -147,7 +147,7 @@ def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") ->
         [sys.executable, "-m", "nbqa", "remove_comments", path],
         stderr=subprocess.PIPE,
         env=os.environ,
-        universal_newlines=True,  # from Python3.7 this can be replaced with `text`
+        text=True,
     )
     expected_stderr = f"\n\x1b[1mnbQA failed to process {path} with exception "
     expected_returncode = 123
