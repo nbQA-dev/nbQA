@@ -280,7 +280,9 @@ def _should_ignore_code_cell(
     ):
         return True
     if all(
-        any(line.startswith(symbol) for symbol in ("%", "?", "!")) for line in source
+        any(line.startswith(symbol) for symbol in ("%", "?", "!"))
+        for line in source
+        if line.strip()
     ):
         # It's all magic, nothing to process
         return True
