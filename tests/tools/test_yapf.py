@@ -51,5 +51,5 @@ def test_successive_runs_using_yapf(
     main(["yapf", str(test_notebook), "--in-place", "--nbqa-diff"])
 
     out, _ = capsys.readouterr()
-    expected_out = ""
+    expected_out = "Notebook(s) would be left unchanged\n"
     assert out == expected_out

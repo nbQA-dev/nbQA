@@ -643,6 +643,8 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
                 sys.stdout.write(
                     "To apply these changes, remove the `--nbqa-diff` flag\n"
                 )
+            else:
+                sys.stdout.write("Notebook(s) would be left unchanged\n")
             # For diff, we return 0 if no mutation would've occurred, and 1 otherwise.
             return int(mutated)
 

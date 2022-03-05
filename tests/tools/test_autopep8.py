@@ -64,5 +64,5 @@ def test_successive_runs_using_autopep8(
     main(["autopep8", str(test_notebook), "-i", "--nbqa-diff"])
 
     out, err = capsys.readouterr()
-    assert out == ""
+    assert out == "Notebook(s) would be left unchanged\n"
     assert err == ""

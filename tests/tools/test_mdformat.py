@@ -52,5 +52,5 @@ def test_mdformat_works_with_empty_file(capsys: "CaptureFixture") -> None:
     main(["mdformat", path, "--nbqa-diff", "--nbqa-md"])
 
     out, err = capsys.readouterr()
-    assert out == ""
+    assert out == "Notebook(s) would be left unchanged\n"
     assert err == ""
