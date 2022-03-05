@@ -20,5 +20,5 @@ def test_non_python_notebook(capsys: "CaptureFixture") -> None:
     path = os.path.join("tests", "invalid_data", "non_python_notebook.ipynb")
     main(["black", path, "--nbqa-diff"])
     out, _ = capsys.readouterr()
-    expected_out = ""
+    expected_out = "Notebook(s) would be left unchanged\n"
     assert out == expected_out

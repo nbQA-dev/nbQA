@@ -53,7 +53,7 @@ def test_skip_celltags_cli_md(capsys: "CaptureFixture") -> None:
     )
 
     out, err = capsys.readouterr()
-    expected_out = ""
+    expected_out = "Notebook(s) would be left unchanged\n"
     expected_err = ""
 
     assert out == expected_out

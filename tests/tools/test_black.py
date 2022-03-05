@@ -440,7 +440,7 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
     main(["black", os.path.abspath(path), "--nbqa-diff", "--nbqa-dont-skip-bad-cells"])
 
     out, err = capsys.readouterr()
-    expected_out = ""
+    expected_out = "Notebook(s) would be left unchanged\n"
     expected_err = (
         (f"{COLLISION} {BROKEN_HEART} {COLLISION}\n1 file failed to reformat.\n")
         .encode("ascii", "backslashreplace")
