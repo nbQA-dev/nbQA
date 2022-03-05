@@ -279,6 +279,13 @@ def _should_ignore_code_cell(
         or any(magic in joined_source for magic in TRANSFORMED_MAGICS)
     ):
         return True
+    if all(
+        any(line.startswith(symbol) for symbol in ("%", "?", "!"))
+        for line in source
+        if line.strip()
+    ):
+        # It's all magic, nothing to process
+        return True
     try:
         ast.parse(joined_source)
     except SyntaxError:
