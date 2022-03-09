@@ -312,6 +312,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "francesco-ballarin",
+      "name": "Francesco Ballarin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11783908?v=4",
+      "profile": "http://www.francescoballarin.it",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
