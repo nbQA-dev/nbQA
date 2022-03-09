@@ -2,6 +2,10 @@
 Changelog
 =========
 
+1.3.1 (2022-03-09)
+~~~~~~~~~~~~~~~~~~
+Fixed setup.cfg to mark than only Python3.7+ is supported.
+
 1.3.0 (2022-03-05)
 ~~~~~~~~~~~~~~~~~~
 Removed support for Python 3.6.
