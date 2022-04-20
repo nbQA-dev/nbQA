@@ -1,6 +1,6 @@
 autoflake
 autopep8
-black==21.12b0  # todo: unpin
+black
 blacken-docs
 coverage[toml]
 flake8

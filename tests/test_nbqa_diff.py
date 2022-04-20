@@ -45,6 +45,7 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
         dedent(
             f"""\
             reformatted {str(DIRTY_NOTEBOOK)}
+
             All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
             1 file reformatted.
             """
