@@ -9,7 +9,7 @@ You can configure :code:`nbQA` either at the command line, or by using a :code:`
     Please note that if you pass the same option via both the :code:`pyproject.toml` file and via the command-line, the command-line will take precedence.
 
 Preview / CI
-------------
+~~~~~~~~~~~~
 
 To preview changes without modifying your notebook, using the :code:`--nbqa-diff` flag. The return code will be ``1`` if ``nbQA`` would've modified any of
 your notebooks, and ``0`` otherwise.

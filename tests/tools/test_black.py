@@ -59,6 +59,7 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
         dedent(
             f"""\
             reformatted {path}
+
             All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
             1 file reformatted.
             """
@@ -120,6 +121,7 @@ def test_black_works_with_trailing_semicolons(
         dedent(
             f"""\
             reformatted {path}
+
             All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
             1 file reformatted.
             """
@@ -172,12 +174,10 @@ def test_black_works_with_multiline(
     expected_out = ""
     # replace \u with \\u for both expected_err and err
     expected_err = (
-        dedent(
-            f"""\
-            reformatted {path}
-            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
-            1 file reformatted.
-            """
+        (
+            f"reformatted {path}\n\n"
+            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}\n"
+            "1 file reformatted.\n"
         )
         .encode("ascii", "backslashreplace")
         .decode()
@@ -267,6 +267,7 @@ def test_black_works_with_commented_magics(capsys: "CaptureFixture") -> None:
         dedent(
             f"""\
             reformatted {path}
+
             All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
             1 file reformatted.
             """
@@ -308,6 +309,7 @@ def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
         dedent(
             f"""\
             reformatted {path}
+
             All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
             1 file reformatted.
             """
@@ -496,7 +498,7 @@ def test_invalid_syntax_with_nbqa_dont_skip_bad_cells(capsys: "CaptureFixture") 
     out, err = capsys.readouterr()
     expected_out = ""
     expected_err = (
-        f"error: cannot format {path}: Cannot parse: cell_1:2:7: if True\n"  # noqa: E501
+        f"error: cannot format {path}: Cannot parse: cell_1:2:7: if True\n\n"  # noqa: E501
         "Oh no! \\U0001f4a5 \\U0001f494 \\U0001f4a5\n"
         "1 file failed to reformat.\n"
     )
