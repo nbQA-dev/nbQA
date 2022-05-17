@@ -134,6 +134,18 @@ Here's an example of how to set up some pre-commit hooks: put this in your `.pre
     - id: nbqa-isort
 ```
 
+> Note, you may need to add `args: ["--profile=black"]` to your pre-commit configuration or [add a configuration file](https://pycqa.github.io/isort/docs/configuration/config_files.html) to prevent conflict between `isort` and `black`:
+> ```yaml
+> - repo: https://github.com/nbQA-dev/nbQA
+>  rev: 1.3.1
+>  hooks:
+>    - id: nbqa-black
+>    - id: nbqa-pyupgrade
+>      args: [--py36-plus]
+>    - id: nbqa-isort
+>      args: ["--profile=black"]
+>```
+
 If you need to select specific versions of any of these linters/formatters,
 add them to [`additional_dependencies`](http://pre-commit.com/#pre-commit-configyaml---hooks).
 
