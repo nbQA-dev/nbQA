@@ -7,6 +7,7 @@ import sys
 import tempfile
 from importlib import import_module
 from pathlib import Path
+from shutil import which
 from textwrap import dedent
 from typing import (
     Any,
@@ -81,6 +82,15 @@ class UnsupportedPackageVersionError(Exception):
             f"{BOLD}nbqa only works with {command} >= {min_version}, "
             f"while you have {current_version} installed.{RESET}"
         )
+        super().__init__(self.msg)
+
+
+class CommandNotFoundError(Exception):
+    """Raise if requested command cannot be found in $PATH."""
+
+    def __init__(self, command: str) -> None:
+        """Initialise with command."""
+        self.msg = f"{BOLD}nbqa was unable to find {command}.{RESET}"
         super().__init__(self.msg)
 
 
@@ -226,6 +236,8 @@ def _run_command(
     command: str,
     cmd_args: Sequence[str],
     args: Sequence[str],
+    *,
+    shell: bool,
 ) -> Tuple[Output, int, bool]:
     """
     Run third-party tool against given file or directory.
@@ -259,9 +271,14 @@ def _run_command(
     if command == "mypy" and "MYPY_FORCE_COLOR" not in my_env:
         my_env["MYPY_FORCE_COLOR"] = "1"
 
-    python_module = COMMAND_TO_PYTHON_MODULE.get(command, command)
+    if shell:
+        cmd = [command]
+    else:
+        python_module = COMMAND_TO_PYTHON_MODULE.get(command, command)
+        cmd = [sys.executable, "-m", python_module]
+
     output = subprocess.run(
-        [sys.executable, "-m", python_module, *args, *cmd_args],
+        [*cmd, *args, *cmd_args],
         capture_output=True,
         text=True,
         env=my_env,
@@ -614,6 +631,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
                 for key, i in nb_to_tmp_mapping.items()
                 if key not in saved_sources.failed_notebooks
             ],
+            shell=configs["shell"],
         )
 
         actually_mutated, output = _post_process_notebooks(
@@ -652,7 +670,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
     return output_code
 
 
-def _check_command_is_installed(command: str) -> None:
+def _check_command_is_installed(command: str, *, shell: bool) -> None:
     """
     Check whether third-party tool is installed.
 
@@ -660,6 +678,8 @@ def _check_command_is_installed(command: str) -> None:
     ----------
     command
         Third-party tool being run on notebook(s).
+    shell
+        Whether the command should run in a shell instead of `python -m`.
 
     Raises
     ------
@@ -667,7 +687,14 @@ def _check_command_is_installed(command: str) -> None:
         If third-party tool isn't installed.
     UnsupportedPackageVersionError
         If third-party tool is of an unsupported version.
+    CommandNotFoundError
+        If third-party tool isn't available as a script in $PATH.
     """
+    if shell:
+        if which(command):
+            return
+        raise CommandNotFoundError(command)
+
     python_module = COMMAND_TO_PYTHON_MODULE.get(command, command)
     try:
         command_version = metadata.version(python_module)
@@ -701,7 +728,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         :code:`None` if calling via command-line.
     """
     cli_args: CLIArgs = CLIArgs.parse_args(argv)
-    _check_command_is_installed(cli_args.command)
+    _check_command_is_installed(cli_args.command, shell=cli_args.shell)
     project_root: Path = find_project_root(tuple(cli_args.root_dirs))
     configs: Configs = _get_configs(cli_args, project_root)
 

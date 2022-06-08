@@ -21,6 +21,7 @@ class Configs(TypedDict):
     dont_skip_bad_cells: bool
     skip_celltags: Sequence[str]
     md: bool
+    shell: bool
 
 
 def get_default_config() -> Configs:
@@ -34,4 +35,5 @@ def get_default_config() -> Configs:
         dont_skip_bad_cells=False,
         skip_celltags=[],
         md=False,
+        shell=False,
     )

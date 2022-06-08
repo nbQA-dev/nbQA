@@ -91,6 +91,14 @@ Format markdown cells with `mdformat`_:
 
    $ nbqa mdformat my_notebook.ipynb --nbqa-md
 
+
+Use an external script:
+
+.. code:: console
+
+   $ nbqa /path/to/script my_notebook.ipynb --nbqa-shell
+
+
 .. _black: https://black.readthedocs.io/en/stable/
 .. _doctest: https://docs.python.org/3/library/doctest.html
 .. _flake8: https://flake8.pycqa.org/en/latest/

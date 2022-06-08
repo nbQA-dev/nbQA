@@ -16,7 +16,7 @@ USAGE_MSG = dedent(
     {BOLD}Please specify:{RESET}
     - 1) a code quality tool (e.g. `black`, `pyupgrade`, `flake`, ...)
     - 2) some notebooks (or, if supported by the tool, directories)
-    - 3) (optional) flags for nbqa (e.g. `--nbqa-diff`)
+    - 3) (optional) flags for nbqa (e.g. `--nbqa-diff`, `--nbqa-shell`)
     - 4) (optional) flags for code quality tool (e.g. `--line-length` for `black`)
 
     {BOLD}Examples:{RESET}
@@ -50,6 +50,7 @@ class CLIArgs:  # pylint: disable=R0902
     exclude: Optional[str]
     dont_skip_bad_cells: Optional[bool]
     md: Optional[bool]
+    shell: bool
 
     def __init__(self, args: argparse.Namespace, cmd_args: Sequence[str]) -> None:
         """
@@ -83,6 +84,7 @@ class CLIArgs:  # pylint: disable=R0902
         else:
             self.skip_celltags = None
         self.md = args.nbqa_md or None
+        self.shell = args.nbqa_shell
 
     @staticmethod
     def parse_args(argv: Optional[Sequence[str]]) -> "CLIArgs":
@@ -118,6 +120,11 @@ class CLIArgs:  # pylint: disable=R0902
             "--nbqa-diff",
             action="store_true",
             help="Show diff which would result from running tool.",
+        )
+        parser.add_argument(
+            "--nbqa-shell",
+            action="store_true",
+            help="Run `command` directly rather than `python -m command`",
         )
         parser.add_argument(
             "--nbqa-process-cells",
