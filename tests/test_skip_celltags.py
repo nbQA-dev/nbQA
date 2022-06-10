@@ -72,7 +72,7 @@ def test_skip_celltags_pyprojecttoml(capsys: "CaptureFixture") -> None:
     # check passing both absolute and relative paths
     with open("pyproject.toml", "w", encoding="utf-8") as handle:
         handle.write(
-            "[tool.nbqa.skip_celltags]\n" 'flake8 = ["skip-flake8", "flake8-skip"]\n'
+            "[tool.nbqa.skip_celltags]\nflake8 = ['skip-flake8', 'flake8-skip']\n"
         )
     path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
     main(["flake8", path])

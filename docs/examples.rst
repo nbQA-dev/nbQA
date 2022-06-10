@@ -96,7 +96,7 @@ Format markdown cells with `mdformat`_:
 .. _flake8: https://flake8.pycqa.org/en/latest/
 .. _isort: https://timothycrosley.github.io/isort/
 .. _mypy: http://mypy-lang.org/
-.. _pylint: https://www.pylint.org/
+.. _pylint: https://github.com/PyCQA/pylint
 .. _pyupgrade: https://github.com/asottile/pyupgrade
 .. _yapf: https://github.com/google/yapf
 .. _autopep8: https://github.com/hhatto/autopep8

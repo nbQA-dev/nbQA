@@ -82,8 +82,9 @@ def _process_source(
     for i, line in enumerate(body.splitlines(), start=1):
         if i in visitor.magics:
             col_offset, src, magic_type = visitor.magics[i][0]
-            if src is None or len(visitor.magics[i]) > 1:
+            if src is None or len(visitor.magics[i]) > 1:  # pragma: nocover
                 # unusual case - skip cell completely for now
+                # can only happen in IPython<8.2
                 handler = MagicHandler(
                     source, whole_src, command, magic_type=magic_type
                 )
