@@ -409,7 +409,7 @@ def test_process_cells_magic_pyprojecttoml(capsys: "CaptureFixture") -> None:
     Notebook contains non-allowlist magic, but it's in process_cells.
     """
     with open("pyproject.toml", "w", encoding="utf-8") as handle:
-        handle.write("[tool.nbqa.process_cells]\n" 'black = ["javascript", "foo"]\n')
+        handle.write("[tool.nbqa.process_cells]\nblack = ['javascript', 'foo']\n")
     path = os.path.abspath(os.path.join("tests", "data", "non_default_magic.ipynb"))
     main(["black", path, "--nbqa-diff"])
 

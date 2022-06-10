@@ -26,7 +26,6 @@ omit = [
 disable = [
   "C0103", # snake case for methods (necessary for subclassing ast stuff)
   "C0301", # line too long (checked by flake8 already)
-  "C0330", # to work well with `black`
   "R0801", # Unfortunately I do need some duplication, e.g. with imports
   "R0903", # Too few public methods
   "W1510", # I need to run subprocess.run without check because it's OK if it fails
