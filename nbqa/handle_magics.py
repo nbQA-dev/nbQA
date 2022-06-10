@@ -122,7 +122,8 @@ class Visitor(ast.NodeVisitor):
             elif node.value.func.attr == "getoutput":
                 src = f"!!{args[0]}"
                 magic_type = "line"
-            else:
+            else:  # pragma: nocover
+                # only necessary for IPython<8.2
                 src = None
             self.magics[node.value.lineno].append(
                 (
