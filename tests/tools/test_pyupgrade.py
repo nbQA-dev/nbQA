@@ -38,7 +38,7 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
         ),
         encoding="utf-8",
     )
-    main(["pyupgrade", os.path.abspath(path), "--py3-plus"])
+    main(["pyupgrade", os.path.abspath(path)])
     Path("pyproject.toml").unlink()
     with open(tmp_notebook_for_testing, encoding="utf-8") as handle:
         after = handle.readlines()
