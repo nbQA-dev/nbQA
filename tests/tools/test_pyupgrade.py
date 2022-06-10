@@ -38,7 +38,7 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
         ),
         encoding="utf-8",
     )
-    main(["pyupgrade", os.path.abspath(path)])
+    main(["pyupgrade", os.path.abspath(path), "--py3-plus"])
     Path("pyproject.toml").unlink()
     with open(tmp_notebook_for_testing, encoding="utf-8") as handle:
         after = handle.readlines()
@@ -72,7 +72,7 @@ def test_pyupgrade_works_with_empty_file(capsys: "CaptureFixture") -> None:
     """
     path = os.path.abspath(os.path.join("tests", "data", "footer.ipynb"))
 
-    main(["pyupgrade", path])
+    main(["pyupgrade", path, "--py3-plus"])
 
     out, err = capsys.readouterr()
     assert out == ""
@@ -89,7 +89,7 @@ def test_pyupgrade_works_with_weird_databricks_file(capsys: "CaptureFixture") ->
         Pytest fixture to capture stdout and stderr.
     """
     path = os.path.join("tests", "data", "databricks_notebook.ipynb")
-    main(["pyupgrade", path, "--nbqa-diff"])
+    main(["pyupgrade", path, "--nbqa-diff", "--py3-plus"])
     out, err = capsys.readouterr()
     expected_out = (
         "\x1b[1mCell 2\x1b[0m\n"
