@@ -315,6 +315,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.linkedin.com/in/chris-knight-3728a449/"><img src="https://avatars.githubusercontent.com/u/2366658?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Chris Knight</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Achrisk314" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/LauraRichter"><img src="https://avatars.githubusercontent.com/u/5072669?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Laura Richter</b></sub></a><br /><a href="#ideas-LauraRichter" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="http://www.francescoballarin.it"><img src="https://avatars.githubusercontent.com/u/11783908?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Francesco Ballarin</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Afrancesco-ballarin" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/janosh"><img src="https://avatars.githubusercontent.com/u/30958850?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Janosh Riebesell</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Ajanosh" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
