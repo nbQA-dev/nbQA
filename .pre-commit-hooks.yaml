@@ -1,13 +1,13 @@
 - id: nbqa
   name: nbqa
-  description: "Run any standard Python code quality tool on a Jupyter Notebook"
+  description: Run any standard Python code quality tool on a Jupyter Notebook
   entry: nbqa
   language: python
   require_serial: true
   types: [jupyter]
 - id: nbqa-black
   name: nbqa-black
-  description: "Run 'black' on a Jupyter Notebook"
+  description: Run 'black' on a Jupyter Notebook
   entry: nbqa black
   language: python
   require_serial: true
@@ -15,7 +15,7 @@
   additional_dependencies: [black]
 - id: nbqa-check-ast
   name: nbqa-check-ast
-  description: "Run 'check-ast' on a Jupyter Notebook"
+  description: Run 'check-ast' on a Jupyter Notebook
   entry: nbqa pre_commit_hooks.check_ast
   language: python
   require_serial: true
@@ -24,7 +24,7 @@
   args: [--nbqa-dont-skip-bad-cells]
 - id: nbqa-flake8
   name: nbqa-flake8
-  description: "Run 'flake8' on a Jupyter Notebook"
+  description: Run 'flake8' on a Jupyter Notebook
   entry: nbqa flake8
   language: python
   require_serial: true
@@ -32,7 +32,7 @@
   additional_dependencies: [flake8]
 - id: nbqa-isort
   name: nbqa-isort
-  description: "Run 'isort' on a Jupyter Notebook"
+  description: Run 'isort' on a Jupyter Notebook
   entry: nbqa isort
   language: python
   require_serial: true
@@ -40,7 +40,7 @@
   additional_dependencies: [isort]
 - id: nbqa-mypy
   name: nbqa-mypy
-  description: "Run 'mypy' on a Jupyter Notebook"
+  description: Run 'mypy' on a Jupyter Notebook
   entry: nbqa mypy
   language: python
   require_serial: true
@@ -48,7 +48,7 @@
   additional_dependencies: [mypy]
 - id: nbqa-pylint
   name: nbqa-pylint
-  description: "Run 'pylint' on a Jupyter Notebook"
+  description: Run 'pylint' on a Jupyter Notebook
   entry: nbqa pylint
   language: python
   require_serial: true
@@ -56,7 +56,7 @@
   additional_dependencies: [pylint]
 - id: nbqa-pyupgrade
   name: nbqa-pyupgrade
-  description: "Run 'pyupgrade' on a Jupyter Notebook"
+  description: Run 'pyupgrade' on a Jupyter Notebook
   entry: nbqa pyupgrade
   language: python
   require_serial: true
@@ -64,7 +64,7 @@
   additional_dependencies: [pyupgrade]
 - id: nbqa-yapf
   name: nbqa-yapf
-  description: "Run 'yapf' on a Jupyter Notebook"
+  description: Run 'yapf' on a Jupyter Notebook
   entry: nbqa yapf --in-place
   language: python
   require_serial: true
@@ -72,7 +72,7 @@
   additional_dependencies: [yapf]
 - id: nbqa-autopep8
   name: nbqa-autopep8
-  description: "Run 'autopep8' on a Jupyter Notebook"
+  description: Run 'autopep8' on a Jupyter Notebook
   entry: nbqa autopep8 -i
   language: python
   require_serial: true
@@ -80,8 +80,8 @@
   additional_dependencies: [autopep8]
 - id: nbqa-pydocstyle
   name: nbqa-pydocstyle
-  description: "Run 'pydocstyle' on a Jupyter Notebook"
-  entry: nbqa pydocstyle -i
+  description: Run 'pydocstyle' on a Jupyter Notebook
+  entry: nbqa pydocstyle
   language: python
   require_serial: true
   types: [jupyter]
