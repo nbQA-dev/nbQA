@@ -21,7 +21,7 @@ Here's an example of what you could include in your ``.pre-commit-config.yaml`` 
          additional_dependencies: [isort==5.6.4]
 
 For best reproducibility, you should pin your dependencies (as above). Running ``pre-commit autoupdate`` will update your hooks' versions, but
-versions of additional dependencies need to updated manually.
+versions of additional dependencies need to be updated manually.
 
 See `.pre-commit-hooks.yaml <https://github.com/nbQA-dev/nbQA/blob/master/.pre-commit-hooks.yaml>`_ for all available built-in hooks.
 
@@ -44,6 +44,22 @@ or let us know in the `issue tracker <https://github.com/nbQA-dev/nbQA/issues>`_
 
 Configuration
 -------------
+
+To pass command line arguments, use the `pre-commit args <https://pre-commit.com/#config-args>`_ option:
+
+    repos:
+    - repo: https://github.com/nbQA-dev/nbQA
+      rev: 1.3.1
+      hooks:
+       - id: nbqa-pyupgrade
+         args: [--py38-plus]
+       - id: nbqa-isort
+         args: [--profile, black]
+       - id: nbqa-flake8
+         args: [--ignore=E402] # E402 module level import not at top of file
+
+Note that some tools like ``flake8`` require the flag and its value to be joined by an equal sign in order to not interpret the value as a
+filename (`GH issue <https://github.com/nbQA-dev/nbQA/issues/731>`_).
 
 See :ref:`configuration<configuration>` for how to further configure how ``nbqa`` should run each tool. Also, see the `pre-commit documentation <https://pre-commit.com/>`_
 for how to further configure these hooks.
