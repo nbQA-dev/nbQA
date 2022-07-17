@@ -11,7 +11,7 @@ repos:
       - id: trailing-whitespace
       - id: debug-statements
   - repo: https://github.com/pre-commit/pre-commit
-    rev: v2.19.0
+    rev: v2.20.0
     hooks:
       - id: validate_manifest
   - repo: https://github.com/psf/black
@@ -56,7 +56,7 @@ repos:
         exclude: ^docs/
         additional_dependencies: [types-setuptools, types-toml]
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.34.0
+    rev: v2.37.1
     hooks:
       - id: pyupgrade
         args: [--py37-plus]
