@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.4.0 (2022-07-17)
+~~~~~~~~~~~~~~~~~~
+Added ``-nbqa-shell`` command (thanks @pwoolvett !).
+Fixed entrypoint of ``pycodestyle`` hook (thanks @janosh !).
+
 1.3.1 (2022-03-09)
 ~~~~~~~~~~~~~~~~~~
 Fixed setup.cfg to mark than only Python3.7+ is supported.
