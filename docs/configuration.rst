@@ -154,3 +154,22 @@ or, from the command-line:
 .. code-block:: bash
 
     nbqa mdformat notebook.ipynb --nbqa-md
+
+Shell commands
+~~~~~~~~~~~~~~
+
+By default, ``nbQA`` runs a command ``command`` as ``python -m command``.
+To instead run it as ``command`` (e.g. ``flake8heavened``, which can't be
+run as ``python -m flake8heavened``),
+you could add the following to your :code:`pyproject.toml` file:
+
+    .. code-block:: toml
+
+        [tool.nbqa.shell]
+        flake8heavened = true
+
+or, from the command-line:
+
+.. code:: console
+
+   $ nbqa flake8heavened my_notebook.ipynb --nbqa-shell

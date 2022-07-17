@@ -7,6 +7,7 @@ import sys
 import tempfile
 from importlib import import_module
 from pathlib import Path
+from shutil import which
 from textwrap import dedent
 from typing import (
     Any,
@@ -81,6 +82,15 @@ class UnsupportedPackageVersionError(Exception):
             f"{BOLD}nbqa only works with {command} >= {min_version}, "
             f"while you have {current_version} installed.{RESET}"
         )
+        super().__init__(self.msg)
+
+
+class CommandNotFoundError(Exception):
+    """Raise if requested command cannot be found in $PATH."""
+
+    def __init__(self, command: str) -> None:
+        """Initialise with command."""
+        self.msg = f"{BOLD}nbqa was unable to find {command}.{RESET}"
         super().__init__(self.msg)
 
 
@@ -226,6 +236,8 @@ def _run_command(
     command: str,
     cmd_args: Sequence[str],
     args: Sequence[str],
+    *,
+    shell: bool,
 ) -> Tuple[Output, int, bool]:
     """
     Run third-party tool against given file or directory.
@@ -259,9 +271,14 @@ def _run_command(
     if command == "mypy" and "MYPY_FORCE_COLOR" not in my_env:
         my_env["MYPY_FORCE_COLOR"] = "1"
 
-    python_module = COMMAND_TO_PYTHON_MODULE.get(command, command)
+    if shell:
+        cmd = [command]
+    else:
+        python_module = COMMAND_TO_PYTHON_MODULE.get(command, command)
+        cmd = [sys.executable, "-m", python_module]
+
     output = subprocess.run(
-        [sys.executable, "-m", python_module, *args, *cmd_args],
+        [*cmd, *args, *cmd_args],
         capture_output=True,
         text=True,
         env=my_env,
@@ -299,6 +316,12 @@ def _get_command_not_found_msg(command: str) -> str:
         a virtual environment in Python, and run:
 
             `python -m pip install {command}`.
+
+        Note: if `{command}` isn't meant to be run as
+
+            `python -m {command}`
+
+        then you might want to pass `--nbqa-shell`.
         """
     )
     python_executable = sys.executable
@@ -327,7 +350,6 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     """
     # start with default config.
     config = get_default_config()
-
     # If a section is in pyproject.toml, use that.
     pyproject_path = project_root / "pyproject.toml"
     if pyproject_path.is_file():
@@ -614,6 +636,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
                 for key, i in nb_to_tmp_mapping.items()
                 if key not in saved_sources.failed_notebooks
             ],
+            shell=configs["shell"],
         )
 
         actually_mutated, output = _post_process_notebooks(
@@ -652,7 +675,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
     return output_code
 
 
-def _check_command_is_installed(command: str) -> None:
+def _check_command_is_installed(command: str, *, shell: bool) -> None:
     """
     Check whether third-party tool is installed.
 
@@ -660,6 +683,8 @@ def _check_command_is_installed(command: str) -> None:
     ----------
     command
         Third-party tool being run on notebook(s).
+    shell
+        Whether the command should run in a shell instead of `python -m`.
 
     Raises
     ------
@@ -667,20 +692,27 @@ def _check_command_is_installed(command: str) -> None:
         If third-party tool isn't installed.
     UnsupportedPackageVersionError
         If third-party tool is of an unsupported version.
+    CommandNotFoundError
+        If third-party tool isn't available as a script in $PATH.
     """
+    if shell:
+        if which(command):
+            return
+        raise CommandNotFoundError(command)
+
     python_module = COMMAND_TO_PYTHON_MODULE.get(command, command)
     try:
         command_version = metadata.version(python_module)
     except metadata.PackageNotFoundError:
         try:
             import_module(python_module)
-        except ImportError as exc:
+        except ImportError:
             if not os.path.isdir(python_module) and not os.path.isfile(
                 f"{os.path.join(*python_module.split('.'))}.py"
             ):  # pragma: nocover(py<37)
                 # I presume the lack of coverage in Python3.6 here is a bug, as all
                 # these branches are actually covered.
-                raise ModuleNotFoundError(_get_command_not_found_msg(command)) from exc
+                raise ModuleNotFoundError(_get_command_not_found_msg(command)) from None
     else:
         if command in MIN_VERSIONS:
             min_version = MIN_VERSIONS[command]
@@ -701,9 +733,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         :code:`None` if calling via command-line.
     """
     cli_args: CLIArgs = CLIArgs.parse_args(argv)
-    _check_command_is_installed(cli_args.command)
     project_root: Path = find_project_root(tuple(cli_args.root_dirs))
     configs: Configs = _get_configs(cli_args, project_root)
+    _check_command_is_installed(cli_args.command, shell=configs["shell"])
 
     return _main(cli_args, configs)
 

@@ -43,7 +43,7 @@ usage: nbqa <code quality tool> <notebook or directory> <nbqa options> \
 {prefix}Please specify:{suffix}
 - 1) a code quality tool (e.g. `black`, `pyupgrade`, `flake`, ...)
 - 2) some notebooks (or, if supported by the tool, directories)
-- 3) (optional) flags for nbqa (e.g. `--nbqa-diff`)
+- 3) (optional) flags for nbqa (e.g. `--nbqa-diff`, `--nbqa-shell`)
 - 4) (optional) flags for code quality tool (e.g. `--line-length` for `black`)
 
 {prefix}Examples:{suffix}
