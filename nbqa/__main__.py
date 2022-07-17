@@ -316,6 +316,12 @@ def _get_command_not_found_msg(command: str) -> str:
         a virtual environment in Python, and run:
 
             `python -m pip install {command}`.
+
+        Note: if `{command}` isn't meant to be run as
+
+            `python -m {command}`
+
+        then you might want to pass `--nbqa-shell`.
         """
     )
     python_executable = sys.executable
@@ -344,7 +350,6 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     """
     # start with default config.
     config = get_default_config()
-
     # If a section is in pyproject.toml, use that.
     pyproject_path = project_root / "pyproject.toml"
     if pyproject_path.is_file():
@@ -701,13 +706,13 @@ def _check_command_is_installed(command: str, *, shell: bool) -> None:
     except metadata.PackageNotFoundError:
         try:
             import_module(python_module)
-        except ImportError as exc:
+        except ImportError:
             if not os.path.isdir(python_module) and not os.path.isfile(
                 f"{os.path.join(*python_module.split('.'))}.py"
             ):  # pragma: nocover(py<37)
                 # I presume the lack of coverage in Python3.6 here is a bug, as all
                 # these branches are actually covered.
-                raise ModuleNotFoundError(_get_command_not_found_msg(command)) from exc
+                raise ModuleNotFoundError(_get_command_not_found_msg(command)) from None
     else:
         if command in MIN_VERSIONS:
             min_version = MIN_VERSIONS[command]
@@ -728,9 +733,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         :code:`None` if calling via command-line.
     """
     cli_args: CLIArgs = CLIArgs.parse_args(argv)
-    _check_command_is_installed(cli_args.command, shell=cli_args.shell)
     project_root: Path = find_project_root(tuple(cli_args.root_dirs))
     configs: Configs = _get_configs(cli_args, project_root)
+    _check_command_is_installed(cli_args.command, shell=configs["shell"])
 
     return _main(cli_args, configs)
 

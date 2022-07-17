@@ -38,6 +38,28 @@ def test_nbqa_shell(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     assert out == "", f"No stdout expected. Received `{out}`"
 
 
+def test_nbqa_shell_pyproject_toml(capsys: CaptureFixture) -> None:
+    """Check nbqa shell command call when set in pyproject.toml"""
+    with open("pyproject.toml", "w", encoding="utf-8") as handle:
+        handle.write("[tool.nbqa.shell]\nflake8heavened = true\n")
+    path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
+
+    args = ["flake8heavened", path]
+    main(args)
+    out, _ = capsys.readouterr()
+    expected_out = (
+        f"{path}:\x1b[32m32\x1b[0m:\x1b[32m1\x1b[0m: \x1b[31mE\x1b[0m\x1b[36m402\x1b[0m module level import not at top of file\x1b[35m [pycodestyle]\x1b[0m\n"  # noqa: E501
+        f"{path}:\x1b[32m39\x1b[0m:\x1b[32m1\x1b[0m: \x1b[31mE\x1b[0m\x1b[36m402\x1b[0m module level import not at top of file\x1b[35m [pycodestyle]\x1b[0m\n"  # noqa: E501
+        f"{path}:\x1b[32m40\x1b[0m:\x1b[32m1\x1b[0m: \x1b[31mE\x1b[0m\x1b[36m402\x1b[0m module level import not at top of file\x1b[35m [pycodestyle]\x1b[0m\n"  # noqa: E501
+        f"{path}:\x1b[32m28\x1b[0m:\x1b[32m9\x1b[0m: \x1b[33mW\x1b[0m\x1b[36m291\x1b[0m trailing whitespace\x1b[35m [pycodestyle]\x1b[0m\n"  # noqa: E501
+        f"{path}:\x1b[32m2\x1b[0m:\x1b[32m1\x1b[0m: \x1b[31mF\x1b[0m\x1b[36m401\x1b[0m \x1b[33m'os'\x1b[0m imported but unused\x1b[35m [pyflakes]\x1b[0m\n"  # noqa: E501
+        f"{path}:\x1b[32m4\x1b[0m:\x1b[32m1\x1b[0m: \x1b[31mF\x1b[0m\x1b[36m401\x1b[0m \x1b[33m'glob'\x1b[0m imported but unused\x1b[35m [pyflakes]\x1b[0m\n"  # noqa: E501
+        f"{path}:\x1b[32m6\x1b[0m:\x1b[32m1\x1b[0m: \x1b[31mF\x1b[0m\x1b[36m401\x1b[0m \x1b[33m'nbqa'\x1b[0m imported but unused\x1b[35m [pyflakes]\x1b[0m\n"  # noqa: E501
+        f"{path}:\x1b[32m32\x1b[0m:\x1b[32m1\x1b[0m: \x1b[31mF\x1b[0m\x1b[36m401\x1b[0m \x1b[33m'random.randint'\x1b[0m imported but unused\x1b[35m [pyflakes]\x1b[0m\n"  # noqa: E501
+    )
+    assert out == expected_out
+
+
 def test_nbqa_not_shell(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     """Check nbqa without --nbqa-shell command call."""
     path = os.path.join("tests", "data", "notebook_for_testing.ipynb")

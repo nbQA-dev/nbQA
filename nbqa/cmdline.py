@@ -50,7 +50,7 @@ class CLIArgs:  # pylint: disable=R0902
     exclude: Optional[str]
     dont_skip_bad_cells: Optional[bool]
     md: Optional[bool]
-    shell: bool
+    shell: Optional[bool]
 
     def __init__(self, args: argparse.Namespace, cmd_args: Sequence[str]) -> None:
         """
@@ -84,7 +84,7 @@ class CLIArgs:  # pylint: disable=R0902
         else:
             self.skip_celltags = None
         self.md = args.nbqa_md or None
-        self.shell = args.nbqa_shell
+        self.shell = args.nbqa_shell or None
 
     @staticmethod
     def parse_args(argv: Optional[Sequence[str]]) -> "CLIArgs":
