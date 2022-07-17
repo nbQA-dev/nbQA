@@ -4,7 +4,6 @@ black
 blacken-docs
 coverage[toml]
 flake8
-flakeheaven
 isort>=5.4.2
 mdformat
 mypy
