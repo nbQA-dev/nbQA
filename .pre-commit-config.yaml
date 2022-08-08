@@ -24,13 +24,13 @@ repos:
       - id: prettier
         exclude: ^README\.md$
   - repo: https://github.com/PyCQA/pylint
-    rev: v2.14.4
+    rev: v2.14.5
     hooks:
       - id: pylint
         files: ^(nbqa|tests)/
         exclude: ^tests/data/
   - repo: https://github.com/PyCQA/flake8
-    rev: 4.0.1
+    rev: 5.0.4
     hooks:
       - id: flake8
         additional_dependencies: [flake8-typing-imports==1.10.0]
@@ -50,13 +50,13 @@ repos:
         args: [-v, --fail-under=100]
         files: ^nbqa/
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.961
+    rev: v0.971
     hooks:
       - id: mypy
         exclude: ^docs/
         additional_dependencies: [types-setuptools, types-toml]
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.37.1
+    rev: v2.37.3
     hooks:
       - id: pyupgrade
         args: [--py37-plus]
@@ -76,7 +76,7 @@ repos:
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
   - repo: https://github.com/asottile/setup-cfg-fmt
-    rev: v1.20.1
+    rev: v2.0.0
     hooks:
       - id: setup-cfg-fmt
   - repo: https://github.com/myint/autoflake
@@ -89,7 +89,7 @@ repos:
       - id: check-hooks-apply
       - id: check-useless-excludes
   - repo: https://github.com/kynan/nbstripout
-    rev: 0.5.0
+    rev: 0.6.0
     hooks:
       - id: nbstripout
         exclude: ^tests/data/(databricks_notebook|notebook_for_testing)\.ipynb$
