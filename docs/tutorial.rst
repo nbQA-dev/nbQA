@@ -67,3 +67,16 @@ Now, you'll be able to run the command from the previous section with just ::
 Much simpler!
 
 See :ref:`configuration<configuration>` for how to further configure how ``nbqa``.
+
+Writing your own tool
+---------------------
+
+You can use ``nbqa`` to run your own custom tool on Jupyter Notebooks too. You just need to make sure you can
+run it as a module on a given set of Python files. For example, if your tool is called ``my_amazing_tool``, then
+as long as you can run ::
+
+    python -m my_amazing_tool file_1.py file_2.py
+
+then you will be able to run
+
+    nbqa my_amazing_tool notebook_1.ipynb notebook_2.ipynb
