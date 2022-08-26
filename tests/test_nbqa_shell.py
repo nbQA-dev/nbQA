@@ -1,6 +1,7 @@
 """Ensure the --nbqa-shell flag correctly calls the underlying command."""
 import os
 import sys
+from shutil import which
 from subprocess import CompletedProcess
 from typing import List
 
@@ -27,11 +28,11 @@ def test_nbqa_shell(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     monkeypatch.setattr("subprocess.run", subprocess_run)
 
     args = ["black", "--nbqa-shell", path]
-    expected_run = ["black", path]
+    expected_run = [which("black"), path]
     main(args)
     out, err = capsys.readouterr()
     received = err.strip()
-    expected = _message(args=expected_run)
+    expected = _message(args=expected_run)  # type:ignore[arg-type]
     assert (
         received == expected
     ), f"nbqa called unexpected `{received}` instead of `{expected}` for args `{args}`"
