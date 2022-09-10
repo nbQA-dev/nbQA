@@ -196,16 +196,28 @@ def mutate(
     notebook_json = json.loads(notebook_txt)
     original_notebook_json = copy.deepcopy(notebook_json)
 
+    cells_to_remove = []
+
     cells = _get_cells(temp_file, len(notebook_info.temporary_lines), md=md)
     for code_cell_number, cell in enumerate(
         _notebook_cells(notebook_json, md=md), start=1
     ):
         if code_cell_number in notebook_info.code_cells_to_ignore:
             continue
-        cell["source"] = _get_new_source(code_cell_number, notebook_info, next(cells))
+        new_source = _get_new_source(code_cell_number, notebook_info, next(cells))
+        if not new_source:
+            cells_to_remove.append(code_cell_number)
+        cell["source"] = new_source
 
     if original_notebook_json == notebook_json:
         return False
+
+    if cells_to_remove:
+        notebook_json["cells"] = [
+            cell
+            for i, cell in enumerate(notebook_json["cells"], start=1)
+            if i not in cells_to_remove
+        ]
 
     temp_notebook = os.path.join(os.path.dirname(temp_file), os.path.basename(notebook))
     with open(temp_notebook, "w", encoding="utf-8") as handle:

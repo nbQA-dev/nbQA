@@ -2,6 +2,10 @@
 Changelog
 =========
 
+1.5.0 (???)
+~~~~~~~~~~~
+``nbqa`` now removes empty cells which were not empty to begin with.
+
 1.4.0 (2022-07-17)
 ~~~~~~~~~~~~~~~~~~
 Added ``-nbqa-shell`` command (thanks @pwoolvett !).
