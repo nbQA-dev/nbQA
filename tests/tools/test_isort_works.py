@@ -1,6 +1,6 @@
 """Check :code:`isort` works as intended."""
-
 import difflib
+import json
 import os
 from pathlib import Path
 from textwrap import dedent
@@ -242,3 +242,44 @@ def test_return_code_false_positive() -> None:
 
     result = main(["isort", str(notebook), "--nbqa-diff", "--float-to-top"])
     assert result == 1
+
+
+def test_float_to_top(tmp_test_data: Path) -> None:
+    """
+    Check isort works when a notebook has imports in different cells.
+
+    This test would fail if we didn't pass --treat-comment-as-code '# %%NBQA-CELL-SEP'.
+
+    Parameters
+    ----------
+    tmp_test_data
+        Temporary copy of test data.
+    """
+    notebook = tmp_test_data / "notebook_with_separated_imports_other.ipynb"
+
+    main(["isort", str(notebook), "--float-to-top"])
+
+    with open(notebook, encoding="utf-8") as fd:
+        result = json.load(fd)["cells"]
+    expected = [
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "import os\n",
+                "\n",
+                "# This is a comment on the second import\n",
+                "import numpy",
+            ],
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [],
+        },
+    ]
+    assert result == expected
