@@ -24,7 +24,7 @@ repos:
       - id: prettier
         exclude: ^README\.md$
   - repo: https://github.com/PyCQA/pylint
-    rev: v2.15.0
+    rev: v2.15.2
     hooks:
       - id: pylint
         files: ^(nbqa|tests)/
