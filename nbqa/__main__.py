@@ -1,4 +1,5 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
+import itertools
 import json
 import os
 import re
@@ -112,7 +113,9 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
         return iter((Path(root_dir),))
     return (
         i
-        for i in Path(root_dir).rglob("*.ipynb")
+        for i in itertools.chain(
+            Path(root_dir).rglob("*.ipynb"), Path(root_dir).rglob("*.md")
+        )
         if not re.search(EXCLUDES, str(i.resolve().as_posix()))
     )
 
@@ -468,6 +471,21 @@ def _is_non_python_notebook(notebook: MutableMapping[str, Any]) -> bool:
     return language is not None and language != "python"
 
 
+def _read_notebook(notebook):
+    _, ext = os.path.splitext(notebook)
+    if ext == ".ipynb":
+        with open(notebook, encoding="utf-8") as handle:
+            content = handle.read()
+        return json.loads(content)
+    elif ext == ".md":
+        try:
+            import jupytext
+        except ImportError:
+            # todo take care of this later
+            pass
+        return jupytext.jupytext.read(notebook)
+
+
 def _save_code_sources(
     nb_to_py_mapping: Dict[str, TemporaryFile],
     process_cells: Sequence[str],
@@ -485,10 +503,8 @@ def _save_code_sources(
     nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
 
     for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
-        with open(str(notebook), encoding="utf-8") as handle:
-            content = handle.read()
         try:
-            notebook_json = json.loads(content)
+            notebook_json = _read_notebook(notebook)
             if _is_non_python_notebook(notebook_json):
                 non_python_notebooks.add(notebook)
                 continue
