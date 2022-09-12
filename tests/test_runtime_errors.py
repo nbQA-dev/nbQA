@@ -235,14 +235,7 @@ def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    main(["black", "docs"])
+    main(["black", "LICENSES"])
     _, err = capsys.readouterr()
-    expected_err = (
-        'No valid notebooks found in given path(s)\n'
-        '\n'
-        '\x1b[1m\n'
-        'If you believe the notebook(s) to be valid, please report a bug at '
-        'https://github.com/nbQA-dev/nbQA/issues \x1b[0m\n'
-        '\n'
-    )
+    expected_err = "No notebooks found in given path(s)\n"
     assert err == expected_err

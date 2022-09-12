@@ -5,12 +5,14 @@ blacken-docs
 coverage[toml]
 flake8
 isort>=5.4.2
+jupytext
 mdformat
 mypy
 pre-commit-hooks
 pydocstyle
 pylint
 pytest
+pytest-cov
 pytest-randomly
 pyupgrade
 yapf

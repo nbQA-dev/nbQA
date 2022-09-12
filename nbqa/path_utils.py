@@ -2,7 +2,7 @@
 import json
 import os
 from pathlib import Path
-from typing import Tuple
+from typing import Any, Dict, Optional, Tuple
 
 
 def remove_prefix(string: str, prefix: str) -> str:
@@ -61,7 +61,24 @@ def get_relative_and_absolute_paths(path: str) -> Tuple[str, str]:
     return str(relative_path), str(absolute_path)
 
 
-def read_notebook(notebook):
+def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[bool]]:
+    """
+    Read notebook.
+
+    If it's .md, try reading it with jupytext. If can't, ignore it.
+
+    Parameters
+    ----------
+    notebook
+        Path of notebook.
+
+    Returns
+    -------
+    notebook_json
+        Parsed notebook
+    trailing_newline
+        Whether the notebook originally had a trailing newline
+    """
     trailing_newline = True
     _, ext = os.path.splitext(notebook)
     with open(notebook, encoding="utf-8") as handle:
@@ -69,34 +86,28 @@ def read_notebook(notebook):
     if ext == ".ipynb":
         trailing_newline = content.endswith("\n")
         return json.loads(content), trailing_newline
-    elif ext == ".md":
-        try:
-            import jupytext
-        except ImportError:
-            return None, None
-        md_content = jupytext.jupytext.read(notebook)
+    assert ext == ".md"
+    try:
+        import jupytext  # pylint: disable=import-outside-toplevel
+        from markdown_it import MarkdownIt  # pylint: disable=import-outside-toplevel
+    except ImportError:
+        return None, None
+    md_content = jupytext.jupytext.read(notebook)
 
-        # get lexer: see https://github.com/mwouts/jupytext/issues/993
-        from markdown_it import MarkdownIt  # must be installed if you have jupytext
+    # get lexer: see https://github.com/mwouts/jupytext/issues/993
+    parser = MarkdownIt("commonmark").disable("inline", True)
+    parsed = parser.parse(content)
+    lexer = None
+    for token in parsed:
+        if token.type == "fence" and token.info.startswith("{code-cell}"):
+            lexer = remove_prefix(parser.parse(content)[4].info, "{code-cell}").strip()
+            md_content["metadata"]["language_info"] = {"pygments_lexer": lexer}
+            break
 
-        parser = (
-            MarkdownIt("commonmark")
-            # we only need to parse block level components (for efficiency)
-            .disable("inline", True)
-        )
-        parsed = parser.parse(content)
-        lexer = None
-        for token in parsed:
-            if token.type == "fence" and token.info.startswith("{code-cell}"):
-                lexer = remove_prefix(
-                    parser.parse(content)[4].info, "{code-cell}"
-                ).strip()
-                md_content["metadata"]["language_info"] = {"pygments_lexer": lexer}
-                break
-
-        for cell in md_content["cells"]:
-            cell["source"] = cell["source"].splitlines(keepends=True)
-        if "format_name" in md_content.get("metadata", {}).get("jupytext", {}).get(
-            "text_representation", {}
-        ):
-            return md_content, True
+    for cell in md_content["cells"]:
+        cell["source"] = cell["source"].splitlines(keepends=True)
+    if "format_name" in md_content.get("metadata", {}).get("jupytext", {}).get(
+        "text_representation", {}
+    ):
+        return md_content, True
+    return None, None

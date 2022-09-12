@@ -618,10 +618,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
     try:  # pylint disable=R0912
 
         if not nb_to_tmp_mapping:
-            sys.stderr.write(
-                "No notebooks found in given directories: "
-                f"{' '.join(i for i in cli_args.root_dirs if os.path.isdir(i))}\n"
-            )
+            sys.stderr.write("No notebooks found in given path(s)\n")
             return 0
         saved_sources = SAVE_SOURCES[configs["md"]](
             nb_to_tmp_mapping,
