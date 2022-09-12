@@ -203,16 +203,17 @@ def _replace_temp_python_file_references_in_out_err(
     Output
         Stdout, stderr with temporary directory replaced by current working directory.
     """
+    _, ext = os.path.splitext(notebook)
     py_basename = os.path.basename(temp_python_file)
     nb_basename = os.path.basename(notebook)
     out = out.replace(py_basename, nb_basename)
     err = err.replace(py_basename, nb_basename)
 
     out = out.replace(
-        remove_suffix(py_basename, SUFFIX[md]), remove_suffix(nb_basename, ".ipynb")
+        remove_suffix(py_basename, SUFFIX[md]), remove_suffix(nb_basename, ext)
     )
     err = err.replace(
-        remove_suffix(py_basename, SUFFIX[md]), remove_suffix(nb_basename, ".ipynb")
+        remove_suffix(py_basename, SUFFIX[md]), remove_suffix(nb_basename, ext)
     )
 
     return Output(out, err)
@@ -433,7 +434,7 @@ def _get_nb_to_tmp_mapping(
         nb_to_tmp_mapping[notebook] = TemporaryFile(
             *tempfile.mkstemp(
                 dir=os.path.dirname(notebook),
-                prefix=remove_suffix(os.path.basename(notebook), ".ipynb"),
+                prefix=remove_suffix(os.path.basename(notebook), os.path.splitext(notebook)[-1]),
                 suffix=SUFFIX[md],
             )
         )
@@ -483,7 +484,10 @@ def _read_notebook(notebook):
         except ImportError:
             # todo take care of this later
             pass
-        return jupytext.jupytext.read(notebook)
+        # might need to keep track of jupytext type
+        content = jupytext.jupytext.read(notebook)
+        if 'text_representation' in content.get('metadata', {}).get('jupytext', {}).get('format_name', {}):
+            return content
 
 
 def _save_code_sources(
@@ -505,7 +509,7 @@ def _save_code_sources(
     for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
         try:
             notebook_json = _read_notebook(notebook)
-            if _is_non_python_notebook(notebook_json):
+            if notebook_json is None or _is_non_python_notebook(notebook_json):
                 non_python_notebooks.add(notebook)
                 continue
             nb_info_mapping[notebook] = save_code_source.main(
@@ -627,7 +631,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
 
         if not nb_to_tmp_mapping:
             sys.stderr.write(
-                "No .ipynb notebooks found in given directories: "
+                "No notebooks found in given directories: "
                 f"{' '.join(i for i in cli_args.root_dirs if os.path.isdir(i))}\n"
             )
             return 0
@@ -638,9 +642,8 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
             configs["dont_skip_bad_cells"],
             cli_args.command,
         )
-
-        if len(saved_sources.failed_notebooks) == len(nb_to_tmp_mapping):
-            sys.stderr.write("No valid .ipynb notebooks found\n")
+        if len(saved_sources.non_python_notebooks) + len(saved_sources.failed_notebooks) == len(nb_to_tmp_mapping):
+            sys.stderr.write("No valid notebooks found in given path(s)\n")
             _print_failed_notebook_errors(saved_sources.failed_notebooks)
             return 123
 

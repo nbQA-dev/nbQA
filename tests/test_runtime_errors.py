@@ -161,7 +161,7 @@ def test_unable_to_parse(capsys: "CaptureFixture") -> None:
     path.write_text("foo")
     main(["flake8", str(path)])
     path.unlink()
-    message = "No valid .ipynb notebooks found"
+    message = "No valid notebooks found"
     _, err = capsys.readouterr()
     assert message in err
 
@@ -237,4 +237,12 @@ def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
     """
     main(["black", "docs"])
     _, err = capsys.readouterr()
-    assert err == "No .ipynb notebooks found in given directories: docs\n"
+    expected_err = (
+        'No valid notebooks found in given path(s)\n'
+        '\n'
+        '\x1b[1m\n'
+        'If you believe the notebook(s) to be valid, please report a bug at '
+        'https://github.com/nbQA-dev/nbQA/issues \x1b[0m\n'
+        '\n'
+    )
+    assert err == expected_err
