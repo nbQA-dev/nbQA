@@ -90,7 +90,7 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
     try:
         import jupytext  # pylint: disable=import-outside-toplevel
         from markdown_it import MarkdownIt  # pylint: disable=import-outside-toplevel
-    except ImportError:
+    except ImportError:  # pragma: no cover (how to test this?)
         return None, None
     md_content = jupytext.jupytext.read(notebook)
 
@@ -110,4 +110,4 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
         "text_representation", {}
     ):
         return md_content, True
-    return None, None
+    return None, None  # how to cover this?

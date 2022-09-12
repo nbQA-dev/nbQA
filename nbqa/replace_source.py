@@ -198,7 +198,8 @@ def _write_notebook(
                 handle.write(
                     f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}"
                 )
-    elif ext == ".md":
+    else:
+        assert ext == ".md"
         import jupytext  # pylint: disable=import-outside-toplevel
 
         for cell in notebook_json["cells"]:
