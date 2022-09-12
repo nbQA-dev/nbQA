@@ -33,7 +33,11 @@ from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
 from nbqa.output_parser import Output, map_python_line_to_nb_lines
-from nbqa.path_utils import get_relative_and_absolute_paths, remove_suffix
+from nbqa.path_utils import (
+    get_relative_and_absolute_paths,
+    read_notebook,
+    remove_suffix,
+)
 from nbqa.save_code_source import CODE_SEPARATOR
 from nbqa.text import BOLD, RESET
 
@@ -434,7 +438,9 @@ def _get_nb_to_tmp_mapping(
         nb_to_tmp_mapping[notebook] = TemporaryFile(
             *tempfile.mkstemp(
                 dir=os.path.dirname(notebook),
-                prefix=remove_suffix(os.path.basename(notebook), os.path.splitext(notebook)[-1]),
+                prefix=remove_suffix(
+                    os.path.basename(notebook), os.path.splitext(notebook)[-1]
+                ),
                 suffix=SUFFIX[md],
             )
         )
@@ -472,24 +478,6 @@ def _is_non_python_notebook(notebook: MutableMapping[str, Any]) -> bool:
     return language is not None and language != "python"
 
 
-def _read_notebook(notebook):
-    _, ext = os.path.splitext(notebook)
-    if ext == ".ipynb":
-        with open(notebook, encoding="utf-8") as handle:
-            content = handle.read()
-        return json.loads(content)
-    elif ext == ".md":
-        try:
-            import jupytext
-        except ImportError:
-            # todo take care of this later
-            pass
-        # might need to keep track of jupytext type
-        content = jupytext.jupytext.read(notebook)
-        if 'text_representation' in content.get('metadata', {}).get('jupytext', {}).get('format_name', {}):
-            return content
-
-
 def _save_code_sources(
     nb_to_py_mapping: Dict[str, TemporaryFile],
     process_cells: Sequence[str],
@@ -508,7 +496,7 @@ def _save_code_sources(
 
     for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
         try:
-            notebook_json = _read_notebook(notebook)
+            notebook_json, _ = read_notebook(notebook)
             if notebook_json is None or _is_non_python_notebook(notebook_json):
                 non_python_notebooks.add(notebook)
                 continue
@@ -642,7 +630,9 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
             configs["dont_skip_bad_cells"],
             cli_args.command,
         )
-        if len(saved_sources.non_python_notebooks) + len(saved_sources.failed_notebooks) == len(nb_to_tmp_mapping):
+        if len(saved_sources.non_python_notebooks) + len(
+            saved_sources.failed_notebooks
+        ) == len(nb_to_tmp_mapping):
             sys.stderr.write("No valid notebooks found in given path(s)\n")
             _print_failed_notebook_errors(saved_sources.failed_notebooks)
             return 123
