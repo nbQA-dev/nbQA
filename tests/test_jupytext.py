@@ -27,6 +27,7 @@ def test_myst(tmp_test_data: Path) -> None:
     expected = (
         "---\n"
         "jupytext:\n"
+        "  notebook_metadata_filter: substitutions\n"
         "  text_representation:\n"
         "    extension: .md\n"
         "    format_name: myst\n"
@@ -36,6 +37,8 @@ def test_myst(tmp_test_data: Path) -> None:
         "  display_name: Python 3\n"
         "  language: python\n"
         "  name: python3\n"
+        "substitutions:\n"
+        "  extra_dependencies: bokeh\n"
         "---\n"
         "\n"
         "```{code-cell} ipython3\n"

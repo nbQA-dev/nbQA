@@ -1,5 +1,6 @@
 ---
 jupytext:
+  notebook_metadata_filter: substitutions
   text_representation:
     extension: .md
     format_name: myst
@@ -9,6 +10,8 @@ kernelspec:
   display_name: Python 3
   language: python
   name: python3
+substitutions:
+  extra_dependencies: bokeh
 ---
 
 ```{code-cell} ipython3

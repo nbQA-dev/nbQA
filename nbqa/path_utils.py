@@ -114,6 +114,12 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
             md_content["metadata"]["language_info"] = {"pygments_lexer": lexer}
             break
 
+    # get substitutions, see https://github.com/mwouts/jupytext/issues/994
+    if "substitutions" in md_content.get("metadata", {}):
+        md_content["metadata"].get("jupytext", {}).update(
+            {"notebook_metadata_filter": "substitutions"}
+        )
+
     for cell in md_content["cells"]:
         cell["source"] = cell["source"].splitlines(keepends=True)
     if "format_name" in md_content.get("metadata", {}).get("jupytext", {}).get(
