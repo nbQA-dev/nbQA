@@ -614,7 +614,6 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
     except FileNotFoundError as exc:
         sys.stderr.write(str(exc))
         return 1
-
     try:  # pylint disable=R0912
 
         if not nb_to_tmp_mapping:
@@ -628,8 +627,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
             cli_args.command,
         )
         if len(saved_sources.non_python_notebooks) == len(nb_to_tmp_mapping):
-            sys.stderr.write("No valid Python notebooks found in given path(s)")
-            _print_failed_notebook_errors(saved_sources.failed_notebooks)
+            sys.stderr.write("No valid Python notebooks found in given path(s)\n")
             return 0
 
         output, output_code, mutated = _run_command(

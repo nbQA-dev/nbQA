@@ -92,7 +92,10 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
         from markdown_it import MarkdownIt  # pylint: disable=import-outside-toplevel
     except ImportError:  # pragma: nocover (how to test this?)
         return None, None
-    md_content = jupytext.jupytext.read(notebook)
+    try:
+        md_content = jupytext.jupytext.read(notebook)
+    except:  # noqa: E72a  # pylint: disable=bare-except
+        return None, None
 
     if (
         md_content.get("metadata", {}).get("kernelspec", {}).get("language", {})

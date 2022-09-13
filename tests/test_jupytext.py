@@ -1,4 +1,5 @@
 """Test files saved via jupytext."""
+import os
 from pathlib import Path
 
 from nbqa.__main__ import main
@@ -180,4 +181,10 @@ def test_md(tmp_test_data: Path) -> None:
 def test_non_jupytext_md() -> None:
     """Check non-Python markdown will be ignored."""
     ret = main(["black", "README.md"])
+    assert ret == 0
+
+
+def test_jupytext_cant_parse() -> None:
+    """Check file jupytext can't parse"""
+    ret = main(["black", os.path.join("tests", "invalid_data", "tracker.md")])
     assert ret == 0
