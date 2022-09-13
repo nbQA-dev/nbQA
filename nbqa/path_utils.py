@@ -90,9 +90,15 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
     try:
         import jupytext  # pylint: disable=import-outside-toplevel
         from markdown_it import MarkdownIt  # pylint: disable=import-outside-toplevel
-    except ImportError:  # pragma: no cover (how to test this?)
+    except ImportError:  # pragma: nocover (how to test this?)
         return None, None
     md_content = jupytext.jupytext.read(notebook)
+
+    if (
+        md_content.get("metadata", {}).get("kernelspec", {}).get("language", {})
+        != "python"
+    ):
+        return None, None
 
     # get lexer: see https://github.com/mwouts/jupytext/issues/993
     parser = MarkdownIt("commonmark").disable("inline", True)
@@ -100,7 +106,7 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
     lexer = None
     for token in parsed:
         if token.type == "fence" and token.info.startswith("{code-cell}"):
-            lexer = remove_prefix(parser.parse(content)[4].info, "{code-cell}").strip()
+            lexer = remove_prefix(token.info, "{code-cell}").strip()
             md_content["metadata"]["language_info"] = {"pygments_lexer": lexer}
             break
 

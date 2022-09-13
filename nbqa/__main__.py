@@ -630,7 +630,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
         if len(saved_sources.non_python_notebooks) + len(
             saved_sources.failed_notebooks
         ) == len(nb_to_tmp_mapping):
-            sys.stderr.write("No valid notebooks found in given path(s)\n")
+            sys.stderr.write("No valid notebooks found in given path(s)")
             _print_failed_notebook_errors(saved_sources.failed_notebooks)
             return 123
 
