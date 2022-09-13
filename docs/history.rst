@@ -5,6 +5,7 @@ Changelog
 1.5.0 (???)
 ~~~~~~~~~~~
 ``nbqa`` now removes empty cells which were not empty to begin with.
+Added support for subcommands (thanks @dnoliver for the issue, @s-weigand for the fix)
 
 1.4.0 (2022-07-17)
 ~~~~~~~~~~~~~~~~~~
