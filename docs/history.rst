@@ -9,6 +9,8 @@ Markdown files saved via ``Jupytext`` will now be processed as well
 (thanks @basnijholt and @rgommers for the suggestion!)
 If ``nbqa`` is passed an invalid notebook, it will exit 123. If it's
 passed a non-Python notebook, it'll exit 0.
+Don't try to process files with the wrong extensions, even if passed
+explicitly.
 
 1.4.0 (2022-07-17)
 ~~~~~~~~~~~~~~~~~~

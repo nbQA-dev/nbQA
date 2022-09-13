@@ -240,3 +240,18 @@ def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
     _, err = capsys.readouterr()
     expected_err = "No notebooks found in given path(s)\n"
     assert err == expected_err
+
+
+def test_wrong_extension_file(capsys: "CaptureFixture") -> None:
+    """
+    Check sensible error message is returned if none of the directories passed have notebooks.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    main(["black", "readthedocs.yml"])
+    _, err = capsys.readouterr()
+    expected_err = "No notebooks found in given path(s)\n"
+    assert err == expected_err

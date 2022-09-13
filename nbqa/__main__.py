@@ -112,16 +112,27 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
     notebooks
         All Jupyter Notebooks found in directory.
     """
-    if not os.path.isdir(root_dir):
-        return iter((Path(root_dir),))
     try:
         pass
     except ImportError:
-        iterable = Path(root_dir).rglob("*.ipynb")
+        jupytext_installed = False
     else:
-        iterable = itertools.chain(  # type: ignore
+        jupytext_installed = True
+
+    if os.path.isfile(root_dir):
+        _, ext = os.path.splitext(root_dir)
+        if (jupytext_installed and ext in (".ipynb", ".md")) or (
+            not jupytext_installed and ext == ".ipynb"
+        ):
+            return iter((Path(root_dir),))
+        return iter([])
+
+    if jupytext_installed:
+        iterable = itertools.chain(
             Path(root_dir).rglob("*.ipynb"), Path(root_dir).rglob("*.md")
         )
+    else:
+        iterable = itertools.chain(Path(root_dir).rglob("*.ipynb"))
 
     return (i for i in iterable if not re.search(EXCLUDES, str(i.resolve().as_posix())))
 
