@@ -114,7 +114,7 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
     """
     try:
         import jupytext  # noqa  # pylint: disable=unused-import,import-outside-toplevel
-    except ImportError:
+    except ImportError:  # pragma: nocover
         jupytext_installed = False
     else:
         jupytext_installed = True
@@ -135,7 +135,7 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
         iterable = itertools.chain(
             Path(root_dir).rglob("*.ipynb"), Path(root_dir).rglob("*.md")
         )
-    else:
+    else:  # pragma: nocover
         iterable = itertools.chain(Path(root_dir).rglob("*.ipynb"))
 
     return (i for i in iterable if not re.search(EXCLUDES, str(i.resolve().as_posix())))

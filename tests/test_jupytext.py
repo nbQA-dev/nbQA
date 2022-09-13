@@ -186,6 +186,8 @@ def test_non_jupytext_md() -> None:
     """Check non-Python markdown will be ignored."""
     ret = main(["black", "README.md"])
     assert ret == 0
+    ret = main(["black", os.path.join("docs", "readme.md"), "--nbqa-md"])
+    assert ret == 0
 
 
 def test_jupytext_cant_parse() -> None:
