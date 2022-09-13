@@ -5,6 +5,10 @@ Changelog
 1.5.0 (???)
 ~~~~~~~~~~~
 ``nbqa`` now removes empty cells which were not empty to begin with.
+Markdown files saved via ``Jupytext`` will now be processed as well
+(thanks @basnijholt and @rgommers for the suggestion!)
+If ``nbqa`` is passed an invalid notebook, it will exit 123. If it's
+passed a non-Python notebook, it'll exit 0.
 
 1.4.0 (2022-07-17)
 ~~~~~~~~~~~~~~~~~~

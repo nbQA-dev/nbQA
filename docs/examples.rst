@@ -91,10 +91,17 @@ Format markdown cells with `mdformat`_:
 
    $ nbqa mdformat my_notebook.ipynb --nbqa-md
 
+Format ``.md`` file saved via `Jupytext`_:`
+
+.. code:: console
+
+   $ nbqa black my_notebook.md
+
 .. _black: https://black.readthedocs.io/en/stable/
 .. _doctest: https://docs.python.org/3/library/doctest.html
 .. _flake8: https://flake8.pycqa.org/en/latest/
 .. _isort: https://timothycrosley.github.io/isort/
+.. _Jupytext: https://github.com/mwouts/jupytext
 .. _mypy: http://mypy-lang.org/
 .. _pylint: https://github.com/PyCQA/pylint
 .. _pyupgrade: https://github.com/asottile/pyupgrade
