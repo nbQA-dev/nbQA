@@ -113,7 +113,7 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
         All Jupyter Notebooks found in directory.
     """
     try:
-        pass
+        import jupytext  # noqa  # pylint: disable=unused-import,import-outside-toplevel
     except ImportError:
         jupytext_installed = False
     else:

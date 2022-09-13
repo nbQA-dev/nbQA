@@ -91,7 +91,7 @@ Format markdown cells with `blacken-docs`_:
 
    $ nbqa blacken-docs my_notebook.ipynb --nbqa-md
 
-Format ``.md`` file saved via `Jupytext`_:`
+Format ``.md`` file saved via `Jupytext`_ (note: requires ``jupytext`` to be installed):
 
 .. code:: console
 
