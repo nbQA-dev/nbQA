@@ -6,7 +6,7 @@
 </h1>
 
 <h3 align="center">
-	Run isort, pyupgrade, mypy, pylint, flake8, mdformat, black, blacken-docs, and more on Jupyter Notebooks
+	Run isort, pyupgrade, mypy, pylint, flake8, black, blacken-docs, and more on Jupyter Notebooks
 </h3>
 
 <p align="center">
@@ -102,10 +102,10 @@ $ nbqa pyupgrade my_notebook.ipynb --py37-plus
 Rewriting my_notebook.ipynb
 ```
 
-Format your markdown cells with [mdformat](https://mdformat.readthedocs.io/en/stable/index.html):
+Format your markdown cells with [blacken-docs](https://github.com/asottile/blacken-docs):
 
 ```console
-$ nbqa mdformat my_notebook.ipynb --nbqa-md --nbqa-diff
+$ nbqa blacken-docs my_notebook.ipynb --nbqa-md --nbqa-diff
 Cell 2
 ------
 --- my_notebook.ipynb

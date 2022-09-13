@@ -140,20 +140,20 @@ Process markdown cells
 
 You can process markdown cells (instead of code cells) by using the :code:`--nbqa-md` CLI argument.
 
-This is useful when running tools which run on markdown files, such as ``mdformat``.
+This is useful when running tools which run on markdown files, such as ``blacken-docs``.
 
 For example, you could add the following to your :code:`pyproject.toml` file:
 
     .. code-block:: toml
 
         [tool.nbqa.md]
-        mdformat = true
+        blacken-docs = true
 
 or, from the command-line:
 
 .. code-block:: bash
 
-    nbqa mdformat notebook.ipynb --nbqa-md
+    nbqa blacken-docs notebook.ipynb --nbqa-md
 
 Shell commands
 ~~~~~~~~~~~~~~

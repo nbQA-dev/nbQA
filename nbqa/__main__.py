@@ -1,6 +1,5 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
 import itertools
-import json
 import os
 import re
 import subprocess
@@ -115,13 +114,16 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
     """
     if not os.path.isdir(root_dir):
         return iter((Path(root_dir),))
-    return (
-        i
-        for i in itertools.chain(
+    try:
+        pass
+    except ImportError:
+        iterable = Path(root_dir).rglob("*.ipynb")
+    else:
+        iterable = itertools.chain(  # type: ignore
             Path(root_dir).rglob("*.ipynb"), Path(root_dir).rglob("*.md")
         )
-        if not re.search(EXCLUDES, str(i.resolve().as_posix()))
-    )
+
+    return (i for i in iterable if not re.search(EXCLUDES, str(i.resolve().as_posix())))
 
 
 def _filter_by_include_exclude(
@@ -526,13 +528,15 @@ def _save_markdown_sources(
     Record which notebooks fail to process.
     """
     failed_notebooks = {}
+    non_python_notebooks = set()
     nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
 
     for notebook, (file_descriptor, _) in nb_to_md_mapping.items():
-        with open(str(notebook), encoding="utf-8") as handle:
-            content = handle.read()
         try:
-            notebook_json = json.loads(content)
+            notebook_json, _ = read_notebook(notebook)
+            if notebook_json is None or _is_non_python_notebook(notebook_json):
+                non_python_notebooks.add(notebook)
+                continue
             nb_info_mapping[notebook] = save_markdown_source.main(
                 notebook_json,
                 file_descriptor,
@@ -540,7 +544,7 @@ def _save_markdown_sources(
             )
         except Exception as exp_repr:  # pylint: disable=W0703
             failed_notebooks[notebook] = repr(exp_repr)
-    return SavedSources(nb_info_mapping, failed_notebooks, set())
+    return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks)
 
 
 SAVE_SOURCES = {False: _save_code_sources, True: _save_markdown_sources}

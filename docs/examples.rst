@@ -85,11 +85,11 @@ Check docstring style with `pydocstyle`_:
 
    $ nbqa pydocstyle my_notebook.ipynb
 
-Format markdown cells with `mdformat`_:
+Format markdown cells with `blacken-docs`_:
 
 .. code:: console
 
-   $ nbqa mdformat my_notebook.ipynb --nbqa-md
+   $ nbqa blacken-docs my_notebook.ipynb --nbqa-md
 
 Format ``.md`` file saved via `Jupytext`_:`
 
@@ -108,4 +108,4 @@ Format ``.md`` file saved via `Jupytext`_:`
 .. _yapf: https://github.com/google/yapf
 .. _autopep8: https://github.com/hhatto/autopep8
 .. _pydocstyle: http://www.pydocstyle.org/en/stable/
-.. _mdformat: https://mdformat.readthedocs.io/en/stable/index.html
+.. _blacken-docs: https://github.com/asottile/blacken-docs
