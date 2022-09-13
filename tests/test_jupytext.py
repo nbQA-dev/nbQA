@@ -198,10 +198,11 @@ def test_jupytext_cant_parse() -> None:
 
 def test_jupytext_with_nbqa_md(capsys: "CaptureFixture") -> None:
     """Should work the same whether running on .md or .ipynb file"""
+    path = os.path.join("tests", "data", "notebook_for_testing.md")
     main(
         [
             "blacken-docs",
-            os.path.join("tests", "data", "notebook_for_testing.md"),
+            path,
             "--nbqa-md",
             "--nbqa-diff",
         ]
@@ -210,13 +211,13 @@ def test_jupytext_with_nbqa_md(capsys: "CaptureFixture") -> None:
     expected = (
         "\x1b[1mCell 3\x1b[0m\n"
         "------\n"
-        "\x1b[1;37m--- tests/data/notebook_for_testing.md\n"
-        "\x1b[0m\x1b[1;37m+++ tests/data/notebook_for_testing.md\n"
+        f"\x1b[1;37m--- {path}\n"
+        f"\x1b[0m\x1b[1;37m+++ {path}\n"
         "\x1b[0m\x1b[36m@@ -1,3 +1,3 @@\n"
         "\x1b[0m\x1b[31m-2 +2\n"
         "\x1b[0m\x1b[32m+2 + 2\n"
         "\x1b[0m\n"
-        "tests/data/notebook_for_testing.md: Rewriting...\n"
+        f"{path}: Rewriting...\n"
         "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected
