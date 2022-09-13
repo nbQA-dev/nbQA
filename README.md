@@ -69,6 +69,11 @@ In your [virtual environment](https://realpython.com/python-virtual-environments
 $ python -m pip install -U nbqa
 ```
 
+To also install all supported linters/formatters:
+```console
+$ python -m pip install -U "nbqa[toolchain]"
+```
+
 Or, if you are using conda:
 ```console
 $ conda install -c conda-forge nbqa
@@ -118,7 +123,7 @@ Cell 2
 To apply these changes, remove the `--nbqa-diff` flag
 ```
 
-Format ``.md`` files saved via [Jupytext](https://github.com/mwouts/jupytext):
+Format ``.md`` files saved via [Jupytext](https://github.com/mwouts/jupytext) (requires ``jupytext`` to be installed):
 
 ```console
 $ nbqa black my_notebook.md
