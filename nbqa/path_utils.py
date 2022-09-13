@@ -97,10 +97,11 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
     except:  # noqa: E72a  # pylint: disable=bare-except
         return None, None
 
-    if (
+    if ("kernelspec" not in md_content.get("metadata", {})) or (
         md_content.get("metadata", {}).get("kernelspec", {}).get("language", {})
         != "python"
     ):
+        # Not saved with jupytext, or not Python
         return None, None
 
     # get lexer: see https://github.com/mwouts/jupytext/issues/993

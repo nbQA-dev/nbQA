@@ -190,6 +190,12 @@ def test_non_jupytext_md() -> None:
     assert ret == 0
 
 
+def test_non_python_md() -> None:
+    """Skip non-Python notebooks."""
+    ret = main(["black", os.path.join("tests", "invalid_data", "octave_notebook.md")])
+    assert ret == 0
+
+
 def test_jupytext_cant_parse() -> None:
     """Check file jupytext can't parse"""
     ret = main(["black", os.path.join("tests", "invalid_data", "tracker.md")])
