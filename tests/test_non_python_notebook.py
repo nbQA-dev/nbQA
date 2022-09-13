@@ -21,7 +21,7 @@ def test_non_python_notebook(capsys: "CaptureFixture") -> None:
     main(["black", path, "--nbqa-diff"])
     _, err = capsys.readouterr()
     expected_err = (
-        "No valid notebooks found in given path(s)\n"
+        "No valid Python notebooks found in given path(s)\n"
         "\x1b[1m\n"
         "If you believe the notebook(s) to be valid, please report a bug "
         "at https://github.com/nbQA-dev/nbQA/issues \x1b[0m\n"

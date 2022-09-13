@@ -627,12 +627,10 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
             configs["dont_skip_bad_cells"],
             cli_args.command,
         )
-        if len(saved_sources.non_python_notebooks) + len(
-            saved_sources.failed_notebooks
-        ) == len(nb_to_tmp_mapping):
-            sys.stderr.write("No valid notebooks found in given path(s)")
+        if len(saved_sources.non_python_notebooks) == len(nb_to_tmp_mapping):
+            sys.stderr.write("No valid Python notebooks found in given path(s)")
             _print_failed_notebook_errors(saved_sources.failed_notebooks)
-            return 123
+            return 0
 
         output, output_code, mutated = _run_command(
             cli_args.command,

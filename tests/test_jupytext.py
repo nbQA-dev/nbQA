@@ -175,3 +175,9 @@ def test_md(tmp_test_data: Path) -> None:
         "```\n"
     )
     assert result == expected
+
+
+def test_non_jupytext_md() -> None:
+    """Check non-Python markdown will be ignored."""
+    ret = main(["black", "README.md"])
+    assert ret == 0

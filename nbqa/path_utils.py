@@ -116,4 +116,4 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
         "text_representation", {}
     ):
         return md_content, True
-    return None, None  # how to cover this?
+    return None, None  # pragma: nocover (defensive check, shouldn't get here)

@@ -161,7 +161,7 @@ def test_unable_to_parse(capsys: "CaptureFixture") -> None:
     path.write_text("foo")
     main(["flake8", str(path)])
     path.unlink()
-    message = "No valid notebooks found"
+    message = "nbQA failed to process"
     _, err = capsys.readouterr()
     assert message in err
 
