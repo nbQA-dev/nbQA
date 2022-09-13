@@ -127,6 +127,10 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
             return iter((Path(root_dir),))
         return iter([])
 
+    if not os.path.exists(root_dir):
+        # Process later, raise appropriate error message after clean up.
+        return iter((Path(root_dir),))
+
     if jupytext_installed:
         iterable = itertools.chain(
             Path(root_dir).rglob("*.ipynb"), Path(root_dir).rglob("*.md")
