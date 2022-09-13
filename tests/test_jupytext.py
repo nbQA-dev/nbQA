@@ -19,7 +19,6 @@ def test_myst(tmp_test_data: Path) -> None:
 
     with open(notebook, encoding="utf-8") as fd:
         result = fd.read()
-    expected = ""
     expected = (
         "---\n"
         "jupytext:\n"
@@ -49,8 +48,7 @@ def test_myst(tmp_test_data: Path) -> None:
         "\n"
         '+++ {"tags": ["skip-mdformat"]}\n'
         "\n"
-        "First level heading\n"
-        "===\n"
+        "# First level heading\n"
         "\n"
         "```{code-cell} ipython3\n"
         ":tags: [flake8-skip]\n"
