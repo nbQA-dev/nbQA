@@ -209,7 +209,8 @@ def tmp_remove_comments() -> Iterator[None]:
     shutil.copy(str(Path("tests") / temp_file), str(temp_file))
     yield
     temp_file.unlink()
-    del sys.modules["remove_comments"]
+    if "remove_comments" in sys.modules:
+        del sys.modules["remove_comments"]
 
 
 @pytest.fixture
@@ -219,7 +220,8 @@ def tmp_remove_all() -> Iterator[None]:
     shutil.copy(str(Path("tests") / temp_file), str(temp_file))
     yield
     temp_file.unlink()
-    del sys.modules["remove_all"]
+    if "remove_all" in sys.modules:
+        del sys.modules["remove_all"]
 
 
 @pytest.fixture

@@ -201,10 +201,15 @@ def _write_notebook(
     else:
         assert ext == ".md"
         import jupytext  # pylint: disable=import-outside-toplevel
+        from jupytext.config import (  # pylint: disable=import-outside-toplevel
+            load_jupytext_config,
+        )
+
+        config = load_jupytext_config(os.path.abspath(temp_notebook))
 
         for cell in notebook_json["cells"]:
             cell["source"] = "".join(cell["source"])
-        jupytext.jupytext.write(notebook_json, temp_notebook)
+        jupytext.jupytext.write(notebook_json, temp_notebook, config=config)
 
 
 def mutate(

@@ -2,6 +2,7 @@
 import itertools
 import os
 import re
+import string
 import subprocess
 import sys
 import tempfile
@@ -492,7 +493,7 @@ def _is_non_python_notebook(notebook: MutableMapping[str, Any]) -> bool:
     if a notebook has empty metadata, we will try to parse it anyway.
     """
     language = notebook.get("metadata", {}).get("language_info", {}).get("name", None)
-    return language is not None and language != "python"
+    return language is not None and language.rstrip(string.digits) != "python"
 
 
 def _save_code_sources(

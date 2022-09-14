@@ -1,6 +1,5 @@
 ---
 jupytext:
-  notebook_metadata_filter: substitutions
   text_representation:
     extension: .md
     format_name: myst

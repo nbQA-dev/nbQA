@@ -20,14 +20,16 @@ def test_myst(tmp_test_data: Path) -> None:
     """
     notebook = tmp_test_data / "notebook_for_testing.md"
 
+    with open(tmp_test_data / ".jupytext.toml", "w", encoding="utf-8") as fd:
+        fd.write('notebook_metadata_filter = "substitutions"\n')
     main(["black", str(notebook)])
+    os.remove(tmp_test_data / ".jupytext.toml")
 
     with open(notebook, encoding="utf-8") as fd:
         result = fd.read()
     expected = (
         "---\n"
         "jupytext:\n"
-        "  notebook_metadata_filter: substitutions\n"
         "  text_representation:\n"
         "    extension: .md\n"
         "    format_name: myst\n"

@@ -1,17 +1,18 @@
 """Utility functions to deal with paths."""
 import json
 import os
+import string
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
 
-def remove_prefix(string: str, prefix: str) -> str:
+def remove_prefix(string_: str, prefix: str) -> str:
     """
     Remove prefix from string.
 
     Parameters
     ----------
-    string
+    string_
         Given string to remove prefix from.
     prefix
         Prefix to remove.
@@ -21,20 +22,20 @@ def remove_prefix(string: str, prefix: str) -> str:
     AssertionError
         If string doesn't start with given prefix.
     """
-    if string.startswith(prefix):
-        string = string[len(prefix) :]
+    if string_.startswith(prefix):
+        string_ = string_[len(prefix) :]
     else:  # pragma: nocover
-        raise AssertionError(f"{string} doesn't start with prefix {prefix}")
-    return string
+        raise AssertionError(f"{string_} doesn't start with prefix {prefix}")
+    return string_
 
 
-def remove_suffix(string: str, suffix: str) -> str:
+def remove_suffix(string_: str, suffix: str) -> str:
     """
     Remove suffix from string.
 
     Parameters
     ----------
-    string
+    string_
         Given string to remove suffix from.
     suffix
         Suffix to remove.
@@ -44,11 +45,11 @@ def remove_suffix(string: str, suffix: str) -> str:
     AssertionError
         If string doesn't end with given suffix.
     """
-    if string.endswith(suffix):
-        string = string[: -len(suffix)]
+    if string_.endswith(suffix):
+        string_ = string_[: -len(suffix)]
     else:  # pragma: nocover
-        raise AssertionError(f"{string} doesn't end with suffix {suffix}")
-    return string
+        raise AssertionError(f"{string_} doesn't end with suffix {suffix}")
+    return string_
 
 
 def get_relative_and_absolute_paths(path: str) -> Tuple[str, str]:
@@ -92,14 +93,33 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
         from markdown_it import MarkdownIt  # pylint: disable=import-outside-toplevel
     except ImportError:  # pragma: nocover (how to test this?)
         return None, None
+
+    from jupytext.config import (  # pylint: disable=import-outside-toplevel
+        load_jupytext_config,
+    )
+
+    config = load_jupytext_config(os.path.abspath(notebook))
+
     try:
-        md_content = jupytext.jupytext.read(notebook)
+        md_content = jupytext.jupytext.read(notebook, config=config)
     except:  # noqa: E72a  # pylint: disable=bare-except
         return None, None
 
     if ("kernelspec" not in md_content.get("metadata", {})) or (
-        md_content.get("metadata", {}).get("kernelspec", {}).get("language", {})
-        != "python"
+        (
+            md_content.get("metadata", {})
+            .get("kernelspec", {})
+            .get("language", "")
+            .rstrip(string.digits)
+            != "python"
+        )
+        and (
+            md_content.get("metadata", {})
+            .get("kernelspec", {})
+            .get("name", "")
+            .rstrip(string.digits)
+            != "python"
+        )
     ):
         # Not saved with jupytext, or not Python
         return None, None
@@ -113,12 +133,6 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
             lexer = remove_prefix(token.info, "{code-cell}").strip()
             md_content["metadata"]["language_info"] = {"pygments_lexer": lexer}
             break
-
-    # get substitutions, see https://github.com/mwouts/jupytext/issues/994
-    if "substitutions" in md_content.get("metadata", {}):
-        md_content["metadata"].get("jupytext", {}).update(
-            {"notebook_metadata_filter": "substitutions"}
-        )
 
     for cell in md_content["cells"]:
         cell["source"] = cell["source"].splitlines(keepends=True)
