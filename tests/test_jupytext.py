@@ -1,4 +1,5 @@
 """Test files saved via jupytext."""
+import pytest
 import os
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -243,3 +244,27 @@ def test_jupytext_with_nbqa_md(capsys: "CaptureFixture") -> None:
     )
     out, _ = capsys.readouterr()
     assert out == expected.replace(".md", ".ipynb")
+
+def test_invalid_config_file(tmpdir):
+    config_file = (
+        'Type: Jupyter Notebook Extension\n'
+        'Name: Jupytext\n'
+        'Section: notebook\n'
+        'Description: Jupytext Menu\n'
+        'tags:\n'
+        '- version control\n'
+        '- markdown\n'
+        '- script\n'
+        'Link: README.md\n'
+        'Icon: jupytext_menu_zoom.png\n'
+        'Main: index.js\n'
+        'Compatibility: 5.x, 6.x\n'
+    )
+    with open(os.path.join(tmpdir, 'jupytext.yml'), 'w') as fd:
+        fd.write(config_file)
+    
+    with open(os.path.join(tmpdir, 'foo.md'), 'w') as fd:
+        fd.write('bar\n')
+
+    with pytest.warns(DeprecationWarning, match=r'Passing unrecognized arguments to super\(JupytextConfiguration\)'):
+        main(['black', os.path.join(tmpdir, 'foo.md')])

@@ -96,9 +96,13 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
 
     from jupytext.config import (  # pylint: disable=import-outside-toplevel
         load_jupytext_config,
+        JupytextConfigurationError,
     )
 
-    config = load_jupytext_config(os.path.abspath(notebook))
+    try:
+        config = load_jupytext_config(os.path.abspath(notebook))
+    except JupytextConfigurationError:
+        config = None
 
     try:
         md_content = jupytext.jupytext.read(notebook, config=config)
