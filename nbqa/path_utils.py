@@ -95,8 +95,8 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
         return None, None
 
     from jupytext.config import (  # pylint: disable=import-outside-toplevel
-        load_jupytext_config,
         JupytextConfigurationError,
+        load_jupytext_config,
     )
 
     try:
@@ -129,8 +129,7 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
         return None, None
 
     # get lexer: see https://github.com/mwouts/jupytext/issues/993
-    parser = MarkdownIt("commonmark").disable("inline", True)
-    parsed = parser.parse(content)
+    parsed = MarkdownIt("commonmark").disable("inline", True).parse(content)
     lexer = None
     for token in parsed:
         if token.type == "fence" and token.info.startswith("{code-cell}"):
