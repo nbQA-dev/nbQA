@@ -21,6 +21,7 @@ from typing import (
     Sequence,
     Set,
     Tuple,
+    cast,
 )
 
 import tomli
@@ -293,15 +294,18 @@ def _run_command(
     """
     before = [_get_mtimes(i) for i in args]
 
+    main_command, *sub_commands = command.split()
+
     my_env = os.environ.copy()
-    if command == "mypy" and "MYPY_FORCE_COLOR" not in my_env:
+    if main_command == "mypy" and "MYPY_FORCE_COLOR" not in my_env:
         my_env["MYPY_FORCE_COLOR"] = "1"
 
     if shell:
-        cmd = [command]
+        # We already checked that which does not return None
+        cmd = [cast(str, which(main_command)), *sub_commands]
     else:
-        python_module = COMMAND_TO_PYTHON_MODULE.get(command, command)
-        cmd = [sys.executable, "-m", python_module]
+        python_module = COMMAND_TO_PYTHON_MODULE.get(main_command, main_command)
+        cmd = [sys.executable, "-m", python_module, *sub_commands]
 
     output = subprocess.run(
         [*cmd, *args, *cmd_args],
@@ -717,12 +721,13 @@ def _check_command_is_installed(command: str, *, shell: bool) -> None:
     CommandNotFoundError
         If third-party tool isn't available as a script in $PATH.
     """
+    main_command, *_ = command.split()
     if shell:
-        if which(command):
+        if which(main_command):
             return
-        raise CommandNotFoundError(command)
+        raise CommandNotFoundError(main_command)
 
-    python_module = COMMAND_TO_PYTHON_MODULE.get(command, command)
+    python_module = COMMAND_TO_PYTHON_MODULE.get(main_command, main_command)
     try:
         command_version = metadata.version(python_module)
     except metadata.PackageNotFoundError:
@@ -734,13 +739,15 @@ def _check_command_is_installed(command: str, *, shell: bool) -> None:
             ):  # pragma: nocover(py<37)
                 # I presume the lack of coverage in Python3.6 here is a bug, as all
                 # these branches are actually covered.
-                raise ModuleNotFoundError(_get_command_not_found_msg(command)) from None
+                raise ModuleNotFoundError(
+                    _get_command_not_found_msg(main_command)
+                ) from None
     else:
-        if command in MIN_VERSIONS:
-            min_version = MIN_VERSIONS[command]
+        if main_command in MIN_VERSIONS:
+            min_version = MIN_VERSIONS[main_command]
             if parse_version(command_version) < parse_version(min_version):
                 raise UnsupportedPackageVersionError(
-                    command, command_version, min_version
+                    main_command, command_version, min_version
                 )
 
 
