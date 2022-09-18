@@ -6,7 +6,7 @@
 </h1>
 
 <h3 align="center">
-	Run isort, pyupgrade, mypy, pylint, flake8, mdformat, black, blacken-docs, and more on Jupyter Notebooks
+	Run isort, pyupgrade, mypy, pylint, flake8, black, blacken-docs, and more on Jupyter Notebooks
 </h3>
 
 <p align="center">
@@ -69,6 +69,11 @@ In your [virtual environment](https://realpython.com/python-virtual-environments
 $ python -m pip install -U nbqa
 ```
 
+To also install all supported linters/formatters:
+```console
+$ python -m pip install -U "nbqa[toolchain]"
+```
+
 Or, if you are using conda:
 ```console
 $ conda install -c conda-forge nbqa
@@ -91,21 +96,21 @@ All done! ✨ 🍰 ✨
 Sort your imports with [isort](https://timothycrosley.github.io/isort/):
 
 ```console
-$ nbqa isort my_notebook.ipynb
+$ nbqa isort my_notebook.ipynb --float-to-top
 Fixing my_notebook.ipynb
 ```
 
 Upgrade your syntax with [pyupgrade](https://github.com/asottile/pyupgrade):
 
 ```console
-$ nbqa pyupgrade my_notebook.ipynb --py36-plus
+$ nbqa pyupgrade my_notebook.ipynb --py37-plus
 Rewriting my_notebook.ipynb
 ```
 
-Format your markdown cells with [mdformat](https://mdformat.readthedocs.io/en/stable/index.html):
+Format your markdown cells with [blacken-docs](https://github.com/asottile/blacken-docs):
 
 ```console
-$ nbqa mdformat my_notebook.ipynb --nbqa-md --nbqa-diff
+$ nbqa blacken-docs my_notebook.ipynb --nbqa-md --nbqa-diff
 Cell 2
 ------
 --- my_notebook.ipynb
@@ -116,6 +121,15 @@ Cell 2
 +# First level heading
 
 To apply these changes, remove the `--nbqa-diff` flag
+```
+
+Format ``.md`` files saved via [Jupytext](https://github.com/mwouts/jupytext) (requires ``jupytext`` to be installed):
+
+```console
+$ nbqa black my_notebook.md
+reformatted my_notebook.md
+All done! ✨ 🍰 ✨
+1 files reformatted.
 ```
 
 See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html) for examples involving [doctest](https://docs.python.org/3/library/doctest.html), [flake8](https://flake8.pycqa.org/en/latest/), [mypy](http://mypy-lang.org/), [pylint](https://github.com/PyCQA/pylint), [autopep8](https://github.com/hhatto/autopep8), [pydocstyle](http://www.pydocstyle.org/en/stable/), and [yapf](https://github.com/google/yapf).
@@ -129,9 +143,11 @@ Here's an example of how to set up some pre-commit hooks: put this in your `.pre
   rev: 1.4.0
   hooks:
     - id: nbqa-black
+      additional_dependencies: [jupytext]  # optional, only if you're using Jupytext
     - id: nbqa-pyupgrade
-      args: [--py36-plus]
+      args: ["--py37-plus"]
     - id: nbqa-isort
+      args: ["--float-to-top"]
 ```
 
 If you need to select specific versions of any of these linters/formatters,

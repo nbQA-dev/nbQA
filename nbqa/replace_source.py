@@ -10,12 +10,13 @@ import os
 import sys
 from difflib import unified_diff
 from shutil import move
-from typing import Any, Iterator, List, Mapping, MutableMapping, Sequence, Set
+from typing import Any, Dict, Iterator, List, Mapping, MutableMapping, Sequence, Set
 
 import tokenize_rt
 
 from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
+from nbqa.path_utils import read_notebook
 from nbqa.save_code_source import CODE_SEPARATOR
 from nbqa.save_markdown_source import MARKDOWN_SEPARATOR
 from nbqa.text import BOLD, RESET
@@ -171,6 +172,46 @@ def _notebook_cells(
             yield cell
 
 
+def _write_notebook(
+    temp_notebook: str, trailing_newline: bool, notebook_json: Dict[str, Any]
+) -> None:
+    """
+    Write notebook to disc.
+
+    Parameters
+    ----------
+    temp_notebook
+        Location of temporary notebook
+    trailing_newline
+        Whether notebook originally had trailing newline
+    notebook_json
+        New source for notebook.
+    """
+    _, ext = os.path.splitext(temp_notebook)
+    if ext == ".ipynb":
+        with open(temp_notebook, "w", encoding="utf-8") as handle:
+            if trailing_newline:
+                handle.write(
+                    f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n"
+                )
+            else:
+                handle.write(
+                    f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}"
+                )
+    else:
+        assert ext == ".md"
+        import jupytext  # pylint: disable=import-outside-toplevel
+        from jupytext.config import (  # pylint: disable=import-outside-toplevel
+            load_jupytext_config,
+        )
+
+        config = load_jupytext_config(os.path.abspath(temp_notebook))
+
+        for cell in notebook_json["cells"]:
+            cell["source"] = "".join(cell["source"])
+        jupytext.jupytext.write(notebook_json, temp_notebook, config=config)
+
+
 def mutate(
     temp_file: str, notebook: str, notebook_info: NotebookInfo, *, md: bool
 ) -> bool:
@@ -191,9 +232,10 @@ def mutate(
     bool
         Whether mutation actually happened.
     """
-    with open(notebook, encoding="utf-8") as handle:
-        notebook_txt = handle.read()
-    notebook_json = json.loads(notebook_txt)
+    notebook_json, trailing_newline = read_notebook(notebook)
+    assert notebook_json is not None  # if we got here, it was a valid notebook
+    assert trailing_newline is not None
+
     original_notebook_json = copy.deepcopy(notebook_json)
 
     cells_to_remove = []
@@ -220,11 +262,7 @@ def mutate(
         ]
 
     temp_notebook = os.path.join(os.path.dirname(temp_file), os.path.basename(notebook))
-    with open(temp_notebook, "w", encoding="utf-8") as handle:
-        if notebook_txt.endswith("\n"):
-            handle.write(f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}\n")
-        else:
-            handle.write(f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}")
+    _write_notebook(temp_notebook, trailing_newline, notebook_json)
     move(temp_notebook, notebook)
     return True
 
@@ -286,8 +324,8 @@ def diff(
     bool
         Whether non-null diff was produced.
     """
-    with open(notebook, encoding="utf-8") as handle:
-        notebook_json = json.loads(handle.read())
+    notebook_json, _ = read_notebook(notebook)
+    assert notebook_json is not None  # if we got here, it was a valid notebook
 
     cells = _get_cells(python_file, len(notebook_info.temporary_lines), md=md)
 

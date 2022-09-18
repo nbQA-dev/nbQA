@@ -13,15 +13,7 @@ if TYPE_CHECKING:
 
 
 def test_mdformat(tmp_notebook_for_testing: Path) -> None:
-    """
-    Check pyupgrade works. Should only reformat code cells.
-
-    Parameters
-    ----------
-    tmp_notebook_for_testing
-        Temporary copy of :code:`tmp_notebook_for_testing.ipynb`.
-    """
-    # check diff
+    """Check mdformat works"""
     with open(tmp_notebook_for_testing, encoding="utf-8") as handle:
         before = handle.readlines()
     path = os.path.join("tests", "data", "notebook_for_testing.ipynb")

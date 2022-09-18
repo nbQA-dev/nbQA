@@ -18,7 +18,8 @@ def test_non_python_notebook(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     path = os.path.join("tests", "invalid_data", "non_python_notebook.ipynb")
-    main(["black", path, "--nbqa-diff"])
-    out, _ = capsys.readouterr()
-    expected_out = "Notebook(s) would be left unchanged\n"
-    assert out == expected_out
+    result = main(["black", path, "--nbqa-diff"])
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == "No valid Python notebooks found in given path(s)\n"
+    assert result == 0

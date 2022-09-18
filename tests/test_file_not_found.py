@@ -11,8 +11,8 @@ if TYPE_CHECKING:
 
 def test_file_not_found(capsys: "CaptureFixture") -> None:
     """Check useful error message is raised if file or directory doesn't exist."""
-    msg = "No such file or directory: I don't exist"
+    msg = "No such file or directory: i_dont_exist.ipynb"
 
-    main(["isort", "I don't exist", "--profile=black"])
+    main(["isort", "i_dont_exist.ipynb", "--profile=black"])
     _, err = capsys.readouterr()
     assert msg in err

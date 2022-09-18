@@ -159,11 +159,12 @@ def test_unable_to_parse(capsys: "CaptureFixture") -> None:
     """Check error message shows if we're unable to parse notebook."""
     path = Path("tests") / "data/invalid_notebook.ipynb"
     path.write_text("foo")
-    main(["flake8", str(path)])
+    result = main(["flake8", str(path)])
     path.unlink()
-    message = "No valid .ipynb notebooks found"
+    message = "nbQA failed to process"
     _, err = capsys.readouterr()
     assert message in err
+    assert result == 123
 
 
 def test_unable_to_parse_with_valid_notebook(capsys: "CaptureFixture") -> None:
@@ -235,6 +236,22 @@ def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    main(["black", "docs"])
+    main(["black", "LICENSES"])
     _, err = capsys.readouterr()
-    assert err == "No .ipynb notebooks found in given directories: docs\n"
+    expected_err = "No notebooks found in given path(s)\n"
+    assert err == expected_err
+
+
+def test_wrong_extension_file(capsys: "CaptureFixture") -> None:
+    """
+    Check sensible error message is returned if none of the directories passed have notebooks.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    main(["black", "readthedocs.yml"])
+    _, err = capsys.readouterr()
+    expected_err = "No notebooks found in given path(s)\n"
+    assert err == expected_err

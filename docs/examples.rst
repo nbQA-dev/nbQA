@@ -85,20 +85,27 @@ Check docstring style with `pydocstyle`_:
 
    $ nbqa pydocstyle my_notebook.ipynb
 
-Format markdown cells with `mdformat`_:
+Format markdown cells with `blacken-docs`_:
 
 .. code:: console
 
-   $ nbqa mdformat my_notebook.ipynb --nbqa-md
+   $ nbqa blacken-docs my_notebook.ipynb --nbqa-md
+
+Format ``.md`` file saved via `Jupytext`_ (note: requires ``jupytext`` to be installed):
+
+.. code:: console
+
+   $ nbqa black my_notebook.md
 
 .. _black: https://black.readthedocs.io/en/stable/
 .. _doctest: https://docs.python.org/3/library/doctest.html
 .. _flake8: https://flake8.pycqa.org/en/latest/
 .. _isort: https://timothycrosley.github.io/isort/
+.. _Jupytext: https://github.com/mwouts/jupytext
 .. _mypy: http://mypy-lang.org/
 .. _pylint: https://github.com/PyCQA/pylint
 .. _pyupgrade: https://github.com/asottile/pyupgrade
 .. _yapf: https://github.com/google/yapf
 .. _autopep8: https://github.com/hhatto/autopep8
 .. _pydocstyle: http://www.pydocstyle.org/en/stable/
-.. _mdformat: https://mdformat.readthedocs.io/en/stable/index.html
+.. _blacken-docs: https://github.com/asottile/blacken-docs

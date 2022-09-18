@@ -1,7 +1,8 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
-import json
+import itertools
 import os
 import re
+import string
 import subprocess
 import sys
 import tempfile
@@ -33,7 +34,11 @@ from nbqa.find_root import find_project_root
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
 from nbqa.output_parser import Output, map_python_line_to_nb_lines
-from nbqa.path_utils import get_relative_and_absolute_paths, remove_suffix
+from nbqa.path_utils import (
+    get_relative_and_absolute_paths,
+    read_notebook,
+    remove_suffix,
+)
 from nbqa.save_code_source import CODE_SEPARATOR
 from nbqa.text import BOLD, RESET
 
@@ -109,13 +114,33 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
     notebooks
         All Jupyter Notebooks found in directory.
     """
-    if not os.path.isdir(root_dir):
+    try:
+        import jupytext  # noqa  # pylint: disable=unused-import,import-outside-toplevel
+    except ImportError:  # pragma: nocover
+        jupytext_installed = False
+    else:
+        jupytext_installed = True
+
+    if os.path.isfile(root_dir):
+        _, ext = os.path.splitext(root_dir)
+        if (jupytext_installed and ext in (".ipynb", ".md")) or (
+            not jupytext_installed and ext == ".ipynb"
+        ):
+            return iter((Path(root_dir),))
+        return iter([])
+
+    if not os.path.exists(root_dir):
+        # Process later, raise appropriate error message after clean up.
         return iter((Path(root_dir),))
-    return (
-        i
-        for i in Path(root_dir).rglob("*.ipynb")
-        if not re.search(EXCLUDES, str(i.resolve().as_posix()))
-    )
+
+    if jupytext_installed:
+        iterable = itertools.chain(
+            Path(root_dir).rglob("*.ipynb"), Path(root_dir).rglob("*.md")
+        )
+    else:  # pragma: nocover
+        iterable = itertools.chain(Path(root_dir).rglob("*.ipynb"))
+
+    return (i for i in iterable if not re.search(EXCLUDES, str(i.resolve().as_posix())))
 
 
 def _filter_by_include_exclude(
@@ -201,16 +226,17 @@ def _replace_temp_python_file_references_in_out_err(
     Output
         Stdout, stderr with temporary directory replaced by current working directory.
     """
+    _, ext = os.path.splitext(notebook)
     py_basename = os.path.basename(temp_python_file)
     nb_basename = os.path.basename(notebook)
     out = out.replace(py_basename, nb_basename)
     err = err.replace(py_basename, nb_basename)
 
     out = out.replace(
-        remove_suffix(py_basename, SUFFIX[md]), remove_suffix(nb_basename, ".ipynb")
+        remove_suffix(py_basename, SUFFIX[md]), remove_suffix(nb_basename, ext)
     )
     err = err.replace(
-        remove_suffix(py_basename, SUFFIX[md]), remove_suffix(nb_basename, ".ipynb")
+        remove_suffix(py_basename, SUFFIX[md]), remove_suffix(nb_basename, ext)
     )
 
     return Output(out, err)
@@ -434,7 +460,9 @@ def _get_nb_to_tmp_mapping(
         nb_to_tmp_mapping[notebook] = TemporaryFile(
             *tempfile.mkstemp(
                 dir=os.path.dirname(notebook),
-                prefix=remove_suffix(os.path.basename(notebook), ".ipynb"),
+                prefix=remove_suffix(
+                    os.path.basename(notebook), os.path.splitext(notebook)[-1]
+                ),
                 suffix=SUFFIX[md],
             )
         )
@@ -469,7 +497,7 @@ def _is_non_python_notebook(notebook: MutableMapping[str, Any]) -> bool:
     if a notebook has empty metadata, we will try to parse it anyway.
     """
     language = notebook.get("metadata", {}).get("language_info", {}).get("name", None)
-    return language is not None and language != "python"
+    return language is not None and language.rstrip(string.digits) != "python"
 
 
 def _save_code_sources(
@@ -489,11 +517,9 @@ def _save_code_sources(
     nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
 
     for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
-        with open(str(notebook), encoding="utf-8") as handle:
-            content = handle.read()
         try:
-            notebook_json = json.loads(content)
-            if _is_non_python_notebook(notebook_json):
+            notebook_json, _ = read_notebook(notebook)
+            if notebook_json is None or _is_non_python_notebook(notebook_json):
                 non_python_notebooks.add(notebook)
                 continue
             nb_info_mapping[notebook] = save_code_source.main(
@@ -522,13 +548,15 @@ def _save_markdown_sources(
     Record which notebooks fail to process.
     """
     failed_notebooks = {}
+    non_python_notebooks = set()
     nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
 
     for notebook, (file_descriptor, _) in nb_to_md_mapping.items():
-        with open(str(notebook), encoding="utf-8") as handle:
-            content = handle.read()
         try:
-            notebook_json = json.loads(content)
+            notebook_json, _ = read_notebook(notebook)
+            if notebook_json is None or _is_non_python_notebook(notebook_json):
+                non_python_notebooks.add(notebook)
+                continue
             nb_info_mapping[notebook] = save_markdown_source.main(
                 notebook_json,
                 file_descriptor,
@@ -536,7 +564,7 @@ def _save_markdown_sources(
             )
         except Exception as exp_repr:  # pylint: disable=W0703
             failed_notebooks[notebook] = repr(exp_repr)
-    return SavedSources(nb_info_mapping, failed_notebooks, set())
+    return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks)
 
 
 SAVE_SOURCES = {False: _save_code_sources, True: _save_markdown_sources}
@@ -610,14 +638,10 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
     except FileNotFoundError as exc:
         sys.stderr.write(str(exc))
         return 1
-
     try:  # pylint disable=R0912
 
         if not nb_to_tmp_mapping:
-            sys.stderr.write(
-                "No .ipynb notebooks found in given directories: "
-                f"{' '.join(i for i in cli_args.root_dirs if os.path.isdir(i))}\n"
-            )
+            sys.stderr.write("No notebooks found in given path(s)\n")
             return 0
         saved_sources = SAVE_SOURCES[configs["md"]](
             nb_to_tmp_mapping,
@@ -626,11 +650,9 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
             configs["dont_skip_bad_cells"],
             cli_args.command,
         )
-
-        if len(saved_sources.failed_notebooks) == len(nb_to_tmp_mapping):
-            sys.stderr.write("No valid .ipynb notebooks found\n")
-            _print_failed_notebook_errors(saved_sources.failed_notebooks)
-            return 123
+        if len(saved_sources.non_python_notebooks) == len(nb_to_tmp_mapping):
+            sys.stderr.write("No valid Python notebooks found in given path(s)\n")
+            return 0
 
         output, output_code, mutated = _run_command(
             cli_args.command,
