@@ -4,14 +4,14 @@
   entry: nbqa
   language: python
   require_serial: true
-  types: [jupyter]
+  types_or: [jupyter, markdown]
 - id: nbqa-black
   name: nbqa-black
   description: Run 'black' on a Jupyter Notebook
   entry: nbqa black
   language: python
   require_serial: true
-  types: [jupyter]
+  types_or: [jupyter, markdown]
   additional_dependencies: [black]
 - id: nbqa-check-ast
   name: nbqa-check-ast
@@ -19,7 +19,7 @@
   entry: nbqa pre_commit_hooks.check_ast
   language: python
   require_serial: true
-  types: [jupyter]
+  types_or: [jupyter, markdown]
   additional_dependencies: [pre-commit-hooks]
   args: [--nbqa-dont-skip-bad-cells]
 - id: nbqa-flake8
@@ -28,7 +28,7 @@
   entry: nbqa flake8
   language: python
   require_serial: true
-  types: [jupyter]
+  types_or: [jupyter, markdown]
   additional_dependencies: [flake8]
 - id: nbqa-isort
   name: nbqa-isort
@@ -36,7 +36,7 @@
   entry: nbqa isort
   language: python
   require_serial: true
-  types: [jupyter]
+  types_or: [jupyter, markdown]
   additional_dependencies: [isort]
 - id: nbqa-mypy
   name: nbqa-mypy
@@ -44,7 +44,7 @@
   entry: nbqa mypy
   language: python
   require_serial: true
-  types: [jupyter]
+  types_or: [jupyter, markdown]
   additional_dependencies: [mypy]
 - id: nbqa-pylint
   name: nbqa-pylint
@@ -52,7 +52,7 @@
   entry: nbqa pylint
   language: python
   require_serial: true
-  types: [jupyter]
+  types_or: [jupyter, markdown]
   additional_dependencies: [pylint]
 - id: nbqa-pyupgrade
   name: nbqa-pyupgrade
@@ -60,7 +60,7 @@
   entry: nbqa pyupgrade
   language: python
   require_serial: true
-  types: [jupyter]
+  types_or: [jupyter, markdown]
   additional_dependencies: [pyupgrade]
 - id: nbqa-yapf
   name: nbqa-yapf
@@ -68,7 +68,7 @@
   entry: nbqa yapf --in-place
   language: python
   require_serial: true
-  types: [jupyter]
+  types_or: [jupyter, markdown]
   additional_dependencies: [yapf]
 - id: nbqa-autopep8
   name: nbqa-autopep8
@@ -76,7 +76,7 @@
   entry: nbqa autopep8 -i
   language: python
   require_serial: true
-  types: [jupyter]
+  types_or: [jupyter, markdown]
   additional_dependencies: [autopep8]
 - id: nbqa-pydocstyle
   name: nbqa-pydocstyle
@@ -84,5 +84,5 @@
   entry: nbqa pydocstyle
   language: python
   require_serial: true
-  types: [jupyter]
+  types_or: [jupyter, markdown]
   additional_dependencies: [pydocstyle]

@@ -2,8 +2,14 @@
 Changelog
 =========
 
-1.5.0 (???)
-~~~~~~~~~~~
+1.5.1 (2022-09-20)
+~~~~~~~~~~~~~~~~~~
+Built-in hooks now have ``types_or: [jupyter, markdown]``, so that
+they'll run on both Jupyter and Markdown files if you specify
+``jupytext`` as an additional dependency.
+
+1.5.0 (2022-09-18)
+~~~~~~~~~~~~~~~~~~
 ``nbqa`` now removes empty cells which were not empty to begin with.
 Markdown files saved via ``Jupytext`` will now be processed as well
 (thanks @basnijholt and @rgommers for the suggestion!)
