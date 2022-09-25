@@ -334,6 +334,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center"><a href="http://www.francescoballarin.it"><img src="https://avatars.githubusercontent.com/u/11783908?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Francesco Ballarin</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Afrancesco-ballarin" title="Bug reports">🐛</a></td>
       <td align="center"><a href="https://github.com/janosh"><img src="https://avatars.githubusercontent.com/u/30958850?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Janosh Riebesell</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Ajanosh" title="Bug reports">🐛</a> <a href="https://github.com/nbQA-dev/nbQA/commits?author=janosh" title="Documentation">📖</a></td>
       <td align="center"><a href="http://www.nijho.lt"><img src="https://avatars.githubusercontent.com/u/6897215?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Bas Nijholt</b></sub></a><br /><a href="#ideas-basnijholt" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center"><a href="https://github.com/rgommers/"><img src="https://avatars.githubusercontent.com/u/98330?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ralf Gommers</b></sub></a><br /><a href="#ideas-rgommers" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>

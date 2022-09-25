@@ -340,6 +340,15 @@
       "contributions": [
         "ideas"
       ]
+     },
+     {
+      "login": "rgommers",
+      "name": "Ralf Gommers",
+      "avatar_url": "https://avatars.githubusercontent.com/u/98330?v=4",
+      "profile": "https://github.com/rgommers/",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
