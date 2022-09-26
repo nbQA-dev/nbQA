@@ -56,7 +56,7 @@ repos:
         exclude: ^docs/
         additional_dependencies: [types-setuptools, types-toml]
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.38.0
+    rev: v2.38.2
     hooks:
       - id: pyupgrade
         args: [--py37-plus]
@@ -80,7 +80,7 @@ repos:
     hooks:
       - id: setup-cfg-fmt
   - repo: https://github.com/PyCQA/autoflake
-    rev: v1.6.0
+    rev: v1.6.1
     hooks:
       - id: autoflake
         args: [--remove-all-unused-imports, -i]
@@ -89,7 +89,7 @@ repos:
       - id: check-hooks-apply
       - id: check-useless-excludes
   - repo: https://github.com/kynan/nbstripout
-    rev: 0.6.0
+    rev: 0.6.1
     hooks:
       - id: nbstripout
         exclude: ^tests/data/(databricks_notebook|notebook_for_testing)\.ipynb$
