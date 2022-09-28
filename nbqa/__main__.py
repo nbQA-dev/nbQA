@@ -120,7 +120,6 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
         jupytext_installed = False
     else:
         jupytext_installed = True
-
     if os.path.isfile(root_dir):
         _, ext = os.path.splitext(root_dir)
         if (jupytext_installed and ext in (".ipynb", ".md")) or (
@@ -306,7 +305,6 @@ def _run_command(
     else:
         python_module = COMMAND_TO_PYTHON_MODULE.get(main_command, main_command)
         cmd = [sys.executable, "-m", python_module, *sub_commands]
-
     output = subprocess.run(
         [*cmd, *args, *cmd_args],
         capture_output=True,
@@ -660,7 +658,11 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
             [
                 i.file
                 for key, i in nb_to_tmp_mapping.items()
-                if key not in saved_sources.failed_notebooks
+                if key
+                not in (
+                    *saved_sources.failed_notebooks,
+                    *saved_sources.non_python_notebooks,
+                )
             ],
             shell=configs["shell"],
         )

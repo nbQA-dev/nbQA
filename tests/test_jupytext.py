@@ -275,3 +275,29 @@ def test_invalid_config_file(tmpdir: "LocalPath") -> None:
         match=r"Passing unrecognized arguments to super\(JupytextConfiguration\)",
     ):
         main(["black", os.path.join(tmpdir, "foo.md")])
+
+
+def test_jupytext_on_folder(capsys: "CaptureFixture") -> None:
+    """Check invalid files aren't checked."""
+    path = os.path.join("tests", "invalid_data")
+    main(
+        [
+            "pydocstyle",
+            path,
+        ]
+    )
+    out, _ = capsys.readouterr()
+    expected = (
+        f'{os.path.join(path, "invalid_syntax.ipynb")}:cell_1:0:1: D100 Missing docstring in public module\n'
+        f'{os.path.join(path, "assignment_to_literal.ipynb")}:cell_1:0:1: D100 Missing docstring in public module\n'
+        f'{os.path.join(path, "automagic.ipynb")}:cell_1:0:1: D100 Missing docstring in public module\n'
+    )
+    expected = (
+        f'{os.path.join(path, "invalid_syntax.ipynb")}:cell_1:0 at module level:\n'
+        "        D100: Missing docstring in public module\n"
+        f'{os.path.join(path, "assignment_to_literal.ipynb")}:cell_1:0 at module level:\n'
+        "        D100: Missing docstring in public module\n"
+        f'{os.path.join(path, "automagic.ipynb")}:cell_1:0 at module level:\n'
+        "        D100: Missing docstring in public module\n"
+    )
+    assert out == expected

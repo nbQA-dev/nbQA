@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.5.2 (2022-09-28)
+~~~~~~~~~~~~~~~~~~
+Fixed bug in which, when running ``nbqa`` on a directory,
+it wasn't ignoring invalid files (thanks @francesco-ballarin for the report!)
+
 1.5.1 (2022-09-20)
 ~~~~~~~~~~~~~~~~~~
 Built-in hooks now have ``types_or: [jupyter, markdown]``, so that
