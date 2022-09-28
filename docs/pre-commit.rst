@@ -11,7 +11,7 @@ Here's an example of what you could include in your ``.pre-commit-config.yaml`` 
 
     repos:
     - repo: https://github.com/nbQA-dev/nbQA
-      rev: 1.5.1
+      rev: 1.5.2
       hooks:
        - id: nbqa-black
          additional_dependencies: [black==20.8b1]
@@ -31,7 +31,7 @@ Custom hooks
 If you have your own custom tool (e.g. ``customtool``) for which we currently don't have a built-in hook, you can define your own one with: ::
 
     - repo: https://github.com/nbQA-dev/nbQA
-      rev: 1.5.1
+      rev: 1.5.2
       hooks:
         - id: nbqa
           entry: nbqa customtool
@@ -49,7 +49,7 @@ To pass command line arguments, use the `pre-commit args <https://pre-commit.com
 
     repos:
     - repo: https://github.com/nbQA-dev/nbQA
-      rev: 1.5.1
+      rev: 1.5.2
       hooks:
        - id: nbqa-pyupgrade
          args: [--py38-plus]
