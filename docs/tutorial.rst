@@ -16,22 +16,30 @@ Rather than using your system installation of Python, we recommend using a virtu
 Here's one way to set one up using Conda - see `this tutorial <https://realpython.com/python-virtual-environments-a-primer/>`_ for other options.
 
 1. Install the `Miniconda distribution of Python <https://docs.conda.io/en/latest/miniconda.html>`_;
-2. Create a new virtual environment. Here, we'll call it ``nbqa-env`` ::
+2. Create a new virtual environment. Here, we'll call it ``nbqa-env``
+
+.. code-block:: bash
 
     conda create -n nbqa-env python=3.8 -y
 
-3. Activate your virtual environment ::
+3. Activate your virtual environment
+
+.. code-block:: bash
 
     conda activate nbqa-env
 
 Install nbqa and black
 ----------------------
 
-1. Install ``nbqa`` and at least one Python code quality tool - here, we'll use ``black`` ::
+1. Install ``nbqa`` and at least one Python code quality tool - here, we'll use ``black``
+
+.. code-block:: bash
 
     pip install -U nbqa black
 
-2. Check your installation ::
+2. Check your installation
+
+.. code-block:: bash
 
     nbqa --version
     black --version
@@ -44,7 +52,9 @@ Run nbqa black
 1. Locate a Jupyter Notebook on your system. If you don't have one, `here <https://www.kaggle.com/startupsci/titanic-data-science-solutions>`_
    is a nice one you can download.
 
-2. Run the ``black`` formatter on your notebook via ``nbqa`` ::
+2. Run the ``black`` formatter on your notebook via ``nbqa``
+
+.. code-block:: bash
 
     nbqa black notebook.ipynb --line-length=96
 
@@ -60,7 +70,9 @@ Open up your ``pyproject.toml`` file (or create one if you don't have one alread
     [tool.black]
     line-length = 96
 
-Now, you'll be able to run the command from the previous section with just ::
+Now, you'll be able to run the command from the previous section with just
+
+.. code-block:: bash
 
     nbqa black notebook.ipynb
 
@@ -73,10 +85,14 @@ Writing your own tool
 
 You can use ``nbqa`` to run your own custom tool on Jupyter Notebooks too. You just need to make sure you can
 run it as a module on a given set of Python files. For example, if your tool is called ``my_amazing_tool``, then
-as long as you can run ::
+as long as you can run
+
+.. code-block:: bash
 
     python -m my_amazing_tool file_1.py file_2.py
 
 then you will be able to run
+
+.. code-block:: bash
 
     nbqa my_amazing_tool notebook_1.ipynb notebook_2.ipynb
