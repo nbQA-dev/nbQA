@@ -7,7 +7,9 @@ Usage
 
 You can easily use ``nbqa`` as a `pre-commit <https://pre-commit.com/>`_ hook.
 
-Here's an example of what you could include in your ``.pre-commit-config.yaml`` file: ::
+Here's an example of what you could include in your ``.pre-commit-config.yaml`` file:
+
+.. code-block:: yaml
 
     repos:
     - repo: https://github.com/nbQA-dev/nbQA
@@ -28,7 +30,9 @@ See `.pre-commit-hooks.yaml <https://github.com/nbQA-dev/nbQA/blob/master/.pre-c
 Custom hooks
 ------------
 
-If you have your own custom tool (e.g. ``customtool``) for which we currently don't have a built-in hook, you can define your own one with: ::
+If you have your own custom tool (e.g. ``customtool``) for which we currently don't have a built-in hook, you can define your own one with:
+
+.. code-block:: yaml
 
     - repo: https://github.com/nbQA-dev/nbQA
       rev: 1.5.2
@@ -46,6 +50,8 @@ Configuration
 -------------
 
 To pass command line arguments, use the `pre-commit args <https://pre-commit.com/#config-args>`_ option:
+
+.. code-block:: yaml
 
     repos:
     - repo: https://github.com/nbQA-dev/nbQA
