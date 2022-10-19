@@ -339,9 +339,9 @@
       "profile": "https://github.com/dnoliver",
       "contributions": [
         "bug"
-        ]
-     },
-     {
+      ]
+    },
+    {
       "login": "basnijholt",
       "name": "Bas Nijholt",
       "avatar_url": "https://avatars.githubusercontent.com/u/6897215?v=4",
@@ -349,14 +349,23 @@
       "contributions": [
         "ideas"
       ]
-     },
-     {
+    },
+    {
       "login": "rgommers",
       "name": "Ralf Gommers",
       "avatar_url": "https://avatars.githubusercontent.com/u/98330?v=4",
       "profile": "https://github.com/rgommers/",
       "contributions": [
         "ideas"
+      ]
+    },
+    {
+      "login": "tovrstra",
+      "name": "Toon Verstraelen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/99431?v=4",
+      "profile": "https://github.com/tovrstra",
+      "contributions": [
+        "doc"
       ]
     }
   ],
@@ -365,5 +374,6 @@
   "projectOwner": "nbQA-dev",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "angular"
 }
