@@ -339,6 +339,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center"><a href="http://www.nijho.lt"><img src="https://avatars.githubusercontent.com/u/6897215?v=4?s=100" width="100px;" alt="Bas Nijholt"/><br /><sub><b>Bas Nijholt</b></sub></a><br /><a href="#ideas-basnijholt" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center"><a href="https://github.com/rgommers/"><img src="https://avatars.githubusercontent.com/u/98330?v=4?s=100" width="100px;" alt="Ralf Gommers"/><br /><sub><b>Ralf Gommers</b></sub></a><br /><a href="#ideas-rgommers" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center"><a href="https://github.com/tovrstra"><img src="https://avatars.githubusercontent.com/u/99431?v=4?s=100" width="100px;" alt="Toon Verstraelen"/><br /><sub><b>Toon Verstraelen</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/commits?author=tovrstra" title="Documentation">📖</a></td>
+      <td align="center"><a href="https://github.com/tqa236"><img src="https://avatars.githubusercontent.com/u/25203655?v=4?s=100" width="100px;" alt="Trinh Quoc Anh"/><br /><sub><b>Trinh Quoc Anh</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Atqa236" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
