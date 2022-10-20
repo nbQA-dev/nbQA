@@ -283,3 +283,33 @@ def test_float_to_top(tmp_test_data: Path) -> None:
         },
     ]
     assert result == expected
+
+
+def test_float_to_top_starting_markdown(tmp_test_data: Path) -> None:
+    """
+    Check isort works when a notebook has markdown in first cell.
+
+    The --float-to-top option would previously have removed the wrong cell.
+
+    Parameters
+    ----------
+    tmp_test_data
+        Temporary copy of test data.
+    """
+    notebook = tmp_test_data / "markdown_then_imports.ipynb"
+
+    main(["isort", str(notebook), "--float-to-top"])
+
+    with open(notebook, encoding="utf-8") as fd:
+        result = json.load(fd)["cells"]
+    expected = [
+        {"cell_type": "markdown", "metadata": {}, "source": ["hello world"]},
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": ["import os\n", "import sys"],
+        },
+    ]
+    assert result == expected

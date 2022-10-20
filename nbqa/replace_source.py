@@ -10,7 +10,17 @@ import os
 import sys
 from difflib import unified_diff
 from shutil import move
-from typing import Any, Dict, Iterator, List, Mapping, MutableMapping, Sequence, Set
+from typing import (
+    Any,
+    Dict,
+    Iterator,
+    List,
+    Mapping,
+    MutableMapping,
+    Sequence,
+    Set,
+    Tuple,
+)
 
 import tokenize_rt
 
@@ -153,7 +163,7 @@ def _notebook_cells(
     notebook_json: Mapping[str, Any],
     *,
     md: bool,
-) -> Iterator[MutableMapping[str, Any]]:
+) -> Iterator[Tuple[int, MutableMapping[str, Any]]]:
     """
     Iterate through notebook's cells.
 
@@ -164,12 +174,14 @@ def _notebook_cells(
 
     Yields
     ------
+    cell_number
+        Index of cell (regardless of type).
     MutableMapping[str, Any]
         Cell content.
     """
-    for cell in notebook_json["cells"]:
+    for i, cell in enumerate(notebook_json["cells"]):
         if cell["cell_type"] == SOURCE[md]:
-            yield cell
+            yield i, cell
 
 
 def _write_notebook(
@@ -241,14 +253,14 @@ def mutate(
     cells_to_remove = []
 
     cells = _get_cells(temp_file, len(notebook_info.temporary_lines), md=md)
-    for code_cell_number, cell in enumerate(
+    for code_cell_number, (cell_number, cell) in enumerate(
         _notebook_cells(notebook_json, md=md), start=1
     ):
         if code_cell_number in notebook_info.code_cells_to_ignore:
             continue
         new_source = _get_new_source(code_cell_number, notebook_info, next(cells))
         if not new_source:
-            cells_to_remove.append(code_cell_number)
+            cells_to_remove.append(cell_number)
         cell["source"] = new_source
 
     if original_notebook_json == notebook_json:
@@ -257,7 +269,7 @@ def mutate(
     if cells_to_remove:
         notebook_json["cells"] = [
             cell
-            for i, cell in enumerate(notebook_json["cells"], start=1)
+            for i, cell in enumerate(notebook_json["cells"])
             if i not in cells_to_remove
         ]
 
@@ -331,7 +343,7 @@ def diff(
 
     actually_mutated = False
 
-    for code_cell_number, cell in enumerate(
+    for code_cell_number, (_, cell) in enumerate(
         _notebook_cells(notebook_json, md=md), start=1
     ):
         if code_cell_number in notebook_info.code_cells_to_ignore:
