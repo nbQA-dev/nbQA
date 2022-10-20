@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.5.3 (2022-10-20)
+~~~~~~~~~~~~~~~~~~
+Fixed bug when running ``isort --float-to-top`` and it was
+removing the wrong cell (thanks @tqa236 for the report!)
+
 1.5.2 (2022-09-28)
 ~~~~~~~~~~~~~~~~~~
 Fixed bug in which, when running ``nbqa`` on a directory,
