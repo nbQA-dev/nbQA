@@ -50,13 +50,13 @@ repos:
         args: [-v, --fail-under=100]
         files: ^nbqa/
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.982
+    rev: v0.990
     hooks:
       - id: mypy
         exclude: ^docs/
         additional_dependencies: [types-setuptools, types-toml]
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.2.0
+    rev: v3.2.2
     hooks:
       - id: pyupgrade
         args: [--py37-plus]
