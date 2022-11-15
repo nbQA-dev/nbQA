@@ -1,4 +1,4 @@
-"""Check :code:`flake8` works as intended."""
+"""Check :code:`ruff` works as intended."""
 
 import os
 from textwrap import dedent
