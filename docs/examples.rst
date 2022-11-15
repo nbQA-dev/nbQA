@@ -97,6 +97,18 @@ Format ``.md`` file saved via `Jupytext`_ (note: requires ``jupytext`` to be ins
 
    $ nbqa black my_notebook.md
 
+Perform linting on a notebook with `ruff`_:
+
+.. code:: console
+
+   $ nbqa ruff my_notebook.ipynb
+
+you can also try to auto-fix reported issues via
+
+.. code:: console
+
+   $ nbqa ruff --fix my_notebook.ipynb
+
 .. _black: https://black.readthedocs.io/en/stable/
 .. _doctest: https://docs.python.org/3/library/doctest.html
 .. _flake8: https://flake8.pycqa.org/en/latest/
@@ -109,3 +121,4 @@ Format ``.md`` file saved via `Jupytext`_ (note: requires ``jupytext`` to be ins
 .. _autopep8: https://github.com/hhatto/autopep8
 .. _pydocstyle: http://www.pydocstyle.org/en/stable/
 .. _blacken-docs: https://github.com/asottile/blacken-docs
+.. _ruff: https://github.com/charliermarsh/ruff
