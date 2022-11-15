@@ -90,6 +90,7 @@
   name: nbqa-ruff
   description: Run 'ruff' on a Jupyter Notebook
   entry: nbqa ruff
+  language: python
   additional_dependencies: [ruff]
   require_serial: true
   types_or: [jupyter, markdown]
