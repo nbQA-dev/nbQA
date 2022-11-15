@@ -94,4 +94,3 @@
   additional_dependencies: [ruff]
   require_serial: true
   types_or: [jupyter, markdown]
-

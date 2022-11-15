@@ -15,5 +15,5 @@ pytest
 pytest-cov
 pytest-randomly
 pyupgrade
-yapf
 ruff
+yapf
