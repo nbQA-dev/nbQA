@@ -89,7 +89,7 @@
 - id: nbqa-ruff
   name: nbqa-ruff
   description: Run 'ruff' on a Jupyter Notebook
-  entry: nbqa ruff
+  entry: nbqa ruff --quiet
   language: python
   additional_dependencies: [ruff]
   require_serial: true
