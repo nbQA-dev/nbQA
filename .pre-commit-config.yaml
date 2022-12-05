@@ -3,7 +3,7 @@ default_language_version:
   python: python3.8
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.3.0
+    rev: v4.4.0
     hooks:
       - id: end-of-file-fixer
         exclude: ^tests/data/
@@ -24,13 +24,13 @@ repos:
       - id: prettier
         exclude: ^README\.md$
   - repo: https://github.com/PyCQA/pylint
-    rev: v2.15.6
+    rev: v2.15.8
     hooks:
       - id: pylint
         files: ^(nbqa|tests)/
         exclude: ^tests/data/
   - repo: https://github.com/PyCQA/flake8
-    rev: 5.0.4
+    rev: 6.0.0
     hooks:
       - id: flake8
         additional_dependencies: [flake8-typing-imports==1.10.0]
@@ -56,7 +56,7 @@ repos:
         exclude: ^docs/
         additional_dependencies: [types-setuptools, types-toml]
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.2.2
+    rev: v3.3.0
     hooks:
       - id: pyupgrade
         args: [--py37-plus]
@@ -80,7 +80,7 @@ repos:
     hooks:
       - id: setup-cfg-fmt
   - repo: https://github.com/PyCQA/autoflake
-    rev: v1.7.7
+    rev: v2.0.0
     hooks:
       - id: autoflake
         args: [--remove-all-unused-imports, -i]
