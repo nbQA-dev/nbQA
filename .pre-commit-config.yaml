@@ -33,7 +33,7 @@ repos:
     rev: 6.0.0
     hooks:
       - id: flake8
-        additional_dependencies: [flake8-typing-imports==1.10.0]
+        additional_dependencies: [flake8-typing-imports==1.14.0]
   - repo: https://github.com/PyCQA/isort
     rev: 5.10.1
     hooks:
