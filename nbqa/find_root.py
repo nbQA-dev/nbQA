@@ -18,7 +18,7 @@ KNOW_PROJECT_ROOT_FILES = [
 ]
 
 
-@lru_cache()
+@lru_cache
 def find_project_root(
     srcs: Iterable[str],
     root_files: Iterable[str] = tuple(KNOW_PROJECT_ROOT_FILES),
