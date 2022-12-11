@@ -1,11 +1,19 @@
 """Check that :code:`autopep8` works as intended."""
 
 import os
+import sys
 from pathlib import Path
 from shutil import copyfile
 from typing import TYPE_CHECKING
 
+import pytest
+
 from nbqa.__main__ import main
+
+pytest.mark.skipif(
+    sys.version_info >= (3, 11),
+    reason="deprecation warning needs sorting out in autopep8",
+)
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
