@@ -37,7 +37,7 @@ def test_myst(tmp_test_data: Path) -> None:
         "    extension: .md\n"
         "    format_name: myst\n"
         "    format_version: 0.13\n"
-        "    jupytext_version: 1.14.1\n"
+        "    jupytext_version: 1.14.2\n"
         "kernelspec:\n"
         "  display_name: Python 3\n"
         "  language: python\n"
@@ -144,8 +144,9 @@ def test_md(tmp_test_data: Path) -> None:
         "      extension: .md\n"
         "      format_name: markdown\n"
         "      format_version: '1.3'\n"
-        "      jupytext_version: 1.14.1\n"
-        "  kernelspec:\n    display_name: Python 3\n"
+        "      jupytext_version: 1.14.2\n"
+        "  kernelspec:\n"
+        "    display_name: Python 3\n"
         "    language: python\n"
         "    name: python3\n"
         "---\n"
@@ -163,7 +164,8 @@ def test_md(tmp_test_data: Path) -> None:
         "\n"
         "```python\n"
         "%%time\n"
-        'def hello(name: str = "world\\n"):\n'
+        'def hello(name: str = "world\\n'
+        '"):\n'
         '    """\n'
         "    Greet user.\n"
         "\n"
