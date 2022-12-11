@@ -1,6 +1,7 @@
 """Check that :code:`autopep8` works as intended."""
 
 import os
+import sys
 from pathlib import Path
 from shutil import copyfile
 from typing import TYPE_CHECKING
@@ -14,7 +15,9 @@ if TYPE_CHECKING:
     from py._path.local import LocalPath
 
 
-@pytest.mark.filterwarnings("ignore:lib2to3 package is deprecated")
+@pytest.mark.skipif(
+    sys.version_info >= (3, 11), reason="Some deprecation warning shows up"
+)
 def test_successive_runs_using_autopep8(
     tmpdir: "LocalPath", capsys: "CaptureFixture"
 ) -> None:
