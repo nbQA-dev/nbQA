@@ -51,7 +51,10 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     expected_out = ""
     # replace \u with \\u for both expected_err and err
     expected_err = (
-        f"reformatted {path}\n" "\n" r"All done! .*\n" r"1 file reformatted.\n"
+        f"reformatted {re.escape(path)}\n"
+        "\n"
+        r"All done! .*\n"
+        r"1 file reformatted.\n"
     )
     # This is required because linux supports emojis
     # so both should have \\ for comparison
@@ -104,7 +107,10 @@ def test_black_works_with_trailing_semicolons(
     expected_out = ""
     # replace \u with \\u for both expected_err and err
     expected_err = (
-        rf"reformatted {path}\n" r"\n" r"All done! .*\n" r"1 file reformatted.\n"
+        rf"reformatted {re.escape(path)}\n"
+        r"\n"
+        r"All done! .*\n"
+        r"1 file reformatted.\n"
     )
     assert out == expected_out
     assert re.search(expected_err, err) is not None
@@ -146,7 +152,9 @@ def test_black_works_with_multiline(
     # check out and err
     out, err = capsys.readouterr()
     expected_out = ""
-    expected_err = f"reformatted {path}\n\n" f"All done! .*\n" "1 file reformatted.\n"
+    expected_err = (
+        f"reformatted {re.escape(path)}\n\n" f"All done! .*\n" "1 file reformatted.\n"
+    )
     assert out == expected_out
     assert re.search(expected_err, err) is not None
 
