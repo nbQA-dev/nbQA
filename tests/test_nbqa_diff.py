@@ -1,8 +1,7 @@
 """Check --nbqa-diff flag."""
-
 import os
+import re
 from pathlib import Path
-from textwrap import dedent
 from typing import TYPE_CHECKING
 
 from nbqa.__main__ import main
@@ -11,10 +10,6 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-SPARKLES = "\N{sparkles}"
-SHORTCAKE = "\N{shortcake}"
-COLLISION = "\N{collision symbol}"
-BROKEN_HEART = "\N{broken heart}"
 TESTS_DIR = Path("tests")
 TEST_DATA_DIR = TESTS_DIR / "data"
 
@@ -42,18 +37,12 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
     )
     assert out == expected_out
     expected_err = (
-        dedent(
-            f"""\
-            reformatted {str(DIRTY_NOTEBOOK)}
-
-            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
-            1 file reformatted.
-            """
-        )
-        .encode("ascii", "backslashreplace")
-        .decode()
+        rf"reformatted {str(DIRTY_NOTEBOOK)}\n"
+        r"\n"
+        r"All done! .*\n"
+        r"1 file reformatted.\n"
     )
-    assert err == expected_err
+    assert re.search(expected_err, err)
 
 
 def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
@@ -71,14 +60,7 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
 
     out, err = capsys.readouterr()
     expected_out = "Notebook(s) would be left unchanged\n"
-    expected_err = (
-        (f"{COLLISION} {BROKEN_HEART} {COLLISION}\n1 file failed to reformat.\n")
-        .encode("ascii", "backslashreplace")
-        .decode()
-    )
-    # This is required because linux supports emojis
-    # so both should have \\ for comparison
-    err = err.encode("ascii", "backslashreplace").decode()
+    expected_err = r".*\n1 file failed to reformat.\n"
 
     assert expected_out == out
-    assert expected_err in err
+    assert re.search(expected_err, err) is not None
