@@ -226,7 +226,7 @@ def test_black_works_with_commented_magics(capsys: "CaptureFixture") -> None:
         "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     expected_err = (
-        rf"reformatted {path}\n" r"\n" r"All done! .*\n" r"1 file reformatted.\n"
+        rf"reformatted {re.escape(path)}\n\n" r"All done! .*\n1 file reformatted.\n"
     )
     assert expected_out == out
     assert re.search(expected_err, err) is not None
