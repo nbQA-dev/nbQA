@@ -159,7 +159,7 @@ def test_unable_to_parse(capsys: "CaptureFixture") -> None:
     """Check error message shows if we're unable to parse notebook."""
     path = Path("tests") / "data/invalid_notebook.ipynb"
     path.write_text("foo")
-    result = main(["flake8", str(path)])
+    result = main(["pyupgrade", str(path)])
     path.unlink()
     message = "nbQA failed to process"
     _, err = capsys.readouterr()
