@@ -438,7 +438,7 @@ def test_invalid_syntax_with_nbqa_dont_skip_bad_cells(capsys: "CaptureFixture") 
     out, err = capsys.readouterr()
     expected_out = ""
     expected_err = (
-        f"error: cannot format {path}: Cannot parse: cell_1:2:7: if True\n\n"  # noqa: E501
+        f"error: cannot format {re.escape(path)}: Cannot parse: cell_1:2:7: if True\n\n"  # noqa: E501
         "Oh no! .*\n"
         "1 file failed to reformat.\n"
     )
