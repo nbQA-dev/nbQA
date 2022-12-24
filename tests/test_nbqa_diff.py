@@ -37,7 +37,7 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
     )
     assert out == expected_out
     expected_err = (
-        rf"reformatted {str(DIRTY_NOTEBOOK)}\n"
+        rf"reformatted {re.escape(str(DIRTY_NOTEBOOK))}\n"
         r"\n"
         r"All done! .*\n"
         r"1 file reformatted.\n"
