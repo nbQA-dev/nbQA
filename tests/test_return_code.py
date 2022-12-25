@@ -10,7 +10,6 @@ TEST_DATA_DIR = TESTS_DIR / "data"
 DIRTY_NOTEBOOK = TEST_DATA_DIR / "notebook_for_testing.ipynb"
 CLEAN_NOTEBOOK = TEST_DATA_DIR / "clean_notebook.ipynb"
 EMPTY_NOTEBOOK = TEST_DATA_DIR / "empty_notebook.ipynb"
-INVALID_SYNTAX_NOTEBOOK = TESTS_DIR / "invalid_data" / "invalid_syntax.ipynb"
 
 # Interpret the below constants in the same context as that of pre-commit tool
 # Success indicates the QA tool reported no issues.
@@ -72,14 +71,3 @@ def test_black_return_code() -> None:
 
     # This is to test if the tool ran on all the notebooks in a given directory
     assert black_runner([TESTS_DIR], "--check") != PASSED
-
-
-def test_check_ast_return_code() -> None:
-    """Check check-ast returns 0 if it passes, 1 otherwise."""
-    check_ast_runner = partial(_run_nbqa_with, "pre_commit_hooks.check_ast")
-
-    assert check_ast_runner([DIRTY_NOTEBOOK]) == PASSED
-    assert (
-        check_ast_runner([INVALID_SYNTAX_NOTEBOOK], "--nbqa-dont-skip-bad-cells")
-        != PASSED
-    )
