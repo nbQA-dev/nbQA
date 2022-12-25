@@ -1,17 +1,11 @@
 """Check user can check for other magics."""
 import difflib
-import os
 from pathlib import Path
 from shutil import copyfile
-from typing import TYPE_CHECKING, Callable, Sequence
-
-import pytest
-
-from nbqa.__main__ import main
+from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
-    from _pytest.capture import CaptureFixture
-    from py._path.local import LocalPath
+    pass
 
 
 def _create_ignore_cell_config(config_file_path: Path, config: str) -> None:
@@ -59,21 +53,6 @@ def _validate_magics_with_black(before: Sequence[str], after: Sequence[str]) -> 
     return result == expected
 
 
-def test_indented_magics(
-    tmp_notebook_with_indented_magics: "LocalPath",
-) -> None:
-    """Check if the indented line magics are retained properly after mutating."""
-    with open(str(tmp_notebook_with_indented_magics), encoding="utf-8") as handle:
-        before = handle.readlines()
-    main(
-        ["black", os.path.join("tests", "data", "notebook_with_indented_magics.ipynb")]
-    )
-    with open(str(tmp_notebook_with_indented_magics), encoding="utf-8") as handle:
-        after = handle.readlines()
-
-    assert _validate_magics_with_black(before, after)
-
-
 def _validate_magics_flake8_warnings(actual: str, test_nb_path: Path) -> bool:
     """Validate the results of notebooks with warnings."""
     expected = (
@@ -83,29 +62,3 @@ def _validate_magics_flake8_warnings(actual: str, test_nb_path: Path) -> bool:
         f"{str(test_nb_path)}:cell_3:11:10: E231 missing whitespace after ','\n"
     )
     return actual == expected
-
-
-@pytest.mark.parametrize(
-    "config, validate",
-    [
-        (
-            "--extend-ignore=F821",
-            _validate_magics_flake8_warnings,
-        ),
-    ],
-)
-def test_magics_with_flake8(
-    config: str,
-    validate: Callable[..., bool],
-    tmpdir: "LocalPath",
-    capsys: "CaptureFixture",
-) -> None:
-    """Test nbqa with flake8 on notebook with different types of ipython magics."""
-    test_nb_path = _copy_notebook(
-        Path("tests/data/notebook_with_indented_magics.ipynb"), Path(tmpdir)
-    )
-
-    main(["flake8", str(test_nb_path), config])
-
-    out, _ = capsys.readouterr()
-    assert validate(out, test_nb_path)
