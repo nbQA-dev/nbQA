@@ -15,45 +15,6 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
 
 
-def test_isort_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> None:
-    """
-    Check isort works.
-
-    Parameters
-    ----------
-    tmp_notebook_for_testing
-        Temporary copy of :code:`notebook_for_testing.ipynb`.
-    capsys
-        Pytest fixture to capture stdout and stderr.
-    """
-    # check diff
-    with open(tmp_notebook_for_testing, encoding="utf-8") as handle:
-        before = handle.readlines()
-    path = os.path.abspath(os.path.join("tests", "data", "notebook_for_testing.ipynb"))
-    main(["isort", path])
-
-    with open(tmp_notebook_for_testing, encoding="utf-8") as handle:
-        after = handle.readlines()
-    diff = difflib.unified_diff(before, after)
-    result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
-
-    expected = dedent(
-        """\
-        +    "import glob\\n",
-        -    "\\n",
-        -    "import glob\\n",
-        """
-    )
-    assert result == expected
-
-    # check out and err
-    out, err = capsys.readouterr()
-    expected_out = f"Fixing {path}\n"
-    expected_err = ""
-    assert out == expected_out
-    assert err == expected_err
-
-
 def test_isort_initial_md(
     tmp_notebook_starting_with_md: Path, capsys: "CaptureFixture"
 ) -> None:

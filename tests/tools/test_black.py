@@ -16,53 +16,6 @@ if TYPE_CHECKING:
     from py._path.local import LocalPath
 
 
-def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> None:
-    """
-    Check black works. Should only reformat code cells.
-
-    Parameters
-    ----------
-    tmp_notebook_for_testing
-        Temporary copy of :code:`notebook_for_testing.ipynb`.
-    capsys
-        Pytest fixture to capture stdout and stderr.
-    """
-    # check diff
-    with open(tmp_notebook_for_testing, encoding="utf-8") as handle:
-        before = handle.readlines()
-    path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
-
-    main(["black", os.path.abspath(path)])
-    with open(tmp_notebook_for_testing, encoding="utf-8") as handle:
-        after = handle.readlines()
-
-    diff = difflib.unified_diff(before, after)
-    result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
-    expected = (
-        "-    \"    return 'hello {}'.format(name)\\n\",\n"
-        '+    "    return \\"hello {}\\".format(name)\\n",\n'
-        '-    "hello(3)   "\n'
-        '+    "hello(3)"\n'
-    )
-    assert result == expected
-
-    # check out and err
-    out, err = capsys.readouterr()
-    expected_out = ""
-    # replace \u with \\u for both expected_err and err
-    expected_err = (
-        f"reformatted {re.escape(path)}\n"
-        "\n"
-        r"All done! .*\n"
-        r"1 file reformatted.\n"
-    )
-    # This is required because linux supports emojis
-    # so both should have \\ for comparison
-    err = err.encode("ascii", "backslashreplace").decode()
-    assert out == expected_out
-    assert re.search(expected_err, err) is not None
-
-
 def test_black_works_with_trailing_semicolons(
     tmp_notebook_with_trailing_semicolon: Path, capsys: "CaptureFixture"
 ) -> None:
