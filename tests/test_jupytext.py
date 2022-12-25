@@ -293,8 +293,6 @@ def test_jupytext_on_folder(capsys: "CaptureFixture") -> None:
     expected = (
         f'{os.path.join(path, "invalid_syntax.ipynb")}:cell_1:0 at module level:\n'
         "        D100: Missing docstring in public module\n"
-        f'{os.path.join(path, "assignment_to_literal.ipynb")}:cell_1:0 at module level:\n'
-        "        D100: Missing docstring in public module\n"
         f'{os.path.join(path, "automagic.ipynb")}:cell_1:0 at module level:\n'
         "        D100: Missing docstring in public module\n"
     )

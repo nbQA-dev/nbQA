@@ -276,26 +276,6 @@ def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
     assert re.search(expected_err, err) is not None
 
 
-def test_black_works_with_literal_assignment(capsys: "CaptureFixture") -> None:
-    """
-    Check black works with notebooks with invalid syntax (e.g. assignment to literal).
-
-    Parameters
-    ----------
-    capsys
-        Pytest fixture to capture stdout and stderr.
-    """
-    path = os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
-
-    main(["black", os.path.abspath(path), "--nbqa-dont-skip-bad-cells"])
-
-    out, err = capsys.readouterr()
-    expected_out = ""
-    expected_err = r".*\n1 file failed to reformat.\n"
-    assert expected_out == out
-    assert re.search(expected_err, err) is not None
-
-
 def test_not_allowlisted_magic(capsys: "CaptureFixture") -> None:
     """
     Notebook contains magic which isn't in the default allowlist.
@@ -373,27 +353,6 @@ def test_process_cells_magic_pyprojecttoml(capsys: "CaptureFixture") -> None:
         "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected
-
-
-def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
-    """
-    Check that using nbqa-diff when there's invalid syntax doesn't have empty output.
-
-    Parameters
-    ----------
-    capsys
-        Pytest fixture to capture stdout and stderr.
-    """
-    path = os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
-
-    main(["black", os.path.abspath(path), "--nbqa-diff", "--nbqa-dont-skip-bad-cells"])
-
-    out, err = capsys.readouterr()
-    expected_out = "Notebook(s) would be left unchanged\n"
-    expected_err = ".*\n1 file failed to reformat.\n"
-
-    assert expected_out == out
-    assert re.search(expected_err, err) is not None
 
 
 def test_invalid_syntax_without_nbqa_dont_skip_bad_cells(

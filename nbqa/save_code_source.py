@@ -138,7 +138,7 @@ def _replace_magics(
     try:
         tree = ast.parse(body)
     except SyntaxError:
-        if dont_skip_bad_cells:
+        if dont_skip_bad_cells:  # pragma: nocover
             return "".join(source)
         handler = MagicHandler("".join(source), whole_src, command, magic_type=None)
         magic_substitutions.append(handler)

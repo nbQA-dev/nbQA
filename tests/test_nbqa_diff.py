@@ -1,5 +1,4 @@
 """Check --nbqa-diff flag."""
-import os
 import re
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -43,24 +42,3 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
         r"1 file reformatted.\n"
     )
     assert re.search(expected_err, err)
-
-
-def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
-    """
-    Check that using nbqa-diff when there's invalid syntax doesn't have empty output.
-
-    Parameters
-    ----------
-    capsys
-        Pytest fixture to capture stdout and stderr.
-    """
-    path = os.path.join("tests", "invalid_data", "assignment_to_literal.ipynb")
-
-    main(["black", os.path.abspath(path), "--nbqa-diff", "--nbqa-dont-skip-bad-cells"])
-
-    out, err = capsys.readouterr()
-    expected_out = "Notebook(s) would be left unchanged\n"
-    expected_err = r".*\n1 file failed to reformat.\n"
-
-    assert expected_out == out
-    assert re.search(expected_err, err) is not None
