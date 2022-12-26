@@ -24,7 +24,7 @@ CLEAN_NOTEBOOK = TEST_DATA_DIR / "clean_notebook.ipynb"
 def test_diff_present(capsys: "CaptureFixture") -> None:
     """Test the results on --nbqa-diff on a dirty notebook."""
     # main(["black", os.path.join("tests", "data", "notebook_for_testing.ipynb")])
-    subprocess.run(["black", "f.py"])
+    subprocess.run(["black", "f.py"], text=True)
 
     out, err = capsys.readouterr()
     assert out is not None
