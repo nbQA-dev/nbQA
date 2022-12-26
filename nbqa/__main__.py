@@ -666,8 +666,11 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
             ],
             shell=configs["shell"],
         )
-
-        actually_mutated, output = _post_process_notebooks(
+        return 1
+        (  # pylint:disable=unreachable
+            actually_mutated,
+            output,
+        ) = _post_process_notebooks(
             saved_sources,
             nb_to_tmp_mapping,
             mutated,
