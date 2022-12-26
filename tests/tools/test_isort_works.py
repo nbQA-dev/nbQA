@@ -50,8 +50,8 @@ def test_isort_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     out, err = capsys.readouterr()
     expected_out = f"Fixing {path}\n"
     expected_err = ""
-    assert out == expected_out
-    assert err == expected_err
+    assert out.replace("\r\n", "\n") == expected_out
+    assert err.replace("\r\n", "\n") == expected_err
 
 
 def test_isort_initial_md(
@@ -91,8 +91,8 @@ def test_isort_initial_md(
     out, err = capsys.readouterr()
     expected_out = f"Fixing {os.path.abspath(path)}\n"
     expected_err = ""
-    assert out == expected_out
-    assert err == expected_err
+    assert out.replace("\r\n", "\n") == expected_out
+    assert err.replace("\r\n", "\n") == expected_err
 
 
 @pytest.mark.parametrize(
@@ -226,7 +226,7 @@ def test_comment_after_trailing_semicolons(capsys: "CaptureFixture") -> None:
         f"Fixing {path}\n"
         "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
-    assert out == expected_out
+    assert out.replace("\r\n", "\n") == expected_out
 
 
 def test_return_code_false_positive() -> None:

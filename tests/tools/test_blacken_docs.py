@@ -44,5 +44,5 @@ def test_blacken_docs(capsys: "CaptureFixture") -> None:
         "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     expected_err = ""
-    assert out == expected_out
-    assert err == expected_err
+    assert out.replace("\r\n", "\n") == expected_out
+    assert err.replace("\r\n", "\n") == expected_err

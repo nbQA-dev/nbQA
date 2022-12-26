@@ -19,7 +19,7 @@ def _message(args: List[str]) -> str:
 def subprocess_run(args: List[str], *_, **__):  # type: ignore
     """Mock subprocess run to print and return ok."""
     print(_message(args=args), file=sys.stderr)
-    return CompletedProcess(args, 0, "", "")
+    return CompletedProcess(args, 0, b"", b"")
 
 
 def test_nbqa_shell(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:

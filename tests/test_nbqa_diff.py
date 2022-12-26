@@ -26,7 +26,6 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
     """Test the results on --nbqa-diff on a dirty notebook."""
     main(["black", str(DIRTY_NOTEBOOK), "--nbqa-diff"])
     out, err = capsys.readouterr()
-    err = err.encode("ascii", "backslashreplace").decode()
     expected_out = (
         "\x1b[1mCell 2\x1b[0m\n"
         "------\n"

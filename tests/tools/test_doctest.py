@@ -53,11 +53,11 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
     )
 
     try:
-        assert out == expected_out
+        assert out.replace("\r\n", "\n") == expected_out
     except AssertionError:
         # observed this in CI, some jobs pass with absolute path,
         # others with relative...
-        assert out == expected_out.replace(
+        assert out.replace("\r\n", "\n") == expected_out.replace(
             WRONG_EXAMPLE_NOTEBOOK, os.path.abspath(WRONG_EXAMPLE_NOTEBOOK)
         )
     assert err == ""

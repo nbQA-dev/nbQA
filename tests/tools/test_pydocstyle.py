@@ -31,5 +31,5 @@ def test_pydocstyle_works(capsys: "CaptureFixture") -> None:
         f"{path}:cell_2:3 in public function `hello`:\n"
         '        D301: Use r""" if any backslashes in a docstring\n'
     )
-    assert out == expected_out
+    assert out.replace("\r\n", "\n") == expected_out
     assert err == ""

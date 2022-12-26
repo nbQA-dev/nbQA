@@ -57,8 +57,8 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
     out, err = capsys.readouterr()
     expected_out = ""
     expected_err = f"Rewriting {path}\n"
-    assert out == expected_out
-    assert err == expected_err
+    assert out.replace("\r\n", "\n") == expected_out
+    assert err.replace("\r\n", "\n") == expected_err
 
 
 def test_pyupgrade_works_with_empty_file(capsys: "CaptureFixture") -> None:
@@ -103,5 +103,5 @@ def test_pyupgrade_works_with_weird_databricks_file(capsys: "CaptureFixture") ->
         "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     expected_err = f"Rewriting {path}\n"
-    assert out == expected_out
-    assert err == expected_err
+    assert out.replace("\r\n", "\n") == expected_out
+    assert err.replace("\r\n", "\n") == expected_err
