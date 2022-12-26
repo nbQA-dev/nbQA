@@ -22,7 +22,7 @@ CLEAN_NOTEBOOK = TEST_DATA_DIR / "clean_notebook.ipynb"
 
 def test_diff_present(capsys: "CaptureFixture") -> None:
     """Test the results on --nbqa-diff on a dirty notebook."""
-    main(["black", str(DIRTY_NOTEBOOK), "--nbqa-diff"])
+    main(["black", str(DIRTY_NOTEBOOK)])
     out, err = capsys.readouterr()
     assert out is not None
     assert err is not None
