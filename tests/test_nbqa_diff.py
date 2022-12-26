@@ -2,7 +2,6 @@
 
 import os
 from pathlib import Path
-from textwrap import dedent
 from typing import TYPE_CHECKING
 
 from nbqa.__main__ import main
@@ -40,19 +39,7 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
         "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected_out
-    expected_err = (
-        dedent(
-            f"""\
-            reformatted {str(DIRTY_NOTEBOOK)}
-
-            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
-            1 file reformatted.
-            """
-        )
-        .encode("ascii", "backslashreplace")
-        .decode()
-    )
-    assert err == expected_err
+    assert "1 file reformatted" in err
 
 
 def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
