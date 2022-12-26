@@ -1,8 +1,8 @@
 """Check --nbqa-diff flag."""
 
 import os
+import re
 from pathlib import Path
-from textwrap import dedent
 from typing import TYPE_CHECKING
 
 from nbqa.__main__ import main
@@ -40,20 +40,14 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
         "\x1b[0m\n"
         "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
-    assert out == expected_out
     expected_err = (
-        dedent(
-            f"""\
-            reformatted {str(DIRTY_NOTEBOOK)}
-
-            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
-            1 file reformatted.
-            """
-        )
-        .encode("ascii", "backslashreplace")
-        .decode()
+        rf"reformatted {str(DIRTY_NOTEBOOK)}\n"
+        "\n"
+        r"All done! .*\n"
+        "1 file reformatted.\n"
     )
-    assert err == expected_err
+    assert out == expected_out
+    assert re.search(expected_err, err) is not None
 
 
 def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
@@ -71,14 +65,7 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
 
     out, err = capsys.readouterr()
     expected_out = "Notebook(s) would be left unchanged\n"
-    expected_err = (
-        (f"{COLLISION} {BROKEN_HEART} {COLLISION}\n1 file failed to reformat.\n")
-        .encode("ascii", "backslashreplace")
-        .decode()
-    )
-    # This is required because linux supports emojis
-    # so both should have \\ for comparison
-    err = err.encode("ascii", "backslashreplace").decode()
+    expected_err = "failed to reformat"
 
     assert expected_out == out
-    assert expected_err in err
+    assert re.search(expected_err, err) is not None
