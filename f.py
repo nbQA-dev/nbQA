@@ -1,8 +1,13 @@
-# %%NBQA-CELL-SEPc5fc8b
+# %%NBQA-CELL-SEP008e8c
+import os
+
+import glob
+
+import nbqa
 
 
-# %%NBQA-CELL-SEPc5fc8b
-# CELL MAGIC 0x2B4D8329
+# %%NBQA-CELL-SEP008e8c
+# CELL MAGIC 0xC0A3FA93
 def hello(name: str = "world\n"):
     """
     Greet user.
@@ -16,20 +21,21 @@ def hello(name: str = "world\n"):
     'hello goodbye'
     """
 
-    return f"hello {name}"
+    return "hello {}".format(name)
 
 
-hash(0xF83024A0)
+hash(0xAAF157B0)
 hello(3)
 
 
-# %%NBQA-CELL-SEPc5fc8b
+# %%NBQA-CELL-SEP008e8c
+from random import randint
 
 if __debug__:
-    hash(0x9BD26189)
+    hash(0xB9CE82A)
 
 
-# %%NBQA-CELL-SEPc5fc8b
+# %%NBQA-CELL-SEP008e8c
 import pprint
 import sys
 

@@ -2,6 +2,8 @@
 
 from pathlib import Path
 from typing import TYPE_CHECKING
+from nbqa.__main__ import main
+import os
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
