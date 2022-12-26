@@ -1,10 +1,9 @@
 """Check --nbqa-diff flag."""
 
 import os
+import subprocess
 from pathlib import Path
 from typing import TYPE_CHECKING
-
-from nbqa.__main__ import main
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -23,7 +22,8 @@ CLEAN_NOTEBOOK = TEST_DATA_DIR / "clean_notebook.ipynb"
 
 def test_diff_present(capsys: "CaptureFixture") -> None:
     """Test the results on --nbqa-diff on a dirty notebook."""
-    main(["pyupgrade", os.path.join("tests", "data", "notebook_for_testing.ipynb")])
+    subprocess.run(["black", os.path.join("nbqa", "__main__.py")])
+
     out, err = capsys.readouterr()
     assert out is not None
     assert err is not None
