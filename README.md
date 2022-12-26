@@ -132,7 +132,7 @@ All done! ✨ 🍰 ✨
 1 files reformatted.
 ```
 
-See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html) for examples involving [doctest](https://docs.python.org/3/library/doctest.html), [flake8](https://flake8.pycqa.org/en/latest/), [mypy](http://mypy-lang.org/), [pylint](https://github.com/PyCQA/pylint), [autopep8](https://github.com/hhatto/autopep8), [pydocstyle](http://www.pydocstyle.org/en/stable/), and [yapf](https://github.com/google/yapf).
+See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html) for examples involving [doctest](https://docs.python.org/3/library/doctest.html), [flake8](https://flake8.pycqa.org/en/latest/), [mypy](http://mypy-lang.org/), [pylint](https://github.com/PyCQA/pylint), [autopep8](https://github.com/hhatto/autopep8), [pydocstyle](http://www.pydocstyle.org/en/stable/), [yapf](https://github.com/google/yapf), and [ruff](https://github.com/charliermarsh/ruff/).
 
 ### Pre-commit
 
@@ -150,7 +150,7 @@ Here's an example of how to set up some pre-commit hooks: put this in your `.pre
       args: ["--float-to-top"]
 ```
 
-If you need to select specific versions of any of these linters/formatters,
+If you need to select specific versions of these linters/formatters,
 add them to [`additional_dependencies`](http://pre-commit.com/#pre-commit-configyaml---hooks).
 
 ## 🥳 Used by
