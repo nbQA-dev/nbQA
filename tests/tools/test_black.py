@@ -55,23 +55,16 @@ def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     out, err = capsys.readouterr()
     expected_out = ""
     # replace \u with \\u for both expected_err and err
-    expected_err = (
-        dedent(
-            f"""\
+    expected_err = dedent(
+        f"""\
             reformatted {path}
 
-            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
-            1 file reformatted.
-            """
-        )
-        .encode("ascii", "backslashreplace")
-        .decode()
+            All done!"""
     )
     # This is required because linux supports emojis
     # so both should have \\ for comparison
-    err = err.encode("ascii", "backslashreplace").decode()
     assert out == expected_out
-    assert expected_err == err
+    assert expected_err in err
 
 
 def test_black_works_with_trailing_semicolons(
@@ -117,23 +110,14 @@ def test_black_works_with_trailing_semicolons(
     out, err = capsys.readouterr()
     expected_out = ""
     # replace \u with \\u for both expected_err and err
-    expected_err = (
-        dedent(
-            f"""\
+    expected_err = dedent(
+        f"""\
             reformatted {path}
 
-            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
-            1 file reformatted.
-            """
-        )
-        .encode("ascii", "backslashreplace")
-        .decode()
+            All done!"""
     )
-    # This is required because linux supports emojis
-    # so both should have \\ for comparison
-    err = err.encode("ascii", "backslashreplace").decode()
     assert out == expected_out
-    assert expected_err == err
+    assert expected_err in err
 
 
 def test_black_works_with_multiline(
@@ -173,20 +157,9 @@ def test_black_works_with_multiline(
     out, err = capsys.readouterr()
     expected_out = ""
     # replace \u with \\u for both expected_err and err
-    expected_err = (
-        (
-            f"reformatted {path}\n\n"
-            f"All done! {SPARKLES} {SHORTCAKE} {SPARKLES}\n"
-            "1 file reformatted.\n"
-        )
-        .encode("ascii", "backslashreplace")
-        .decode()
-    )
-    # This is required because linux supports emojis
-    # so both should have \\ for comparison
-    err = err.encode("ascii", "backslashreplace").decode()
+    expected_err = f"reformatted {path}\n\n" f"All done!"
     assert out == expected_out
-    assert expected_err == err
+    assert expected_err in err
 
 
 def test_black_multiple_files(tmp_test_data: Path) -> None:
@@ -250,7 +223,6 @@ def test_black_works_with_commented_magics(capsys: "CaptureFixture") -> None:
     main(["black", os.path.abspath(path), "--nbqa-diff"])
 
     out, err = capsys.readouterr()
-    err = err.encode("ascii", "backslashreplace").decode()
     expected_out = (
         "\x1b[1mCell 1\x1b[0m\n"
         "------\n"
@@ -263,20 +235,14 @@ def test_black_works_with_commented_magics(capsys: "CaptureFixture") -> None:
         "\x1b[0m\n"
         "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
-    expected_err = (
-        dedent(
-            f"""\
+    expected_err = dedent(
+        f"""\
             reformatted {path}
 
-            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
-            1 file reformatted.
-            """
-        )
-        .encode("ascii", "backslashreplace")
-        .decode()
+            All done!"""
     )
     assert expected_out == out
-    assert expected_err == err
+    assert expected_err in err
 
 
 def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
@@ -293,7 +259,6 @@ def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
     main(["black", os.path.abspath(path), "--nbqa-diff"])
 
     out, err = capsys.readouterr()
-    err = err.encode("ascii", "backslashreplace").decode()
     expected_out = (
         "\x1b[1mCell 3\x1b[0m\n"
         "------\n"
@@ -305,20 +270,14 @@ def test_black_works_with_leading_comment(capsys: "CaptureFixture") -> None:
         "\x1b[0m\n"
         "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
-    expected_err = (
-        dedent(
-            f"""\
+    expected_err = dedent(
+        f"""\
             reformatted {path}
 
-            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
-            1 file reformatted.
-            """
-        )
-        .encode("ascii", "backslashreplace")
-        .decode()
+            All done!"""
     )
     assert expected_out == out
-    assert expected_err == err
+    assert expected_err in err
 
 
 def test_black_works_with_literal_assignment(capsys: "CaptureFixture") -> None:
@@ -336,15 +295,7 @@ def test_black_works_with_literal_assignment(capsys: "CaptureFixture") -> None:
 
     out, err = capsys.readouterr()
     expected_out = ""
-    expected_err = (
-        (f"{COLLISION} {BROKEN_HEART} {COLLISION}\n1 file failed to reformat.\n")
-        .encode("ascii", "backslashreplace")
-        .decode()
-    )
-    # This is required because linux supports emojis
-    # so both should have \\ for comparison
-    err = err.encode("ascii", "backslashreplace").decode()
-
+    expected_err = "1 file failed to reformat.\n"
     assert expected_out == out
     assert expected_err in err
 
@@ -443,14 +394,7 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
 
     out, err = capsys.readouterr()
     expected_out = "Notebook(s) would be left unchanged\n"
-    expected_err = (
-        (f"{COLLISION} {BROKEN_HEART} {COLLISION}\n1 file failed to reformat.\n")
-        .encode("ascii", "backslashreplace")
-        .decode()
-    )
-    # This is required because linux supports emojis
-    # so both should have \\ for comparison
-    err = err.encode("ascii", "backslashreplace").decode()
+    expected_err = "1 file failed to reformat.\n"
 
     assert expected_out == out
     assert expected_err in err
@@ -473,13 +417,10 @@ def test_invalid_syntax_without_nbqa_dont_skip_bad_cells(
 
     out, err = capsys.readouterr()
     expected_out = ""
-    expected_err = "All done! \\u2728 \\U0001f370 \\u2728\n1 file left unchanged.\n"
-    # This is required because linux supports emojis
-    # so both should have \\ for comparison
-    err = err.encode("ascii", "backslashreplace").decode()
+    expected_err = "1 file left unchanged.\n"
 
     assert expected_out == out
-    assert expected_err == err
+    assert expected_err in err
 
 
 def test_invalid_syntax_with_nbqa_dont_skip_bad_cells(capsys: "CaptureFixture") -> None:
@@ -497,17 +438,10 @@ def test_invalid_syntax_with_nbqa_dont_skip_bad_cells(capsys: "CaptureFixture") 
 
     out, err = capsys.readouterr()
     expected_out = ""
-    expected_err = (
-        f"error: cannot format {path}: Cannot parse: cell_1:2:7: if True\n\n"  # noqa: E501
-        "Oh no! \\U0001f4a5 \\U0001f494 \\U0001f4a5\n"
-        "1 file failed to reformat.\n"
-    )
-    # This is required because linux supports emojis
-    # so both should have \\ for comparison
-    err = err.encode("ascii", "backslashreplace").decode()
+    expected_err = "1 file failed to reformat."
 
     assert expected_out == out
-    assert expected_err == err
+    assert expected_err in err
 
 
 def test_comment_after_trailing_comma(capsys: "CaptureFixture") -> None:

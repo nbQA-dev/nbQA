@@ -26,7 +26,6 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
     """Test the results on --nbqa-diff on a dirty notebook."""
     main(["black", str(DIRTY_NOTEBOOK), "--nbqa-diff"])
     out, err = capsys.readouterr()
-    err = err.encode("ascii", "backslashreplace").decode()
     expected_out = (
         "\x1b[1mCell 2\x1b[0m\n"
         "------\n"
@@ -41,19 +40,13 @@ def test_diff_present(capsys: "CaptureFixture") -> None:
         "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out == expected_out
-    expected_err = (
-        dedent(
-            f"""\
+    expected_err = dedent(
+        f"""\
             reformatted {str(DIRTY_NOTEBOOK)}
 
-            All done! {SPARKLES} {SHORTCAKE} {SPARKLES}
-            1 file reformatted.
-            """
-        )
-        .encode("ascii", "backslashreplace")
-        .decode()
+            All done!"""
     )
-    assert err == expected_err
+    assert expected_err in err
 
 
 def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
@@ -71,14 +64,7 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
 
     out, err = capsys.readouterr()
     expected_out = "Notebook(s) would be left unchanged\n"
-    expected_err = (
-        (f"{COLLISION} {BROKEN_HEART} {COLLISION}\n1 file failed to reformat.\n")
-        .encode("ascii", "backslashreplace")
-        .decode()
-    )
-    # This is required because linux supports emojis
-    # so both should have \\ for comparison
-    err = err.encode("ascii", "backslashreplace").decode()
+    expected_err = "1 file failed to reformat."
 
     assert expected_out == out
     assert expected_err in err
