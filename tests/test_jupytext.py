@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import jupytext
 import pytest
 
 from nbqa.__main__ import main
@@ -37,7 +38,7 @@ def test_myst(tmp_test_data: Path) -> None:
         "    extension: .md\n"
         "    format_name: myst\n"
         "    format_version: 0.13\n"
-        "    jupytext_version: 1.14.2\n"
+        f"    jupytext_version: {jupytext.__version__}\n"
         "kernelspec:\n"
         "  display_name: Python 3\n"
         "  language: python\n"
@@ -144,7 +145,7 @@ def test_md(tmp_test_data: Path) -> None:
         "      extension: .md\n"
         "      format_name: markdown\n"
         "      format_version: '1.3'\n"
-        "      jupytext_version: 1.14.2\n"
+        f"      jupytext_version: {jupytext.__version__}\n"
         "  kernelspec:\n"
         "    display_name: Python 3\n"
         "    language: python\n"
@@ -236,7 +237,7 @@ def test_jupytext_with_nbqa_md(capsys: "CaptureFixture") -> None:
         f"{path}: Rewriting...\n"
         "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
-    assert out == expected
+    assert out.replace("\r\n", "\n") == expected
 
     main(
         [
@@ -247,7 +248,7 @@ def test_jupytext_with_nbqa_md(capsys: "CaptureFixture") -> None:
         ]
     )
     out, _ = capsys.readouterr()
-    assert out == expected.replace(".md", ".ipynb")
+    assert out.replace("\r\n", "\n") == expected.replace(".md", ".ipynb")
 
 
 def test_invalid_config_file(tmpdir: "LocalPath") -> None:

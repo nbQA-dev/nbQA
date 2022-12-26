@@ -55,4 +55,4 @@ def test_with_subcommand(capsys: "CaptureFixture") -> None:
     """Check subcommand is picked up by module."""
     main(["tests.local_script foo", "."])
     out, _ = capsys.readouterr()
-    assert out == "['foo']\n"
+    assert out.replace("\r\n", "\n") == "['foo']\n"

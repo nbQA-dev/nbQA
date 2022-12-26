@@ -308,7 +308,7 @@ def _run_command(
     output = subprocess.run(
         [*cmd, *args, *cmd_args],
         capture_output=True,
-        text=True,
+        text=False,
         env=my_env,
     )
 
@@ -316,8 +316,8 @@ def _run_command(
 
     output_code = output.returncode
 
-    out = output.stdout
-    err = output.stderr
+    out = output.stdout.decode()
+    err = output.stderr.decode()
 
     return Output(out, err), output_code, mutated
 

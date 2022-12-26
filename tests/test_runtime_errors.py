@@ -224,7 +224,7 @@ def test_unable_to_parse_output(capsys: "CaptureFixture") -> None:
     main(["print_6174", str(path)])
     out, _ = capsys.readouterr()
     expected_out = f"{str(path)}:6174:0 some silly warning\n"
-    assert out == expected_out
+    assert out.replace("\r\n", "\n") == expected_out
 
 
 def test_directory_without_notebooks(capsys: "CaptureFixture") -> None:
