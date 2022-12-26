@@ -305,6 +305,7 @@ def _run_command(
     else:
         python_module = COMMAND_TO_PYTHON_MODULE.get(main_command, main_command)
         cmd = [sys.executable, "-m", python_module, *sub_commands]
+    breakpoint()
     output = subprocess.run(
         [*cmd, *args, *cmd_args],
         capture_output=True,
