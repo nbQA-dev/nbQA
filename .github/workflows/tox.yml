@@ -3,7 +3,7 @@ name: tox
 on:
   pull_request:
   push:
-    branches: [master]
+    branches: [main]
 
 jobs:
   tox:
