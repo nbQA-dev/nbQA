@@ -1,7 +1,6 @@
 """Check :code:`ruff` works as intended."""
 
 import os
-from textwrap import dedent
 from typing import TYPE_CHECKING
 
 import pytest
@@ -53,26 +52,27 @@ def test_ruff_works(
     expected_path_2 = os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
 
     out, err = capsys.readouterr()
-    expected_out = dedent(
-        f"""Found 13 error(s).
-{expected_path_0}:cell_1:1:1: F401 `os` imported but unused
-{expected_path_0}:cell_1:3:1: F401 `glob` imported but unused
-{expected_path_0}:cell_1:5:1: F401 `nbqa` imported but unused
-{expected_path_0}:cell_4:1:1: E402 Module level import not at top of file
-{expected_path_0}:cell_4:1:1: F401 `random.randint` imported but unused
-{expected_path_0}:cell_5:1:1: E402 Module level import not at top of file
-{expected_path_0}:cell_5:2:1: E402 Module level import not at top of file
-{expected_path_1}:cell_1:1:1: F401 `os` imported but unused
-{expected_path_1}:cell_1:3:1: F401 `glob` imported but unused
-{expected_path_1}:cell_1:5:1: F401 `nbqa` imported but unused
-{expected_path_2}:cell_1:1:1: F401 `os` imported but unused
-{expected_path_2}:cell_1:3:1: F401 `glob` imported but unused
-{expected_path_2}:cell_1:5:1: F401 `nbqa` imported but unused
-10 potentially fixable with the --fix option."""
+    expected_out = (
+        "Found 13 error(s).\n"
+        f"{expected_path_1}:cell_1:1:8: F401 `os` imported but unused\n"
+        f"{expected_path_1}:cell_1:3:8: F401 `glob` imported but unused\n"
+        f"{expected_path_1}:cell_1:5:8: F401 `nbqa` imported but unused\n"
+        f"{expected_path_0}:cell_1:1:8: F401 `os` imported but unused\n"
+        f"{expected_path_0}:cell_1:3:8: F401 `glob` imported but unused\n"
+        f"{expected_path_0}:cell_1:5:8: F401 `nbqa` imported but unused\n"
+        f"{expected_path_0}:cell_4:1:1: E402 Module level import not at top of file\n"
+        f"{expected_path_0}:cell_4:1:20: F401 `random.randint` imported but unused\n"
+        f"{expected_path_0}:cell_5:1:1: E402 Module level import not at top of file\n"
+        f"{expected_path_0}:cell_5:2:1: E402 Module level import not at top of file\n"
+        f"{expected_path_2}:cell_1:1:8: F401 `os` imported but unused\n"
+        f"{expected_path_2}:cell_1:3:8: F401 `glob` imported but unused\n"
+        f"{expected_path_2}:cell_1:5:8: F401 `nbqa` imported but unused\n"
+        "10 potentially fixable with the --fix option.\n"
     )
-    expected_err = ""
-    assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
-    assert sorted(err.splitlines()) == sorted(expected_err.splitlines())
+    assert "\n".join(sorted(out.replace("\r\n", "\n").splitlines())) == "\n".join(
+        sorted(expected_out.splitlines())
+    )
+    assert err == ""
 
 
 def test_cell_with_all_magics(capsys: "CaptureFixture") -> None:
