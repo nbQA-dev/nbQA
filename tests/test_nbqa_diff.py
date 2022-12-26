@@ -57,14 +57,5 @@ def test_invalid_syntax_with_nbqa_diff(capsys: "CaptureFixture") -> None:
 
     out, err = capsys.readouterr()
     expected_out = "Notebook(s) would be left unchanged\n"
-    expected_err = (
-        (f"{COLLISION} {BROKEN_HEART} {COLLISION}\n1 file failed to reformat.\n")
-        .encode("ascii", "backslashreplace")
-        .decode()
-    )
-    # This is required because linux supports emojis
-    # so both should have \\ for comparison
-    err = err.encode("ascii", "backslashreplace").decode()
-
     assert expected_out == out
-    assert expected_err in err
+    assert "1 file failed to reformat" in err
