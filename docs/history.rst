@@ -2,6 +2,14 @@
 Changelog
 =========
 
+1.6.0 (2022-12-26)
+~~~~~~~~~~~~~~~~~~
+Fixed bug(?) whereby running ``black`` was resulting in
+``UnicodeDecodeError`` on Windows. I couldn't reproduce this locally
+on Windows, and nobody reported it, but it did fail CI, so better to
+have fixed it.
+Added support for ``ruff`` (thanks @marscher !)
+
 1.5.3 (2022-10-20)
 ~~~~~~~~~~~~~~~~~~
 Fixed bug when running ``isort --float-to-top`` and it was
