@@ -11,11 +11,11 @@ repos:
       - id: trailing-whitespace
       - id: debug-statements
   - repo: https://github.com/pre-commit/pre-commit
-    rev: v2.20.0
+    rev: v2.21.0
     hooks:
       - id: validate_manifest
   - repo: https://github.com/psf/black
-    rev: 22.10.0
+    rev: 22.12.0
     hooks:
       - id: black
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -24,7 +24,7 @@ repos:
       - id: prettier
         exclude: ^README\.md$
   - repo: https://github.com/PyCQA/pylint
-    rev: v2.15.8
+    rev: v2.15.9
     hooks:
       - id: pylint
         files: ^(nbqa|tests)/
@@ -35,7 +35,7 @@ repos:
       - id: flake8
         additional_dependencies: [flake8-typing-imports==1.14.0]
   - repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
+    rev: 5.11.4
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/pydocstyle
@@ -56,12 +56,12 @@ repos:
         exclude: ^docs/
         additional_dependencies: [types-setuptools, types-toml]
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.0
+    rev: v3.3.1
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
   - repo: https://github.com/MarcoGorelli/auto-walrus
-    rev: v0.2.1
+    rev: v0.2.2
     hooks:
       - id: auto-walrus
   - repo: https://github.com/codespell-project/codespell
