@@ -86,7 +86,7 @@ class CLIArgs:  # pylint: disable=R0902
         self.md = args.nbqa_md or None
         self.shell = args.nbqa_shell or None
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: nocover
         """Print prettily."""
         return str(self.__dict__)
 
