@@ -140,7 +140,7 @@ Here's an example of how to set up some pre-commit hooks: put this in your `.pre
 
 ```yaml
 - repo: https://github.com/nbQA-dev/nbQA
-  rev: 1.6.0
+  rev: 1.6.1
   hooks:
     - id: nbqa-black
       additional_dependencies: [jupytext]  # optional, only if you're using Jupytext

@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.6.1 (2022-01-09)
+~~~~~~~~~~~~~~~~~~
+Fixed bug when executing ``grep`` with string argument
+(e.g. ``nbqa 'grep "import numpy"' . --nbqa-shell``).
+
 1.6.0 (2022-12-26)
 ~~~~~~~~~~~~~~~~~~
 Fixed bug(?) whereby running ``black`` was resulting in
