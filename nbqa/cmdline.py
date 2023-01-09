@@ -86,6 +86,10 @@ class CLIArgs:  # pylint: disable=R0902
         self.md = args.nbqa_md or None
         self.shell = args.nbqa_shell or None
 
+    def __repr__(self) -> str:
+        """Print prettily."""
+        return str(self.__dict__)
+
     @staticmethod
     def parse_args(argv: Optional[Sequence[str]]) -> "CLIArgs":
         """

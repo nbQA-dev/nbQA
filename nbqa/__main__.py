@@ -2,6 +2,7 @@
 import itertools
 import os
 import re
+import shlex
 import string
 import subprocess
 import sys
@@ -301,7 +302,8 @@ def _run_command(
 
     if shell:
         # We already checked that which does not return None
-        cmd = [cast(str, which(main_command)), *sub_commands]
+
+        cmd = [cast(str, which(main_command)), *shlex.split(" ".join(sub_commands))]
     else:
         python_module = COMMAND_TO_PYTHON_MODULE.get(main_command, main_command)
         cmd = [sys.executable, "-m", python_module, *sub_commands]

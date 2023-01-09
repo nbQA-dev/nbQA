@@ -65,3 +65,11 @@ def test_nbqa_shell_not_found(monkeypatch: MonkeyPatch) -> None:
     msg = "\x1b\\[1mnbqa was unable to find some-fictional-command.\x1b\\[0m"
     with pytest.raises(CommandNotFoundError, match=msg):
         main(args)
+
+
+@pytest.mark.skipif(sys.platform != "linux", reason="needs grep")
+def test_grep(capsys: CaptureFixture) -> None:
+    """Check grep with string works."""
+    main(["grep 'import pandas'", ".", "--nbqa-shell"])
+    out, _ = capsys.readouterr()
+    assert out == "tests/data/notebook_for_autoflake.ipynb:import pandas as pd\n"
