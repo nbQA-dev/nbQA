@@ -74,11 +74,6 @@ To also install all supported linters/formatters:
 $ python -m pip install -U "nbqa[toolchain]"
 ```
 
-Or, if you are using conda:
-```console
-$ conda install -c conda-forge nbqa
-```
-
 ## 🚀 Examples
 
 ### Command-line
