@@ -30,6 +30,7 @@ MAGIC = frozenset(("time", "timeit", "capture", "pypy", "python", "python3"))
 NEWLINE = "\n"
 NEWLINES = defaultdict(lambda: NEWLINE * 3)
 NEWLINES["isort"] = NEWLINE * 2
+NEWLINES["ruff"] = NEWLINE * 2
 TRANSFORMED_MAGICS = frozenset(
     (
         "get_ipython().run_cell_magic",
