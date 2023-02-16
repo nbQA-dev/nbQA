@@ -2,7 +2,7 @@
 Changelog
 =========
 
-1.6.1 (2022-01-09)
+1.6.2 (2022-01-09)
 ~~~~~~~~~~~~~~~~~~
 Fixed bug when executing ``grep`` with string argument
 (e.g. ``nbqa 'grep "import numpy"' . --nbqa-shell``).
