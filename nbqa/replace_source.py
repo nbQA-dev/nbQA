@@ -298,7 +298,6 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> bool:
     # https://github.com/psf/black/blob/9a73bb86db59de1e12426fec81dcdb7f3bb9be7b/src/black/output.py#L79-L92
     line_changes = []
     for line in cell_diff:
-
         if line.startswith("+++") or line.startswith("---"):
             line_changes.append("\033[1;37m" + line + "\033[0m")  # bold white, reset
         elif line.startswith("@@"):

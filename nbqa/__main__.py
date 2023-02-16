@@ -383,7 +383,6 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     # If a section is in pyproject.toml, use that.
     pyproject_path = project_root / "pyproject.toml"
     if pyproject_path.is_file():
-
         config_file = tomli.loads(pyproject_path.read_text("utf-8"))
         if "tool" in config_file and "nbqa" in config_file["tool"]:
             file_config = config_file["tool"]["nbqa"]
@@ -639,7 +638,6 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
         sys.stderr.write(str(exc))
         return 1
     try:  # pylint disable=R0912
-
         if not nb_to_tmp_mapping:
             sys.stderr.write("No notebooks found in given path(s)\n")
             return 0
