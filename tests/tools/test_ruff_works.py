@@ -91,3 +91,21 @@ def test_cell_with_all_magics(capsys: "CaptureFixture") -> None:
     out, err = capsys.readouterr()
     assert out == ""
     assert err == ""
+
+
+def test_ruff_isort(capsys: "CaptureFixture") -> None:
+    """
+    Should ignore cell with all magics.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+
+    path = os.path.join("tests", "data", "simple_imports.ipynb")
+    main(["ruff", path, "--select=I"])
+
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == ""
