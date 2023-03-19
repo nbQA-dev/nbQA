@@ -1,9 +1,13 @@
 """Test files saved via jupytext."""
 import os
+import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import jupytext
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    import jupytext
+
 import pytest
 
 from nbqa.__main__ import main

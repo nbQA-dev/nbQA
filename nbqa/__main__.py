@@ -1,4 +1,6 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
+from __future__ import annotations
+
 import itertools
 import os
 import re
@@ -11,22 +13,9 @@ from importlib import import_module
 from pathlib import Path
 from shutil import which
 from textwrap import dedent
-from typing import (
-    Any,
-    Dict,
-    Iterator,
-    Mapping,
-    MutableMapping,
-    NamedTuple,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    cast,
-)
+from typing import Any, Iterator, Mapping, MutableMapping, NamedTuple, Sequence, cast
 
 import tomli
-from pkg_resources import parse_version
 
 from nbqa import replace_source, save_code_source, save_markdown_source
 from nbqa.cmdline import CLIArgs
@@ -42,6 +31,18 @@ from nbqa.path_utils import (
 )
 from nbqa.save_code_source import CODE_SEPARATOR
 from nbqa.text import BOLD, RESET
+
+
+def parse_version(version: str) -> tuple[int, ...]:
+    """
+    Parse version; split into a tuple of ints for comparison.
+
+    Borrowed from polars, I can't tell what Python expects us to use.
+    pkg_resources is deprecated apparently.
+    This is only used for isort and nbqa anyway
+    """
+    return tuple(int(re.sub(r"\D", "", str(v))) for v in version.split("."))
+
 
 BASE_ERROR_MESSAGE = (
     f'{BOLD}nbQA failed to process {{notebook}} with exception "{{exp}}"{RESET}\n'
@@ -77,7 +78,7 @@ class SavedSources(NamedTuple):
 
     nb_info_mapping: Mapping[str, NotebookInfo]
     failed_notebooks: MutableMapping[str, str]
-    non_python_notebooks: Set[str]
+    non_python_notebooks: set[str]
 
 
 class UnsupportedPackageVersionError(Exception):
@@ -145,8 +146,8 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
 
 def _filter_by_include_exclude(
     notebooks: Iterator[Path],
-    include: Optional[str],
-    exclude: Optional[str],
+    include: str | None,
+    exclude: str | None,
 ) -> Iterator[str]:
     """
     Include files which match include, exclude those matching exclude.
@@ -175,7 +176,7 @@ def _filter_by_include_exclude(
 
 
 def _get_all_notebooks(
-    root_dirs: Sequence[str], files: Optional[str], exclude: Optional[str]
+    root_dirs: Sequence[str], files: str | None, exclude: str | None
 ) -> Iterator[str]:
     """
     Get generator with all notebooks passed in via the command-line, applying exclusions.
@@ -242,7 +243,7 @@ def _replace_temp_python_file_references_in_out_err(
     return Output(out, err)
 
 
-def _get_mtimes(arg: str) -> Set[float]:
+def _get_mtimes(arg: str) -> set[float]:
     """
     Get the modification times of any converted notebooks.
 
@@ -265,7 +266,7 @@ def _run_command(
     args: Sequence[str],
     *,
     shell: bool,
-) -> Tuple[Output, int, bool]:
+) -> tuple[Output, int, bool]:
     """
     Run third-party tool against given file or directory.
 
@@ -412,7 +413,7 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     return config
 
 
-def _clean_up_tmp_files(nb_to_py_mapping: Mapping[str, Tuple[int, str]]) -> None:
+def _clean_up_tmp_files(nb_to_py_mapping: Mapping[str, tuple[int, str]]) -> None:
     """Remove temporary files."""
     for file_descriptor, tmp_path in nb_to_py_mapping.values():
         try:
@@ -424,8 +425,8 @@ def _clean_up_tmp_files(nb_to_py_mapping: Mapping[str, Tuple[int, str]]) -> None
 
 
 def _get_nb_to_tmp_mapping(
-    root_dirs: Sequence[str], files: Optional[str], exclude: Optional[str], md: bool
-) -> Dict[str, TemporaryFile]:
+    root_dirs: Sequence[str], files: str | None, exclude: str | None, md: bool
+) -> dict[str, TemporaryFile]:
     """
     Get mapping between notebooks and temporary files.
 
@@ -448,7 +449,7 @@ def _get_nb_to_tmp_mapping(
     FileNotFoundError
         If notebook isn't found.
     """
-    nb_to_tmp_mapping: Dict[str, TemporaryFile] = {}
+    nb_to_tmp_mapping: dict[str, TemporaryFile] = {}
     for notebook in _get_all_notebooks(root_dirs, files, exclude):
         if not os.path.exists(notebook):
             _clean_up_tmp_files(nb_to_tmp_mapping)
@@ -500,7 +501,7 @@ def _is_non_python_notebook(notebook: MutableMapping[str, Any]) -> bool:
 
 
 def _save_code_sources(
-    nb_to_py_mapping: Dict[str, TemporaryFile],
+    nb_to_py_mapping: dict[str, TemporaryFile],
     process_cells: Sequence[str],
     skip_celltags: Sequence[str],
     dont_skip_bad_cells: bool,
@@ -535,7 +536,7 @@ def _save_code_sources(
 
 
 def _save_markdown_sources(
-    nb_to_md_mapping: Dict[str, TemporaryFile],
+    nb_to_md_mapping: dict[str, TemporaryFile],
     process_cells: Sequence[str],  # pylint: disable=W0613
     skip_celltags: Sequence[str],
     dont_skip_bad_cells: bool,  # pylint: disable=W0613
@@ -578,7 +579,7 @@ def _post_process_notebooks(  # pylint: disable=R0913
     output: Output,
     *,
     md: bool,
-) -> Tuple[bool, Output]:
+) -> tuple[bool, Output]:
     """Replace source in notebooks, modify output so it refers to notebooks."""
     actually_mutated = False
     for notebook, (_, temp_python_file) in nb_to_py_mapping.items():
@@ -753,7 +754,7 @@ def _check_command_is_installed(command: str, *, shell: bool) -> None:
                 )
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     """
     Run third-party tool (e.g. :code:`mypy`) against notebook or directory.
 
