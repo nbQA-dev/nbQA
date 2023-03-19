@@ -2,11 +2,15 @@
 Changelog
 =========
 
-1.6.3 (2022-02-16)
+1.6.4 (2023-03-19)
+~~~~~~~~~~~~~~~~~~
+Removed usage of (deprecated) ``pkg_resources``.
+
+1.6.3 (2023-02-16)
 ~~~~~~~~~~~~~~~~~~
 Compatibility with ``ruff``'s ``isort``.
 
-1.6.1 (2022-01-09)
+1.6.1 (2023-01-09)
 ~~~~~~~~~~~~~~~~~~
 Fixed bug when executing ``grep`` with string argument
 (e.g. ``nbqa 'grep "import numpy"' . --nbqa-shell``).
