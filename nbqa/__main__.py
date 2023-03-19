@@ -33,16 +33,15 @@ from nbqa.save_code_source import CODE_SEPARATOR
 from nbqa.text import BOLD, RESET
 
 
-def parse_version(version: Sequence[str | int]) -> tuple[int, ...]:
+def parse_version(version: str) -> tuple[int, ...]:
     """
     Parse version; split into a tuple of ints for comparison.
 
     Borrowed from polars, I can't tell what Python expects us to use.
     pkg_resources is deprecated apparently.
+    This is only used for isort and nbqa anyway
     """
-    if isinstance(version, str):
-        version = version.split(".")
-    return tuple(int(re.sub(r"\D", "", str(v))) for v in version)
+    return tuple(int(re.sub(r"\D", "", str(v))) for v in version.split("."))
 
 
 BASE_ERROR_MESSAGE = (
