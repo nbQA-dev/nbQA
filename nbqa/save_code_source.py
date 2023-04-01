@@ -481,7 +481,7 @@ def main(  # pylint: disable=R0914
                 {
                     py_line
                     + index.line_number
-                    + 1: f"cell_{index.cell_number}:{cell_line}"
+                    + 1: f"cell_{index.cell_number}:{cell_line+1}"
                     for py_line, cell_line in _get_line_numbers_for_mapping(
                         parsed_cell, temporary_lines[index.cell_number]
                     ).items()

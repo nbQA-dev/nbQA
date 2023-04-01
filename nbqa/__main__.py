@@ -354,7 +354,6 @@ def _run_command(
         python_module = COMMAND_TO_PYTHON_MODULE.get(main_command, main_command)
         cmd = [sys.executable, "-m", python_module, *sub_commands]
     before = [_get_mtimes(i) for i in args]
-    breakpoint()
     output = subprocess.run(
         [*cmd, *args, *cmd_args],
         capture_output=True,
@@ -596,9 +595,12 @@ def _save_code_sources(
                 continue
             with open(file_name) as fd:
                 content = fd.read()
+            parsed_cells = content.split(CODE_SEPARATOR)
+            if parsed_cells:
+                parsed_cells = parsed_cells[1:]
             nb_info_mapping[notebook] = save_code_source.main(
                 *first_passes[notebook],
-                content.split(CODE_SEPARATOR),
+                content.split(CODE_SEPARATOR)[1:],
                 notebook_json,
                 file_name,
                 process_cells,
