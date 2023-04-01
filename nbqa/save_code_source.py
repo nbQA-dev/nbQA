@@ -343,7 +343,88 @@ def _has_trailing_semicolon(src: str) -> Tuple[str, bool]:
     return tokenize_rt.tokens_to_src(tokens), True
 
 
+def pre_main(  # pylint: disable=R0914
+    notebook_json: MutableMapping[str, Any],
+    file_descriptor: int,
+    process_cells: Sequence[str],
+    command: str,
+    skip_celltags: Sequence[str],
+    *,
+    dont_skip_bad_cells: bool,
+) -> NotebookInfo:
+    """
+    Extract code cells from notebook and save them in temporary Python file.
+
+    Parameters
+    ----------
+    notebook_json
+        Jupyter Notebook third-party tool is being run against.
+    process_cells
+        Extra cells which nbqa should process.
+    command
+        The third-party tool being run.
+
+    Returns
+    -------
+    NotebookInfo
+
+    Raises
+    ------
+    AssertionError
+        If hash collision (extremely rare event!)
+    """
+    cells = notebook_json["cells"]
+
+    result = []
+    index = Index(line_number=0, cell_number=0)
+    temporary_lines: DefaultDict[int, Sequence[MagicHandler]] = defaultdict(list)
+    code_cells_to_ignore = set()
+
+    whole_src = "".join(
+        ["".join(cell["source"]) for cell in cells if cell["cell_type"] == "code"]
+    )
+    if CODE_SEPARATOR.strip() in whole_src:
+        raise AssertionError(
+            "Extremely rare hash collision occurred - please re-run nbQA to fix this"
+        )
+
+    for cell in cells:
+        if cell["cell_type"] == "code":
+            index = index._replace(cell_number=index.cell_number + 1)
+
+            if _should_ignore_code_cell(
+                cell["source"],
+                process_cells,
+                skip_celltags,
+                cell.get("metadata", {}).get("tags", []),
+            ):
+                code_cells_to_ignore.add(index.cell_number)
+                continue
+
+            parsed_cell = _parse_cell(
+                cell["source"],
+                whole_src,
+                index.cell_number,
+                temporary_lines,
+                command,
+                dont_skip_bad_cells=dont_skip_bad_cells,
+            )
+            result.append(parsed_cell)
+            index = index._replace(
+                line_number=index.line_number + len(parsed_cell.splitlines())
+            )
+
+    result_txt = "".join(result).rstrip(NEWLINE) + NEWLINE if result else ""
+    with open(file_descriptor, "w", encoding="utf-8") as handle:
+        handle.write(result_txt)
+
+    return temporary_lines, code_cells_to_ignore
+
+
 def main(  # pylint: disable=R0914
+    temporary_lines,
+    code_cells_to_ignore,
+    parsed_cells,
     notebook_json: MutableMapping[str, Any],
     file_descriptor: int,
     process_cells: Sequence[str],
@@ -379,17 +460,8 @@ def main(  # pylint: disable=R0914
     cell_mapping = {0: "cell_0:0"}
     index = Index(line_number=0, cell_number=0)
     trailing_semicolons = set()
-    temporary_lines: DefaultDict[int, Sequence[MagicHandler]] = defaultdict(list)
-    code_cells_to_ignore = set()
 
-    whole_src = "".join(
-        ["".join(cell["source"]) for cell in cells if cell["cell_type"] == "code"]
-    )
-    if CODE_SEPARATOR.strip() in whole_src:
-        raise AssertionError(
-            "Extremely rare hash collision occurred - please re-run nbQA to fix this"
-        )
-
+    parsed_cell_idx = 0
     for cell in cells:
         if cell["cell_type"] == "code":
             index = index._replace(cell_number=index.cell_number + 1)
@@ -403,14 +475,7 @@ def main(  # pylint: disable=R0914
                 code_cells_to_ignore.add(index.cell_number)
                 continue
 
-            parsed_cell = _parse_cell(
-                cell["source"],
-                whole_src,
-                index.cell_number,
-                temporary_lines,
-                command,
-                dont_skip_bad_cells=dont_skip_bad_cells,
-            )
+            parsed_cell = parsed_cells[parsed_cell_idx]
 
             cell_mapping.update(
                 {
@@ -429,6 +494,7 @@ def main(  # pylint: disable=R0914
             index = index._replace(
                 line_number=index.line_number + len(parsed_cell.splitlines())
             )
+            parsed_cell_idx += 1
 
     result_txt = "".join(result).rstrip(NEWLINE) + NEWLINE if result else ""
     with open(file_descriptor, "w", encoding="utf-8") as handle:

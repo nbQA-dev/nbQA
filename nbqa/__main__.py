@@ -260,14 +260,12 @@ def _get_mtimes(arg: str) -> set[float]:
     return {os.path.getmtime(arg)}
 
 
-def _record_newlines(args, info_mappings, nb_to_tmp_mapping):
+def _record_newlines(args, first_passes, nb_to_tmp_mapping):
     new_lines = {}
     tmp_to_nb_mapping = {val.file: key for key, val in nb_to_tmp_mapping.items()}
     for arg in args:
-        info_mapping = info_mappings[tmp_to_nb_mapping[arg]]
-        replacements = [
-            j.replacement for i in info_mapping.temporary_lines.values() for j in i
-        ]
+        temporary_lines, _ = first_passes[tmp_to_nb_mapping[arg]]
+        replacements = [j.replacement for i in temporary_lines.values() for j in i]
         new_lines[arg] = {}
         with open(arg) as fd:
             newlines = 0
@@ -355,10 +353,8 @@ def _run_command(
     else:
         python_module = COMMAND_TO_PYTHON_MODULE.get(main_command, main_command)
         cmd = [sys.executable, "-m", python_module, *sub_commands]
-    newlinesbefore, newlinesafter = _fixup_newlines(
-        args, info_mapping, nb_to_tmp_mapping
-    )
     before = [_get_mtimes(i) for i in args]
+    breakpoint()
     output = subprocess.run(
         [*cmd, *args, *cmd_args],
         capture_output=True,
@@ -373,7 +369,7 @@ def _run_command(
     out = output.stdout.decode()
     err = output.stderr.decode()
 
-    return Output(out, err), output_code, mutated, (newlinesbefore, newlinesafter)
+    return Output(out, err), output_code, mutated
 
 
 def _get_command_not_found_msg(command: str) -> str:
@@ -567,13 +563,15 @@ def _save_code_sources(
     non_python_notebooks = set()
     nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
 
+    first_passes = {}
+
     for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
         try:
             notebook_json, _ = read_notebook(notebook)
             if notebook_json is None or _is_non_python_notebook(notebook_json):
                 non_python_notebooks.add(notebook)
                 continue
-            nb_info_mapping[notebook] = save_code_source.main(
+            temporary_lines, code_cells_to_ignore = save_code_source.pre_main(
                 notebook_json,
                 file_descriptor,
                 process_cells,
@@ -581,9 +579,40 @@ def _save_code_sources(
                 skip_celltags,
                 dont_skip_bad_cells=dont_skip_bad_cells,
             )
+            first_passes[notebook] = (temporary_lines, code_cells_to_ignore)
         except Exception as exp_repr:  # pylint: disable=W0703
             failed_notebooks[notebook] = repr(exp_repr)
-    return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks)
+
+    args = [i.file for i in nb_to_py_mapping.values()]
+    newlinesbefore, newlinesafter = _fixup_newlines(
+        args, first_passes, nb_to_py_mapping
+    )
+
+    for notebook, (file_descriptor, file_name) in nb_to_py_mapping.items():
+        try:
+            notebook_json, _ = read_notebook(notebook)
+            if notebook_json is None or _is_non_python_notebook(notebook_json):
+                non_python_notebooks.add(notebook)
+                continue
+            with open(file_name) as fd:
+                content = fd.read()
+            nb_info_mapping[notebook] = save_code_source.main(
+                *first_passes[notebook],
+                content.split(CODE_SEPARATOR),
+                notebook_json,
+                file_name,
+                process_cells,
+                command,
+                skip_celltags,
+                dont_skip_bad_cells=dont_skip_bad_cells,
+            )
+        except Exception as exp_repr:  # pylint: disable=W0703
+            failed_notebooks[notebook] = repr(exp_repr)
+
+    return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks), (
+        newlinesbefore,
+        newlinesafter,
+    )
 
 
 def _save_markdown_sources(
@@ -697,7 +726,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
         if not nb_to_tmp_mapping:
             sys.stderr.write("No notebooks found in given path(s)\n")
             return 0
-        saved_sources = SAVE_SOURCES[configs["md"]](
+        saved_sources, (newlinesbefore, newlinesafter) = SAVE_SOURCES[configs["md"]](
             nb_to_tmp_mapping,
             configs["process_cells"],
             configs["skip_celltags"],
@@ -708,7 +737,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
             sys.stderr.write("No valid Python notebooks found in given path(s)\n")
             return 0
 
-        output, output_code, mutated, (newlinesbefore, newlinesafter) = _run_command(
+        output, output_code, mutated = _run_command(
             cli_args.command,
             configs["addopts"],
             [
