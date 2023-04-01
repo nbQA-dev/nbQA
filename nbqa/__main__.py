@@ -259,6 +259,40 @@ def _get_mtimes(arg: str) -> set[float]:
     """
     return {os.path.getmtime(arg)}
 
+def _record_newlines(args, info_mappings,nb_to_tmp_mapping ):
+    new_lines = {}
+    tmp_to_nb_mapping = {val.file: key for key, val in nb_to_tmp_mapping.items()}
+    for arg in args:
+        breakpoint()
+        info_mapping = info_mappings[tmp_to_nb_mapping[arg]]
+        breakpoint()
+        new_lines[arg] = []
+        with open(arg) as fd:
+            newlines = 0
+            after_comment = False
+            for line in fd:
+                if after_comment and line == '\n':
+                    newlines += 1
+                elif after_comment:
+                    new_lines[arg].append(newlines)
+                    newlines = 0
+                    after_comment = False
+                if line == CODE_SEPARATOR:
+                    after_comment = True
+                    newlines = 0
+                    continue
+    return new_lines
+
+def _fixup_newlines(args, info_mappings, nb_to_tmp_mapping):
+    # ah, we need to record what happens after
+    # each replacement...
+    # should be easier?
+    new_lines_before = _record_newlines(args, info_mappings, nb_to_tmp_mapping)
+    subprocess.run(
+        [sys.executable, "-m", "autopep8", "--select=E3", "--in-place", *args],
+    )
+    new_lines_after = _record_newlines(args)
+    return (new_lines_before, new_lines_after)
 
 def _run_command(
     command: str,
@@ -266,6 +300,8 @@ def _run_command(
     args: Sequence[str],
     *,
     shell: bool,
+    info_mapping,
+    nb_to_tmp_mapping,
 ) -> tuple[Output, int, bool]:
     """
     Run third-party tool against given file or directory.
@@ -306,13 +342,8 @@ def _run_command(
     else:
         python_module = COMMAND_TO_PYTHON_MODULE.get(main_command, main_command)
         cmd = [sys.executable, "-m", python_module, *sub_commands]
-    # fixup line breaks
-    subprocess.run(
-        [sys.executable, "-m", "autopep8", "--select=E3", "--in-place", *args],
-        capture_output=True,
-        text=False,
-        env=my_env,
-    )
+    newlinesbefore, newlinesafter = _fixup_newlines(args, info_mapping, nb_to_tmp_mapping)
+    breakpoint()
     before = [_get_mtimes(i) for i in args]
     output = subprocess.run(
         [*cmd, *args, *cmd_args],
@@ -328,7 +359,7 @@ def _run_command(
     out = output.stdout.decode()
     err = output.stderr.decode()
 
-    return Output(out, err), output_code, mutated
+    return Output(out, err), output_code, mutated, (newlinesbefore, newlinesafter)
 
 
 def _get_command_not_found_msg(command: str) -> str:
@@ -583,6 +614,8 @@ def _post_process_notebooks(  # pylint: disable=R0913
     diff: bool,
     command: str,
     output: Output,
+    newlinesbefore: dict,
+    newlinesafter: dict,
     *,
     md: bool,
 ) -> tuple[bool, Output]:
@@ -612,6 +645,8 @@ def _post_process_notebooks(  # pylint: disable=R0913
                         temp_python_file,
                         notebook,
                         saved_sources.nb_info_mapping[notebook],
+                        newlinesbefore=newlinesbefore,
+                        newlinesafter=newlinesafter,
                         md=md,
                     )
                     or actually_mutated
@@ -659,7 +694,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
             sys.stderr.write("No valid Python notebooks found in given path(s)\n")
             return 0
 
-        output, output_code, mutated = _run_command(
+        output, output_code, mutated, (newlinesbefore, newlinesafter) = _run_command(
             cli_args.command,
             configs["addopts"],
             [
@@ -672,6 +707,8 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
                 )
             ],
             shell=configs["shell"],
+            info_mapping =saved_sources.nb_info_mapping,
+            nb_to_tmp_mapping=nb_to_tmp_mapping,
         )
 
         actually_mutated, output = _post_process_notebooks(
@@ -682,6 +719,8 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
             cli_args.command,
             output,
             md=configs["md"],
+            newlinesbefore=newlinesbefore,
+            newlinesafter=newlinesafter,
         )
 
         sys.stdout.write(output.out)

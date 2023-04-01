@@ -28,7 +28,7 @@ from nbqa.path_utils import remove_prefix
 CODE_SEPARATOR = f"# %%NBQA-CELL-SEP{secrets.token_hex(3)}\n"
 MAGIC = frozenset(("time", "timeit", "capture", "pypy", "python", "python3"))
 NEWLINE = "\n"
-NEWLINES = defaultdict(lambda: NEWLINE * 3)
+NEWLINES = defaultdict(lambda: NEWLINE * 3)  # can we uniform to 2?
 NEWLINES["isort"] = NEWLINE * 2
 NEWLINES["ruff"] = NEWLINE * 2
 TRANSFORMED_MAGICS = frozenset(
