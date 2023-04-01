@@ -259,29 +259,41 @@ def _get_mtimes(arg: str) -> set[float]:
     """
     return {os.path.getmtime(arg)}
 
-def _record_newlines(args, info_mappings,nb_to_tmp_mapping ):
+
+def _record_newlines(args, info_mappings, nb_to_tmp_mapping):
     new_lines = {}
     tmp_to_nb_mapping = {val.file: key for key, val in nb_to_tmp_mapping.items()}
     for arg in args:
-        breakpoint()
         info_mapping = info_mappings[tmp_to_nb_mapping[arg]]
-        breakpoint()
-        new_lines[arg] = []
+        replacements = [
+            j.replacement for i in info_mapping.temporary_lines.values() for j in i
+        ]
+        new_lines[arg] = {}
         with open(arg) as fd:
             newlines = 0
             after_comment = False
+            comment = None
             for line in fd:
-                if after_comment and line == '\n':
+                if after_comment and line == "\n":
                     newlines += 1
                 elif after_comment:
-                    new_lines[arg].append(newlines)
+                    assert comment is not None
+                    new_lines[arg][comment] = newlines
                     newlines = 0
                     after_comment = False
-                if line == CODE_SEPARATOR:
-                    after_comment = True
-                    newlines = 0
-                    continue
+                    comment = None
+                for replacement in replacements:
+                    if replacement in line:
+                        after_comment = True
+                        newlines = 0
+                        comment = replacement
+                        break
+            # we've gone through all lines. If we're in 'after_comment',
+            # it means there was a magic right at the end of the file.
+            if after_comment:
+                new_lines[arg][comment] = newlines
     return new_lines
+
 
 def _fixup_newlines(args, info_mappings, nb_to_tmp_mapping):
     # ah, we need to record what happens after
@@ -291,8 +303,9 @@ def _fixup_newlines(args, info_mappings, nb_to_tmp_mapping):
     subprocess.run(
         [sys.executable, "-m", "autopep8", "--select=E3", "--in-place", *args],
     )
-    new_lines_after = _record_newlines(args)
+    new_lines_after = _record_newlines(args, info_mappings, nb_to_tmp_mapping)
     return (new_lines_before, new_lines_after)
+
 
 def _run_command(
     command: str,
@@ -342,8 +355,9 @@ def _run_command(
     else:
         python_module = COMMAND_TO_PYTHON_MODULE.get(main_command, main_command)
         cmd = [sys.executable, "-m", python_module, *sub_commands]
-    newlinesbefore, newlinesafter = _fixup_newlines(args, info_mapping, nb_to_tmp_mapping)
-    breakpoint()
+    newlinesbefore, newlinesafter = _fixup_newlines(
+        args, info_mapping, nb_to_tmp_mapping
+    )
     before = [_get_mtimes(i) for i in args]
     output = subprocess.run(
         [*cmd, *args, *cmd_args],
@@ -707,7 +721,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
                 )
             ],
             shell=configs["shell"],
-            info_mapping =saved_sources.nb_info_mapping,
+            info_mapping=saved_sources.nb_info_mapping,
             nb_to_tmp_mapping=nb_to_tmp_mapping,
         )
 

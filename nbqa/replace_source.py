@@ -74,6 +74,8 @@ def _restore_semicolon(
 def _reinstate_magics(
     source: str,
     temporary_lines: Sequence[MagicHandler],
+    newlinesbefore,
+    newlinesafter,
 ) -> List[str]:
     """
     Put (preprocessed) line magics back in.
@@ -90,15 +92,16 @@ def _reinstate_magics(
     List[str]
         New source that can be saved into Jupyter Notebook.
     """
-    # think I need to get this within each 
+    # think I need to get this within each
     # cell?
     for magic_substitution in temporary_lines:
-        # source = re.sub(
-        #     f"{re.escape(magic_substitution.replacement)}\n",
-        #     f"{magic_substitution.src}\n",
-        #     source,
-        # )
-        source = source.replace(magic_substitution.replacement, magic_substitution.src)
+        nlinesbefore = "\n" * newlinesbefore[magic_substitution.replacement]
+        nlinesafter = "{" + str(newlinesafter[magic_substitution.replacement]) + "}"
+        source = re.sub(
+            f"{re.escape(magic_substitution.replacement)}\n{nlinesafter}",
+            f"{magic_substitution.src}{nlinesbefore}",
+            source,
+        )
     return source.strip("\n").splitlines(True)
 
 
@@ -132,10 +135,12 @@ def _get_new_source(
     return _reinstate_magics(
         source,
         notebook_info.temporary_lines.get(code_cell_number, []),
+        newlinesbefore,
+        newlinesafter,
     )
 
 
-def _get_cells(txt: str, num_cells: int, *, md: bool) -> Iterator[str]:
+def _get_cells(python_file: str, num_cells: int, *, md: bool) -> Iterator[str]:
     """
     Parse cells from Python file.
 
@@ -154,6 +159,8 @@ def _get_cells(txt: str, num_cells: int, *, md: bool) -> Iterator[str]:
     ValueError
         If the third-party tool "ate" any separator comments.
     """
+    with open(python_file) as fd:
+        txt = fd.read()
     separator = SEPARATOR[md]
 
     if txt.count(separator) != num_cells:
@@ -232,10 +239,13 @@ def _write_notebook(
 
 
 def mutate(
-    temp_file: str, notebook: str, notebook_info: NotebookInfo,
+    temp_file: str,
+    notebook: str,
+    notebook_info: NotebookInfo,
     newlinesbefore,
     newlinesafter,
-    *, md: bool
+    *,
+    md: bool,
 ) -> bool:
     """
     Replace :code:`source` code cells of original notebook.
@@ -262,14 +272,19 @@ def mutate(
 
     cells_to_remove = []
 
-    txt = _restore_newlines(temp_file, newlinesbefore[temp_file], newlinesafter[temp_file])
-    cells = _get_cells(txt, len(notebook_info.temporary_lines), md=md)
+    cells = _get_cells(temp_file, len(notebook_info.temporary_lines), md=md)
     for code_cell_number, (cell_number, cell) in enumerate(
         _notebook_cells(notebook_json, md=md), start=1
     ):
         if code_cell_number in notebook_info.code_cells_to_ignore:
             continue
-        new_source = _get_new_source(code_cell_number, notebook_info, next(cells), newlinesbefore, newlinesafter)
+        new_source = _get_new_source(
+            code_cell_number,
+            notebook_info,
+            next(cells),
+            newlinesbefore[temp_file],
+            newlinesafter[temp_file],
+        )
         if not new_source:
             cells_to_remove.append(cell_number)
         cell["source"] = new_source
@@ -325,36 +340,15 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> bool:
         return True
     return False
 
-def _restore_newlines(arg, newlinesbefore, newlinesafter):
-    new_content = []
-    with open(arg) as fd:
-        oldcontent = fd.read()
-    breakpoint()
-    with open(arg) as fd:
-        newlines = 0
-        after_comment = False
-        comment_idx = 0
-        for line in fd:
-            if after_comment and line == '\n':
-                if newlines > newlinesbefore[comment_idx-1]:  # -1 as we start on 1
-                    continue
-                newlines += 1
-            elif after_comment:
-                after_comment = False
-                newlines = 0
-            if line == CODE_SEPARATOR:
-                after_comment = True
-                comment_idx += 1
-                newlines = 0
-            new_content.append(line)
-    return ''.join(new_content)
 
 def diff(
-    python_file: str, notebook: str, notebook_info: NotebookInfo,
+    python_file: str,
+    notebook: str,
+    notebook_info: NotebookInfo,
     newlinesbefore,
     newlinesafter,
     *,
-    md: bool
+    md: bool,
 ) -> bool:
     """
     View diff between new source of code cells and original sources.
@@ -376,8 +370,7 @@ def diff(
     notebook_json, _ = read_notebook(notebook)
     assert notebook_json is not None  # if we got here, it was a valid notebook
 
-    txt = _restore_newlines(python_file, newlinesbefore[python_file], newlinesafter[python_file])
-    cells = _get_cells(txt, len(notebook_info.temporary_lines), md=md)
+    cells = _get_cells(python_file, len(notebook_info.temporary_lines), md=md)
 
     actually_mutated = False
 
@@ -386,7 +379,13 @@ def diff(
     ):
         if code_cell_number in notebook_info.code_cells_to_ignore:
             continue
-        new_source = _get_new_source(code_cell_number, notebook_info, next(cells), newlinesbefore[python_file], newlinesafter[python_file])
+        new_source = _get_new_source(
+            code_cell_number,
+            notebook_info,
+            next(cells),
+            newlinesbefore[python_file],
+            newlinesafter[python_file],
+        )
         cell["source"][-1] += "\n"
         if new_source:
             new_source[-1] += "\n"
