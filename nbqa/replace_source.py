@@ -96,7 +96,6 @@ def _reinstate_magics(
             f"{magic_substitution.src}\n",
             source,
         )
-        # source = source.replace(magic_substitution.replacement, magic_substitution.src)
     return source.strip("\n").splitlines(True)
 
 
