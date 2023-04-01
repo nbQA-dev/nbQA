@@ -3,10 +3,10 @@ Replace :code:`source` code cells of original notebook with ones from converted 
 
 The converted file will have had the third-party tool run against it by now.
 """
-
 import copy
 import json
 import os
+import re
 import sys
 from difflib import unified_diff
 from shutil import move
@@ -91,7 +91,12 @@ def _reinstate_magics(
         New source that can be saved into Jupyter Notebook.
     """
     for magic_substitution in temporary_lines:
-        source = source.replace(magic_substitution.replacement, magic_substitution.src)
+        source = re.sub(
+            f"{re.escape(magic_substitution.replacement)}\n*",
+            f"{magic_substitution.src}\n",
+            source,
+        )
+        # source = source.replace(magic_substitution.replacement, magic_substitution.src)
     return source.strip("\n").splitlines(True)
 
 

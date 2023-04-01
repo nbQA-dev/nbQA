@@ -293,8 +293,6 @@ def _run_command(
     ValueError
         If third-party tool isn't found in system.
     """
-    before = [_get_mtimes(i) for i in args]
-
     main_command, *sub_commands = command.split()
 
     my_env = os.environ.copy()
@@ -308,6 +306,14 @@ def _run_command(
     else:
         python_module = COMMAND_TO_PYTHON_MODULE.get(main_command, main_command)
         cmd = [sys.executable, "-m", python_module, *sub_commands]
+    # fixup line breaks
+    subprocess.run(
+        [sys.executable, "-m", "autopep8", "--select=E3", "--in-place", *args],
+        capture_output=True,
+        text=False,
+        env=my_env,
+    )
+    before = [_get_mtimes(i) for i in args]
     output = subprocess.run(
         [*cmd, *args, *cmd_args],
         capture_output=True,

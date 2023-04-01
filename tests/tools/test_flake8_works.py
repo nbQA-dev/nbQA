@@ -58,8 +58,8 @@ def test_flake8_works(
         {expected_path_0}:cell_1:1:1: F401 'os' imported but unused
         {expected_path_0}:cell_1:3:1: F401 'glob' imported but unused
         {expected_path_0}:cell_1:5:1: F401 'nbqa' imported but unused
-        {expected_path_0}:cell_2:19:9: W291 trailing whitespace
         {expected_path_0}:cell_4:1:1: E402 module level import not at top of file
+        {expected_path_0}:cell_2:19:9: W291 trailing whitespace
         {expected_path_0}:cell_4:1:1: F401 'random.randint' imported but unused
         {expected_path_0}:cell_5:1:1: E402 module level import not at top of file
         {expected_path_0}:cell_5:2:1: E402 module level import not at top of file
@@ -69,7 +69,6 @@ def test_flake8_works(
         {expected_path_2}:cell_1:1:1: F401 'os' imported but unused
         {expected_path_2}:cell_1:3:1: F401 'glob' imported but unused
         {expected_path_2}:cell_1:5:1: F401 'nbqa' imported but unused
-        {expected_path_2}:cell_3:2:1: E302 expected 2 blank lines, found 0
         """
     )
     expected_err = ""

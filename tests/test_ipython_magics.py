@@ -45,12 +45,14 @@ def _validate_magics_with_black(before: Sequence[str], after: Sequence[str]) -> 
     diff = difflib.unified_diff(before, after)
     result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
     expected = (
+        '-    "\\n",\n'
         '-    "def compute(operand1,operand2, bin_op):\\n",\n'
         '+    "def compute(operand1, operand2, bin_op):\\n",\n'
         '-    "compute(5,1, operator.add)"\n'
         '+    "compute(5, 1, operator.add)"\n'
         '-    "    ?str.splitlines"\n'
         '+    "str.splitlines?"\n'
+        '-    "\\n",\n'
         '-    "   %time randint(5,10)"\n'
         '+    "%time randint(5,10)"\n'
         '-    "result = str.split??"\n'

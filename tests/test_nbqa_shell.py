@@ -1,7 +1,6 @@
 """Ensure the --nbqa-shell flag correctly calls the underlying command."""
 import os
 import sys
-from shutil import which
 from subprocess import CompletedProcess
 from typing import List
 
@@ -28,15 +27,16 @@ def test_nbqa_shell(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     monkeypatch.setattr("subprocess.run", subprocess_run)
 
     args = ["black", "--nbqa-shell", path]
-    expected_run = [which("black"), path]
     main(args)
     out, err = capsys.readouterr()
     received = err.strip()
-    expected = _message(args=expected_run)  # type:ignore[arg-type]
-    assert (
-        received == expected
-    ), f"nbqa called unexpected `{received}` instead of `{expected}` for args `{args}`"
-    assert out == "", f"No stdout expected. Received `{out}`"
+    black_executable = sys.executable.replace("python", "black")
+    expected = (
+        f"I would have run `['{sys.executable}', '-m', 'autopep8', '--select=E3', '--in-place']`\n"
+        f"I would have run `['{black_executable}']`"
+    )
+    assert received == expected
+    assert out == ""
 
 
 def test_nbqa_not_shell(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
@@ -45,15 +45,15 @@ def test_nbqa_not_shell(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> Non
     monkeypatch.setattr("subprocess.run", subprocess_run)
 
     args = ["black", path]
-    expected_run = [sys.executable, "-m", "black", path]
     main(args)
     out, err = capsys.readouterr()
     received = err.strip()
-    expected = _message(args=expected_run)
-    assert (
-        received == expected
-    ), f"nbqa called unexpected `{received}` instead of `{expected}` for args `{args}`"
-    assert out == "", f"No stdout expected. Received `{out}`"
+    expected = (
+        f"I would have run `['{sys.executable}', '-m', 'autopep8', '--select=E3', '--in-place']`\n"
+        f"I would have run `['{sys.executable}', '-m', 'black']`"
+    )
+    assert received == expected
+    assert out == ""
 
 
 def test_nbqa_shell_not_found(monkeypatch: MonkeyPatch) -> None:

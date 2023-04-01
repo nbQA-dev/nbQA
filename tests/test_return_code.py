@@ -19,7 +19,7 @@ PASSED = 0
 
 def _run_nbqa_with(command: str, notebooks: Sequence[Path], *args: str) -> int:
     """Run nbqa with the QA tool specified by command parameter."""
-    notebook_paths = map(str, notebooks)
+    notebook_paths = [str(i) for i in notebooks]
     output = subprocess.run(["nbqa", command, *notebook_paths, *args])
     return output.returncode
 
@@ -68,6 +68,8 @@ def test_black_return_code() -> None:
         TEST_DATA_DIR / "clean_notebook_with_trailing_semicolon.ipynb",
         EMPTY_NOTEBOOK,
     ]
+    output = subprocess.run(["nbqa", "black", *clean_notebooks, "--check"])
+    assert output.returncode == PASSED
     assert black_runner(clean_notebooks, "--check") == PASSED
 
     # This is to test if the tool ran on all the notebooks in a given directory
