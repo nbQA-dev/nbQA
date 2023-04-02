@@ -456,7 +456,6 @@ def main(  # pylint: disable=R0914
                 skip_celltags,
                 cell.get("metadata", {}).get("tags", []),
             ):
-                code_cells_to_ignore.add(index.cell_number)
                 continue
 
             parsed_cell = parsed_cells[parsed_cell_idx]
