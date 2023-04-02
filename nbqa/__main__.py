@@ -595,6 +595,7 @@ def _save_code_sources(
                 continue
             with open(file_name) as fd:
                 content = fd.read()
+            breakpoint()
             parsed_cells = content.split(CODE_SEPARATOR)
             if parsed_cells:
                 parsed_cells = parsed_cells[1:]

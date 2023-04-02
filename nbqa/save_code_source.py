@@ -476,12 +476,13 @@ def main(  # pylint: disable=R0914
                 continue
 
             parsed_cell = parsed_cells[parsed_cell_idx]
+            breakpoint()
 
             cell_mapping.update(
                 {
                     py_line
                     + index.line_number
-                    + 1: f"cell_{index.cell_number}:{cell_line+1}"
+                    + 1: f"cell_{index.cell_number}:{cell_line}"
                     for py_line, cell_line in _get_line_numbers_for_mapping(
                         parsed_cell, temporary_lines[index.cell_number]
                     ).items()
