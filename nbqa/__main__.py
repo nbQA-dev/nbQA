@@ -604,25 +604,20 @@ def _save_code_sources(  # pylint: disable=too-many-locals
         code_cells_to_ignore,
         file_name,
     ) in first_passes.items():
-        try:
-            notebook_json, _ = read_notebook(notebook)
-            if notebook_json is None or _is_non_python_notebook(notebook_json):
-                non_python_notebooks.add(notebook)
-                continue
-            with open(file_name, encoding="utf-8") as fd:
-                content = fd.read()
-            parsed_cells = [CODE_SEPARATOR + i for i in content.split(CODE_SEPARATOR)]
-            nb_info_mapping[notebook] = save_code_source.main(
-                notebook_json,
-                file_name,
-                process_cells,
-                skip_celltags,
-                parsed_cells=parsed_cells[1:],
-                temporary_lines=temporary_lines,
-                code_cells_to_ignore=code_cells_to_ignore,
-            )
-        except Exception as exp_repr:  # pylint: disable=W0703
-            failed_notebooks[notebook] = repr(exp_repr)
+        notebook_json, _ = read_notebook(notebook)
+        assert notebook_json is not None
+        with open(file_name, encoding="utf-8") as fd:
+            content = fd.read()
+        parsed_cells = [CODE_SEPARATOR + i for i in content.split(CODE_SEPARATOR)]
+        nb_info_mapping[notebook] = save_code_source.main(
+            notebook_json,
+            file_name,
+            process_cells,
+            skip_celltags,
+            parsed_cells=parsed_cells[1:],
+            temporary_lines=temporary_lines,
+            code_cells_to_ignore=code_cells_to_ignore,
+        )
 
     return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks), (
         newlinesbefore,
