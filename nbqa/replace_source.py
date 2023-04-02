@@ -86,8 +86,6 @@ def _reinstate_magics(
     List[str]
         New source that can be saved into Jupyter Notebook.
     """
-    # think I need to get this within each
-    # cell?
     for magic_substitution in temporary_lines:
         if md:
             source = source.replace(

@@ -298,7 +298,8 @@ def test_allowlisted_magic(capsys: "CaptureFixture") -> None:
         "\x1b[0m\x1b[36m@@ -1,3 +1,3 @@\n"
         "\x1b[0m\x1b[31m-a = 2 \n"
         "\x1b[0m\x1b[32m+a = 2\n"
-        "\x1b[0m\nTo apply these changes, remove the `--nbqa-diff` flag\n"
+        "\x1b[0m\n"
+        "To apply these changes, remove the `--nbqa-diff` flag\n"
     )
     assert out.replace("\r\n", "\n") == expected
 
