@@ -563,7 +563,6 @@ def _save_code_sources(
     nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
 
     first_passes = {}
-
     for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
         try:
             notebook_json, _ = read_notebook(notebook)
