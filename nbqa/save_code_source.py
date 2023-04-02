@@ -3,20 +3,12 @@ Extract code cells from notebook and save them to temporary Python file.
 
 Markdown cells, output, and metadata are ignored.
 """
+from __future__ import annotations
 
 import ast
 import secrets
 from collections import defaultdict
-from typing import (
-    Any,
-    DefaultDict,
-    List,
-    Mapping,
-    MutableMapping,
-    NamedTuple,
-    Sequence,
-    Tuple,
-)
+from typing import Any, DefaultDict, Mapping, MutableMapping, NamedTuple, Sequence
 
 import tokenize_rt
 from IPython.core.inputtransformer2 import TransformerManager
@@ -28,7 +20,7 @@ from nbqa.path_utils import remove_prefix
 CODE_SEPARATOR = f"# %%NBQA-CELL-SEP{secrets.token_hex(3)}\n"
 MAGIC = frozenset(("time", "timeit", "capture", "pypy", "python", "python3"))
 NEWLINE = "\n"
-NEWLINES = defaultdict(lambda: NEWLINE * 3)
+NEWLINES = defaultdict(lambda: NEWLINE * 3)  # can we uniform to 2?
 NEWLINES["isort"] = NEWLINE * 2
 NEWLINES["ruff"] = NEWLINE * 2
 TRANSFORMED_MAGICS = frozenset(
@@ -52,7 +44,7 @@ def _process_source(
     source: str,
     whole_src: str,
     command: str,
-    magic_substitutions: List[MagicHandler],
+    magic_substitutions: list[MagicHandler],
     *,
     dont_skip_bad_cells: bool,
 ) -> str:
@@ -106,7 +98,7 @@ def _process_source(
 def _replace_magics(
     source: Sequence[str],
     whole_src: str,
-    magic_substitutions: List[MagicHandler],
+    magic_substitutions: list[MagicHandler],
     command: str,
     *,
     dont_skip_bad_cells: bool,
@@ -204,7 +196,7 @@ def _parse_cell(
     str
         Parsed cell.
     """
-    substituted_magics: List[MagicHandler] = []
+    substituted_magics: list[MagicHandler] = []
     parsed_cell = CODE_SEPARATOR
 
     parsed_cell += _replace_magics(
@@ -315,7 +307,7 @@ def _should_ignore_code_cell(
     }
 
 
-def _has_trailing_semicolon(src: str) -> Tuple[str, bool]:
+def _has_trailing_semicolon(src: str) -> tuple[str, bool]:
     """
     Check if cell has trailing semicolon.
 
@@ -343,7 +335,7 @@ def _has_trailing_semicolon(src: str) -> Tuple[str, bool]:
     return tokenize_rt.tokens_to_src(tokens), True
 
 
-def main(  # pylint: disable=R0914
+def pre_main(  # pylint: disable=R0914
     notebook_json: MutableMapping[str, Any],
     file_descriptor: int,
     process_cells: Sequence[str],
@@ -351,7 +343,7 @@ def main(  # pylint: disable=R0914
     skip_celltags: Sequence[str],
     *,
     dont_skip_bad_cells: bool,
-) -> NotebookInfo:
+) -> tuple[Mapping[int, Sequence[MagicHandler]], set[int]]:
     """
     Extract code cells from notebook and save them in temporary Python file.
 
@@ -366,7 +358,8 @@ def main(  # pylint: disable=R0914
 
     Returns
     -------
-    NotebookInfo
+    mapping[int, Sequence[MagicHandler]]
+    Set[Int]
 
     Raises
     ------
@@ -376,9 +369,7 @@ def main(  # pylint: disable=R0914
     cells = notebook_json["cells"]
 
     result = []
-    cell_mapping = {0: "cell_0:0"}
     index = Index(line_number=0, cell_number=0)
-    trailing_semicolons = set()
     temporary_lines: DefaultDict[int, Sequence[MagicHandler]] = defaultdict(list)
     code_cells_to_ignore = set()
 
@@ -411,6 +402,63 @@ def main(  # pylint: disable=R0914
                 command,
                 dont_skip_bad_cells=dont_skip_bad_cells,
             )
+            result.append(parsed_cell)
+            index = index._replace(
+                line_number=index.line_number + len(parsed_cell.splitlines())
+            )
+
+    result_txt = "".join(result).rstrip(NEWLINE) + NEWLINE if result else ""
+    with open(file_descriptor, "w", encoding="utf-8") as handle:
+        handle.write(result_txt)
+
+    return temporary_lines, code_cells_to_ignore
+
+
+def main(  # pylint: disable=R0914
+    notebook_json: MutableMapping[str, Any],
+    file_name: str,
+    process_cells: Sequence[str],
+    skip_celltags: Sequence[str],
+    *,
+    parsed_cells: list[str],
+    temporary_lines: Mapping[int, Sequence[MagicHandler]],
+    code_cells_to_ignore: set[int],
+) -> NotebookInfo:
+    """
+    Extract code cells from notebook and save them in temporary Python file.
+
+    Parameters
+    ----------
+    notebook_json
+        Jupyter Notebook third-party tool is being run against.
+    process_cells
+        Extra cells which nbqa should process.
+
+    Returns
+    -------
+    NotebookInfo
+    """
+    cells = notebook_json["cells"]
+
+    result = []
+    cell_mapping = {0: "cell_0:0"}
+    index = Index(line_number=0, cell_number=0)
+    trailing_semicolons = set()
+
+    parsed_cell_idx = 0
+    for cell in cells:
+        if cell["cell_type"] == "code":
+            index = index._replace(cell_number=index.cell_number + 1)
+
+            if _should_ignore_code_cell(
+                cell["source"],
+                process_cells,
+                skip_celltags,
+                cell.get("metadata", {}).get("tags", []),
+            ):
+                continue
+
+            parsed_cell = parsed_cells[parsed_cell_idx]
 
             cell_mapping.update(
                 {
@@ -429,9 +477,10 @@ def main(  # pylint: disable=R0914
             index = index._replace(
                 line_number=index.line_number + len(parsed_cell.splitlines())
             )
+            parsed_cell_idx += 1
 
     result_txt = "".join(result).rstrip(NEWLINE) + NEWLINE if result else ""
-    with open(file_descriptor, "w", encoding="utf-8") as handle:
+    with open(file_name, "w", encoding="utf-8") as handle:
         handle.write(result_txt)
 
     return NotebookInfo(

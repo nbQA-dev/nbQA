@@ -69,7 +69,6 @@ def test_flake8_works(
         {expected_path_2}:cell_1:1:1: F401 'os' imported but unused
         {expected_path_2}:cell_1:3:1: F401 'glob' imported but unused
         {expected_path_2}:cell_1:5:1: F401 'nbqa' imported but unused
-        {expected_path_2}:cell_3:2:1: E302 expected 2 blank lines, found 0
         """
     )
     expected_err = ""
