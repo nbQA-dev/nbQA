@@ -68,8 +68,6 @@ def _reinstate_magics(
     temporary_lines: Sequence[MagicHandler],
     newlinesbefore: dict[str, int],
     newlinesafter: dict[str, int],
-    *,
-    md: bool,
 ) -> list[str]:
     """
     Put (preprocessed) line magics back in.
@@ -87,18 +85,13 @@ def _reinstate_magics(
         New source that can be saved into Jupyter Notebook.
     """
     for magic_substitution in temporary_lines:
-        if md:
-            source = source.replace(
-                magic_substitution.replacement, magic_substitution.src
-            )
-        else:
-            nlinesbefore = "\n" * newlinesbefore[magic_substitution.replacement]
-            nlinesafter = "{" + str(newlinesafter[magic_substitution.replacement]) + "}"
-            source = re.sub(
-                f"{re.escape(magic_substitution.replacement)}\n{nlinesafter}",
-                f"{magic_substitution.src}{nlinesbefore}",
-                source,
-            )
+        nlinesbefore = "\n" * newlinesbefore[magic_substitution.replacement]
+        nlinesafter = "{" + str(newlinesafter[magic_substitution.replacement]) + "}"
+        source = re.sub(
+            f"{re.escape(magic_substitution.replacement)}\n{nlinesafter}",
+            f"{magic_substitution.src}{nlinesbefore}",
+            source,
+        )
     return source.strip("\n").splitlines(True)
 
 
@@ -108,8 +101,6 @@ def _get_new_source(
     pycell: str,
     newlinesbefore: dict[str, int],
     newlinesafter: dict[str, int],
-    *,
-    md: bool,
 ) -> list[str]:
     """
     Get new source to replace original one with.
@@ -136,7 +127,6 @@ def _get_new_source(
         notebook_info.temporary_lines.get(code_cell_number, []),
         newlinesbefore,
         newlinesafter,
-        md=md,
     )
 
 
@@ -284,7 +274,6 @@ def mutate(  # pylint: disable=too-many-locals
             next(cells),
             newlinesbefore[temp_file],
             newlinesafter[temp_file],
-            md=md,
         )
         if not new_source:
             cells_to_remove.append(cell_number)
@@ -386,7 +375,6 @@ def diff(
             next(cells),
             newlinesbefore[python_file],
             newlinesafter[python_file],
-            md=md,
         )
         cell["source"][-1] += "\n"
         if new_source:

@@ -216,6 +216,6 @@ class MagicHandler:
         else:
             self.replacement = f"hash({self.token})"
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: nocover
         """Print src and replacement."""
         return f"src: {self.src}; replacement: {self.replacement}"
