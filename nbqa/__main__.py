@@ -611,15 +611,13 @@ def _save_code_sources(  # pylint: disable=too-many-locals
                 continue
             with open(file_name, encoding="utf-8") as fd:
                 content = fd.read()
-            parsed_cells = [CODE_SEPARATOR + i for i in content.split(CODE_SEPARATOR)][
-                1:
-            ]
+            parsed_cells = [CODE_SEPARATOR + i for i in content.split(CODE_SEPARATOR)]
             nb_info_mapping[notebook] = save_code_source.main(
                 notebook_json,
                 file_name,
                 process_cells,
                 skip_celltags,
-                parsed_cells=parsed_cells,
+                parsed_cells=parsed_cells[1:],
                 temporary_lines=temporary_lines,
                 code_cells_to_ignore=code_cells_to_ignore,
             )
