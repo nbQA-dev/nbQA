@@ -2,6 +2,14 @@
 Changelog
 =========
 
+1.7.0 (2023-04-02)
+~~~~~~~~~~~~~~~~~~
+Added ``autopep8`` as runtime dependency. This is used
+to do some preprocessing on the notebooks before running the
+given tool them, thus solving a historic bug in which users
+would get errors to do with cell separators (which they couldn't
+do anything about). Thanks @felix-cw for the report!
+
 1.6.4 (2023-03-19)
 ~~~~~~~~~~~~~~~~~~
 Removed usage of (deprecated) ``pkg_resources``.
