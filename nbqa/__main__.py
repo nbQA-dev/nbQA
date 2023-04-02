@@ -588,20 +588,26 @@ def _save_code_sources(
     )
 
     for notebook, (file_descriptor, file_name) in nb_to_py_mapping.items():
-        try:
+        if True:  # try:
             notebook_json, _ = read_notebook(notebook)
             if notebook_json is None or _is_non_python_notebook(notebook_json):
                 non_python_notebooks.add(notebook)
                 continue
+            parsed_cells = []
+            current_cell = []
             with open(file_name) as fd:
-                content = fd.read()
-            breakpoint()
-            parsed_cells = content.split(CODE_SEPARATOR)
+                for line in fd:
+                    if line == CODE_SEPARATOR:
+                        parsed_cells.append(current_cell)
+                        current_cell = []
+                    current_cell.append(line)
+                parsed_cells.append("".join(current_cell))
             if parsed_cells:
+                # skip the initial empty one
                 parsed_cells = parsed_cells[1:]
             nb_info_mapping[notebook] = save_code_source.main(
                 *first_passes[notebook],
-                content.split(CODE_SEPARATOR)[1:],
+                parsed_cells,
                 notebook_json,
                 file_name,
                 process_cells,
@@ -609,8 +615,8 @@ def _save_code_sources(
                 skip_celltags,
                 dont_skip_bad_cells=dont_skip_bad_cells,
             )
-        except Exception as exp_repr:  # pylint: disable=W0703
-            failed_notebooks[notebook] = repr(exp_repr)
+        # except Exception as exp_repr:  # pylint: disable=W0703
+        #     failed_notebooks[notebook] = repr(exp_repr)
 
     return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks), (
         newlinesbefore,

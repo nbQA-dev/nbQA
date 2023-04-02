@@ -476,7 +476,6 @@ def main(  # pylint: disable=R0914
                 continue
 
             parsed_cell = parsed_cells[parsed_cell_idx]
-            breakpoint()
 
             cell_mapping.update(
                 {
