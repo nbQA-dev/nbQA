@@ -418,13 +418,13 @@ def pre_main(  # pylint: disable=R0914
     with open(file_descriptor, "w", encoding="utf-8") as handle:
         handle.write(result_txt)
 
-    return temporary_lines, code_cells_to_ignore
+    return result, temporary_lines, code_cells_to_ignore
 
 
 def main(  # pylint: disable=R0914
+    parsed_cells,
     temporary_lines,
     code_cells_to_ignore,
-    parsed_cells,
     notebook_json: MutableMapping[str, Any],
     file_descriptor: int,
     process_cells: Sequence[str],

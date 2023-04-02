@@ -264,7 +264,7 @@ def _record_newlines(args, first_passes, nb_to_tmp_mapping):
     new_lines = {}
     tmp_to_nb_mapping = {val.file: key for key, val in nb_to_tmp_mapping.items()}
     for arg in args:
-        temporary_lines, _ = first_passes[tmp_to_nb_mapping[arg]]
+        _, temporary_lines, __ = first_passes[tmp_to_nb_mapping[arg]]
         replacements = [j.replacement for i in temporary_lines.values() for j in i]
         new_lines[arg] = {}
         with open(arg) as fd:
@@ -570,7 +570,7 @@ def _save_code_sources(
             if notebook_json is None or _is_non_python_notebook(notebook_json):
                 non_python_notebooks.add(notebook)
                 continue
-            temporary_lines, code_cells_to_ignore = save_code_source.pre_main(
+            result, temporary_lines, code_cells_to_ignore = save_code_source.pre_main(
                 notebook_json,
                 file_descriptor,
                 process_cells,
@@ -578,36 +578,23 @@ def _save_code_sources(
                 skip_celltags,
                 dont_skip_bad_cells=dont_skip_bad_cells,
             )
-            first_passes[notebook] = (temporary_lines, code_cells_to_ignore)
+            first_passes[notebook] = (result, temporary_lines, code_cells_to_ignore)
         except Exception as exp_repr:  # pylint: disable=W0703
             failed_notebooks[notebook] = repr(exp_repr)
 
-    args = [i.file for i in nb_to_py_mapping.values()]
+    args = [nb_to_py_mapping[key].file for key in first_passes]
     newlinesbefore, newlinesafter = _fixup_newlines(
         args, first_passes, nb_to_py_mapping
     )
 
     for notebook, (file_descriptor, file_name) in nb_to_py_mapping.items():
-        if True:  # try:
+        try:
             notebook_json, _ = read_notebook(notebook)
             if notebook_json is None or _is_non_python_notebook(notebook_json):
                 non_python_notebooks.add(notebook)
                 continue
-            parsed_cells = []
-            current_cell = []
-            with open(file_name) as fd:
-                for line in fd:
-                    if line == CODE_SEPARATOR:
-                        parsed_cells.append(current_cell)
-                        current_cell = []
-                    current_cell.append(line)
-                parsed_cells.append("".join(current_cell))
-            if parsed_cells:
-                # skip the initial empty one
-                parsed_cells = parsed_cells[1:]
             nb_info_mapping[notebook] = save_code_source.main(
                 *first_passes[notebook],
-                parsed_cells,
                 notebook_json,
                 file_name,
                 process_cells,
@@ -615,8 +602,8 @@ def _save_code_sources(
                 skip_celltags,
                 dont_skip_bad_cells=dont_skip_bad_cells,
             )
-        # except Exception as exp_repr:  # pylint: disable=W0703
-        #     failed_notebooks[notebook] = repr(exp_repr)
+        except Exception as exp_repr:  # pylint: disable=W0703
+            failed_notebooks[notebook] = repr(exp_repr)
 
     return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks), (
         newlinesbefore,
@@ -653,7 +640,11 @@ def _save_markdown_sources(
             )
         except Exception as exp_repr:  # pylint: disable=W0703
             failed_notebooks[notebook] = repr(exp_repr)
-    return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks)
+    # todo!
+    return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks), (
+        {},
+        {},
+    )
 
 
 SAVE_SOURCES = {False: _save_code_sources, True: _save_markdown_sources}
