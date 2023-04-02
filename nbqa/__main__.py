@@ -21,6 +21,7 @@ from nbqa import replace_source, save_code_source, save_markdown_source
 from nbqa.cmdline import CLIArgs
 from nbqa.config.config import Configs, get_default_config
 from nbqa.find_root import find_project_root
+from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
 from nbqa.output_parser import Output, map_python_line_to_nb_lines
@@ -260,14 +261,24 @@ def _get_mtimes(arg: str) -> set[float]:
     return {os.path.getmtime(arg)}
 
 
-def _record_newlines(args, first_passes, nb_to_tmp_mapping):
-    new_lines = {}
+def _record_newlines(
+    args: Sequence[str],
+    first_passes: dict[str, tuple[Mapping[int, Sequence[MagicHandler]], set[int], str]],
+    nb_to_tmp_mapping: dict[str, TemporaryFile],
+) -> dict[str, dict[str, int]]:  # pylint: disable=too-many-locals
+    """
+    Record newlines after each magic.
+
+    We record the number of newlines both before and after
+    running autopep8, to be able to restore them at the end.
+    """
+    new_lines: dict[str, dict[str, int]] = {}
     tmp_to_nb_mapping = {val.file: key for key, val in nb_to_tmp_mapping.items()}
     for arg in args:
-        temporary_lines, __, ___ = first_passes[tmp_to_nb_mapping[arg]]
+        temporary_lines, _, __ = first_passes[tmp_to_nb_mapping[arg]]
         replacements = [j.replacement for i in temporary_lines.values() for j in i]
         new_lines[arg] = {}
-        with open(arg) as fd:
+        with open(arg, encoding="utf-8") as fd:
             newlines = 0
             after_comment = False
             comment = None
@@ -289,30 +300,31 @@ def _record_newlines(args, first_passes, nb_to_tmp_mapping):
             # we've gone through all lines. If we're in 'after_comment',
             # it means there was a magic right at the end of the file.
             if after_comment:
+                assert comment is not None
                 new_lines[arg][comment] = newlines
     return new_lines
 
 
-def _fixup_newlines(args, info_mappings, nb_to_tmp_mapping):
-    # ah, we need to record what happens after
-    # each replacement...
-    # should be easier?
-    new_lines_before = _record_newlines(args, info_mappings, nb_to_tmp_mapping)
+def _fixup_newlines(
+    args: Sequence[str],
+    first_passes: dict[str, tuple[Mapping[int, Sequence[MagicHandler]], set[int], str]],
+    nb_to_tmp_mapping: dict[str, TemporaryFile],
+) -> tuple[dict[str, dict[str, int]], dict[str, dict[str, int]]]:
+    """Run autopep8 to remove false-positives due to spaces between cells."""
+    new_lines_before = _record_newlines(args, first_passes, nb_to_tmp_mapping)
     subprocess.run(
         [sys.executable, "-m", "autopep8", "--select=E3", "--in-place", *args],
     )
-    new_lines_after = _record_newlines(args, info_mappings, nb_to_tmp_mapping)
+    new_lines_after = _record_newlines(args, first_passes, nb_to_tmp_mapping)
     return (new_lines_before, new_lines_after)
 
 
-def _run_command(
+def _run_command(  # pylint: disable=too-many-locals
     command: str,
     cmd_args: Sequence[str],
     args: Sequence[str],
     *,
     shell: bool,
-    info_mapping,
-    nb_to_tmp_mapping,
 ) -> tuple[Output, int, bool]:
     """
     Run third-party tool against given file or directory.
@@ -546,13 +558,13 @@ def _is_non_python_notebook(notebook: MutableMapping[str, Any]) -> bool:
     return language is not None and language.rstrip(string.digits) != "python"
 
 
-def _save_code_sources(
+def _save_code_sources(  # pylint: disable=too-many-locals
     nb_to_py_mapping: dict[str, TemporaryFile],
     process_cells: Sequence[str],
     skip_celltags: Sequence[str],
     dont_skip_bad_cells: bool,
     command: str,
-) -> SavedSources:
+) -> tuple[SavedSources, tuple[dict[str, dict[str, int]], dict[str, dict[str, int]]]]:
     """
     Save sources of notebooks.
 
@@ -562,7 +574,9 @@ def _save_code_sources(
     non_python_notebooks = set()
     nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
 
-    first_passes = {}
+    first_passes: dict[
+        str, tuple[Mapping[int, Sequence[MagicHandler]], set[int], str]
+    ] = {}
     for notebook, (file_descriptor, file_name) in nb_to_py_mapping.items():
         try:
             notebook_json, _ = read_notebook(notebook)
@@ -585,25 +599,29 @@ def _save_code_sources(
     newlinesbefore, newlinesafter = _fixup_newlines(
         args, first_passes, nb_to_py_mapping
     )
-    for notebook, (temporary_lines, code_cells_to_ignore, file_name) in first_passes.items():
+    for notebook, (
+        temporary_lines,
+        code_cells_to_ignore,
+        file_name,
+    ) in first_passes.items():
         try:
             notebook_json, _ = read_notebook(notebook)
             if notebook_json is None or _is_non_python_notebook(notebook_json):
                 non_python_notebooks.add(notebook)
                 continue
-            with open(file_name) as fd:
+            with open(file_name, encoding="utf-8") as fd:
                 content = fd.read()
-            parsed_cells = [CODE_SEPARATOR+i for i in content.split(CODE_SEPARATOR)][1:]
+            parsed_cells = [CODE_SEPARATOR + i for i in content.split(CODE_SEPARATOR)][
+                1:
+            ]
             nb_info_mapping[notebook] = save_code_source.main(
-                parsed_cells,
-                temporary_lines,
-                code_cells_to_ignore,
                 notebook_json,
                 file_name,
                 process_cells,
-                command,
                 skip_celltags,
-                dont_skip_bad_cells=dont_skip_bad_cells,
+                parsed_cells=parsed_cells,
+                temporary_lines=temporary_lines,
+                code_cells_to_ignore=code_cells_to_ignore,
             )
         except Exception as exp_repr:  # pylint: disable=W0703
             failed_notebooks[notebook] = repr(exp_repr)
@@ -620,7 +638,7 @@ def _save_markdown_sources(
     skip_celltags: Sequence[str],
     dont_skip_bad_cells: bool,  # pylint: disable=W0613
     command: str,  # pylint: disable=W0613
-) -> SavedSources:
+) -> tuple[SavedSources, tuple[dict[str, dict[str, int]], dict[str, dict[str, int]]]]:
     """
     Save markdown sources of notebooks.
 
@@ -643,10 +661,13 @@ def _save_markdown_sources(
             )
         except Exception as exp_repr:  # pylint: disable=W0703
             failed_notebooks[notebook] = repr(exp_repr)
-    # todo!
-    _placeholder = {value.file: [] for key, value in nb_to_md_mapping.items()}
+    # we don't run autopep8 on md files, so this is just for compatibility
+    _placeholder: dict[str, dict[str, int]] = {
+        value.file: {} for key, value in nb_to_md_mapping.items()
+    }
     return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks), (
-        _placeholder, _placeholder
+        _placeholder,
+        _placeholder,
     )
 
 
@@ -660,8 +681,8 @@ def _post_process_notebooks(  # pylint: disable=R0913
     diff: bool,
     command: str,
     output: Output,
-    newlinesbefore: dict,
-    newlinesafter: dict,
+    newlinesbefore: dict[str, dict[str, int]],
+    newlinesafter: dict[str, dict[str, int]],
     *,
     md: bool,
 ) -> tuple[bool, Output]:
@@ -753,8 +774,6 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
                 )
             ],
             shell=configs["shell"],
-            info_mapping=saved_sources.nb_info_mapping,
-            nb_to_tmp_mapping=nb_to_tmp_mapping,
         )
 
         actually_mutated, output = _post_process_notebooks(

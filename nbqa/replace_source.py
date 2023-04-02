@@ -3,6 +3,8 @@ Replace :code:`source` code cells of original notebook with ones from converted 
 
 The converted file will have had the third-party tool run against it by now.
 """
+from __future__ import annotations
+
 import copy
 import json
 import os
@@ -10,17 +12,7 @@ import re
 import sys
 from difflib import unified_diff
 from shutil import move
-from typing import (
-    Any,
-    Dict,
-    Iterator,
-    List,
-    Mapping,
-    MutableMapping,
-    Sequence,
-    Set,
-    Tuple,
-)
+from typing import Any, Iterator, Mapping, MutableMapping, Sequence
 
 import tokenize_rt
 
@@ -38,7 +30,7 @@ SEPARATOR = {True: MARKDOWN_SEPARATOR, False: CODE_SEPARATOR}
 def _restore_semicolon(
     source: str,
     cell_number: int,
-    trailing_semicolons: Set[int],
+    trailing_semicolons: set[int],
 ) -> str:
     """
     Restore the semicolon at the end of the cell.
@@ -74,11 +66,11 @@ def _restore_semicolon(
 def _reinstate_magics(
     source: str,
     temporary_lines: Sequence[MagicHandler],
-    newlinesbefore,
-    newlinesafter,
+    newlinesbefore: dict[str, int],
+    newlinesafter: dict[str, int],
     *,
-    md,
-) -> List[str]:
+    md: bool,
+) -> list[str]:
     """
     Put (preprocessed) line magics back in.
 
@@ -98,7 +90,9 @@ def _reinstate_magics(
     # cell?
     for magic_substitution in temporary_lines:
         if md:
-            source = source.replace(magic_substitution.replacement, magic_substitution.src)
+            source = source.replace(
+                magic_substitution.replacement, magic_substitution.src
+            )
         else:
             nlinesbefore = "\n" * newlinesbefore[magic_substitution.replacement]
             nlinesafter = "{" + str(newlinesafter[magic_substitution.replacement]) + "}"
@@ -114,11 +108,11 @@ def _get_new_source(
     code_cell_number: int,
     notebook_info: NotebookInfo,
     pycell: str,
-    newlinesbefore,
-    newlinesafter,
+    newlinesbefore: dict[str, int],
+    newlinesafter: dict[str, int],
     *,
-    md
-) -> List[str]:
+    md: bool,
+) -> list[str]:
     """
     Get new source to replace original one with.
 
@@ -144,11 +138,11 @@ def _get_new_source(
         notebook_info.temporary_lines.get(code_cell_number, []),
         newlinesbefore,
         newlinesafter,
-        md=md
+        md=md,
     )
 
 
-def _get_cells(python_file: str, num_cells: int, *, md: bool) -> Iterator[str]:
+def _get_cells(tmp_file: str, num_cells: int, *, md: bool) -> Iterator[str]:
     """
     Parse cells from Python file.
 
@@ -167,7 +161,7 @@ def _get_cells(python_file: str, num_cells: int, *, md: bool) -> Iterator[str]:
     ValueError
         If the third-party tool "ate" any separator comments.
     """
-    with open(python_file) as fd:
+    with open(tmp_file, encoding="utf-8") as fd:
         txt = fd.read()
     separator = SEPARATOR[md]
 
@@ -185,7 +179,7 @@ def _notebook_cells(
     notebook_json: Mapping[str, Any],
     *,
     md: bool,
-) -> Iterator[Tuple[int, MutableMapping[str, Any]]]:
+) -> Iterator[tuple[int, MutableMapping[str, Any]]]:
     """
     Iterate through notebook's cells.
 
@@ -207,7 +201,7 @@ def _notebook_cells(
 
 
 def _write_notebook(
-    temp_notebook: str, trailing_newline: bool, notebook_json: Dict[str, Any]
+    temp_notebook: str, trailing_newline: bool, notebook_json: dict[str, Any]
 ) -> None:
     """
     Write notebook to disc.
@@ -246,12 +240,12 @@ def _write_notebook(
         jupytext.jupytext.write(notebook_json, temp_notebook, config=config)
 
 
-def mutate(
+def mutate(  # pylint: disable=too-many-locals
     temp_file: str,
     notebook: str,
     notebook_info: NotebookInfo,
-    newlinesbefore,
-    newlinesafter,
+    newlinesbefore: dict[str, dict[str, int]],
+    newlinesafter: dict[str, dict[str, int]],
     *,
     md: bool,
 ) -> bool:
@@ -292,7 +286,7 @@ def mutate(
             next(cells),
             newlinesbefore[temp_file],
             newlinesafter[temp_file],
-            md=md
+            md=md,
         )
         if not new_source:
             cells_to_remove.append(cell_number)
@@ -354,8 +348,8 @@ def diff(
     python_file: str,
     notebook: str,
     notebook_info: NotebookInfo,
-    newlinesbefore,
-    newlinesafter,
+    newlinesbefore: dict[str, dict[str, int]],
+    newlinesafter: dict[str, dict[str, int]],
     *,
     md: bool,
 ) -> bool:
@@ -394,7 +388,7 @@ def diff(
             next(cells),
             newlinesbefore[python_file],
             newlinesafter[python_file],
-            md=md
+            md=md,
         )
         cell["source"][-1] += "\n"
         if new_source:

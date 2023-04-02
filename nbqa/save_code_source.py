@@ -3,20 +3,12 @@ Extract code cells from notebook and save them to temporary Python file.
 
 Markdown cells, output, and metadata are ignored.
 """
+from __future__ import annotations
 
 import ast
 import secrets
 from collections import defaultdict
-from typing import (
-    Any,
-    DefaultDict,
-    List,
-    Mapping,
-    MutableMapping,
-    NamedTuple,
-    Sequence,
-    Tuple,
-)
+from typing import Any, DefaultDict, Mapping, MutableMapping, NamedTuple, Sequence
 
 import tokenize_rt
 from IPython.core.inputtransformer2 import TransformerManager
@@ -52,7 +44,7 @@ def _process_source(
     source: str,
     whole_src: str,
     command: str,
-    magic_substitutions: List[MagicHandler],
+    magic_substitutions: list[MagicHandler],
     *,
     dont_skip_bad_cells: bool,
 ) -> str:
@@ -106,7 +98,7 @@ def _process_source(
 def _replace_magics(
     source: Sequence[str],
     whole_src: str,
-    magic_substitutions: List[MagicHandler],
+    magic_substitutions: list[MagicHandler],
     command: str,
     *,
     dont_skip_bad_cells: bool,
@@ -204,7 +196,7 @@ def _parse_cell(
     str
         Parsed cell.
     """
-    substituted_magics: List[MagicHandler] = []
+    substituted_magics: list[MagicHandler] = []
     parsed_cell = CODE_SEPARATOR
 
     parsed_cell += _replace_magics(
@@ -315,7 +307,7 @@ def _should_ignore_code_cell(
     }
 
 
-def _has_trailing_semicolon(src: str) -> Tuple[str, bool]:
+def _has_trailing_semicolon(src: str) -> tuple[str, bool]:
     """
     Check if cell has trailing semicolon.
 
@@ -351,7 +343,7 @@ def pre_main(  # pylint: disable=R0914
     skip_celltags: Sequence[str],
     *,
     dont_skip_bad_cells: bool,
-) -> NotebookInfo:
+) -> tuple[Mapping[int, Sequence[MagicHandler]], set[int]]:
     """
     Extract code cells from notebook and save them in temporary Python file.
 
@@ -366,7 +358,8 @@ def pre_main(  # pylint: disable=R0914
 
     Returns
     -------
-    NotebookInfo
+    mapping[int, Sequence[MagicHandler]]
+    Set[Int]
 
     Raises
     ------
@@ -422,16 +415,14 @@ def pre_main(  # pylint: disable=R0914
 
 
 def main(  # pylint: disable=R0914
-    parsed_cells,
-    temporary_lines,
-    code_cells_to_ignore,
     notebook_json: MutableMapping[str, Any],
-    file_descriptor: int,
+    file_name: str,
     process_cells: Sequence[str],
-    command: str,
     skip_celltags: Sequence[str],
     *,
-    dont_skip_bad_cells: bool,
+    parsed_cells: list[str],
+    temporary_lines: Mapping[int, Sequence[MagicHandler]],
+    code_cells_to_ignore: set[int],
 ) -> NotebookInfo:
     """
     Extract code cells from notebook and save them in temporary Python file.
@@ -442,17 +433,10 @@ def main(  # pylint: disable=R0914
         Jupyter Notebook third-party tool is being run against.
     process_cells
         Extra cells which nbqa should process.
-    command
-        The third-party tool being run.
 
     Returns
     -------
     NotebookInfo
-
-    Raises
-    ------
-    AssertionError
-        If hash collision (extremely rare event!)
     """
     cells = notebook_json["cells"]
 
@@ -497,7 +481,7 @@ def main(  # pylint: disable=R0914
             parsed_cell_idx += 1
 
     result_txt = "".join(result).rstrip(NEWLINE) + NEWLINE if result else ""
-    with open(file_descriptor, "w", encoding="utf-8") as handle:
+    with open(file_name, "w", encoding="utf-8") as handle:
         handle.write(result_txt)
 
     return NotebookInfo(
