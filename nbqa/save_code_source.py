@@ -418,7 +418,7 @@ def pre_main(  # pylint: disable=R0914
     with open(file_descriptor, "w", encoding="utf-8") as handle:
         handle.write(result_txt)
 
-    return result, temporary_lines, code_cells_to_ignore
+    return temporary_lines, code_cells_to_ignore
 
 
 def main(  # pylint: disable=R0914

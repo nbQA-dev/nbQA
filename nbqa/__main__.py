@@ -264,7 +264,7 @@ def _record_newlines(args, first_passes, nb_to_tmp_mapping):
     new_lines = {}
     tmp_to_nb_mapping = {val.file: key for key, val in nb_to_tmp_mapping.items()}
     for arg in args:
-        _, temporary_lines, __ = first_passes[tmp_to_nb_mapping[arg]]
+        temporary_lines, __, ___ = first_passes[tmp_to_nb_mapping[arg]]
         replacements = [j.replacement for i in temporary_lines.values() for j in i]
         new_lines[arg] = {}
         with open(arg) as fd:
@@ -563,13 +563,13 @@ def _save_code_sources(
     nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
 
     first_passes = {}
-    for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
+    for notebook, (file_descriptor, file_name) in nb_to_py_mapping.items():
         try:
             notebook_json, _ = read_notebook(notebook)
             if notebook_json is None or _is_non_python_notebook(notebook_json):
                 non_python_notebooks.add(notebook)
                 continue
-            result, temporary_lines, code_cells_to_ignore = save_code_source.pre_main(
+            temporary_lines, code_cells_to_ignore = save_code_source.pre_main(
                 notebook_json,
                 file_descriptor,
                 process_cells,
@@ -577,7 +577,7 @@ def _save_code_sources(
                 skip_celltags,
                 dont_skip_bad_cells=dont_skip_bad_cells,
             )
-            first_passes[notebook] = (result, temporary_lines, code_cells_to_ignore)
+            first_passes[notebook] = (temporary_lines, code_cells_to_ignore, file_name)
         except Exception as exp_repr:  # pylint: disable=W0703
             failed_notebooks[notebook] = repr(exp_repr)
 
@@ -585,15 +585,19 @@ def _save_code_sources(
     newlinesbefore, newlinesafter = _fixup_newlines(
         args, first_passes, nb_to_py_mapping
     )
-
-    for notebook, (file_descriptor, file_name) in nb_to_py_mapping.items():
+    for notebook, (temporary_lines, code_cells_to_ignore, file_name) in first_passes.items():
         try:
             notebook_json, _ = read_notebook(notebook)
             if notebook_json is None or _is_non_python_notebook(notebook_json):
                 non_python_notebooks.add(notebook)
                 continue
+            with open(file_name) as fd:
+                content = fd.read()
+            parsed_cells = [CODE_SEPARATOR+i for i in content.split(CODE_SEPARATOR)][1:]
             nb_info_mapping[notebook] = save_code_source.main(
-                *first_passes[notebook],
+                parsed_cells,
+                temporary_lines,
+                code_cells_to_ignore,
                 notebook_json,
                 file_name,
                 process_cells,
@@ -640,9 +644,9 @@ def _save_markdown_sources(
         except Exception as exp_repr:  # pylint: disable=W0703
             failed_notebooks[notebook] = repr(exp_repr)
     # todo!
+    _placeholder = {value.file: [] for key, value in nb_to_md_mapping.items()}
     return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks), (
-        {},
-        {},
+        _placeholder, _placeholder
     )
 
 
