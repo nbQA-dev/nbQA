@@ -392,7 +392,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/87987318?v=4",
       "profile": "https://github.com/felix-cw",
       "contributions": [
-        "bug"
+        "bug",
+        "infra"
       ]
     }
   ],
