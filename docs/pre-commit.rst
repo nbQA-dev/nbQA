@@ -60,7 +60,7 @@ To pass command line arguments, use the `pre-commit args <https://pre-commit.com
        - id: nbqa-pyupgrade
          args: [--py38-plus]
        - id: nbqa-isort
-         args: [--profile, black]
+         args: [--profile=black] 
        - id: nbqa-flake8
          args: [--ignore=E402] # E402 module level import not at top of file
 
