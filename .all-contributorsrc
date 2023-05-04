@@ -394,6 +394,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "florianbaer",
+      "name": "Florian Bär",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3041156?v=4",
+      "profile": "http://florianbaer.github.io",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
