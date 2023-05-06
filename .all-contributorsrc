@@ -403,6 +403,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "okken",
+      "name": "Brian Okken",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1568356?v=4",
+      "profile": "https://pythontest.com",
+      "contributions": [
+        "audio"
+      ]
     }
   ],
   "contributorsPerLine": 7,
