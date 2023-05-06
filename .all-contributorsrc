@@ -403,6 +403,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "mikeckennedy",
+      "name": "Michael Kennedy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2035561?v=4",
+      "profile": "https://mkennedy.codes",
+      "contributions": [
+        "audio"
+      ]
     }
   ],
   "contributorsPerLine": 7,
