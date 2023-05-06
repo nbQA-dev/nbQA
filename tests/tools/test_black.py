@@ -450,7 +450,7 @@ def test_comment_after_trailing_comma(capsys: "CaptureFixture") -> None:
 
 def test_assignment_to_env_var(capsys: "CaptureFixture") -> None:
     """
-    Check that assigning to %env rountrips.
+    Check that assigning to %env roundtrips.
 
     Parameters
     ----------

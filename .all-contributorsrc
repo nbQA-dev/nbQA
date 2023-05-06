@@ -394,6 +394,34 @@
       "contributions": [
         "bug",
         "infra"
+        "bug"
+      ]
+    },
+    {
+      "login": "florianbaer",
+      "name": "Florian Bär",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3041156?v=4",
+      "profile": "http://florianbaer.github.io",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "mikeckennedy",
+      "name": "Michael Kennedy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2035561?v=4",
+      "profile": "https://mkennedy.codes",
+      "contributions": [
+        "audio"
+      ]
+    },
+    {
+      "login": "okken",
+      "name": "Brian Okken",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1568356?v=4",
+      "profile": "https://pythontest.com",
+      "contributions": [
+        "audio"
       ]
     }
   ],

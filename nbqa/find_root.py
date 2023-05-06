@@ -58,7 +58,6 @@ def find_project_root(
     )
 
     for directory in (common_base, *common_base.parents):
-
         for known_project_root_dir in root_dirs:
             if (directory / known_project_root_dir).is_dir():
                 return directory

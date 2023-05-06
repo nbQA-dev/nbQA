@@ -215,3 +215,7 @@ class MagicHandler:
             self.replacement = f"# CELL MAGIC {self.token}"
         else:
             self.replacement = f"hash({self.token})"
+
+    def __repr__(self) -> str:  # pragma: nocover
+        """Print src and replacement."""
+        return f"src: {self.src}; replacement: {self.replacement}"

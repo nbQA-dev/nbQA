@@ -1,4 +1,6 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
+from __future__ import annotations
+
 import itertools
 import os
 import re
@@ -11,27 +13,15 @@ from importlib import import_module
 from pathlib import Path
 from shutil import which
 from textwrap import dedent
-from typing import (
-    Any,
-    Dict,
-    Iterator,
-    Mapping,
-    MutableMapping,
-    NamedTuple,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    cast,
-)
+from typing import Any, Iterator, Mapping, MutableMapping, NamedTuple, Sequence, cast
 
 import tomli
-from pkg_resources import parse_version
 
 from nbqa import replace_source, save_code_source, save_markdown_source
 from nbqa.cmdline import CLIArgs
 from nbqa.config.config import Configs, get_default_config
 from nbqa.find_root import find_project_root
+from nbqa.handle_magics import MagicHandler
 from nbqa.notebook_info import NotebookInfo
 from nbqa.optional import metadata
 from nbqa.output_parser import Output, map_python_line_to_nb_lines
@@ -42,6 +32,18 @@ from nbqa.path_utils import (
 )
 from nbqa.save_code_source import CODE_SEPARATOR
 from nbqa.text import BOLD, RESET
+
+
+def parse_version(version: str) -> tuple[int, ...]:
+    """
+    Parse version; split into a tuple of ints for comparison.
+
+    Borrowed from polars, I can't tell what Python expects us to use.
+    pkg_resources is deprecated apparently.
+    This is only used for isort and nbqa anyway
+    """
+    return tuple(int(re.sub(r"\D", "", str(v))) for v in version.split("."))
+
 
 BASE_ERROR_MESSAGE = (
     f'{BOLD}nbQA failed to process {{notebook}} with exception "{{exp}}"{RESET}\n'
@@ -77,7 +79,7 @@ class SavedSources(NamedTuple):
 
     nb_info_mapping: Mapping[str, NotebookInfo]
     failed_notebooks: MutableMapping[str, str]
-    non_python_notebooks: Set[str]
+    non_python_notebooks: set[str]
 
 
 class UnsupportedPackageVersionError(Exception):
@@ -145,8 +147,8 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
 
 def _filter_by_include_exclude(
     notebooks: Iterator[Path],
-    include: Optional[str],
-    exclude: Optional[str],
+    include: str | None,
+    exclude: str | None,
 ) -> Iterator[str]:
     """
     Include files which match include, exclude those matching exclude.
@@ -175,7 +177,7 @@ def _filter_by_include_exclude(
 
 
 def _get_all_notebooks(
-    root_dirs: Sequence[str], files: Optional[str], exclude: Optional[str]
+    root_dirs: Sequence[str], files: str | None, exclude: str | None
 ) -> Iterator[str]:
     """
     Get generator with all notebooks passed in via the command-line, applying exclusions.
@@ -242,7 +244,7 @@ def _replace_temp_python_file_references_in_out_err(
     return Output(out, err)
 
 
-def _get_mtimes(arg: str) -> Set[float]:
+def _get_mtimes(arg: str) -> set[float]:
     """
     Get the modification times of any converted notebooks.
 
@@ -259,13 +261,71 @@ def _get_mtimes(arg: str) -> Set[float]:
     return {os.path.getmtime(arg)}
 
 
-def _run_command(
+def _record_newlines(
+    args: Sequence[str],
+    first_passes: dict[str, tuple[Mapping[int, Sequence[MagicHandler]], set[int], str]],
+    nb_to_tmp_mapping: dict[str, TemporaryFile],
+) -> dict[str, dict[str, int]]:  # pylint: disable=too-many-locals
+    """
+    Record newlines after each magic.
+
+    We record the number of newlines both before and after
+    running autopep8, to be able to restore them at the end.
+    """
+    new_lines: dict[str, dict[str, int]] = {}
+    tmp_to_nb_mapping = {val.file: key for key, val in nb_to_tmp_mapping.items()}
+    for arg in args:
+        temporary_lines, _, __ = first_passes[tmp_to_nb_mapping[arg]]
+        replacements = [j.replacement for i in temporary_lines.values() for j in i]
+        new_lines[arg] = {}
+        with open(arg, encoding="utf-8") as fd:
+            newlines = 0
+            after_comment = False
+            comment = None
+            for line in fd:
+                if after_comment and line == "\n":
+                    newlines += 1
+                elif after_comment:
+                    assert comment is not None
+                    new_lines[arg][comment] = newlines
+                    newlines = 0
+                    after_comment = False
+                    comment = None
+                for replacement in replacements:
+                    if replacement in line:
+                        after_comment = True
+                        newlines = 0
+                        comment = replacement
+                        break
+            # we've gone through all lines. If we're in 'after_comment',
+            # it means there was a magic right at the end of the file.
+            if after_comment:
+                assert comment is not None
+                new_lines[arg][comment] = newlines
+    return new_lines
+
+
+def _fixup_newlines(
+    args: Sequence[str],
+    first_passes: dict[str, tuple[Mapping[int, Sequence[MagicHandler]], set[int], str]],
+    nb_to_tmp_mapping: dict[str, TemporaryFile],
+) -> tuple[dict[str, dict[str, int]], dict[str, dict[str, int]]]:
+    """Run autopep8 to remove false-positives due to spaces between cells."""
+    new_lines_before = _record_newlines(args, first_passes, nb_to_tmp_mapping)
+    subprocess.run(
+        [sys.executable, "-m", "autopep8", "--select=E3", "--in-place", *args],
+    )
+    new_lines_after = _record_newlines(args, first_passes, nb_to_tmp_mapping)
+    return (new_lines_before, new_lines_after)
+
+
+def _run_command(  # pylint: disable=too-many-locals
     command: str,
     cmd_args: Sequence[str],
     args: Sequence[str],
     *,
     shell: bool,
-) -> Tuple[Output, int, bool]:
+) -> tuple[Output, int, bool]:
     """
     Run third-party tool against given file or directory.
 
@@ -292,8 +352,6 @@ def _run_command(
     ValueError
         If third-party tool isn't found in system.
     """
-    before = [_get_mtimes(i) for i in args]
-
     main_command, *sub_commands = command.split()
 
     my_env = os.environ.copy()
@@ -307,6 +365,7 @@ def _run_command(
     else:
         python_module = COMMAND_TO_PYTHON_MODULE.get(main_command, main_command)
         cmd = [sys.executable, "-m", python_module, *sub_commands]
+    before = [_get_mtimes(i) for i in args]
     output = subprocess.run(
         [*cmd, *args, *cmd_args],
         capture_output=True,
@@ -383,7 +442,6 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     # If a section is in pyproject.toml, use that.
     pyproject_path = project_root / "pyproject.toml"
     if pyproject_path.is_file():
-
         config_file = tomli.loads(pyproject_path.read_text("utf-8"))
         if "tool" in config_file and "nbqa" in config_file["tool"]:
             file_config = config_file["tool"]["nbqa"]
@@ -413,7 +471,7 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
     return config
 
 
-def _clean_up_tmp_files(nb_to_py_mapping: Mapping[str, Tuple[int, str]]) -> None:
+def _clean_up_tmp_files(nb_to_py_mapping: Mapping[str, tuple[int, str]]) -> None:
     """Remove temporary files."""
     for file_descriptor, tmp_path in nb_to_py_mapping.values():
         try:
@@ -425,8 +483,8 @@ def _clean_up_tmp_files(nb_to_py_mapping: Mapping[str, Tuple[int, str]]) -> None
 
 
 def _get_nb_to_tmp_mapping(
-    root_dirs: Sequence[str], files: Optional[str], exclude: Optional[str], md: bool
-) -> Dict[str, TemporaryFile]:
+    root_dirs: Sequence[str], files: str | None, exclude: str | None, md: bool
+) -> dict[str, TemporaryFile]:
     """
     Get mapping between notebooks and temporary files.
 
@@ -449,7 +507,7 @@ def _get_nb_to_tmp_mapping(
     FileNotFoundError
         If notebook isn't found.
     """
-    nb_to_tmp_mapping: Dict[str, TemporaryFile] = {}
+    nb_to_tmp_mapping: dict[str, TemporaryFile] = {}
     for notebook in _get_all_notebooks(root_dirs, files, exclude):
         if not os.path.exists(notebook):
             _clean_up_tmp_files(nb_to_tmp_mapping)
@@ -500,13 +558,13 @@ def _is_non_python_notebook(notebook: MutableMapping[str, Any]) -> bool:
     return language is not None and language.rstrip(string.digits) != "python"
 
 
-def _save_code_sources(
-    nb_to_py_mapping: Dict[str, TemporaryFile],
+def _save_code_sources(  # pylint: disable=too-many-locals
+    nb_to_py_mapping: dict[str, TemporaryFile],
     process_cells: Sequence[str],
     skip_celltags: Sequence[str],
     dont_skip_bad_cells: bool,
     command: str,
-) -> SavedSources:
+) -> tuple[SavedSources, tuple[dict[str, dict[str, int]], dict[str, dict[str, int]]]]:
     """
     Save sources of notebooks.
 
@@ -516,13 +574,16 @@ def _save_code_sources(
     non_python_notebooks = set()
     nb_info_mapping: MutableMapping[str, NotebookInfo] = {}
 
-    for notebook, (file_descriptor, _) in nb_to_py_mapping.items():
+    first_passes: dict[
+        str, tuple[Mapping[int, Sequence[MagicHandler]], set[int], str]
+    ] = {}
+    for notebook, (file_descriptor, file_name) in nb_to_py_mapping.items():
         try:
             notebook_json, _ = read_notebook(notebook)
             if notebook_json is None or _is_non_python_notebook(notebook_json):
                 non_python_notebooks.add(notebook)
                 continue
-            nb_info_mapping[notebook] = save_code_source.main(
+            temporary_lines, code_cells_to_ignore = save_code_source.pre_main(
                 notebook_json,
                 file_descriptor,
                 process_cells,
@@ -530,18 +591,47 @@ def _save_code_sources(
                 skip_celltags,
                 dont_skip_bad_cells=dont_skip_bad_cells,
             )
+            first_passes[notebook] = (temporary_lines, code_cells_to_ignore, file_name)
         except Exception as exp_repr:  # pylint: disable=W0703
             failed_notebooks[notebook] = repr(exp_repr)
-    return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks)
+
+    args = [nb_to_py_mapping[key].file for key in first_passes]
+    newlinesbefore, newlinesafter = _fixup_newlines(
+        args, first_passes, nb_to_py_mapping
+    )
+    for notebook, (
+        temporary_lines,
+        code_cells_to_ignore,
+        file_name,
+    ) in first_passes.items():
+        notebook_json, _ = read_notebook(notebook)
+        assert notebook_json is not None
+        with open(file_name, encoding="utf-8") as fd:
+            content = fd.read()
+        parsed_cells = [CODE_SEPARATOR + i for i in content.split(CODE_SEPARATOR)]
+        nb_info_mapping[notebook] = save_code_source.main(
+            notebook_json,
+            file_name,
+            process_cells,
+            skip_celltags,
+            parsed_cells=parsed_cells[1:],
+            temporary_lines=temporary_lines,
+            code_cells_to_ignore=code_cells_to_ignore,
+        )
+
+    return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks), (
+        newlinesbefore,
+        newlinesafter,
+    )
 
 
 def _save_markdown_sources(
-    nb_to_md_mapping: Dict[str, TemporaryFile],
+    nb_to_md_mapping: dict[str, TemporaryFile],
     process_cells: Sequence[str],  # pylint: disable=W0613
     skip_celltags: Sequence[str],
     dont_skip_bad_cells: bool,  # pylint: disable=W0613
     command: str,  # pylint: disable=W0613
-) -> SavedSources:
+) -> tuple[SavedSources, tuple[dict[str, dict[str, int]], dict[str, dict[str, int]]]]:
     """
     Save markdown sources of notebooks.
 
@@ -564,7 +654,14 @@ def _save_markdown_sources(
             )
         except Exception as exp_repr:  # pylint: disable=W0703
             failed_notebooks[notebook] = repr(exp_repr)
-    return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks)
+    # we don't run autopep8 on md files, so this is just for compatibility
+    _placeholder: dict[str, dict[str, int]] = {
+        value.file: {} for key, value in nb_to_md_mapping.items()
+    }
+    return SavedSources(nb_info_mapping, failed_notebooks, non_python_notebooks), (
+        _placeholder,
+        _placeholder,
+    )
 
 
 SAVE_SOURCES = {False: _save_code_sources, True: _save_markdown_sources}
@@ -577,9 +674,11 @@ def _post_process_notebooks(  # pylint: disable=R0913
     diff: bool,
     command: str,
     output: Output,
+    newlinesbefore: dict[str, dict[str, int]],
+    newlinesafter: dict[str, dict[str, int]],
     *,
     md: bool,
-) -> Tuple[bool, Output]:
+) -> tuple[bool, Output]:
     """Replace source in notebooks, modify output so it refers to notebooks."""
     actually_mutated = False
     for notebook, (_, temp_python_file) in nb_to_py_mapping.items():
@@ -606,6 +705,8 @@ def _post_process_notebooks(  # pylint: disable=R0913
                         temp_python_file,
                         notebook,
                         saved_sources.nb_info_mapping[notebook],
+                        newlinesbefore=newlinesbefore,
+                        newlinesafter=newlinesafter,
                         md=md,
                     )
                     or actually_mutated
@@ -639,11 +740,10 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
         sys.stderr.write(str(exc))
         return 1
     try:  # pylint disable=R0912
-
         if not nb_to_tmp_mapping:
             sys.stderr.write("No notebooks found in given path(s)\n")
             return 0
-        saved_sources = SAVE_SOURCES[configs["md"]](
+        saved_sources, (newlinesbefore, newlinesafter) = SAVE_SOURCES[configs["md"]](
             nb_to_tmp_mapping,
             configs["process_cells"],
             configs["skip_celltags"],
@@ -677,6 +777,8 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
             cli_args.command,
             output,
             md=configs["md"],
+            newlinesbefore=newlinesbefore,
+            newlinesafter=newlinesafter,
         )
 
         sys.stdout.write(output.out)
@@ -755,7 +857,7 @@ def _check_command_is_installed(command: str, *, shell: bool) -> None:
                 )
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     """
     Run third-party tool (e.g. :code:`mypy`) against notebook or directory.
 

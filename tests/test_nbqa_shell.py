@@ -31,11 +31,9 @@ def test_nbqa_shell(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     expected_run = [which("black"), path]
     main(args)
     out, err = capsys.readouterr()
-    received = err.strip()
+    received = err.strip().splitlines()[1]
     expected = _message(args=expected_run)  # type:ignore[arg-type]
-    assert (
-        received == expected
-    ), f"nbqa called unexpected `{received}` instead of `{expected}` for args `{args}`"
+    assert received == expected
     assert out == "", f"No stdout expected. Received `{out}`"
 
 
@@ -48,11 +46,9 @@ def test_nbqa_not_shell(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> Non
     expected_run = [sys.executable, "-m", "black", path]
     main(args)
     out, err = capsys.readouterr()
-    received = err.strip()
+    received = err.strip().splitlines()[1]
     expected = _message(args=expected_run)
-    assert (
-        received == expected
-    ), f"nbqa called unexpected `{received}` instead of `{expected}` for args `{args}`"
+    assert received == expected
     assert out == "", f"No stdout expected. Received `{out}`"
 
 

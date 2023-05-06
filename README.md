@@ -135,7 +135,7 @@ Here's an example of how to set up some pre-commit hooks: put this in your `.pre
 
 ```yaml
 - repo: https://github.com/nbQA-dev/nbQA
-  rev: 1.6.1
+  rev: 1.7.0
   hooks:
     - id: nbqa-black
       additional_dependencies: [jupytext]  # optional, only if you're using Jupytext
@@ -337,6 +337,12 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/tqa236"><img src="https://avatars.githubusercontent.com/u/25203655?v=4?s=100" width="100px;" alt="Trinh Quoc Anh"/><br /><sub><b>Trinh Quoc Anh</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Atqa236" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/marscher"><img src="https://avatars.githubusercontent.com/u/170287?v=4?s=100" width="100px;" alt="Martin K. Scherer"/><br /><sub><b>Martin K. Scherer</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/commits?author=marscher" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/felix-cw"><img src="https://avatars.githubusercontent.com/u/87987318?v=4?s=100" width="100px;" alt="Felix Williams"/><br /><sub><b>Felix Williams</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Afelix-cw" title="Bug reports">🐛</a> <a href="#infra-felix-cw" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/felix-cw"><img src="https://avatars.githubusercontent.com/u/87987318?v=4?s=100" width="100px;" alt="Felix Williams"/><br /><sub><b>Felix Williams</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Afelix-cw" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://florianbaer.github.io"><img src="https://avatars.githubusercontent.com/u/3041156?v=4?s=100" width="100px;" alt="Florian Bär"/><br /><sub><b>Florian Bär</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/commits?author=florianbaer" title="Documentation">📖</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://mkennedy.codes"><img src="https://avatars.githubusercontent.com/u/2035561?v=4?s=100" width="100px;" alt="Michael Kennedy"/><br /><sub><b>Michael Kennedy</b></sub></a><br /><a href="#audio-mikeckennedy" title="Audio">🔊</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://pythontest.com"><img src="https://avatars.githubusercontent.com/u/1568356?v=4?s=100" width="100px;" alt="Brian Okken"/><br /><sub><b>Brian Okken</b></sub></a><br /><a href="#audio-okken" title="Audio">🔊</a></td>
     </tr>
   </tbody>
 </table>
