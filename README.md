@@ -341,6 +341,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://mkennedy.codes"><img src="https://avatars.githubusercontent.com/u/2035561?v=4?s=100" width="100px;" alt="Michael Kennedy"/><br /><sub><b>Michael Kennedy</b></sub></a><br /><a href="#audio-mikeckennedy" title="Audio">🔊</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://pythontest.com"><img src="https://avatars.githubusercontent.com/u/1568356?v=4?s=100" width="100px;" alt="Brian Okken"/><br /><sub><b>Brian Okken</b></sub></a><br /><a href="#audio-okken" title="Audio">🔊</a></td>
     </tr>
   </tbody>
 </table>
