@@ -6,7 +6,7 @@
 </h1>
 
 <h3 align="center">
-	Run isort, pyupgrade, mypy, pylint, flake8, black, blacken-docs, and more on Jupyter Notebooks
+	Run ruff, isort, pyupgrade, mypy, pylint, flake8, black, blacken-docs, and more on Jupyter Notebooks
 </h3>
 
 <p align="center">
