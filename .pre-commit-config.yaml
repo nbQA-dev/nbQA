@@ -50,7 +50,7 @@ repos:
         args: [-v, --fail-under=100]
         files: ^nbqa/
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.3.0
+    rev: v1.4.1
     hooks:
       - id: mypy
         exclude: ^docs/
@@ -84,7 +84,7 @@ repos:
     hooks:
       - id: setup-cfg-fmt
   - repo: https://github.com/PyCQA/autoflake
-    rev: v2.1.1
+    rev: v2.2.0
     hooks:
       - id: autoflake
         args: [--remove-all-unused-imports, -i]
