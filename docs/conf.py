@@ -33,11 +33,15 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
+    "myst_parser",
 ]
 
 add_module_names = False
 autodoc_member_order = "bysource"
 autodoc_typehints = "description"
+
+myst_title_to_header = True
+myst_heading_anchors = 3
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -70,7 +74,7 @@ release = nbqa.__version__
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
