@@ -50,7 +50,7 @@
 - ✅ preserves "quiet mode" trailing semicolons
 - ✅ lints both code and markdown cells
 
-# Table of contents
+## Table of contents
 
 - [Table of contents](#table-of-contents)
   - [🎉 Installation](#-installation)
