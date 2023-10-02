@@ -228,7 +228,7 @@ def _write_notebook(
         jupytext.jupytext.write(notebook_json, temp_notebook, config=config)
 
 
-def mutate(  # pylint: disable=too-many-locals
+def mutate(  # pylint: disable=too-many-locals,too-many-arguments
     temp_file: str,
     notebook: str,
     notebook_info: NotebookInfo,
@@ -331,7 +331,7 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> bool:
     return False
 
 
-def diff(
+def diff(  # pylint: disable=too-many-arguments
     python_file: str,
     notebook: str,
     notebook_info: NotebookInfo,
