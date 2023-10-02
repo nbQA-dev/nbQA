@@ -166,7 +166,7 @@ def _replace_magics(
     )
 
 
-def _parse_cell(
+def _parse_cell(  # pylint: disable=too-many-arguments
     source: Sequence[str],
     whole_src: str,
     cell_number: int,
@@ -335,7 +335,7 @@ def _has_trailing_semicolon(src: str) -> tuple[str, bool]:
     return tokenize_rt.tokens_to_src(tokens), True
 
 
-def pre_main(  # pylint: disable=R0914
+def pre_main(  # pylint: disable=R0914,too-many-arguments
     notebook_json: MutableMapping[str, Any],
     file_descriptor: int,
     process_cells: Sequence[str],
@@ -414,7 +414,7 @@ def pre_main(  # pylint: disable=R0914
     return temporary_lines, code_cells_to_ignore
 
 
-def main(  # pylint: disable=R0914
+def main(  # pylint: disable=R0914,too-many-arguments
     notebook_json: MutableMapping[str, Any],
     file_name: str,
     process_cells: Sequence[str],
