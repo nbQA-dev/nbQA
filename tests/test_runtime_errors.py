@@ -252,7 +252,7 @@ def test_wrong_extension_file(capsys: "CaptureFixture") -> None:
     capsys
         Pytest fixture to capture stdout and stderr.
     """
-    main(["black", "readthedocs.yml"])
+    main(["black", ".readthedocs.yaml"])
     _, err = capsys.readouterr()
     expected_err = "No notebooks found in given path(s)\n"
     assert err == expected_err
