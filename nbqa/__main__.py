@@ -723,7 +723,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
     Parameters
     ----------
     cli_args
-        Commanline arguments passed to nbqa.
+        Commandline arguments passed to nbqa.
     configs
         Configuration passed to nbqa from commandline or via a config file
 
