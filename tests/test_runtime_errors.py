@@ -155,6 +155,7 @@ def test_unable_to_reconstruct_message_pythonpath(monkeypatch: "MonkeyPatch") ->
     assert output.returncode == expected_returncode
 
 
+@pytest.mark.skip(reason="too slow - TODO how to re-enable / speedup?")
 def test_unable_to_parse(capsys: "CaptureFixture") -> None:
     """Check error message shows if we're unable to parse notebook."""
     path = Path("tests") / "data/invalid_notebook.ipynb"

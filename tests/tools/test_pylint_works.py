@@ -29,8 +29,8 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
 
     expected_out = (
         "************* Module tests.data.notebook_for_testing\n"
-        f"{notebook1}:cell_2:19:8: C0303: Trailing whitespace (trailing-whitespace)\n"
-        f"{notebook1}:cell_2:15:11: C0209: Formatting a regular string which could be a f-string (consider-using-f-string)\n"  # noqa: E501
+        f"{notebook1}:cell_2:19:8: C0303: Trailing whitespace (trailing-whitespace)\n"  # noqa: E501
+        f"{notebook1}:cell_2:15:11: C0209: Formatting a regular string which could be an f-string (consider-using-f-string)\n"  # noqa: E501
         f'{notebook1}:cell_4:1:0: C0413: Import "from random import randint" should be placed at the top of the module (wrong-import-position)\n'  # noqa: E501
         f'{notebook1}:cell_5:1:0: C0413: Import "import pprint" should be placed at the top of the module (wrong-import-position)\n'  # noqa: E501
         f'{notebook1}:cell_5:2:0: C0413: Import "import sys" should be placed at the top of the module (wrong-import-position)\n'  # noqa: E501
