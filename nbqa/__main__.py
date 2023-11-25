@@ -312,8 +312,9 @@ def _fixup_newlines(
 ) -> tuple[dict[str, dict[str, int]], dict[str, dict[str, int]]]:
     """Run autopep8 to remove false-positives due to spaces between cells."""
     new_lines_before = _record_newlines(args, first_passes, nb_to_tmp_mapping)
-    subprocess.run(
+    _ = subprocess.run(
         [sys.executable, "-m", "autopep8", "--select=E3", "--in-place", *args],
+        capture_output=True,  # capture output to not show users irrelevant warning
     )
     new_lines_after = _record_newlines(args, first_passes, nb_to_tmp_mapping)
     return (new_lines_before, new_lines_after)
@@ -723,7 +724,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
     Parameters
     ----------
     cli_args
-        Commanline arguments passed to nbqa.
+        Commandline arguments passed to nbqa.
     configs
         Configuration passed to nbqa from commandline or via a config file
 
