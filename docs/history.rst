@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.7.1 (2023-04-02)
+~~~~~~~~~~~~~~~~~~
+Silenced ``autopep8`` deprecation warning which users couldn't
+do anything about.
+
 1.7.0 (2023-04-02)
 ~~~~~~~~~~~~~~~~~~
 Added ``autopep8`` as runtime dependency. This is used
