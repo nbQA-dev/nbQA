@@ -11,32 +11,32 @@ repos:
       - id: trailing-whitespace
       - id: debug-statements
   - repo: https://github.com/pre-commit/pre-commit
-    rev: v3.5.0
+    rev: v3.6.2
     hooks:
       - id: validate_manifest
   - repo: https://github.com/hauntsaninja/black-pre-commit-mirror
     # black compiled with mypyc
-    rev: 23.11.0
+    rev: 24.2.0
     hooks:
       - id: black
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.1.0
+    rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
         exclude: ^README\.md$
   - repo: https://github.com/PyCQA/pylint
-    rev: v3.0.1
+    rev: v3.0.3
     hooks:
       - id: pylint
         files: ^(nbqa|tests)/
         exclude: ^tests/data/
   - repo: https://github.com/PyCQA/flake8
-    rev: 6.1.0
+    rev: 7.0.0
     hooks:
       - id: flake8
         additional_dependencies: [flake8-typing-imports==1.14.0]
   - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+    rev: 5.13.2
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/pydocstyle
@@ -51,13 +51,13 @@ repos:
         args: [-v, --fail-under=100]
         files: ^nbqa/
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.1
+    rev: v1.8.0
     hooks:
       - id: mypy
         exclude: ^docs/
         additional_dependencies: [types-setuptools, types-toml]
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.0
+    rev: v3.15.1
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
@@ -85,7 +85,7 @@ repos:
     hooks:
       - id: setup-cfg-fmt
   - repo: https://github.com/PyCQA/autoflake
-    rev: v2.2.1
+    rev: v2.3.0
     hooks:
       - id: autoflake
         args: [--remove-all-unused-imports, -i]
@@ -94,7 +94,7 @@ repos:
       - id: check-hooks-apply
       - id: check-useless-excludes
   - repo: https://github.com/kynan/nbstripout
-    rev: 0.6.1
+    rev: 0.7.1
     hooks:
       - id: nbstripout
         exclude: ^tests/data/(databricks_notebook|notebook_for_testing)\.ipynb$
