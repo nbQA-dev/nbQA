@@ -2,7 +2,16 @@
 
 import shutil
 import sys
-from distutils.dir_util import copy_tree  # pylint: disable=E0611
+import warnings
+
+# distutils is deprecated, but this is just a test, so not urgent to update
+with warnings.catch_warnings():
+    warnings.filterwarnings(
+        "ignore",
+        message=r"The distutils package",
+        category=DeprecationWarning,
+    )
+    from distutils.dir_util import copy_tree  # pylint: disable=E0611,W4901
 from pathlib import Path
 from typing import TYPE_CHECKING, Iterator
 

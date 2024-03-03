@@ -1,4 +1,5 @@
 """Check blacken-docs runs."""
+
 import os
 from typing import TYPE_CHECKING
 

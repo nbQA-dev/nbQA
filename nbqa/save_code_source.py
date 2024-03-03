@@ -3,6 +3,7 @@ Extract code cells from notebook and save them to temporary Python file.
 
 Markdown cells, output, and metadata are ignored.
 """
+
 from __future__ import annotations
 
 import ast

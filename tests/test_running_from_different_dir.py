@@ -1,4 +1,5 @@
 """Check configs are picked up when running in different directory."""
+
 import os
 from pathlib import Path
 from textwrap import dedent

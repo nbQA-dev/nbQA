@@ -1,4 +1,5 @@
 """Parse output from code quality tools."""
+
 import re
 from functools import partial
 from typing import Callable, Mapping, Match, NamedTuple, Sequence, Tuple, Union

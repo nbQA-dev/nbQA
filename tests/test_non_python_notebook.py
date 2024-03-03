@@ -1,4 +1,5 @@
 """Test non-Python notebook."""
+
 import os
 from typing import TYPE_CHECKING
 

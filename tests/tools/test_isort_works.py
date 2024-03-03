@@ -1,4 +1,5 @@
 """Check :code:`isort` works as intended."""
+
 import difflib
 import json
 import os

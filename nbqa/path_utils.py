@@ -1,4 +1,5 @@
 """Utility functions to deal with paths."""
+
 import json
 import os
 import string

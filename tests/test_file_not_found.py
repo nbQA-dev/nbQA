@@ -1,6 +1,5 @@
 """Check what happens when running on non-existent file/directory."""
 
-
 from typing import TYPE_CHECKING
 
 from nbqa.__main__ import main
