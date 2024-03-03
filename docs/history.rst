@@ -2,7 +2,7 @@
 Changelog
 =========
 
-1.8.0 (2024-03-03)
+1.8.1 (2024-03-03)
 ~~~~~~~~~~~~~~~~~~
 Compatibility with latest Ruff.
 
