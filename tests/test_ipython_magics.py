@@ -1,4 +1,5 @@
 """Check user can check for other magics."""
+
 import difflib
 import os
 from pathlib import Path

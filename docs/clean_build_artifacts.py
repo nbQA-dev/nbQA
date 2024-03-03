@@ -1,4 +1,5 @@
 """Cross platform way to call 'rm -rf docs/_build/ docs/api/' """
+
 from pathlib import Path
 from shutil import rmtree
 

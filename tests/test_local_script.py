@@ -1,4 +1,5 @@
 """Tets running local script."""
+
 import os
 from typing import TYPE_CHECKING
 

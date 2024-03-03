@@ -1,4 +1,5 @@
 """Check what happens if cell separator appears in notebook."""
+
 import os
 
 import pytest

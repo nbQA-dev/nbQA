@@ -1,4 +1,5 @@
 """Test the skip bad cells flag."""
+
 import os
 from typing import TYPE_CHECKING
 

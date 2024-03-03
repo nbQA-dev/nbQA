@@ -1,4 +1,5 @@
 """Ensure the --nbqa-shell flag correctly calls the underlying command."""
+
 import os
 import sys
 from shutil import which

@@ -1,4 +1,5 @@
 """Run third-party tool (e.g. :code:`mypy`) against notebook or directory."""
+
 from __future__ import annotations
 
 import itertools

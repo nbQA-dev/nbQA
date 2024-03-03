@@ -1,4 +1,5 @@
 """Check configs from :code:`pyproject.toml` are picked up."""
+
 import difflib
 from pathlib import Path
 from textwrap import dedent

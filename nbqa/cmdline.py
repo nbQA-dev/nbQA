@@ -1,4 +1,5 @@
 """Parses the command line arguments provided."""
+
 import argparse
 import sys
 from textwrap import dedent

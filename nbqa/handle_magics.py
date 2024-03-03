@@ -1,4 +1,5 @@
 """Detect ipython magics and provide python code replacements for those magics."""
+
 import ast
 import secrets
 from collections import defaultdict

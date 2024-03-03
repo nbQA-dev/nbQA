@@ -1,4 +1,5 @@
 """Check project root is round correctly."""
+
 from pathlib import Path
 from typing import Sequence
 
