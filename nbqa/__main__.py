@@ -359,6 +359,9 @@ def _run_command(  # pylint: disable=too-many-locals
     if main_command == "mypy" and "MYPY_FORCE_COLOR" not in my_env:
         my_env["MYPY_FORCE_COLOR"] = "1"
 
+    if main_command == "ruff":
+        sub_commands.insert(0, "check")
+
     if shell:
         # We already checked that which does not return None
 
