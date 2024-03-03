@@ -2,6 +2,10 @@
 Changelog
 =========
 
+1.8.0 (2024-03-03)
+~~~~~~~~~~~~~~~~~~
+Compatibility with latest Ruff.
+
 1.7.1 (2023-04-02)
 ~~~~~~~~~~~~~~~~~~
 Silenced ``autopep8`` deprecation warning which users couldn't
