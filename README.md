@@ -343,6 +343,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://mkennedy.codes"><img src="https://avatars.githubusercontent.com/u/2035561?v=4?s=100" width="100px;" alt="Michael Kennedy"/><br /><sub><b>Michael Kennedy</b></sub></a><br /><a href="#audio-mikeckennedy" title="Audio">🔊</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://pythontest.com"><img src="https://avatars.githubusercontent.com/u/1568356?v=4?s=100" width="100px;" alt="Brian Okken"/><br /><sub><b>Brian Okken</b></sub></a><br /><a href="#audio-okken" title="Audio">🔊</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/funkeleinhorn"><img src="https://avatars.githubusercontent.com/u/103313934?v=4?s=100" width="100px;" alt="Sydney"/><br /><sub><b>Sydney</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Afunkeleinhorn" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/fvonbergen"><img src="https://avatars.githubusercontent.com/u/41888414?v=4?s=100" width="100px;" alt="fvonbergen"/><br /><sub><b>fvonbergen</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Afvonbergen" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>

@@ -317,6 +317,13 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/103313934?v=4",
       "profile": "https://github.com/funkeleinhorn",
       "contributions": ["bug"]
+    },
+    {
+      "login": "fvonbergen",
+      "name": "fvonbergen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/41888414?v=4",
+      "profile": "https://github.com/fvonbergen",
+      "contributions": ["bug"]
     }
   ],
   "contributorsPerLine": 7,
