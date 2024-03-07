@@ -360,7 +360,7 @@ def _run_command(  # pylint: disable=too-many-locals
     if main_command == "mypy" and "MYPY_FORCE_COLOR" not in my_env:
         my_env["MYPY_FORCE_COLOR"] = "1"
 
-    if main_command == "ruff":
+    if main_command == "ruff" and not sub_commands:
         sub_commands.insert(0, "check")
 
     if shell:

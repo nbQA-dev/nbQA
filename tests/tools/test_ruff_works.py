@@ -1,6 +1,7 @@
 """Check :code:`ruff` works as intended."""
 
 import os
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
@@ -108,4 +109,21 @@ def test_ruff_isort(capsys: "CaptureFixture") -> None:
 
     out, err = capsys.readouterr()
     assert out == ""
+    assert err == ""
+
+
+def test_ruff_format(capsys: "CaptureFixture", tmp_notebook_for_testing: Path) -> None:
+    """
+    Should ignore cell with all magics.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+
+    main(["ruff format", str(tmp_notebook_for_testing)])
+
+    out, err = capsys.readouterr()
+    assert out == "1 file reformatted\n"
     assert err == ""
