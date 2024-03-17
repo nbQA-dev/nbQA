@@ -324,6 +324,13 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/41888414?v=4",
       "profile": "https://github.com/fvonbergen",
       "contributions": ["bug"]
+    },
+    {
+      "login": "GaetanLepage",
+      "name": "Gaétan Lepage",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33058747?v=4",
+      "profile": "http://glepage.com",
+      "contributions": ["test"]
     }
   ],
   "contributorsPerLine": 7,
