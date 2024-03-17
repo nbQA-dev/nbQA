@@ -87,7 +87,7 @@ def test_cell_with_all_magics(capsys: "CaptureFixture") -> None:
     """
 
     path = os.path.join("tests", "data", "all_magic_cell.ipynb")
-    main(["ruff", path])
+    main(["ruff", "--quiet", path])
 
     out, err = capsys.readouterr()
     assert out == ""
@@ -105,7 +105,7 @@ def test_ruff_isort(capsys: "CaptureFixture") -> None:
     """
 
     path = os.path.join("tests", "data", "simple_imports.ipynb")
-    main(["ruff", path, "--select=I"])
+    main(["ruff", "--quiet", path, "--select=I"])
 
     out, err = capsys.readouterr()
     assert out == ""
