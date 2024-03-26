@@ -16,11 +16,6 @@ repos:
     rev: 24.3.0
     hooks:
       - id: black
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v4.0.0-alpha.8
-    hooks:
-      - id: prettier
-        exclude: ^README\.md$
   - repo: https://github.com/PyCQA/pylint
     rev: v3.1.0
     hooks:
@@ -41,12 +36,6 @@ repos:
     rev: 6.3.0
     hooks:
       - id: pydocstyle
-        files: ^nbqa/
-  - repo: https://github.com/econchick/interrogate
-    rev: 1.5.0
-    hooks:
-      - id: interrogate
-        args: [-v, --fail-under=100]
         files: ^nbqa/
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.9.0

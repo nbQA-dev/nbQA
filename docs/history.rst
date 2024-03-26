@@ -2,6 +2,10 @@
 Changelog
 =========
 
+1.8.5 (2024-03-26)
+~~~~~~~~~~~~~~~~~~
+Update tests for ruff compat.
+
 1.8.4 (2024-03-07)
 ~~~~~~~~~~~~~~~~~~
 Fixed "ruff format" regression.
