@@ -13,7 +13,7 @@ repos:
       - id: validate_manifest
   - repo: https://github.com/hauntsaninja/black-pre-commit-mirror
     # black compiled with mypyc
-    rev: 24.4.0
+    rev: 24.4.2
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/pylint
@@ -38,7 +38,7 @@ repos:
       - id: pydocstyle
         files: ^nbqa/
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.9.0
+    rev: v1.10.0
     hooks:
       - id: mypy
         exclude: ^docs/
@@ -49,7 +49,7 @@ repos:
       - id: pyupgrade
         args: [--py38-plus]
   - repo: https://github.com/MarcoGorelli/auto-walrus
-    rev: 0.3.3
+    rev: 0.3.4
     hooks:
       - id: auto-walrus
   - repo: https://github.com/codespell-project/codespell
