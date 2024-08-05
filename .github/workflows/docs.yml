@@ -14,12 +14,12 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: 3.8 # Same as RTD
       - name: Cache multiple paths
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: docs
@@ -29,7 +29,7 @@ jobs:
         run: tox -e ${{ matrix.tox-env-name }}
       - name: Upload docs artifact
         if: ${{ matrix.tox-env-name }} == "docs"
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: nbqa-docs
           path: docs/_build/html
