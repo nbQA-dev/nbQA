@@ -23,7 +23,7 @@ repos:
         files: ^(nbqa|tests)/
         exclude: ^tests/data/
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.0
+    rev: 7.1.1
     hooks:
       - id: flake8
         additional_dependencies: [flake8-typing-imports==1.14.0]
@@ -38,7 +38,7 @@ repos:
       - id: pydocstyle
         files: ^nbqa/
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.0
+    rev: v1.11.1
     hooks:
       - id: mypy
         exclude: ^docs/
