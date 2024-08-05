@@ -34,6 +34,7 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
         f'{notebook1}:cell_4:1:0: C0413: Import "from random import randint" should be placed at the top of the module (wrong-import-position)\n'  # noqa: E501
         f'{notebook1}:cell_5:1:0: C0413: Import "import pprint" should be placed at the top of the module (wrong-import-position)\n'  # noqa: E501
         f'{notebook1}:cell_5:2:0: C0413: Import "import sys" should be placed at the top of the module (wrong-import-position)\n'  # noqa: E501
+        f"{notebook1}:cell_5:9:0: E0606: Possibly using variable 'pretty_print_object' before assignment (possibly-used-before-assignment)\n"  # noqa: E501
         f'{notebook1}:cell_4:1:0: C0411: standard import "random.randint" should be placed before first party import "nbqa"  (wrong-import-order)\n'  # noqa: E501
         f'{notebook1}:cell_5:1:0: C0411: standard import "pprint" should be placed before first party import "nbqa"  (wrong-import-order)\n'  # noqa: E501
         f'{notebook1}:cell_5:2:0: C0411: standard import "sys" should be placed before first party import "nbqa"  (wrong-import-order)\n'  # noqa: E501
