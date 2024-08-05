@@ -2,6 +2,10 @@
 Changelog
 =========
 
+1.8.6 (2024-08-05)
+~~~~~~~~~~~~~~~~~~
+Ruff/pylint compat.
+
 1.8.5 (2024-03-26)
 ~~~~~~~~~~~~~~~~~~
 Update tests for ruff compat.
