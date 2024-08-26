@@ -8,6 +8,7 @@ isort>=5.4.2
 jupytext
 mdformat
 mypy
+pre-commit
 pre-commit-hooks
 pydocstyle
 pylint
