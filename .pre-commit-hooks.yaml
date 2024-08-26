@@ -88,8 +88,24 @@
   additional_dependencies: [pydocstyle]
 - id: nbqa-ruff
   name: nbqa-ruff
-  description: Run 'ruff' on a Jupyter Notebook
-  entry: nbqa ruff
+  description: Run 'ruff check' on a Jupyter Notebook       # for backwards compatiblity
+  entry: nbqa "ruff check"
+  language: python
+  additional_dependencies: [ruff]
+  require_serial: true
+  types_or: [jupyter, markdown]
+- id: nbqa-ruff-check
+  name: nbqa-ruff-check
+  description: Run 'ruff check' on a Jupyter Notebook
+  entry: nbqa "ruff check"
+  language: python
+  additional_dependencies: [ruff]
+  require_serial: true
+  types_or: [jupyter, markdown]
+- id: nbqa-ruff-format
+  name: nbqa-ruff-format
+  description: Run 'ruff format' on a Jupyter Notebook
+  entry: nbqa "ruff format"
   language: python
   additional_dependencies: [ruff]
   require_serial: true
