@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.9.0 (2024-08-27)
+~~~~~~~~~~~~~~~~~~
+More ruff compat, introduced ``nbqa-ruff-check`` and ``nbqa-ruff-format``
+hooks.
+
 1.8.7 (2024-08-05)
 ~~~~~~~~~~~~~~~~~~
 Ruff/pylint compat.
