@@ -13,11 +13,11 @@ repos:
       - id: validate_manifest
   - repo: https://github.com/hauntsaninja/black-pre-commit-mirror
     # black compiled with mypyc
-    rev: 24.4.2
+    rev: 24.8.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/pylint
-    rev: v3.2.6
+    rev: v3.2.7
     hooks:
       - id: pylint
         files: ^(nbqa|tests)/
@@ -38,7 +38,7 @@ repos:
       - id: pydocstyle
         files: ^nbqa/
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.1
+    rev: v1.11.2
     hooks:
       - id: mypy
         exclude: ^docs/
