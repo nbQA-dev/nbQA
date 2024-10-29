@@ -526,7 +526,7 @@ def _get_nb_to_tmp_mapping(
                 prefix=remove_suffix(
                     os.path.basename(notebook), os.path.splitext(notebook)[-1]
                 ),
-                suffix=SUFFIX[md],
+                suffix="_nbqa_ipynb" + SUFFIX[md],
             )
         )
         relative_path, _ = get_relative_and_absolute_paths(
