@@ -346,6 +346,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/fvonbergen"><img src="https://avatars.githubusercontent.com/u/41888414?v=4?s=100" width="100px;" alt="fvonbergen"/><br /><sub><b>fvonbergen</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3Afvonbergen" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://glepage.com"><img src="https://avatars.githubusercontent.com/u/33058747?v=4?s=100" width="100px;" alt="Gaétan Lepage"/><br /><sub><b>Gaétan Lepage</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/commits?author=GaetanLepage" title="Tests">⚠️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Anu-Ra-g"><img src="https://avatars.githubusercontent.com/u/94440065?v=4?s=100" width="100px;" alt="Anurag Nayak"/><br /><sub><b>Anurag Nayak</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/issues?q=author%3AAnu-Ra-g" title="Bug reports">🐛</a> <a href="#infra-Anu-Ra-g" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/minrk"><img src="https://avatars.githubusercontent.com/u/151929?v=4?s=100" width="100px;" alt="Min RK"/><br /><sub><b>Min RK</b></sub></a><br /><a href="https://github.com/nbQA-dev/nbQA/commits?author=minrk" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
