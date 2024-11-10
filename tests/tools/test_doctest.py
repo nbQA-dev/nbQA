@@ -1,6 +1,7 @@
 """Check that running :code:`doctest` works."""
 
 import os
+import sys
 from typing import TYPE_CHECKING
 
 from nbqa.__main__ import main
@@ -51,6 +52,9 @@ def test_doctest_works(capsys: "CaptureFixture") -> None:
         "   1 of   2 in notebook_for_testing_copy.hello\n"
         "***Test Failed*** 1 failures.\n"
     )
+    if sys.version_info >= (3, 13):
+        expected_out = expected_out.replace("1 failures", "1 failure")
+        expected_out = expected_out.replace("1 items", "1 item")
 
     try:
         assert out.replace("\r\n", "\n") == expected_out
