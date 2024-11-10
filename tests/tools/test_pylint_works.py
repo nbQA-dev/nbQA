@@ -54,5 +54,5 @@ def test_pylint_works(capsys: "CaptureFixture") -> None:
     horizontal_bar = "-----------------------------------"
     assert (
         out.replace("\r\n", "\n").split(horizontal_bar)[0]
-        == expected_out.split(horizontal_bar)[0]
+        == expected_out.split(horizontal_bar, maxsplit=1)[0]
     )

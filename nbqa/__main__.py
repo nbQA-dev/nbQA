@@ -672,7 +672,7 @@ def _save_markdown_sources(
 SAVE_SOURCES = {False: _save_code_sources, True: _save_markdown_sources}
 
 
-def _post_process_notebooks(  # pylint: disable=R0913
+def _post_process_notebooks(  # pylint: disable=R0913,R0917
     saved_sources: SavedSources,
     nb_to_py_mapping: Mapping[str, TemporaryFile],
     mutated: bool,
