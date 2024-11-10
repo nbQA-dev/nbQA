@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.9.1 (2024-11-10)
+~~~~~~~~~~~~~~~~~~
+Drop support for Python 3.8, test against Python 3.13.
+Added to suffix, so e.g. all generated .py files match *nbqa_ipynb.py* (thanks Min RK!)
+
 1.9.0 (2024-08-27)
 ~~~~~~~~~~~~~~~~~~
 More ruff compat, introduced ``nbqa-ruff-check`` and ``nbqa-ruff-format``
