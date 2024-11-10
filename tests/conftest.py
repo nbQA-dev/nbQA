@@ -3,10 +3,10 @@
 import shutil
 import sys
 from pathlib import Path
+from shutil import copytree  # pylint: disable=E0611,W4901
 from typing import TYPE_CHECKING, Iterator
 
 import pytest
-from shutils import copytree  # pylint: disable=E0611,W4901
 
 if TYPE_CHECKING:
     from py._path.local import LocalPath
