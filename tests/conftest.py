@@ -2,17 +2,8 @@
 
 import shutil
 import sys
-import warnings
-
-# distutils is deprecated, but this is just a test, so not urgent to update
-with warnings.catch_warnings():
-    warnings.filterwarnings(
-        "ignore",
-        message=r"The distutils package",
-        category=DeprecationWarning,
-    )
-    from distutils.dir_util import copy_tree  # pylint: disable=E0611,W4901
 from pathlib import Path
+from shutil import copytree  # pylint: disable=E0611,W4901
 from typing import TYPE_CHECKING, Iterator
 
 import pytest
@@ -140,9 +131,9 @@ def tmp_test_data(tmpdir: "LocalPath") -> Iterator[Path]:
     """
     dirname = Path("tests/data")
     temp_dir = Path(tmpdir)
-    copy_tree(str(dirname), str(temp_dir / dirname))
+    copytree(str(dirname), str(temp_dir / dirname))
     yield dirname
-    copy_tree(str(temp_dir / dirname), str(dirname))
+    copytree(str(temp_dir / dirname), str(dirname), dirs_exist_ok=True)
 
 
 @pytest.fixture
