@@ -29,8 +29,8 @@ def _get_node_args(func: ast.Call) -> List[str]:
     """
     args = []
     for arg in func.args:
-        if isinstance(arg, ast.Str):
-            args.append(arg.s)
+        if isinstance(arg, ast.Constant):
+            args.append(arg.value)
         else:
             raise AssertionError(
                 "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
@@ -158,8 +158,8 @@ class CellMagicFinder(ast.NodeVisitor):
             if node.func.attr == "run_cell_magic":
                 args = []
                 for arg in node.args:
-                    if isinstance(arg, ast.Str):
-                        args.append(arg.s)
+                    if isinstance(arg, ast.Constant):
+                        args.append(arg.value)
                     else:
                         raise AssertionError(
                             "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
