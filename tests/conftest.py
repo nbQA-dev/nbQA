@@ -133,7 +133,7 @@ def tmp_test_data(tmpdir: "LocalPath") -> Iterator[Path]:
     temp_dir = Path(tmpdir)
     copytree(str(dirname), str(temp_dir / dirname))
     yield dirname
-    copytree(str(temp_dir / dirname), str(dirname))
+    copytree(str(temp_dir / dirname), str(dirname), dirs_exist_ok=True)
 
 
 @pytest.fixture
