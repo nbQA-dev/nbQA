@@ -53,7 +53,7 @@ repos:
     hooks:
       - id: auto-walrus
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
+    rev: v2.4.0
     hooks:
       - id: codespell
         files: \.(py|rst|md)$
