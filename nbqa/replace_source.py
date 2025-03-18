@@ -45,7 +45,7 @@ def _restore_quarto_cell_options(source: str) -> str:
     Returns
     -------
     str
-        New source with leading '# |' restored to '#!'.
+        New source with leading '# |' restored to '#|'.
     """
     new_lines = []
     lines = source.splitlines()
