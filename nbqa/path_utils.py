@@ -88,7 +88,7 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
     if ext == ".ipynb":
         trailing_newline = content.endswith("\n")
         return json.loads(content), trailing_newline
-    assert ext == ".md"
+    assert ext in (".md", ".qmd")
     try:
         import jupytext  # pylint: disable=import-outside-toplevel
         from markdown_it import MarkdownIt  # pylint: disable=import-outside-toplevel
@@ -133,8 +133,14 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
     parsed = MarkdownIt("commonmark").disable("inline", True).parse(content)
     lexer = None
     for token in parsed:
-        if token.type == "fence" and token.info.startswith("{code-cell}"):
-            lexer = remove_prefix(token.info, "{code-cell}").strip()
+        if token.type == "fence" and (
+            token.info.startswith("{code-cell}") or token.info.startswith("{python}")
+        ):
+            lexer = (
+                remove_prefix(token.info, "{code-cell}").strip()
+                if not token.info.startswith("{python}")
+                else "python"
+            )
             md_content["metadata"]["language_info"] = {"pygments_lexer": lexer}
             break
 
