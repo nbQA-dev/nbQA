@@ -28,6 +28,37 @@ SOURCE = {True: "markdown", False: "code"}
 SEPARATOR = {True: MARKDOWN_SEPARATOR, False: CODE_SEPARATOR}
 
 
+def _restore_quarto_cell_options(source: str) -> str:
+    """
+    Restore the cell option comments #| at the start of the cell.
+
+    This comment like is typically changed to '# |' by third party tools.
+
+    This is for the cell options in quarto format as described at
+    https://quarto.org/docs/reference/cells/cells-jupyter.html.
+
+    Parameters
+    ----------
+    source
+        Portion of Python file between cell separators.
+
+    Returns
+    -------
+    str
+        New source with leading '# |' restored to '#!'.
+    """
+    new_lines = []
+    lines = source.splitlines()
+    i = 0
+    for i, line in enumerate(lines):
+        if not line.startswith("# |"):
+            break  # only leading '#!' are cell options
+        new_lines.append("#|" + line[3:])
+    if i < len(lines):
+        new_lines.extend(lines[i:])
+    return "\n".join(new_lines)
+
+
 def _restore_semicolon(
     source: str,
     cell_number: int,
@@ -123,6 +154,7 @@ def _get_new_source(
     source = _restore_semicolon(
         pycell, code_cell_number, notebook_info.trailing_semicolons
     )
+    source = _restore_quarto_cell_options(source)
     return _reinstate_magics(
         source,
         notebook_info.temporary_lines.get(code_cell_number, []),
@@ -216,7 +248,7 @@ def _write_notebook(
                     f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}"
                 )
     else:
-        assert ext == ".md"
+        assert ext in (".md", ".qmd")
         import jupytext  # pylint: disable=import-outside-toplevel
         from jupytext.config import (  # pylint: disable=import-outside-toplevel
             load_jupytext_config,
@@ -326,7 +358,7 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> bool:
 
     if line_changes:
         header = f"Cell {code_cell_number}"
-        headers = [f"{BOLD}{header}{RESET}\n", f"{'-'*len(header)}\n"]
+        headers = [f"{BOLD}{header}{RESET}\n", f"{'-' * len(header)}\n"]
         sys.stdout.writelines(headers + line_changes + ["\n"])
         return True
     return False
