@@ -252,11 +252,11 @@ def test_qmd(tmp_test_data: Path) -> None:
         """```\n"""
         """\n"""
         """# Other Markdown\n"""
-        """This content should not change in any way. \n"""
+        """This content should not change in any way.\n"""
         """#| cell option like line\n"""
-        """#comment like line \n"""
+        """#comment like line\n"""
         """code that won't get formatted\n"""
-        """ax.set_rticks([0.5,1,1.5,2]) \n"""
+        """ax.set_rticks([0.5,1,1.5,2])\n"""
     )
     assert result == expected
 
