@@ -198,6 +198,69 @@ def test_md(tmp_test_data: Path) -> None:
     assert result == expected
 
 
+def test_qmd(tmp_test_data: Path) -> None:
+    """
+    Notebook in qmd format.
+
+    Parameters
+    ----------
+    tmp_test_data
+        Temporary copy of test data.
+    """
+    notebook = tmp_test_data / "notebook_for_testing.qmd"
+
+    main(["black", str(notebook)])
+
+    with open(notebook, encoding="utf-8") as fd:
+        result = fd.read()
+    expected = (
+        """---\n"""
+        """title: Quarto Basics\n"""
+        """format:\n"""
+        """  html:\n"""
+        """    code-fold: true\n"""
+        """jupyter:\n"""
+        """  jupytext:\n"""
+        """    text_representation:\n"""
+        """      extension: .qmd\n"""
+        """      format_name: quarto\n"""
+        """      format_version: '1.0'\n"""
+        """      jupytext_version: 1.16.7\n"""
+        """  kernelspec:\n"""
+        """    display_name: Python 3\n"""
+        """    language: python\n"""
+        """    name: python3\n"""
+        """---\n"""
+        """\n"""
+        """```{python}\n"""
+        """#| label: fig-polar\n"""
+        """#| fig-cap: A line plot on a polar axis\n"""
+        """# This is a comment\n"""
+        """# | Looks like a cell option, but treat like\n"""
+        """# comment since not at top\n"""
+        """\n"""
+        """import numpy as np\n"""
+        """import matplotlib.pyplot as plt\n"""
+        """\n"""
+        """r = np.arange(0, 2, 0.01)\n"""
+        """theta = 2 * np.pi * r\n"""
+        """fig, ax = plt.subplots(subplot_kw={"projection": "polar"})\n"""
+        """ax.plot(theta, r)\n"""
+        """ax.set_rticks([0.5, 1, 1.5, 2])\n"""
+        """ax.grid(True)\n"""
+        """plt.show()\n"""
+        """```\n"""
+        """\n"""
+        """# Other Markdown\n"""
+        """This content should not change in any way. \n"""
+        """#| cell option like line\n"""
+        """#comment like line \n"""
+        """code that won't get formatted\n"""
+        """ax.set_rticks([0.5,1,1.5,2]) \n"""
+    )
+    assert result == expected
+
+
 def test_non_jupytext_md() -> None:
     """Check non-Python markdown will be ignored."""
     ret = main(["black", "README.md"])
