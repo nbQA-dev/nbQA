@@ -60,10 +60,9 @@ def _restore_quarto_cell_options(og_lines: list[str], lines: list[str]) -> list[
             # if we encounter a line without, then all following are not
             # we also skip if the formatting tool hasn't changed '#|' to '# |'
             # since that means the formatter is handling qmd lines properly
-            i -= 1  # rolling back so the logic below works without branching
+            restored_lines.append(line)
             break
         restored_lines.append("#|" + line[3:])
-
     restored_lines.extend(lines[i + 1 :])
     return restored_lines
 
