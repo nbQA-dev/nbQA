@@ -28,7 +28,7 @@ SOURCE = {True: "markdown", False: "code"}
 SEPARATOR = {True: MARKDOWN_SEPARATOR, False: CODE_SEPARATOR}
 
 
-def _restore_quarto_cell_options(lines: list[str]) -> list[str]:
+def _restore_quarto_cell_options(og_lines: list[str], lines: list[str]) -> list[str]:
     """
     Restore the cell option comments #| at the start of the cell.
 
@@ -39,23 +39,33 @@ def _restore_quarto_cell_options(lines: list[str]) -> list[str]:
 
     Parameters
     ----------
+    og_lines
+        Original input lines.
     lines
-        Lines after all pre-processing restored.
+        Lines after all formatting and magics restored.
 
     Returns
     -------
     list[str]
         Lines with leading '# |' restored to '#|'.
     """
-    new_lines = []
+    restored_lines = []
     i = 0
+    # iteration logic should be safe since all cell options are at the start
+    # and single lines so shouldn't suffer multi-line formatting before
+    # breaking out
     for i, line in enumerate(lines):
-        if not line.startswith("# |"):
-            break  # only leading '#!' are cell options
-        new_lines.append("#|" + line[3:])
-    if i < len(lines):
-        new_lines.extend(lines[i:])
-    return new_lines
+        if not line.startswith("# |") or not og_lines[i].startswith("#|"):
+            # only leading '#|' are cell options
+            # if we encounter a line without, then all following are not
+            # we also skip if the formatting tool hasn't changed '#|' to '# |'
+            # since that means the formatter is handling qmd lines properly
+            i -= 1  # rolling back so the logic below works without branching
+            break
+        restored_lines.append("#|" + line[3:])
+
+    restored_lines.extend(lines[i + 1 :])
+    return restored_lines
 
 
 def _restore_semicolon(
@@ -255,8 +265,6 @@ def _write_notebook(
         config = load_jupytext_config(os.path.abspath(temp_notebook))
 
         for cell in notebook_json["cells"]:
-            if ext == ".qmd":
-                cell["source"] = _restore_quarto_cell_options(cell["source"])
             cell["source"] = "".join(cell["source"])
         jupytext.jupytext.write(notebook_json, temp_notebook, config=config)
 
@@ -310,6 +318,8 @@ def mutate(  # pylint: disable=too-many-locals,too-many-arguments
         )
         if not new_source:
             cells_to_remove.append(cell_number)
+        if notebook.endswith(".qmd"):
+            new_source = _restore_quarto_cell_options(new_source)
         cell["source"] = new_source
 
     if original_notebook_json == notebook_json:
@@ -409,6 +419,8 @@ def diff(  # pylint: disable=too-many-arguments
             newlinesbefore[python_file],
             newlinesafter[python_file],
         )
+        if notebook.endswith(".qmd"):
+            new_source = _restore_quarto_cell_options(cell["source"], new_source)
         cell["source"][-1] += "\n"
         if new_source:
             new_source[-1] += "\n"

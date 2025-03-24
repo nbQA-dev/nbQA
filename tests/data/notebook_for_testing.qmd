@@ -9,6 +9,7 @@ jupyter: python3
 ```{python}
 #| label: fig-polar
 #| fig-cap: A line plot on a polar axis
+# |  Should not be changed back to #|
 # This is a comment
 # | Looks like a cell option, but treat like
 # comment since not at top
