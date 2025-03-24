@@ -319,7 +319,7 @@ def mutate(  # pylint: disable=too-many-locals,too-many-arguments
         if not new_source:
             cells_to_remove.append(cell_number)
         if notebook.endswith(".qmd"):
-            new_source = _restore_quarto_cell_options(new_source)
+            new_source = _restore_quarto_cell_options(cell["source"], new_source)
         cell["source"] = new_source
 
     if original_notebook_json == notebook_json:
