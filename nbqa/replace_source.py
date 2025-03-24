@@ -28,45 +28,6 @@ SOURCE = {True: "markdown", False: "code"}
 SEPARATOR = {True: MARKDOWN_SEPARATOR, False: CODE_SEPARATOR}
 
 
-def _restore_quarto_cell_options(og_lines: list[str], lines: list[str]) -> list[str]:
-    """
-    Restore the cell option comments #| at the start of the cell.
-
-    This comment like is typically changed to '# |' by third party tools.
-
-    This is for the cell options in quarto format as described at
-    https://quarto.org/docs/reference/cells/cells-jupyter.html.
-
-    Parameters
-    ----------
-    og_lines
-        Original input lines.
-    lines
-        Lines after all formatting and magics restored.
-
-    Returns
-    -------
-    list[str]
-        Lines with leading '# |' restored to '#|'.
-    """
-    restored_lines = []
-    i = 0
-    # iteration logic should be safe since all cell options are at the start
-    # and single lines so shouldn't suffer multi-line formatting before
-    # breaking out
-    for i, line in enumerate(lines):
-        if not line.startswith("# |") or not og_lines[i].startswith("#|"):
-            # only leading '#|' are cell options
-            # if we encounter a line without, then all following are not
-            # we also skip if the formatting tool hasn't changed '#|' to '# |'
-            # since that means the formatter is handling qmd lines properly
-            restored_lines.append(line)
-            break
-        restored_lines.append("#|" + line[3:])
-    restored_lines.extend(lines[i + 1 :])
-    return restored_lines
-
-
 def _restore_semicolon(
     source: str,
     cell_number: int,
@@ -317,8 +278,6 @@ def mutate(  # pylint: disable=too-many-locals,too-many-arguments
         )
         if not new_source:
             cells_to_remove.append(cell_number)
-        if notebook.endswith(".qmd"):
-            new_source = _restore_quarto_cell_options(cell["source"], new_source)
         cell["source"] = new_source
 
     if original_notebook_json == notebook_json:
@@ -418,8 +377,6 @@ def diff(  # pylint: disable=too-many-arguments
             newlinesbefore[python_file],
             newlinesafter[python_file],
         )
-        if notebook.endswith(".qmd"):
-            new_source = _restore_quarto_cell_options(cell["source"], new_source)
         cell["source"][-1] += "\n"
         if new_source:
             new_source[-1] += "\n"

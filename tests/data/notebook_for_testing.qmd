@@ -18,20 +18,20 @@ jupyter:
 
 ```{python}
 #| label: fig-polar
-#| fig-cap: A line plot on a polar axis
-#   Should not be changed back to #|
-# This is a comment
-# | Looks like a cell option, but treat like
-# comment since not at top
+# | fig-cap: A line plot on a polar axis
+#|  Additional content
+# This is a comment that stops cell options
+#| fig-subcap: A line plot on a polar axis
+# |  Additional content
 
 import numpy as np
-import matplotlib.pyplot as    plt
+import matplotlib.pyplot as plt
 
-r = np.arange(0,2,0.01)
-theta = 2*np.pi*r
-fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+r = np.arange(0, 2, 0.01)
+theta = 2 * np.pi * r
+fig, ax = plt.subplots(subplot_kw={"projection": "polar"})
 ax.plot(theta, r)
-ax.set_rticks([0.5,1,1.5,2])
+ax.set_rticks([0.5, 1, 1.5, 2])
 ax.grid(True)
 plt.show()
 ```
