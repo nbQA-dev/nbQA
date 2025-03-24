@@ -1,15 +1,25 @@
 ---
-title: "Quarto Basics"
+title: Quarto Basics
 format:
   html:
     code-fold: true
-jupyter: python3
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.16.7
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
 ---
 
 ```{python}
 #| label: fig-polar
 #| fig-cap: A line plot on a polar axis
-# |  Should not be changed back to #|
+#   Should not be changed back to #|
 # This is a comment
 # | Looks like a cell option, but treat like
 # comment since not at top

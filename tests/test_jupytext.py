@@ -235,7 +235,7 @@ def test_qmd(tmp_test_data: Path) -> None:
         """```{python}\n"""
         """#| label: fig-polar\n"""
         """#| fig-cap: A line plot on a polar axis\n"""
-        """# |  Should not be changed back to #|\n"""
+        """#   Should not be changed back to #|\n"""
         """# This is a comment\n"""
         """# | Looks like a cell option, but treat like\n"""
         """# comment since not at top\n"""
