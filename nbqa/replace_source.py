@@ -28,7 +28,7 @@ SOURCE = {True: "markdown", False: "code"}
 SEPARATOR = {True: MARKDOWN_SEPARATOR, False: CODE_SEPARATOR}
 
 
-def _restore_quarto_cell_options(source: str) -> str:
+def _restore_quarto_cell_options(lines: list[str]) -> list[str]:
     """
     Restore the cell option comments #| at the start of the cell.
 
@@ -39,16 +39,15 @@ def _restore_quarto_cell_options(source: str) -> str:
 
     Parameters
     ----------
-    source
-        Portion of Python file between cell separators.
+    lines
+        Lines after all pre-processing restored.
 
     Returns
     -------
-    str
-        New source with leading '# |' restored to '#|'.
+    list[str]
+        Lines with leading '# |' restored to '#|'.
     """
     new_lines = []
-    lines = source.splitlines()
     i = 0
     for i, line in enumerate(lines):
         if not line.startswith("# |"):
@@ -56,7 +55,7 @@ def _restore_quarto_cell_options(source: str) -> str:
         new_lines.append("#|" + line[3:])
     if i < len(lines):
         new_lines.extend(lines[i:])
-    return "\n".join(new_lines)
+    return new_lines
 
 
 def _restore_semicolon(
@@ -154,7 +153,6 @@ def _get_new_source(
     source = _restore_semicolon(
         pycell, code_cell_number, notebook_info.trailing_semicolons
     )
-    source = _restore_quarto_cell_options(source)
     return _reinstate_magics(
         source,
         notebook_info.temporary_lines.get(code_cell_number, []),
@@ -257,6 +255,8 @@ def _write_notebook(
         config = load_jupytext_config(os.path.abspath(temp_notebook))
 
         for cell in notebook_json["cells"]:
+            if ext == ".qmd":
+                cell["source"] = _restore_quarto_cell_options(cell["source"])
             cell["source"] = "".join(cell["source"])
         jupytext.jupytext.write(notebook_json, temp_notebook, config=config)
 
