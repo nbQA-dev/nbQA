@@ -225,7 +225,7 @@ def test_qmd(tmp_test_data: Path) -> None:
         """      extension: .qmd\n"""
         """      format_name: quarto\n"""
         """      format_version: '1.0'\n"""
-        """      jupytext_version: 1.16.7\n"""
+        f"      jupytext_version: {jupytext.__version__}\n"
         """  kernelspec:\n"""
         """    display_name: Python 3\n"""
         """    language: python\n"""
