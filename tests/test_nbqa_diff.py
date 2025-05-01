@@ -10,10 +10,10 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
 
 
-SPARKLES = "\N{sparkles}"
-SHORTCAKE = "\N{shortcake}"
-COLLISION = "\N{collision symbol}"
-BROKEN_HEART = "\N{broken heart}"
+SPARKLES = "\N{SPARKLES}"
+SHORTCAKE = "\N{SHORTCAKE}"
+COLLISION = "\N{COLLISION SYMBOL}"
+BROKEN_HEART = "\N{BROKEN HEART}"
 TESTS_DIR = Path("tests")
 TEST_DATA_DIR = TESTS_DIR / "data"
 

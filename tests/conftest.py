@@ -1,4 +1,4 @@
-"""Define some fixtures that can be re-used between tests."""
+"""Define some fixtures that can be reused between tests."""
 
 import shutil
 import sys

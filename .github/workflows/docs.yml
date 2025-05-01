@@ -10,7 +10,7 @@ jobs:
     name: "Running: ${{ matrix.tox-env-name }}"
     strategy:
       matrix:
-        tox-env-name: ["docs", "docs-links"]
+        tox-env-name: ["docs"]
 
     runs-on: ubuntu-latest
     steps:

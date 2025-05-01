@@ -15,10 +15,10 @@ if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
     from py._path.local import LocalPath
 
-SPARKLES = "\N{sparkles}"
-SHORTCAKE = "\N{shortcake}"
-COLLISION = "\N{collision symbol}"
-BROKEN_HEART = "\N{broken heart}"
+SPARKLES = "\N{SPARKLES}"
+SHORTCAKE = "\N{SHORTCAKE}"
+COLLISION = "\N{COLLISION SYMBOL}"
+BROKEN_HEART = "\N{BROKEN HEART}"
 
 
 def test_black_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> None:
