@@ -770,7 +770,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
                 for key, i in nb_to_tmp_mapping.items()
                 if key
                 not in (
-                    *saved_sources.failed_notebooks,
+                    *saved_sources.failed_notebooks,  # type: ignore[not-a-type, unused-ignore]
                     *saved_sources.non_python_notebooks,
                 )
             ],
