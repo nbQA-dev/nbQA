@@ -460,7 +460,10 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
         if getattr(cli_args, section) is not None:
             if section == "addopts":
                 # addopts are added to / overridden rather than replaced outright
-                config["addopts"] = (*config["addopts"], *getattr(cli_args, section))
+                config["addopts"] = (  # type: ignore[missing-attribute,unused-ignore]
+                    *config["addopts"],
+                    *getattr(cli_args, section),
+                )
             else:
                 # TypedDict key must be a string literal
                 config[section] = getattr(cli_args, section)  # type: ignore

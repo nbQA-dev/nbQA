@@ -106,7 +106,7 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
         config = None
 
     try:
-        md_content = jupytext.jupytext.read(notebook, config=config)
+        md_content = jupytext.jupytext.read(notebook, config=config)  # type: ignore[missing-attribute,unused-ignore]
     except:  # noqa: E72a  # pylint: disable=bare-except
         return None, None
 
