@@ -12,6 +12,7 @@ pre-commit
 pre-commit-hooks
 pydocstyle
 pylint
+pyrefly
 pytest
 pytest-cov
 pytest-randomly

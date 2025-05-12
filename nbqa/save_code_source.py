@@ -328,7 +328,7 @@ def _has_trailing_semicolon(src: str) -> tuple[str, bool]:
         if not token.src.strip(" \n") or token.name == "COMMENT":
             continue
         if token.name == "OP" and token.src == ";":
-            tokens[idx] = token._replace(src="")
+            tokens[idx] = token._replace(src="")  # type: ignore[missing-attribute,unused-ignore]
             trailing_semicolon = True
         break
     if not trailing_semicolon:

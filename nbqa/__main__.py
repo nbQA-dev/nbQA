@@ -460,7 +460,10 @@ def _get_configs(cli_args: CLIArgs, project_root: Path) -> Configs:
         if getattr(cli_args, section) is not None:
             if section == "addopts":
                 # addopts are added to / overridden rather than replaced outright
-                config["addopts"] = (*config["addopts"], *getattr(cli_args, section))
+                config["addopts"] = (  # type: ignore[missing-attribute,unused-ignore]
+                    *config["addopts"],
+                    *getattr(cli_args, section),
+                )
             else:
                 # TypedDict key must be a string literal
                 config[section] = getattr(cli_args, section)  # type: ignore
@@ -767,7 +770,7 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
                 for key, i in nb_to_tmp_mapping.items()
                 if key
                 not in (
-                    *saved_sources.failed_notebooks,
+                    *saved_sources.failed_notebooks,  # type: ignore[not-a-type, unused-ignore]
                     *saved_sources.non_python_notebooks,
                 )
             ],

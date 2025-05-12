@@ -4,7 +4,7 @@ import json
 import os
 import string
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, cast
 
 
 def remove_prefix(string_: str, prefix: str) -> str:
@@ -106,7 +106,10 @@ def read_notebook(notebook: str) -> Tuple[Optional[Dict[str, Any]], Optional[boo
         config = None
 
     try:
-        md_content = jupytext.jupytext.read(notebook, config=config)
+        # jupytext isn't typed unfortunately
+        md_content = cast(  # type: ignore[missing-attribute,unused-ignore]
+            Any, jupytext.jupytext.read(notebook, config=config)
+        )
     except:  # noqa: E72a  # pylint: disable=bare-except
         return None, None
 

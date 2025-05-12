@@ -58,7 +58,7 @@ def _restore_semicolon(
         for idx, token in tokenize_rt.reversed_enumerate(tokens):
             if not token.src.strip(" \n") or token.name == "COMMENT":
                 continue
-            tokens[idx] = token._replace(src=token.src + ";")
+            tokens[idx] = token._replace(src=token.src + ";")  # type: ignore[missing-attribute,unused-ignore]
             break
         source = tokenize_rt.tokens_to_src(tokens)
     return source
@@ -226,7 +226,9 @@ def _write_notebook(
 
         for cell in notebook_json["cells"]:
             cell["source"] = "".join(cell["source"])
-        jupytext.jupytext.write(notebook_json, temp_notebook, config=config)
+        jupytext.jupytext.write(  # type: ignore[missing-attribute,unused-ignore]
+            notebook_json, temp_notebook, config=config
+        )
 
 
 def mutate(  # pylint: disable=too-many-locals,too-many-arguments
