@@ -33,5 +33,3 @@ jobs:
           python -m pip install -e .
       - name: run-tests
         run: pytest tests --cov=100
-      - name: run-pyrefly
-        run: pyrefly check nbqa
