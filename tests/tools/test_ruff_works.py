@@ -53,26 +53,38 @@ def test_ruff_works(
     expected_path_2 = os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
 
     out, err = capsys.readouterr()
+
     # ignore ruff's suggestions
-    out = "\n".join([x for x in out.splitlines() if "cell_" in x])
+    prev = ""
+    output: list[str] = []
+    for line in out.splitlines():
+        if "cell_" in line:
+            # append previous line and matching line
+            output.append(prev)
+            output.append(line)
+        prev = line
+
     expected_out = (
-        f"{expected_path_1}:cell_1:1:8: F401 [*] `os` imported but unused\n"
-        f"{expected_path_1}:cell_1:3:8: F401 [*] `glob` imported but unused\n"
-        f"{expected_path_1}:cell_1:5:8: F401 [*] `nbqa` imported but unused\n"
-        f"{expected_path_0}:cell_1:1:8: F401 [*] `os` imported but unused\n"
-        f"{expected_path_0}:cell_1:3:8: F401 [*] `glob` imported but unused\n"
-        f"{expected_path_0}:cell_1:5:8: F401 [*] `nbqa` imported but unused\n"
-        f"{expected_path_0}:cell_4:1:1: E402 Module level import not at top of file\n"
-        f"{expected_path_0}:cell_4:1:20: F401 [*] `random.randint` imported but unused\n"
-        f"{expected_path_0}:cell_5:1:1: E402 Module level import not at top of file\n"
-        f"{expected_path_0}:cell_5:2:1: E402 Module level import not at top of file\n"
-        f"{expected_path_2}:cell_1:1:8: F401 [*] `os` imported but unused\n"
-        f"{expected_path_2}:cell_1:3:8: F401 [*] `glob` imported but unused\n"
-        f"{expected_path_2}:cell_1:5:8: F401 [*] `nbqa` imported but unused\n"
+        f"F401 [*] `os` imported but unused\n --> {expected_path_1}:cell_1:1:8\n"
+        f"F401 [*] `glob` imported but unused\n --> {expected_path_1}:cell_1:3:8\n"
+        f"F401 [*] `nbqa` imported but unused\n --> {expected_path_1}:cell_1:5:8\n"
+        f"F401 [*] `os` imported but unused\n --> {expected_path_0}:cell_1:1:8\n"
+        f"F401 [*] `glob` imported but unused\n --> {expected_path_0}:cell_1:3:8\n"
+        f"F401 [*] `nbqa` imported but unused\n --> {expected_path_0}:cell_1:5:8\n"
+        f"E402 Module level import not at top of file\n --> {expected_path_0}:cell_4:1:1\n"
+        f"F401 [*] `random.randint` imported but unused\n --> {expected_path_0}:cell_4:1:20\n"
+        f"E402 Module level import not at top of file\n --> {expected_path_0}:cell_5:1:1\n"
+        f"E402 Module level import not at top of file\n --> {expected_path_0}:cell_5:2:1\n"
+        f"F401 [*] `os` imported but unused\n --> {expected_path_2}:cell_1:1:8\n"
+        f"F401 [*] `glob` imported but unused\n --> {expected_path_2}:cell_1:3:8\n"
+        f"F401 [*] `nbqa` imported but unused\n --> {expected_path_2}:cell_1:5:8\n"
     )
-    assert "\n".join(sorted(out.replace("\r\n", "\n").splitlines())) == "\n".join(
-        sorted(expected_out.splitlines())
-    )
+
+    # simple dedent of '\s+-->'
+    out = "\n".join(sorted([x.lstrip() for x in output]))
+    exp = "\n".join(sorted([x.lstrip() for x in expected_out.splitlines()]))
+
+    assert out == exp
     assert err == ""
 
 
