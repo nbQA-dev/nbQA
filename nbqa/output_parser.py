@@ -68,6 +68,15 @@ def _get_pattern(
             ),
         ]
 
+    if command.startswith("ruff"):
+        return [
+            (
+                rf"(?<=--> {re.escape(relative_path)}:)\d+"
+                rf"|(?<=--> {re.escape(absolute_path)}:)\d+",
+                standard_substitution,
+            )
+        ]
+
     # This is the most common one and is used by flake, pylint, mypy, and more.
     return [
         (
