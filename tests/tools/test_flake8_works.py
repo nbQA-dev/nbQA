@@ -54,8 +54,7 @@ def test_flake8_works(
     expected_path_2 = os.path.join("tests", "data", "notebook_starting_with_md.ipynb")
 
     out, err = capsys.readouterr()
-    expected_out = dedent(
-        f"""\
+    expected_out = dedent(f"""\
         {expected_path_0}:cell_1:1:1: F401 'os' imported but unused
         {expected_path_0}:cell_1:3:1: F401 'glob' imported but unused
         {expected_path_0}:cell_1:5:1: F401 'nbqa' imported but unused
@@ -70,8 +69,7 @@ def test_flake8_works(
         {expected_path_2}:cell_1:1:1: F401 'os' imported but unused
         {expected_path_2}:cell_1:3:1: F401 'glob' imported but unused
         {expected_path_2}:cell_1:5:1: F401 'nbqa' imported but unused
-        """
-    )
+        """)
     expected_err = ""
     assert sorted(out.splitlines()) == sorted(expected_out.splitlines())
     assert sorted(err.splitlines()) == sorted(expected_err.splitlines())
@@ -110,14 +108,12 @@ def test_per_file_ignores(
     # enable per-file ignores with nbqa glob
     flake8_ini = Path(".flake8")
     flake8_ini.write_text(
-        dedent(
-            """
+        dedent("""
         [flake8]
         per-file-ignores =
           **/*.ipynb: E402
           **/*nbqa_ipynb.py: E402
-        """
-        ),
+        """),
         encoding="utf-8",
     )
 
@@ -127,14 +123,12 @@ def test_per_file_ignores(
     expected_path_0 = os.path.join("tests", "data", "notebook_for_testing.ipynb")
 
     out, err = capsys.readouterr()
-    expected_out = dedent(
-        f"""\
+    expected_out = dedent(f"""\
         {expected_path_0}:cell_1:1:1: F401 'os' imported but unused
         {expected_path_0}:cell_1:3:1: F401 'glob' imported but unused
         {expected_path_0}:cell_1:5:1: F401 'nbqa' imported but unused
         {expected_path_0}:cell_2:19:9: W291 trailing whitespace
         {expected_path_0}:cell_4:1:1: F401 'random.randint' imported but unused
-        """
-    )
+        """)
     assert err == ""
     assert sorted(out.splitlines()) == sorted(expected_out.splitlines())

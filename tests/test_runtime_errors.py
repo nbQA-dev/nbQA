@@ -35,8 +35,7 @@ def test_missing_root_dir(capsys: "CaptureFixture") -> None:
     """Check useful error message is raised if :code:`nbqa` is called without root_dir."""
     prefix = "\x1b[1m"
     suffix = "\x1b[0m"
-    pattern = re.escape(
-        f"""\
+    pattern = re.escape(f"""\
 usage: nbqa <code quality tool> <notebook or directory> <nbqa options> \
 <code quality tool arguments>
 
@@ -53,8 +52,7 @@ usage: nbqa <code quality tool> <notebook or directory> <nbqa options> \
 
 See https://nbqa.readthedocs.io/en/latest/index.html for more details on \
 how to run `nbqa`.\
-"""
-    )
+""")
 
     pattern = pattern + ".*: error: the following arguments are required: root_dirs\n"
 

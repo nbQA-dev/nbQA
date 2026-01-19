@@ -31,13 +31,11 @@ def test_mypy_works(capsys: "CaptureFixture") -> None:
 
     # check out and err
     out, err = capsys.readouterr()
-    expected_out = dedent(
-        """\
+    expected_out = dedent("""\
         has incompatible type
         has incompatible type
         has incompatible type
-        """
-    )
+        """)
     # Unfortunately, the colours don't show up in CI. Seems to work fine locally though.
     # So, we can only do a partial test.
     for result, expected in zip(

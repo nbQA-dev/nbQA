@@ -21,15 +21,13 @@ def test_pyproject_toml_works(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     Path("pyproject.toml").write_text(
-        dedent(
-            """
+        dedent("""
             [tool.nbqa.addopts]
             flake8 = [
                 "--ignore=F401,E302",
                 "--select=E303",
             ]
-            """
-        ),
+            """),
         encoding="utf-8",
     )
 
@@ -51,14 +49,12 @@ def test_cli_extends_pyprojecttoml(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     Path("pyproject.toml").write_text(
-        dedent(
-            """
+        dedent("""
             [tool.nbqa.addopts]
             flake8 = [
                 "--ignore=F401",
             ]
-            """
-        ),
+            """),
         encoding="utf-8",
     )
 
@@ -75,12 +71,10 @@ def test_cli_extends_pyprojecttoml(capsys: "CaptureFixture") -> None:
     # if arguments are specified on command line, they will take precedence
     # over those specified in the pyproject.toml
     notebook_path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
-    expected_out = dedent(
-        f"""\
+    expected_out = dedent(f"""\
         {notebook_path}:cell_1:1:1: F401 'os' imported but unused
         {notebook_path}:cell_1:3:1: F401 'glob' imported but unused
         {notebook_path}:cell_1:5:1: F401 'nbqa' imported but unused
         {notebook_path}:cell_4:1:1: F401 'random.randint' imported but unused
-        """
-    )
+        """)
     assert out == expected_out

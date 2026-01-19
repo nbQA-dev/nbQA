@@ -55,12 +55,10 @@ def test_config_files(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     Path("pyproject.toml").write_text(
-        dedent(
-            """\
+        dedent("""\
         [tool.nbqa.files]
         flake8 = "^tests/data/notebook_for"
-        """
-        ),
+        """),
         encoding="utf-8",
     )
     main(["flake8", "tests"])
@@ -82,12 +80,10 @@ def test_config_exclude(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     Path("pyproject.toml").write_text(
-        dedent(
-            """\
+        dedent("""\
         [tool.nbqa.exclude]
         flake8 = "^tests/data/notebook_for"
-        """
-        ),
+        """),
         encoding="utf-8",
     )
 

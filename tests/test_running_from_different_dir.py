@@ -37,12 +37,10 @@ def test_running_in_different_dir_works(
     """
     config_path = Path("pyproject.toml")
     config_path.write_text(
-        dedent(
-            """\
+        dedent("""\
             [tool.nbqa.addopts]
             flake8 = ["--ignore=F401"] \
-            """
-        ),
+            """),
         encoding="utf8",
     )
     original_cwd = os.getcwd()

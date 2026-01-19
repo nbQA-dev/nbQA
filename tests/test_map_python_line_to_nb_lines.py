@@ -19,21 +19,17 @@ def test_map_python_line_to_nb_lines() -> None:
 def test_black_unparseable_output() -> None:
     """Check that the output is correctly parsed if ``black`` fails to reformat."""
     out = ""
-    err = dedent(
-        """\
+    err = dedent("""\
         error: cannot format notebook.ipynb: Cannot parse: 38:5: invalid syntax
         Oh no! 💥 💔 💥
         1 file failed to reformat.
-        """
-    )
+        """)
     notebook = "notebook.ipynb"
     cell_mapping = {38: "cell_10:1"}
     _, result = map_python_line_to_nb_lines("black", out, err, notebook, cell_mapping)
-    expected = dedent(
-        """\
+    expected = dedent("""\
         error: cannot format notebook.ipynb: Cannot parse: cell_10:1:5: invalid syntax
         Oh no! 💥 💔 💥
         1 file failed to reformat.
-        """
-    )
+        """)
     assert result == expected

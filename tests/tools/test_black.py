@@ -82,8 +82,7 @@ def test_black_works_with_trailing_semicolons(
 
     diff = difflib.unified_diff(before, after)
     result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
-    expected = dedent(
-        """\
+    expected = dedent("""\
         -    "import glob;\\n",
         +    "import glob\\n",
         -    "def func(a, b):\\n",
@@ -93,8 +92,7 @@ def test_black_works_with_trailing_semicolons(
         +    "    a, b\\n",
         +    "):\\n",
         +    "    pass;"
-        """
-    )
+        """)
     assert result == expected
 
     # check out and err
@@ -129,13 +127,11 @@ def test_black_works_with_multiline(
 
     diff = difflib.unified_diff(before, after)
     result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
-    expected = dedent(
-        """\
+    expected = dedent("""\
         -    "assert 1 + 1 == 2;  assert 1 + 1 == 2;"
         +    "assert 1 + 1 == 2\\n",
         +    "assert 1 + 1 == 2;"
-        """
-    )
+        """)
     assert result == expected
 
     # check out and err

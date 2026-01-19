@@ -29,12 +29,10 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
     path = os.path.join("tests", "data", "notebook_for_testing.ipynb")
 
     Path("pyproject.toml").write_text(
-        dedent(
-            """\
+        dedent("""\
             [tool.nbqa.addopts]
             pyupgrade = ['--py36-plus']
-            """
-        ),
+            """),
         encoding="utf-8",
     )
     main(["pyupgrade", os.path.abspath(path)])
@@ -44,12 +42,10 @@ def test_pyupgrade(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -> 
 
     diff = difflib.unified_diff(before, after)
     result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
-    expected = dedent(
-        """\
+    expected = dedent("""\
         -    \"    return 'hello {}'.format(name)\\n\",
         +    \"    return f'hello {name}'\\n\",
-        """
-    )
+        """)
     assert result == expected
 
     # check out and err
