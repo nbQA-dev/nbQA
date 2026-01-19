@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: end-of-file-fixer
         exclude: ^tests/data/
@@ -8,28 +8,28 @@ repos:
       - id: trailing-whitespace
       - id: debug-statements
   - repo: https://github.com/pre-commit/pre-commit
-    rev: v4.2.0
+    rev: v4.5.1
     hooks:
       - id: validate_manifest
   - repo: https://github.com/hauntsaninja/black-pre-commit-mirror
     # black compiled with mypyc
-    rev: 25.1.0
+    rev: 26.1.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/pylint
-    rev: v3.3.7
+    rev: v4.0.4
     hooks:
       - id: pylint
         files: ^(nbqa|tests)/
         exclude: ^tests/data/
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.2.0
+    rev: 7.3.0
     hooks:
       - id: flake8
         additional_dependencies: [flake8-typing-imports==1.14.0]
         exclude: tests/data
   - repo: https://github.com/PyCQA/isort
-    rev: 6.0.1
+    rev: 7.0.0
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/pydocstyle
@@ -38,13 +38,13 @@ repos:
       - id: pydocstyle
         files: ^nbqa/
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.16.0
+    rev: v1.19.1
     hooks:
       - id: mypy
         exclude: ^docs/
         additional_dependencies: [types-setuptools, types-toml, tokenize-rt]
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.20.0
+    rev: v3.21.2
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
@@ -68,7 +68,7 @@ repos:
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
   - repo: https://github.com/asottile/setup-cfg-fmt
-    rev: v2.8.0
+    rev: v3.2.0
     hooks:
       - id: setup-cfg-fmt
   - repo: https://github.com/PyCQA/autoflake
@@ -81,7 +81,7 @@ repos:
       - id: check-hooks-apply
       - id: check-useless-excludes
   - repo: https://github.com/kynan/nbstripout
-    rev: 0.8.1
+    rev: 0.9.0
     hooks:
       - id: nbstripout
         exclude: ^tests/data/(databricks_notebook|notebook_for_testing)\.ipynb$
