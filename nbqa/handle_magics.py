@@ -27,10 +27,10 @@ def _get_node_args(func: ast.Call) -> List[str]:
     AssertionError
         Defensive check.
     """
-    args = []
+    args: list[str] = []
     for arg in func.args:
         if isinstance(arg, ast.Constant):
-            args.append(arg.value)
+            args.append(arg.value)  # type: ignore[arg-type]
         else:
             raise AssertionError(
                 "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
@@ -156,10 +156,10 @@ class CellMagicFinder(ast.NodeVisitor):
         if _is_ipython_magic(node.func):
             assert isinstance(node.func, ast.Attribute)  # help mypy
             if node.func.attr == "run_cell_magic":
-                args = []
+                args: list[str] = []
                 for arg in node.args:
                     if isinstance(arg, ast.Constant):
-                        args.append(arg.value)
+                        args.append(arg.value)  # type: ignore[arg-type]
                     else:
                         raise AssertionError(
                             "Please report a bug at https://github.com/nbQA-dev/nbQA/issues"
