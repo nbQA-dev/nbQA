@@ -59,14 +59,12 @@ def _validate(before: Sequence[str], after: Sequence[str]) -> bool:
     diff = difflib.unified_diff(before, after)
     result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
 
-    expected = dedent(
-        """\
+    expected = dedent("""\
         -    "    unused_var = \\"not used\\"\\n",
         -    "from os.path import *\\n",
         +    "from os.path import abspath\\n",
         -    "import pandas as pd\\n",
-        """
-    )
+        """)
     return result == expected
 
 
@@ -93,9 +91,7 @@ def _create_toml_config(config_file: Path) -> None:
     config_file : Path
         nbqa configuration file
     """
-    config_file.write_text(
-        dedent(
-            """
+    config_file.write_text(dedent("""
             [tool.nbqa.addopts]
             autoflake = [
                 "--in-place",
@@ -103,9 +99,7 @@ def _create_toml_config(config_file: Path) -> None:
                 "--remove-all-unused-imports",
                 "--remove-unused-variables"
             ]
-            """
-        )
-    )
+            """))
 
 
 def test_autoflake_toml(tmp_notebook_for_autoflake: "LocalPath") -> None:

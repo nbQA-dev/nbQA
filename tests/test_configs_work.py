@@ -20,14 +20,12 @@ def test_configs_work(capsys: "CaptureFixture") -> None:
         Pytest fixture to capture stdout and stderr.
     """
     Path(".flake8").write_text(
-        dedent(
-            """\
+        dedent("""\
             [flake8]
             ignore=F401
             select=E303
             quiet=1
-            """
-        ),
+            """),
         encoding="utf-8",
     )
 

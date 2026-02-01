@@ -401,8 +401,7 @@ def _get_command_not_found_msg(command: str) -> str:
     str
         Message to display to stdout.
     """
-    template = dedent(
-        f"""\
+    template = dedent(f"""\
         {BOLD}Command `{command}` not found by nbqa.{RESET}
 
         Please make sure you have it installed in the same Python environment as nbqa. See
@@ -416,8 +415,7 @@ def _get_command_not_found_msg(command: str) -> str:
             `python -m {command}`
 
         then you might want to pass `--nbqa-shell`.
-        """
-    )
+        """)
     python_executable = sys.executable
     nbqa_file = sys.modules["nbqa"].__file__
     assert nbqa_file is not None

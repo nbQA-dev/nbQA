@@ -33,7 +33,7 @@ def test_nbqa_shell(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     main(args)
     out, err = capsys.readouterr()
     received = err.strip().splitlines()[1]
-    expected = _message(args=expected_run)  # type:ignore[arg-type]
+    expected = _message(args=expected_run)  # type: ignore[arg-type]
     assert received == expected
     assert out == "", f"No stdout expected. Received `{out}`"
 

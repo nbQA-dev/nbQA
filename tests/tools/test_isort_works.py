@@ -38,13 +38,11 @@ def test_isort_works(tmp_notebook_for_testing: Path, capsys: "CaptureFixture") -
     diff = difflib.unified_diff(before, after)
     result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
 
-    expected = dedent(
-        """\
+    expected = dedent("""\
         +    "import glob\\n",
         -    "\\n",
         -    "import glob\\n",
-        """
-    )
+        """)
     assert result == expected
 
     # check out and err
@@ -79,13 +77,11 @@ def test_isort_initial_md(
     diff = difflib.unified_diff(before, after)
     result = "".join(i for i in diff if any([i.startswith("+ "), i.startswith("- ")]))
 
-    expected = dedent(
-        """\
+    expected = dedent("""\
         +    "import glob\\n",
         -    "\\n",
         -    "import glob\\n",
-        """
-    )
+        """)
     assert result == expected
 
     # check out and err
@@ -117,12 +113,10 @@ def test_isort_separated_imports(notebook: str, capsys: "CaptureFixture") -> Non
         Pytest fixture to capture stdout and stderr.
     """
     Path("pyproject.toml").write_text(
-        dedent(
-            """\
+        dedent("""\
             [tool.nbqa.isort]
             addopts = ["--treat-comment-as-code=# %%NBQA-CELL-SEP"]
-            """
-        ),
+            """),
         encoding="utf-8",
     )
 
