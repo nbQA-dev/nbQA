@@ -216,7 +216,7 @@ def _write_notebook(
                     f"{json.dumps(notebook_json, indent=1, ensure_ascii=False)}"
                 )
     else:
-        assert ext == ".md"
+        assert ext in (".md", ".qmd")
         import jupytext  # pylint: disable=import-outside-toplevel
         from jupytext.config import (  # pylint: disable=import-outside-toplevel
             load_jupytext_config,
@@ -328,7 +328,7 @@ def _print_diff(code_cell_number: int, cell_diff: Iterator[str]) -> bool:
 
     if line_changes:
         header = f"Cell {code_cell_number}"
-        headers = [f"{BOLD}{header}{RESET}\n", f"{'-'*len(header)}\n"]
+        headers = [f"{BOLD}{header}{RESET}\n", f"{'-' * len(header)}\n"]
         sys.stdout.writelines(headers + line_changes + ["\n"])
         return True
     return False
