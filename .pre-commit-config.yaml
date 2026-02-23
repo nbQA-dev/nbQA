@@ -17,7 +17,7 @@ repos:
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/pylint
-    rev: v4.0.4
+    rev: v4.0.5
     hooks:
       - id: pylint
         files: ^(nbqa|tests)/
@@ -29,7 +29,7 @@ repos:
         additional_dependencies: [flake8-typing-imports==1.14.0]
         exclude: tests/data
   - repo: https://github.com/PyCQA/isort
-    rev: 7.0.0
+    rev: 8.0.0
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/pydocstyle
@@ -72,7 +72,7 @@ repos:
     hooks:
       - id: setup-cfg-fmt
   - repo: https://github.com/PyCQA/autoflake
-    rev: v2.3.1
+    rev: v2.3.3
     hooks:
       - id: autoflake
         args: [--remove-all-unused-imports, -i]
@@ -81,7 +81,7 @@ repos:
       - id: check-hooks-apply
       - id: check-useless-excludes
   - repo: https://github.com/kynan/nbstripout
-    rev: 0.9.0
+    rev: 0.9.1
     hooks:
       - id: nbstripout
         exclude: ^tests/data/(databricks_notebook|notebook_for_testing)\.ipynb$
