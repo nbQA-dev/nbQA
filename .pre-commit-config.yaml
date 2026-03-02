@@ -29,7 +29,7 @@ repos:
         additional_dependencies: [flake8-typing-imports==1.14.0]
         exclude: tests/data
   - repo: https://github.com/PyCQA/isort
-    rev: 8.0.0
+    rev: 8.0.1
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/pydocstyle
