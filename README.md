@@ -126,6 +126,12 @@ reformatted my_notebook.md
 All done! ✨ 🍰 ✨
 1 files reformatted.
 ```
+Quarto format markdown ``.qmd`` files are also supported via [quarto-cli](https://github.com/quarto-dev/quarto-cli) (requires `jupytext` and `quarto-cli` to be installed):
+
+```console
+$ nbqa "ruff check --select=I --fix" my_notebook.qmd
+Found 1 error (1 fixed, 0 remaining).
+```
 
 See [command-line examples](https://nbqa.readthedocs.io/en/latest/examples.html) for examples involving [doctest](https://docs.python.org/3/library/doctest.html), [flake8](https://flake8.pycqa.org/en/latest/), [mypy](http://mypy-lang.org/), [pylint](https://github.com/PyCQA/pylint), [autopep8](https://github.com/hhatto/autopep8), [pydocstyle](http://www.pydocstyle.org/en/stable/), [yapf](https://github.com/google/yapf), and [ruff](https://github.com/charliermarsh/ruff/).
 
