@@ -8,7 +8,7 @@ repos:
       - id: trailing-whitespace
       - id: debug-statements
   - repo: https://github.com/pre-commit/pre-commit
-    rev: v4.5.1
+    rev: v4.6.0
     hooks:
       - id: validate_manifest
   - repo: https://github.com/hauntsaninja/black-pre-commit-mirror
@@ -29,7 +29,7 @@ repos:
         additional_dependencies: [flake8-typing-imports==1.14.0]
         exclude: tests/data
   - repo: https://github.com/PyCQA/isort
-    rev: 8.0.1
+    rev: 9.0.0a3
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/pydocstyle
@@ -38,7 +38,7 @@ repos:
       - id: pydocstyle
         files: ^nbqa/
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.20.1
+    rev: v1.20.2
     hooks:
       - id: mypy
         exclude: ^docs/
