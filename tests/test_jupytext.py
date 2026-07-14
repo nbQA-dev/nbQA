@@ -198,6 +198,71 @@ def test_md(tmp_test_data: Path) -> None:
     assert result == expected
 
 
+def test_qmd(tmp_test_data: Path) -> None:
+    """
+    Notebook in qmd format.
+
+    Parameters
+    ----------
+    tmp_test_data
+        Temporary copy of test data.
+    """
+    notebook = tmp_test_data / "notebook_for_testing.qmd"
+
+    main(["black", str(notebook)])
+
+    with open(notebook, encoding="utf-8") as fd:
+        result = fd.read()
+    expected = (
+        """---\n"""
+        """title: Quarto Basics\n"""
+        """format:\n"""
+        """  html:\n"""
+        """    code-fold: true\n"""
+        """jupyter:\n"""
+        """  jupytext:\n"""
+        """    text_representation:\n"""
+        """      extension: .qmd\n"""
+        """      format_name: quarto\n"""
+        """      format_version: '1.0'\n"""
+        f"      jupytext_version: {jupytext.__version__}\n"
+        """  kernelspec:\n"""
+        """    display_name: Python 3\n"""
+        """    language: python\n"""
+        """    name: python3\n"""
+        """---\n"""
+        """\n"""
+        """```{python}\n"""
+        """#| label: fig-polar\n"""
+        """#| fig-cap: |-\n"""
+        """#|   A line plot on a polar axis\n"""
+        """#|   Additional content\n"""
+        """# This is a comment that stops cell options\n"""
+        """# | fig-subcap: A line plot on a polar axis\n"""
+        """# |  Additional content\n"""
+        """\n"""
+        """import numpy as np\n"""
+        """import matplotlib.pyplot as plt\n"""
+        """\n"""
+        """r = np.arange(0, 2, 0.01)\n"""
+        """theta = 2 * np.pi * r\n"""
+        """fig, ax = plt.subplots(subplot_kw={"projection": "polar"})\n"""
+        """ax.plot(theta, r)\n"""
+        """ax.set_rticks([0.5, 1, 1.5, 2])\n"""
+        """ax.grid(True)\n"""
+        """plt.show()\n"""
+        """```\n"""
+        """\n"""
+        """# Other Markdown\n"""
+        """This content should not change in any way.\n"""
+        """#| cell option like line\n"""
+        """#comment like line\n"""
+        """code that won't get formatted\n"""
+        """ax.set_rticks([0.5,1,1.5,2])\n"""
+    )
+    assert result == expected
+
+
 def test_non_jupytext_md() -> None:
     """Check non-Python markdown will be ignored."""
     ret = main(["black", "README.md"])
@@ -296,11 +361,11 @@ def test_jupytext_on_folder(capsys: "CaptureFixture") -> None:
     )
     out, _ = capsys.readouterr()
     expected = (
-        f'{os.path.join(path, "invalid_syntax.ipynb")}:cell_1:0 at module level:\n'
+        f"{os.path.join(path, 'invalid_syntax.ipynb')}:cell_1:0 at module level:\n"
         "        D100: Missing docstring in public module\n"
-        f'{os.path.join(path, "assignment_to_literal.ipynb")}:cell_1:0 at module level:\n'
+        f"{os.path.join(path, 'assignment_to_literal.ipynb')}:cell_1:0 at module level:\n"
         "        D100: Missing docstring in public module\n"
-        f'{os.path.join(path, "automagic.ipynb")}:cell_1:0 at module level:\n'
+        f"{os.path.join(path, 'automagic.ipynb')}:cell_1:0 at module level:\n"
         "        D100: Missing docstring in public module\n"
     )
     assert "\n".join(sorted(out.splitlines())) == "\n".join(

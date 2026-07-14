@@ -126,7 +126,7 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
         jupytext_installed = True
     if os.path.isfile(root_dir):
         _, ext = os.path.splitext(root_dir)
-        if (jupytext_installed and ext in (".ipynb", ".md")) or (
+        if (jupytext_installed and ext in (".ipynb", ".md", ".qmd")) or (
             not jupytext_installed and ext == ".ipynb"
         ):
             return iter((Path(root_dir),))
@@ -138,7 +138,9 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
 
     if jupytext_installed:
         iterable = itertools.chain(
-            Path(root_dir).rglob("*.ipynb"), Path(root_dir).rglob("*.md")
+            Path(root_dir).rglob("*.ipynb"),
+            Path(root_dir).rglob("*.md"),
+            Path(root_dir).rglob("*.qmd"),
         )
     else:  # pragma: nocover
         iterable = itertools.chain(Path(root_dir).rglob("*.ipynb"))
