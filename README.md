@@ -196,6 +196,7 @@ add them to [`additional_dependencies`](http://pre-commit.com/#pre-commit-config
 - https://github.com/mayou36/raredecay
 - https://github.com/neomatrix369/nlp_profiler
 - https://github.com/openforcefield/openff-system
+- https://github.com/oxsecurity/megalinter
 - https://github.com/pandas-profiling/pandas-profiling
 - https://github.com/paw-lu/dotfiles
 - https://github.com/pawamoy/wps-light
@@ -219,6 +220,8 @@ add them to [`additional_dependencies`](http://pre-commit.com/#pre-commit-config
 - https://github.com/zfit/zfit-tutorials
 
 </details>
+
+nbQA is also built into [MegaLinter](https://megalinter.io/latest/descriptors/python_nbqa/), so if you run MegaLinter in your CI, your notebooks are already covered.
 
 Is your project missing? Let us know, or open a pull request!
 
