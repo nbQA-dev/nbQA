@@ -17,5 +17,6 @@ pytest
 pytest-cov
 pytest-randomly
 pyupgrade
+quarto-cli
 ruff
 yapf
