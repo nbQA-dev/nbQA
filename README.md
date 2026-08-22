@@ -221,8 +221,6 @@ add them to [`additional_dependencies`](http://pre-commit.com/#pre-commit-config
 
 </details>
 
-nbQA is also built into [MegaLinter](https://megalinter.io/latest/descriptors/python_nbqa/), so if you run MegaLinter in your CI, your notebooks are already covered.
-
 Is your project missing? Let us know, or open a pull request!
 
 ## 💬 Testimonials
