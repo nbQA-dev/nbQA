@@ -234,14 +234,18 @@ def _get_line_numbers_for_mapping(
     lines_in_cell = cell_source.splitlines()
     line_mapping: MutableMapping[int, int] = {}
 
+    # Line 0 of the parsed cell is the CODE_SEPARATOR which nbQA itself
+    # inserted, so a diagnostic reported there belongs to the first line the
+    # user actually wrote. Cell lines are 1-indexed, and cell_N:0 does not
+    # exist - see https://github.com/nbQA-dev/nbQA/issues/821
     if not magic_substitutions:
-        line_mapping.update({i: i for i in range(len(lines_in_cell))})
+        line_mapping.update({i: max(i, 1) for i in range(len(lines_in_cell))})
     else:
         line_number = -1
 
         for line_no, _ in enumerate(lines_in_cell):
             line_number += 1
-            line_mapping[line_no] = line_number
+            line_mapping[line_no] = max(line_number, 1)
 
     return line_mapping
 

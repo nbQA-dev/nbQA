@@ -24,7 +24,7 @@ def test_pydocstyle_works(capsys: "CaptureFixture") -> None:
     # check out and err
     out, err = capsys.readouterr()
     expected_out = (
-        f"{path}:cell_1:0 at module level:\n"
+        f"{path}:cell_1:1 at module level:\n"
         "        D100: Missing docstring in public module\n"
         f"{path}:cell_2:3 in public function `hello`:\n"
         "        D202: No blank lines allowed after function docstring (found 1)\n"
