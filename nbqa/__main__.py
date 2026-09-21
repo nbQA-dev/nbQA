@@ -791,8 +791,14 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
         sys.stderr.write(output.err)
 
         if mutated and not actually_mutated:
-            output_code = 0
             mutated = False
+            if not output.out.strip() and not output.err.strip():
+                # The tool rewrote the temporary Python file, the notebook came
+                # back unchanged, and the tool reported nothing: its non-zero
+                # exit code was about having modified files, so there is
+                # nothing left to report. If it did print something, keep its
+                # exit code - see https://github.com/nbQA-dev/nbQA/issues/872
+                output_code = 0
 
         if saved_sources.failed_notebooks:
             output_code = 123

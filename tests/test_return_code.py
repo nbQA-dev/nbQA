@@ -4,6 +4,10 @@ import subprocess
 from functools import partial
 from pathlib import Path
 from typing import Sequence
+from unittest import mock
+
+from nbqa import __main__ as nbqa_main
+from nbqa.output_parser import Output
 
 TESTS_DIR = Path("tests")
 TEST_DATA_DIR = TESTS_DIR / "data"
@@ -15,6 +19,7 @@ INVALID_SYNTAX_NOTEBOOK = TESTS_DIR / "invalid_data" / "invalid_syntax.ipynb"
 # Interpret the below constants in the same context as that of pre-commit tool
 # Success indicates the QA tool reported no issues.
 PASSED = 0
+FAILED = 1
 
 
 def _run_nbqa_with(command: str, notebooks: Sequence[Path], *args: str) -> int:
@@ -83,3 +88,41 @@ def test_check_ast_return_code() -> None:
         check_ast_runner([INVALID_SYNTAX_NOTEBOOK], "--nbqa-dont-skip-bad-cells")
         != PASSED
     )
+
+
+def test_return_code_survives_unchanged_notebook() -> None:
+    """Tool reported an issue, so nbQA must not report success.
+
+    See https://github.com/nbQA-dev/nbQA/issues/872: ``ruff check --fix`` fixes
+    some violations, leaves others, and exits 1. If nbQA's round-trip happens to
+    leave the notebook unchanged, that 1 must still reach the caller.
+    """
+    reported = Output("clean_notebook.ipynb:cell_1:1:1: F821 Undefined name `x`\n", "")
+    with mock.patch.object(
+        nbqa_main, "_run_command", return_value=(reported, FAILED, True)
+    ), mock.patch.object(
+        nbqa_main, "_post_process_notebooks", return_value=(False, reported)
+    ):
+        assert nbqa_main.main(["flake8", str(CLEAN_NOTEBOOK)]) == FAILED
+
+
+def test_silent_tool_exit_code_is_still_reset() -> None:
+    """Tool said nothing, so its exit code was only about rewriting files."""
+    silent = Output("", "")
+    with mock.patch.object(
+        nbqa_main, "_run_command", return_value=(silent, FAILED, True)
+    ), mock.patch.object(
+        nbqa_main, "_post_process_notebooks", return_value=(False, silent)
+    ):
+        assert nbqa_main.main(["flake8", str(CLEAN_NOTEBOOK)]) == PASSED
+
+
+def test_success_stays_success_for_unchanged_notebook() -> None:
+    """``black`` reformatted the temporary file but the notebook is unchanged."""
+    reformatted = Output("", "reformatted clean_notebook.ipynb\n")
+    with mock.patch.object(
+        nbqa_main, "_run_command", return_value=(reformatted, PASSED, True)
+    ), mock.patch.object(
+        nbqa_main, "_post_process_notebooks", return_value=(False, reformatted)
+    ):
+        assert nbqa_main.main(["black", str(CLEAN_NOTEBOOK)]) == PASSED
