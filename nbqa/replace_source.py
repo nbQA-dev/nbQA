@@ -12,7 +12,8 @@ import os
 import re
 import sys
 from difflib import unified_diff
-from shutil import move
+from shutil import copymode
+from tempfile import TemporaryDirectory
 from typing import Any, Iterator, Mapping, MutableMapping, Sequence
 
 import tokenize_rt
@@ -190,7 +191,11 @@ def _notebook_cells(
 
 
 def _write_notebook(
-    temp_notebook: str, trailing_newline: bool, notebook_json: dict[str, Any]
+    temp_notebook: str,
+    trailing_newline: bool,
+    notebook_json: dict[str, Any],
+    *,
+    notebook: str,
 ) -> None:
     """
     Write notebook to disc.
@@ -203,6 +208,8 @@ def _write_notebook(
         Whether notebook originally had trailing newline
     notebook_json
         New source for notebook.
+    notebook
+        Original notebook whose Jupytext configuration should be used.
     """
     _, ext = os.path.splitext(temp_notebook)
     if ext == ".ipynb":
@@ -222,7 +229,7 @@ def _write_notebook(
             load_jupytext_config,
         )
 
-        config = load_jupytext_config(os.path.abspath(temp_notebook))
+        config = load_jupytext_config(os.path.abspath(notebook))
 
         for cell in notebook_json["cells"]:
             cell["source"] = "".join(cell["source"])
@@ -292,9 +299,14 @@ def mutate(  # pylint: disable=too-many-locals,too-many-arguments
             if i not in cells_to_remove
         ]
 
-    temp_notebook = os.path.join(os.path.dirname(temp_file), os.path.basename(notebook))
-    _write_notebook(temp_notebook, trailing_newline, notebook_json)
-    move(temp_notebook, notebook)
+    target = os.path.realpath(notebook)
+    with TemporaryDirectory(prefix=".nbqa-", dir=os.path.dirname(target)) as temp_dir:
+        temp_notebook = os.path.join(temp_dir, os.path.basename(notebook))
+        _write_notebook(
+            temp_notebook, trailing_newline, notebook_json, notebook=notebook
+        )
+        copymode(target, temp_notebook)
+        os.replace(temp_notebook, target)
     return True
 
 
