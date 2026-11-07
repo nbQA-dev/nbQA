@@ -191,7 +191,11 @@ def _notebook_cells(
 
 
 def _write_notebook(
-    temp_notebook: str, trailing_newline: bool, notebook_json: dict[str, Any]
+    temp_notebook: str,
+    trailing_newline: bool,
+    notebook_json: dict[str, Any],
+    *,
+    notebook: str,
 ) -> None:
     """
     Write notebook to disc.
@@ -204,6 +208,8 @@ def _write_notebook(
         Whether notebook originally had trailing newline
     notebook_json
         New source for notebook.
+    notebook
+        Original notebook whose Jupytext configuration should be used.
     """
     _, ext = os.path.splitext(temp_notebook)
     if ext == ".ipynb":
@@ -223,7 +229,7 @@ def _write_notebook(
             load_jupytext_config,
         )
 
-        config = load_jupytext_config(os.path.abspath(temp_notebook))
+        config = load_jupytext_config(os.path.abspath(notebook))
 
         for cell in notebook_json["cells"]:
             cell["source"] = "".join(cell["source"])
@@ -293,22 +299,19 @@ def mutate(  # pylint: disable=too-many-locals,too-many-arguments
             if i not in cells_to_remove
         ]
 
-    # Write to a separate temporary file next to the notebook and then
-    # atomically replace the notebook with it, so that the original is left
-    # intact if writing fails or is interrupted.
-    fd, temp_notebook = tempfile.mkstemp(
-        dir=os.path.dirname(os.path.abspath(notebook)),
-        prefix=".nbqa_",
-        suffix=os.path.splitext(notebook)[1],
-    )
-    os.close(fd)
-    try:
-        _write_notebook(temp_notebook, trailing_newline, notebook_json)
-        shutil.copymode(notebook, temp_notebook)
-        os.replace(temp_notebook, notebook)
-    finally:
-        if os.path.exists(temp_notebook):
-            os.remove(temp_notebook)
+    # Write to a temporary file next to the real notebook (resolving symlinks)
+    # and then atomically replace it, so that the original is left intact if
+    # writing fails or is interrupted.
+    target = os.path.realpath(notebook)
+    with tempfile.TemporaryDirectory(
+        prefix=".nbqa-", dir=os.path.dirname(target)
+    ) as temp_dir:
+        temp_notebook = os.path.join(temp_dir, os.path.basename(notebook))
+        _write_notebook(
+            temp_notebook, trailing_newline, notebook_json, notebook=notebook
+        )
+        shutil.copymode(target, temp_notebook)
+        os.replace(temp_notebook, target)
     return True
 
 

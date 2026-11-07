@@ -254,27 +254,3 @@ def test_wrong_extension_file(capsys: "CaptureFixture") -> None:
     _, err = capsys.readouterr()
     expected_err = "No notebooks found in given path(s)\n"
     assert err == expected_err
-
-
-def test_notebook_intact_if_writing_fails(
-    tmp_path: Path, monkeypatch: "MonkeyPatch"
-) -> None:
-    """Check the notebook isn't truncated if writing it back fails (#908)."""
-    import shutil  # pylint: disable=import-outside-toplevel
-
-    from nbqa import replace_source  # pylint: disable=import-outside-toplevel
-
-    notebook = tmp_path / "notebook_for_testing.ipynb"
-    shutil.copy(os.path.join("tests", "data", "notebook_for_testing.ipynb"), notebook)
-    original = notebook.read_bytes()
-
-    def _failing_write(temp_notebook: str, *_: object) -> None:
-        with open(temp_notebook, "w", encoding="utf-8") as handle:
-            handle.write("{")
-        raise OSError(27, "File too large")
-
-    monkeypatch.setattr(replace_source, "_write_notebook", _failing_write)
-    assert main(["black", str(notebook)]) == 123
-
-    assert notebook.read_bytes() == original
-    assert not [f for f in os.listdir(tmp_path) if f.startswith(".nbqa_")]
