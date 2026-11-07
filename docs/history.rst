@@ -2,12 +2,18 @@
 Changelog
 =========
 
-Unreleased
-~~~~~~~~~~
+1.10.0 (2026-11-07)
+~~~~~~~~~~~~~~~~~~~
 Drop support for Python 3.10 (end-of-life); Python 3.11+ is now required.
 Fixed notebook being left truncated if writing it back failed or was
 interrupted; it is now written to a temporary file and atomically replaced
 (thanks Mayank Dhingra!)
+Diagnostics reported on the first line of a cell (e.g. module-level
+docstring checks such as ``D100`` or ``C0114``) now show line 1 instead of
+the nonexistent line 0 (thanks Yuriy Tumanov!)
+The tool's exit code is no longer reset to 0 when the notebook is left
+unchanged but the tool reported problems, e.g. ``ruff check --fix`` leaving
+unfixable violations (thanks Yuriy Tumanov!)
 
 1.9.1 (2024-11-10)
 ~~~~~~~~~~~~~~~~~~
