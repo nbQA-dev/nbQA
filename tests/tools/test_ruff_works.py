@@ -1,5 +1,6 @@
 """Check :code:`ruff` works as intended."""
 
+import json
 import os
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -106,18 +107,21 @@ def test_cell_with_all_magics(capsys: "CaptureFixture") -> None:
     assert err == ""
 
 
-def test_ruff_isort(capsys: "CaptureFixture") -> None:
+@pytest.mark.parametrize("command", ["ruff", "ruff check"])
+def test_ruff_isort(capsys: "CaptureFixture", command: str) -> None:
     """
-    Should ignore cell with all magics.
+    Should not report unsorted imports in a notebook with sorted imports.
 
     Parameters
     ----------
     capsys
         Pytest fixture to capture stdout and stderr.
+    command
+        How ruff is invoked, e.g. ``ruff check`` in the ``nbqa-ruff-check`` hook.
     """
 
     path = os.path.join("tests", "data", "simple_imports.ipynb")
-    main(["ruff", "--quiet", path, "--select=I"])
+    main([command, "--quiet", path, "--select=I"])
 
     out, err = capsys.readouterr()
     assert out == ""
@@ -138,4 +142,43 @@ def test_ruff_format(capsys: "CaptureFixture", tmp_notebook_for_testing: Path) -
 
     out, err = capsys.readouterr()
     assert out == "1 file reformatted\n"
+    assert err == ""
+
+
+def test_ruff_format_consecutive_definitions(
+    capsys: "CaptureFixture", tmp_path: Path
+) -> None:
+    """
+    Should not ask for more blank lines between definitions in separate cells.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    tmp_path
+        Temporary directory to write the notebook to.
+    """
+    path = tmp_path / "definitions.ipynb"
+    cells = ["def f():\n    pass", "def g():\n    pass"]
+    notebook = {
+        "cells": [
+            {
+                "cell_type": "code",
+                "execution_count": None,
+                "metadata": {},
+                "outputs": [],
+                "source": source,
+            }
+            for source in cells
+        ],
+        "metadata": {},
+        "nbformat": 4,
+        "nbformat_minor": 4,
+    }
+    path.write_text(json.dumps(notebook), encoding="utf-8")
+
+    main(["ruff format", str(path), "--check"])
+
+    out, err = capsys.readouterr()
+    assert out == "1 file already formatted\n"
     assert err == ""
