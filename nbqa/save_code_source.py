@@ -25,6 +25,7 @@ NEWLINE = "\n"
 NEWLINES = defaultdict(lambda: NEWLINE * 3)  # can we uniform to 2?
 NEWLINES["isort"] = NEWLINE * 2
 NEWLINES["ruff"] = NEWLINE * 2
+NEWLINES["ruff format"] = NEWLINE * 3  # Black-compatible, so same as black
 TRANSFORMED_MAGICS = frozenset(
     (
         "get_ipython().run_cell_magic",
@@ -212,7 +213,30 @@ def _parse_cell(  # pylint: disable=too-many-arguments
     if substituted_magics:
         temporary_lines[cell_number] = substituted_magics
 
-    return f"{parsed_cell}{NEWLINES[command]}"
+    return f"{parsed_cell}{_get_newlines(command)}"
+
+
+def _get_newlines(command: str) -> str:
+    """
+    Get the newlines to put after each cell for the given command.
+
+    The command may include a subcommand and options (e.g. ``ruff check``,
+    as in the ``nbqa-ruff-check`` hook), so look up the tool with its
+    subcommand first, then the tool alone.
+
+    Parameters
+    ----------
+    command
+        The third-party tool being run.
+
+    Returns
+    -------
+    str
+        Newlines to put after each cell.
+    """
+    main_command, *sub_commands = command.split()
+    with_sub_command = " ".join([main_command, *sub_commands[:1]])
+    return NEWLINES.get(with_sub_command) or NEWLINES[main_command]
 
 
 def _get_line_numbers_for_mapping(
