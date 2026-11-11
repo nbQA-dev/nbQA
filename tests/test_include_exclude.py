@@ -70,6 +70,23 @@ def test_config_files(capsys: "CaptureFixture") -> None:
     )
 
 
+def test_invalid_regex_is_reported_cleanly(capsys: "CaptureFixture") -> None:
+    """
+    Test invalid include pattern is reported cleanly, not as a traceback.
+
+    Parameters
+    ----------
+    capsys
+        Pytest fixture to capture stdout and stderr.
+    """
+    return_code = main(["flake8", "tests", "--nbqa-files", "["])
+
+    _, err = capsys.readouterr()
+    assert return_code == 1
+    assert "Invalid regular expression" in err
+    assert "Traceback" not in err
+
+
 def test_config_exclude(capsys: "CaptureFixture") -> None:
     """
     Test [nbqa.exclude] config is picked up correctly.
