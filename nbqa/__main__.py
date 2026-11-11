@@ -746,6 +746,9 @@ def _main(cli_args: CLIArgs, configs: Configs) -> int:
     except FileNotFoundError as exc:
         sys.stderr.write(str(exc))
         return 1
+    except re.error as exc:
+        sys.stderr.write(f"{BOLD}Invalid regular expression: {exc}{RESET}\n")
+        return 1
     try:  # pylint disable=R0912
         if not nb_to_tmp_mapping:
             sys.stderr.write("No notebooks found in given path(s)\n")
