@@ -21,6 +21,7 @@ from nbqa.path_utils import remove_prefix
 
 CODE_SEPARATOR = f"# %%NBQA-CELL-SEP{secrets.token_hex(3)}\n"
 MAGIC = frozenset(("time", "timeit", "capture", "pypy", "python", "python3"))
+DATABRICKS_MAGIC = frozenset(("%r", "%scala", "%sql"))
 NEWLINE = "\n"
 NEWLINES = defaultdict(lambda: NEWLINE * 3)  # can we uniform to 2?
 NEWLINES["isort"] = NEWLINE * 2
@@ -256,6 +257,8 @@ def _should_ignore_code_cell(
     process_cells: Sequence[str],
     skip_celltags: Sequence[str],
     tags: Sequence[str],
+    *,
+    is_databricks: bool = False,
 ) -> bool:
     """
     Return True if the current cell should be ignored from processing.
@@ -266,6 +269,8 @@ def _should_ignore_code_cell(
         Source from the notebook cell
     process_cells
         Extra cells which nbqa should process.
+    is_databricks
+        Whether the notebook has Databricks export metadata.
 
     Returns
     -------
@@ -283,8 +288,13 @@ def _should_ignore_code_cell(
         any(line.startswith(symbol) for symbol in ("%", "?", "!"))
         for line in source
         if line.strip()
+    ) or (
+        is_databricks
+        and (language_magic := joined_source.lstrip().split(maxsplit=1)[0])
+        in DATABRICKS_MAGIC
+        and language_magic[1:] not in {i.strip() for i in process_cells}
     ):
-        # It's all magic, nothing to process
+        # No Python body for the underlying tool to process.
         return True
     try:
         ast.parse(joined_source)
@@ -373,6 +383,9 @@ def pre_main(  # pylint: disable=R0914,too-many-arguments
         If hash collision (extremely rare event!)
     """
     cells = notebook_json["cells"]
+    is_databricks = "application/vnd.databricks.v1+notebook" in notebook_json.get(
+        "metadata", {}
+    )
 
     result = []
     index = Index(line_number=0, cell_number=0)
@@ -396,6 +409,7 @@ def pre_main(  # pylint: disable=R0914,too-many-arguments
                 process_cells,
                 skip_celltags,
                 cell.get("metadata", {}).get("tags", []),
+                is_databricks=is_databricks,
             ):
                 code_cells_to_ignore.add(index.cell_number)
                 continue
@@ -445,6 +459,9 @@ def main(  # pylint: disable=R0914,too-many-arguments
     NotebookInfo
     """
     cells = notebook_json["cells"]
+    is_databricks = "application/vnd.databricks.v1+notebook" in notebook_json.get(
+        "metadata", {}
+    )
 
     result = []
     cell_mapping = {0: "cell_0:0"}
@@ -461,6 +478,7 @@ def main(  # pylint: disable=R0914,too-many-arguments
                 process_cells,
                 skip_celltags,
                 cell.get("metadata", {}).get("tags", []),
+                is_databricks=is_databricks,
             ):
                 continue
 
