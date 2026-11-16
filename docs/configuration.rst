@@ -44,6 +44,10 @@ Cell magics
 ~~~~~~~~~~~
 
 By default, :code:`nbQA` will ignore line magics (e.g. :code:`%matplotlib inline`), as well as most cell magics.
+In Databricks notebook exports, cells beginning with the language commands
+:code:`%r`, :code:`%scala`, or :code:`%sql` are also skipped, so their non-Python
+code is preserved. These commands keep their ordinary line-magic behavior in
+Jupyter notebooks without Databricks export metadata.
 To process code in cells with cell magics, you can use the :code:`--nbqa-process-cells` CLI argument. E.g. to process code within :code:`%%add_to` cell magics, use
 
 .. code-block:: bash
