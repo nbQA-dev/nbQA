@@ -144,7 +144,13 @@ def _get_notebooks(root_dir: str) -> Iterator[Path]:
     else:  # pragma: nocover
         iterable = itertools.chain(Path(root_dir).rglob("*.ipynb"))
 
-    return (i for i in iterable if not re.search(EXCLUDES, str(i.resolve().as_posix())))
+    # Match against the path relative to root_dir, so that an ancestor directory
+    # (e.g. a checkout under /build/) doesn't cause every notebook to be excluded.
+    return (
+        i
+        for i in iterable
+        if not re.search(EXCLUDES, "/" + i.relative_to(root_dir).as_posix())
+    )
 
 
 def _filter_by_include_exclude(
